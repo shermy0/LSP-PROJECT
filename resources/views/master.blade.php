@@ -3,20 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sidebar Collapsible</title>
-<link rel="stylesheet" href="{{ asset('master.css') }}?v={{ time() }}">
+<title>LSP 11</title>
+<link rel="stylesheet" href="{{ asset('assets/css/master.css')}}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
 <div class="sidebar" id="sidebar">
     <button class="toggle-btn" onclick="toggleSidebar()">
+    <img src="#" alt="">
+        <div class="toggle-left">
+            <span class="lsp-title">LSP 11</span>
+            <span class="lsp-subtitle">Solusi Digital Asesmen</span>
+        </div>
         <i class="fas fa-bars"></i>
     </button>
-
-    <div class="logo">
-        <span>LSP 11</span>
-    </div>
 
     <div class="menu">
         <ul>
@@ -28,22 +30,37 @@
     </div>
 
     <div class="sidebar-footer">
-        <div class="avatar"></div>
-        <div class="role">Assesor</div>
-        <button class="logout-btn">Logout</button>
+        <div class="avatar">
+            <div class="avatar-img">
+                <img src="{{ asset('assets/poto/potta.png') }}" alt="Potta" class="img-fluid">
+                <span class="status-dot"></span>
+            </div>
+            <div class="user-info">
+                <span class="username">
+                    {{ Session::get('user.name', 'irma') }}
+                </span>
+                <span class="role">
+                    {{ Session::get('user.role', 'Asesor') }}
+                </span>
+            </div>
+        </div>
+        <button class="logout-btn">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+        </button>
     </div>
 </div>
 
-<div style="margin-left:240px; padding:20px; transition: margin-left 0.3s ease;" id="content">
-    <h1>Pra Perencanaan</h1>
-    <p>....</p>
-</div>
+<main>
+    @yield('konten')
+</main>
 
 <script>
     function toggleSidebar() {
-        document.getElementById("sidebar").classList.toggle("collapsed");
-        document.getElementById("content").style.marginLeft =
-            document.getElementById("sidebar").classList.contains("collapsed") ? "70px" : "240px";
+        const sidebar = document.getElementById("sidebar");
+        const content = document.getElementById("content");
+        sidebar.classList.toggle("collapsed");
+        content.style.marginLeft = sidebar.classList.contains("collapsed") ? "70px" : "240px";
     }
 </script>
 
