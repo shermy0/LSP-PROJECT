@@ -1,0 +1,106 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+
+.sidebar {
+    height: 100vh;
+    width: 240px;
+    background-color: #002366; /* Biru Navy */
+    color: white;
+    transition: width 0.3s ease;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar.collapsed {
+    width: 70px;
+}
+
+/* Tombol toggle di atas */
+.toggle-btn {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 15px;
+    align-self: flex-end;
+}
+
+/* Logo / Judul */
+.logo {
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
+}
+.logo span {
+    display: inline;
+}
+.sidebar.collapsed .logo span {
+    display: none;
+}
+
+/* Menu */
+.menu {
+    flex-grow: 1;
+}
+.menu ul {
+    list-style: none;
+    padding: 0;
+}
+.menu ul li {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.menu ul li:hover {
+    background-color: #003399;
+}
+.menu ul li i {
+    font-size: 18px;
+    min-width: 20px;
+    text-align: center;
+}
+.sidebar.collapsed .menu ul li span {
+    display: none;
+}
+
+/* Footer */
+.sidebar-footer {
+    padding: 15px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    text-align: center;
+}
+.avatar {
+    background-color: #0099cc;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: inline-block;
+}
+.role {
+    margin-top: 5px;
+    font-size: 14px;
+}
+.sidebar.collapsed .role {
+    display: none;
+}
+.logout-btn {
+    background-color: #ff7b7b;
+    color: white;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    border-radius: 5px;
+    margin-top: 10px;
+    cursor: pointer;
+}

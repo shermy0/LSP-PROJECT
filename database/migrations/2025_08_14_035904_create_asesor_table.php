@@ -14,12 +14,17 @@ return new class extends Migration
         Schema::create('asesor', function (Blueprint $table) {
             $table->id('id_asesor');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+
+            // Data wajib
             $table->string('nama_asesor');
-            $table->string('nip')->nullable();
+            $table->string('nip', 18)->nullable();
+
+            // Data tambahan
             $table->string('keahlian')->nullable();
             $table->string('tanda_tangan')->nullable();
             $table->string('jabatan')->nullable();
             $table->string('no_registrasi')->nullable();
+
             $table->timestamps();
         });
     }

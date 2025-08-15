@@ -1,0 +1,56 @@
+body {
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.login-card {
+    background-color: #001f66;
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 350px;
+}
+.form-control {
+    border-radius: 10px;
+}
+.btn-primary {
+    background-color: #00aaff;
+    border: none;
+    border-radius: 10px;
+}
+.btn-primary:hover {
+    background-color: #008ecc;
+}
+.register-link {
+    color: white;
+}
+.register-link:hover {
+    text-decoration: underline;
+}
+.modal-content{
+    background-color: #001f66;
+}
+.btn-close{
+    color: #e6f0ff;
+    background-color: gray;
+}
+.role-option {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: #e6f0ff;
+    color: #001f66;
+}
+.role-option:hover {
+    background-color: #77c8f0;
+    border-color: #007bff;
+    color: #001f66;
+}
+.role-option.active {
+    background-color: #007bff;
+    color: white;
+}
+.role-option.active p {
+    color: white !important;
+}
