@@ -26,7 +26,7 @@ class RegisterController extends Controller
             'name' => 'required|string',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6|confirmed',
-            'nik' => 'required|digits_between:9,16',
+            'nik' => 'required|digits:16',
             'nama_lengkap' => 'required|string',
             'tempat_lahir' => 'required|string',
             'tgl_lahir' => 'required|date',
