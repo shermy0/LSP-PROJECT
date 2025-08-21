@@ -62,6 +62,7 @@ class RegisterController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6|confirmed',
             'nama_asesor' => 'required',
+            'nip' => 'nullable|digits:18',
         ]);
 
         $user = User::create([
