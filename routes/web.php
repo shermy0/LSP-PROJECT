@@ -5,6 +5,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
+use App\Http\Controllers\FormPerencanaan\MapaController;
+
 
 // login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -23,6 +25,13 @@ Route::post('/register/asesor', [RegisterController::class, 'storeAsesor'])->nam
 
 // Form Perencanaan untuk Asesor
 Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('formperencanaan');
+
+// form perencanaan mapa 01
+Route::prefix('form-perencanaan')->group(function () {
+    Route::get('/mapa01', [MapaController::class, 'create'])->name('form.mapa01');
+    Route::get('/get-skema/{id}', [MapaController::class, 'getSkema']);
+});
+
 
 // Dashboard Admin
 Route::middleware(['auth', 'role:admin'])->group(function () {
