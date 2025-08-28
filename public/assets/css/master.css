@@ -179,7 +179,7 @@ body {
 }
 
 .sidebar.collapsed .menu ul li a {
-    display: none;         /* ❌ sembunyikan link/teks */
+    display: none;
 }
 
 /* Sidebar collapse: sembunyikan teks, icon tetap di tengah */
@@ -195,14 +195,14 @@ body {
 
 /* Konten utama menyesuaikan sidebar */
 #main-content {
-    margin-left: 240px; /* default lebar sidebar */
+    margin-left: 240px;
     padding: 20px;
     transition: margin-left 0.3s ease;
 }
 
 /* Responsive sidebar */
 .sidebar.collapsed + #main-content {
-    margin-left: 70px; /* ketika sidebar collapse */
+    margin-left: 70px; 
 }
 
 .menu ul li a {
@@ -218,11 +218,11 @@ body {
     }
 
     .sidebar .menu ul li a {
-        display: none;     /* ❌ sembunyikan teks */
+        display: none;  
     }
 
     .sidebar .menu ul li {
-        justify-content: center; /* icon di tengah */
+        justify-content: center;
     }
 }
 
@@ -289,7 +289,7 @@ h5 {
     border-radius: 12px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     overflow: hidden;
-    border: none; /* samakan border dengan dropdown */
+    border: none; 
 }
 
 .accordion-header {
@@ -301,8 +301,8 @@ h5 {
     font-weight: 500;
     cursor: pointer;
     background-color: #fff;
-    border-radius: 12px; /* samakan dengan dropdown */
-    border: none; /* hilangkan border default */
+    border-radius: 12px; 
+    border: none;
     transition: background-color 0.2s ease;
 }
 
@@ -347,14 +347,14 @@ h5 {
 
 /* Dropdown menu */
 .dropdown-menu {
-    border-radius: 12px;          /* sudut rounded */
-    border: 1px solid #e5e7eb;    /* abu halus */
-    background-color: #fff;       /* putih bersih */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* shadow lembut */
-    font-size: 0.9rem;            /* sedikit lebih besar dari aslinya */
-    min-width: 180px;             /* biar gak sempit */
-    padding: 6px 0;               /* rapetin */
-    margin-top: 8px;              /* jarak dari tombol */
+    border-radius: 12px;          
+    border: 1px solid #e5e7eb;
+    background-color: #fff;      
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+    font-size: 0.9rem;        
+    min-width: 180px;            
+    padding: 6px 0;               
+    margin-top: 8px;               
 }
 
 /* Item dropdown */
@@ -363,6 +363,210 @@ h5 {
     font-size: 0.85rem;
     color: #4C4C4C;
     transition: background-color 0.2s ease;
-    border-radius: 12px; /* samakan radius semua item */
-    border: none; /* hilangkan garis pinggir */
+    border-radius: 12px;
+    border: none;
+}
+
+.breadcrumb a {
+    color: #002D72;
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+/* ---------- Header ---------- */
+h3.fw-bold {
+    color: #002D72;
+    font-size: 1.75rem;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+/* ---------- Form ---------- */
+/* Membuat label TUK muncul di tengah */
+.text-center .form-label {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.form-control {
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    padding: 0.5rem 0.75rem;
+    transition: border 0.3s, box-shadow 0.3s;
+}
+
+.form-control:focus {
+    border-color: #002D72;
+    box-shadow: 0 0 0 0.2rem rgba(0,45,114,0.25);
+}
+
+.form-check-input:checked {
+    background-color: #002D72;
+    border-color: #002D72;
+}
+
+.form-check-label {
+    margin-left: 0.3rem;
+    font-weight: 500;
+    color: #555;
+}
+
+/* ---------- Radio Buttons Sejajar ---------- */
+.form-check-inline {
+    display: flex;
+    align-items: center;
+    margin-right: 1.5rem; /* jarak antar pilihan */
+}
+
+.form-check-inline input {
+    margin-right: 0.3rem;
+}
+
+/* ---------- Submit Button ---------- */
+.btn-primary {
+    background-color: #002D72;
+    border-color: #002D72;
+    border-radius: 6px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #001f54;
+    transform: translateY(-1px);
+}
+
+/* ---------- Container ---------- */
+.container {
+    background-color: #fff;
+    padding: 50px;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+}
+
+/* ---------- Custom Box Above Header ---------- */
+.text-center > div > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Card Wrapper */
+.card-box {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+/* Penjelasan */
+.penjelasan-box {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.penjelasan-header {
+    background: #eaf2ff;
+    color: #0d47a1;
+    font-weight: 600;
+    padding: 10px 16px;
+}
+
+.penjelasan-list {
+    list-style: none;
+    margin: 0;
+    padding: 16px;
+    counter-reset: list-counter;
+}
+
+.penjelasan-list li {
+    position: relative;
+    padding-left: 40px;
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.penjelasan-list li::before {
+    counter-increment: list-counter;
+    content: counter(list-counter);
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: linear-gradient(#0284C7, #041562);
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+itu naha garis yang horizontal kagak ada 
+.custom-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 15px;
+    overflow: hidden; 
+}
+
+.custom-table td {
+    background: #f9f9f9;
+}
+
+thead.table-title th {
+    background-color: #041562;
+    color: white;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Penjelasan */
+.komen_ttd-box {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.komen_ttd-header {
+    background: #eaf2ff;
+    color: #0d47a1;
+    font-weight: 600;
+    padding: 10px 16px;
+}
+
+/* Header Box */
+.komen_ttd-header {
+    background: #e5efff;
+    color: #111827;
+    font-weight: 600;
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.simpan-btn {
+    background-color: #041562; 
+    color: white;
+    font-weight: 500;
+    padding: 10px 24px;
+    border-radius: 6px;
+    border: none;
+    transition: background 0.2s;
+    display: block;         
+    margin-left: auto;
+}
+
+.col-md-12 {
+    margin: 10px;
 }

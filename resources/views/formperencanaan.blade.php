@@ -34,7 +34,9 @@
         <!-- Item 4 -->
         <div class="accordion-item">
             <h2 class="accordion-header">
-                <i class="fa-solid fa-stop me-2"></i> FR.AK.06 - MENINJAU PROSES ASESMEN
+                <a href="{{ route('ninjau_asesemen') }}" class="text-decoration-none text-dark">
+                    <i class="fa-solid fa-stop me-2"></i> FR.AK.06 - MENINJAU PROSES ASESMEN
+                </a>
             </h2>
         </div>
     </div>

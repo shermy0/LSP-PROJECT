@@ -5,6 +5,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
+use App\Http\Controllers\SkemaController;
+
+Route::get('/', function () {
+    return view('welcome');
+});
 
 // login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -33,6 +38,14 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 Route::middleware(['auth', 'role:asesi'])->group(function () {
     Route::get('/dashboard/asesi', [DashboardController::class, 'asesi'])->name('dashboard.asesi');
 });
+
+// Meninjau Asesmen
+Route::get('/ninjau_asesemen', [SkemaController::class, 'ninjau_asesemen'])->name('ninjau_asesemen');
+Route::get('/ninjau-asesmen-asesor', [PerencanaanController::class, 'ninjauAsesmenAsesor'])->name('ninjau_asesmen_asesor.view');
+
+// simpan dan lanjut
+Route::post('/formperencanaan', [PerencanaanController::class, 'simpan'])->name('formperencanaan');
+Route::post('/ninjau-asesmen-asesor', [PerencanaanController::class, 'simpanLanjut'])->name('ninjau_asesmen_asesor');
 
 // Logout
 Route::post('/logout', function () {
