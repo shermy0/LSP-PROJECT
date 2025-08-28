@@ -19,4 +19,10 @@ class MapaController extends Controller
         $skema = SkemaSertifikasi::findOrFail($id);
         return response()->json($skema);
     }
+
+    public function kodeUnit()
+{
+    return view('form_perencanaan.form_mapa_01.mapa01_kodeunit');
+}
+
 }

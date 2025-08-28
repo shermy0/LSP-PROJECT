@@ -6,6 +6,8 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
 use App\Http\Controllers\FormPerencanaan\MapaController;
+use App\Http\Controllers\SkemaController;
+
 
 
 // login
@@ -29,8 +31,10 @@ Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('f
 // form perencanaan mapa 01
 Route::prefix('form-perencanaan')->group(function () {
     Route::get('/mapa01', [MapaController::class, 'create'])->name('form.mapa01');
+    Route::get('/mapa01/kode-unit', [MapaController::class, 'kodeUnit'])->name('form.mapa01.kodeunit');
     Route::get('/get-skema/{id}', [MapaController::class, 'getSkema']);
 });
+
 
 
 // Dashboard Admin
@@ -42,6 +46,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 Route::middleware(['auth', 'role:asesi'])->group(function () {
     Route::get('/dashboard/asesi', [DashboardController::class, 'asesi'])->name('dashboard.asesi');
 });
+
+Route::get('/form-mapa01', [SkemaController::class, 'formMapa01'])->name('form.mapa01');
+
 
 // Logout
 Route::post('/logout', function () {
