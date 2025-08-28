@@ -1,5 +1,4 @@
 @extends('master')
-
 @section('konten')
 <div class="container mt-4">
     <!-- Breadcrumb -->
@@ -12,29 +11,35 @@
 
     <!-- Header -->
     <div class="text-center mb-4">
+        <div class="mapa-logo"></div>
         <h3 class="fw-bold">FR.AK.06 – Meninjau Proses Asesmen</h3>
         <p class="text-muted">Peninjauan Proses Asesmen</p>
     </div>
 
     <!-- Skema -->
-    <select name="skema_id" id="skema_id" class="form-select w-auto">
-        Skema:
-        <option value="">-- Pilih Skema --</option>
-        @foreach($skemas as $skema)
-            <option value="{{ $skema->id_skema }}"
-                    data-kode="{{ $skema->kode_skema }}"
-                    data-jenjang="{{ $skema->jenjang }}">
-                {{ $skema->nama_skema }}
-            </option>
-        @endforeach
-    </select>
+    <div class="skema-container">
+        <div class="skema-group">
+        <span class="skema-label">SKEMA:</span>
+            <select name="skema_id" id="skema_id" class="skema-select">
+                <option value="">-- Pilih Skema --</option>
+                @foreach($skemas as $skema)
+                    <option value="{{ $skema->id_skema }}"
+                            data-kode="{{ $skema->kode_skema }}"
+                            data-jenjang="{{ $skema->jenjang }}">
+                        {{ $skema->nama_skema }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+    </div>
 
     <!-- Form -->
     <form>
-        <div class="row g-3 mb-3">
-             <!-- Skema Sertifikasi -->
-            <div class="col-md-6">
-                <label class="form-label fw-semibold">Skema Sertifikasi</label>
+    <div class="row g-3 mb-4">
+        <!-- Skema Sertifikasi -->
+        <div class="col-md-6">
+            <div class="card-field">
+                <label class="form-label">Skema Sertifikasi</label>
                 <div class="d-flex gap-3 mt-1">
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="skema" id="skema1" value="KKNI">
@@ -46,25 +51,33 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Nomor -->
-            <div class="col-md-6">
-                <label for="nomor" class="form-label fw-semibold">Nomor</label>
-                <input type="text" class="form-control" id="nomor" readonly>
+        <!-- Nomor -->
+        <div class="col-md-6">
+            <div class="card-field">
+                <label for="nomor" class="form-label">Nomor</label>
+                <input type="text" class="form-control" id="nomor" placeholder="Nomor Skema" readonly>
             </div>
+        </div>
 
-            <!-- Nama Asesor -->
-            <div class="col-md-6">
-                <label for="namaAsesor" class="form-label fw-semibold">Nama Asesor</label>
+        <!-- Nama Asesor -->
+        <div class="col-md-6">
+            <div class="card-field">
+                <label for="namaAsesor" class="form-label">Nama Asesor</label>
                 <input type="text" class="form-control" id="namaAsesor" placeholder="Nama Asesor">
             </div>
+        </div>
 
-            <!-- Tanggal Asesmen -->
-            <div class="col-md-6">
-                <label for="tanggalAsesmen" class="form-label fw-semibold">Tanggal Asesmen</label>
+        <!-- Tanggal Asesmen -->
+        <div class="col-md-6">
+            <div class="card-field">
+                <label for="tanggalAsesmen" class="form-label">Tanggal Asesmen</label>
                 <input type="date" class="form-control" id="tanggalAsesmen">
             </div>
         </div>
+    </div>
+
 
         <!-- TUK -->
         <div class="col-12 text-center">
@@ -84,6 +97,7 @@
                 </div>
             </div>
         </div>
+        <br>
     </form>
 </div>
 
