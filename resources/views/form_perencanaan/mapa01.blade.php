@@ -1,45 +1,55 @@
 @extends('master')
 
 @section('konten')
-<div class="container">
-    <h3>FR.MAPA.01 - Merencanakan Aktivitas dan Proses Asesmen</h3>
+<div class="container mt-4">
 
-    <div class="mb-3">
-        <label for="skema">Skema:</label>
-        <select id="skema" name="id_skema" class="form-control">
-            <option value="">-- Pilih Skema --</option>
-            @foreach($skema as $s)
-                <option value="{{ $s->id_skema }}">{{ $s->nama_skema }}</option>
-            @endforeach
-        </select>
+    <!-- Breadcrumb -->
+    <div class="mb-3 text-secondary">
+        <small>
+            <span class="text-muted">Form Perencanaan</span> > <span class="fw-semibold">FR.MAPA.01</span>
+        </small>
     </div>
 
-    <div class="mb-3">
-        <label>Jenis Skema:</label><br>
-        <input type="radio" name="jenis_skema" value="KKNI"> KKNI
-        <input type="radio" name="jenis_skema" value="Okupasi"> Okupasi
-    </div>
+    <!-- Card utama -->
+    <div class="card shadow-sm rounded-4 p-4 border-0">
+        <div class="text-center mb-4">
+            <!-- Kotak logo -->
+            <div class="mx-auto mb-3" style="width: 50px; height: 50px; background-color:#001f60; border-radius:6px;"></div>
+            
+            <!-- Judul besar -->
+            <h4 class="fw-bold">FR.MAPA.01 – MERENCANAKAN AKTIVITAS DAN PROSES ASESMEN</h4>
+        </div>
 
-    <div class="mb-3">
-        <label for="kode_skema">Nomor Skema:</label>
-        <input type="text" id="kode_skema" name="kode_skema" class="form-control" readonly>
+        <!-- Dropdown skema -->
+        <div class="text-center mb-4">
+            <span class="fw-semibold">SKEMA:</span>
+            <select class="form-select d-inline-block w-auto fw-bold text-primary bg-primary-subtle border-0 rounded-3 ms-2">
+                <option selected>JUNIOR OPERATOR DESAIN GRAFIS</option>
+                <option>Skema Lain</option>
+            </select>
+        </div>
+
+        <!-- Form input -->
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="p-3 border rounded-3">
+                    <label class="fw-semibold d-block mb-2">Skema Sertifikasi</label>
+                    <div>
+                        <input type="radio" id="kkni" name="skema" class="form-check-input me-2">
+                        <label for="kkni">KKNI</label>
+                        <input type="radio" id="okupasi" name="skema" class="form-check-input me-2" checked>
+                        <label for="okupasi">Okupasi</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="p-3 border rounded-3">
+                    <label for="nomorSkema" class="fw-semibold d-block mb-2">Nomor</label>
+                    <input type="text" id="nomorSkema" class="form-control" placeholder="Nomor Skema">
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-    document.getElementById('skema').addEventListener('change', function() {
-        let skemaId = this.value;
-        if(skemaId){
-            fetch(`/form-perencanaan/get-skema/${skemaId}`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('kode_skema').value = data.kode_skema;
-            });
-        } else {
-            document.getElementById('kode_skema').value = '';
-        }
-    });
-</script>
-@endpush
