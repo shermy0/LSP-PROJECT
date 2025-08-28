@@ -25,8 +25,22 @@ class PerencanaanController extends Controller
             ->with('success', 'Data berhasil disimpan dan dilanjutkan!');
     }
 
+    public function simpanLanjutLaporan(Request $request)
+    {
+        // logika simpan data ke DB di sini juga
+
+        return redirect()->route('laporan_asesor')
+            ->with('success', 'Data berhasil disimpan dan lanjut ke laporan!');
+    }
+
     public function ninjauAsesmenAsesor()
     {
         return view('meninjau_asesmen.ninjau_asesmen_asesor');
     }
+
+    public function laporan()
+    {
+        return view('laporan_asesmen.laporan_asesor');
+    }
+
 }

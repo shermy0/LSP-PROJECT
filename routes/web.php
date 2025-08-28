@@ -43,9 +43,18 @@ Route::middleware(['auth', 'role:asesi'])->group(function () {
 Route::get('/ninjau_asesemen', [SkemaController::class, 'ninjau_asesemen'])->name('ninjau_asesemen');
 Route::get('/ninjau-asesmen-asesor', [PerencanaanController::class, 'ninjauAsesmenAsesor'])->name('ninjau_asesmen_asesor.view');
 
+// Laporan
+Route::get('/laporan', [SkemaController::class, 'laporan'])->name('laporan');
+
 // simpan dan lanjut
 Route::post('/formperencanaan', [PerencanaanController::class, 'simpan'])->name('formperencanaan');
 Route::post('/ninjau-asesmen-asesor', [PerencanaanController::class, 'simpanLanjut'])->name('ninjau_asesmen_asesor');
+
+Route::post('/laporan-asesor', [PerencanaanController::class, 'simpanLanjutLaporan'])
+    ->name('laporan_asesor');
+Route::get('/laporan-asesor', [PerencanaanController::class, 'laporan'])
+    ->name('laporan_asesor.show');
+
 
 // Logout
 Route::post('/logout', function () {

@@ -27,7 +27,9 @@
         <!-- Item 3 -->
         <div class="accordion-item">
             <h2 class="accordion-header">
-                <i class="fa-solid fa-stop me-2"></i> FR.AK.05 - LAPORAN ASESMEN
+                <a href="{{ route('laporan') }}" class="text-decoration-none text-dark">
+                    <i class="fa-solid fa-stop me-2"></i> FR.AK.06 - LAPORAN ASESMEN
+                </a>
             </h2>
         </div>
 

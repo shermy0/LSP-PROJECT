@@ -12,4 +12,10 @@ class SkemaController extends Controller
         $skemas = Skema::all(); 
         return view('meninjau_asesmen/ninjau_asesemen', compact('skemas'));
     }
+
+    public function laporan()
+    {
+        $skemas = Skema::all(); 
+        return view('laporan_asesmen.laporan', compact('skemas'));
+    }
 }
