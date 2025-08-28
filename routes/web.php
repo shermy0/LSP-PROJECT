@@ -7,28 +7,40 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
 use App\Http\Controllers\SkemaController;
 
+// ============================
+// Halaman Utama
+// ============================
 Route::get('/', function () {
     return view('welcome');
 });
 
-// login
+// ============================
+// Login & Register
+// ============================
+// Login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
-// pilih role register
+// Pilih Role Register
 Route::get('/register-role', [AuthController::class, 'showRegisterRole'])->name('register.role');
 
-// register asesi
+// Register Asesi
 Route::get('/register/asesi', [RegisterController::class, 'showAsesiForm'])->name('register.asesi');
 Route::post('/register/asesi', [RegisterController::class, 'storeAsesi'])->name('register.asesi.store');
 
-// register asesor
+// Register Asesor
 Route::get('/register/asesor', [RegisterController::class, 'showAsesorForm'])->name('register.asesor');
 Route::post('/register/asesor', [RegisterController::class, 'storeAsesor'])->name('register.asesor.store');
 
-// Form Perencanaan untuk Asesor
+// ============================
+// Form Perencanaan (Asesor)
+// ============================
 Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('formperencanaan');
+Route::post('/formperencanaan', [PerencanaanController::class, 'simpan'])->name('formperencanaan');
 
+// ============================
+// Dashboard
+// ============================
 // Dashboard Admin
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
@@ -39,24 +51,33 @@ Route::middleware(['auth', 'role:asesi'])->group(function () {
     Route::get('/dashboard/asesi', [DashboardController::class, 'asesi'])->name('dashboard.asesi');
 });
 
+// ============================
 // Meninjau Asesmen
+// ============================
 Route::get('/ninjau_asesemen', [SkemaController::class, 'ninjau_asesemen'])->name('ninjau_asesemen');
 Route::get('/ninjau-asesmen-asesor', [PerencanaanController::class, 'ninjauAsesmenAsesor'])->name('ninjau_asesmen_asesor.view');
-
-// Laporan
-Route::get('/laporan', [SkemaController::class, 'laporan'])->name('laporan');
-
-// simpan dan lanjut
-Route::post('/formperencanaan', [PerencanaanController::class, 'simpan'])->name('formperencanaan');
 Route::post('/ninjau-asesmen-asesor', [PerencanaanController::class, 'simpanLanjut'])->name('ninjau_asesmen_asesor');
 
-Route::post('/laporan-asesor', [PerencanaanController::class, 'simpanLanjutLaporan'])
-    ->name('laporan_asesor');
-Route::get('/laporan-asesor', [PerencanaanController::class, 'laporan'])
-    ->name('laporan_asesor.show');
+// ============================
+// Laporan
+// ============================
+Route::get('/laporan', [SkemaController::class, 'laporan'])->name('laporan');
+Route::get('/laporan-asesor', [PerencanaanController::class, 'laporan'])->name('laporan_asesor.show');
+Route::post('/laporan-asesor', [PerencanaanController::class, 'simpanLanjutLaporan'])->name('laporan_asesor');
 
+// ============================
+// MAPA 02
+// ============================
+// Halaman utama MAPA02
+Route::get('/mapa02', [SkemaController::class, 'mapa02'])->name('mapa02');
 
+// Lanjutan MAPA02 Asesor
+Route::get('/mapa02-asesor', [PerencanaanController::class, 'mapa02'])->name('mapa02_asesor.show');
+Route::post('/mapa02-asesor', [PerencanaanController::class, 'simpanLanjutmapa02'])->name('mapa02_asesor');
+
+// ============================
 // Logout
+// ============================
 Route::post('/logout', function () {
     Auth::logout();
     request()->session()->invalidate();

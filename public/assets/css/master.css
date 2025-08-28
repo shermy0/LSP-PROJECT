@@ -1,11 +1,15 @@
-/* MASTER */
+/* =========================
+   MASTER LAYOUT
+========================= */
 body {
     margin: 0;
     font-family: "Poppins", sans-serif;
     background-color: #f4f4f4;
 }
 
-/* Sidebar */
+/* =========================
+   SIDEBAR
+========================= */
 .sidebar {
     height: 100vh;
     width: 240px;
@@ -118,7 +122,7 @@ body {
     gap: 10px;
 }
 
-/* Avatar Container */
+/* Avatar */
 .avatar {
     display: flex;
     align-items: center;
@@ -157,7 +161,7 @@ body {
     color: #ccc;
 }
 
-/* Logout Button */
+/* Logout */
 .logout-btn {
     background: #f44336;
     color: #fff;
@@ -182,7 +186,6 @@ body {
     display: none;
 }
 
-/* Sidebar collapse: sembunyikan teks, icon tetap di tengah */
 .sidebar.collapsed .logout-btn {
     width: 50px;
     justify-content: center;
@@ -192,15 +195,13 @@ body {
     display: none;
 }
 
-
-/* Konten utama menyesuaikan sidebar */
+/* Konten */
 #main-content {
     margin-left: 240px;
     padding: 20px;
     transition: margin-left 0.3s ease;
 }
 
-/* Responsive sidebar */
 .sidebar.collapsed + #main-content {
     margin-left: 70px; 
 }
@@ -211,7 +212,7 @@ body {
     font-size: 14px;
 }
 
-/* Untuk layar kecil */
+/* Responsive */
 @media (max-width: 768px) {
     .sidebar {
         width: 70px;
@@ -226,16 +227,9 @@ body {
     }
 }
 
-/* FORM PERENCANAAN */
-/* Font & Body */
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #fafafa;
-    margin: 0;
-    padding: 0;
-}
-
-/* Judul */
+/* =========================
+   FORM PERENCANAAN
+========================= */
 h1 {
     font-size: 1.5rem;
     font-weight: 600;
@@ -253,31 +247,34 @@ h5 {
 }
 
 .center-underline {
-    display: inline-block; /* pastikan lebarnya sesuai teks */
-    position: relative; 
-    text-align: center; /* tambahan */
+    display: inline-block;
+    position: relative;
+    text-align: center;
 }
 
 .center-underline::after {
     content: "";
     position: absolute;
     left: 50%;
-    bottom: -5px; /* jarak garis ke teks */
+    bottom: -5px;
     transform: translateX(-50%);
-    width: 60%; /* bisa disesuaikan */
+    width: 60%;
     height: 3px;
     background-color: #0284C7;
     border-radius: 2px;
 }
 
-/* Container */
 .container {
     max-width: 800px;
     margin: 20px auto;
     padding: 0 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 15px rgba(0,0,0,0.05);
 }
 
-/* Accordion umum */
+/* Accordion */
 .accordion {
     display: flex;
     flex-direction: column;
@@ -315,7 +312,7 @@ h5 {
     display: none;
 }
 
-/* Dropdown tampil seperti item accordion */
+/* Dropdown */
 .dropdown .btn {
     background-color: #fff;
     color: #4C4C4C;
@@ -330,22 +327,21 @@ h5 {
     gap: 10px;
     transition: background-color 0.2s ease;
     border: none;
+    position: relative;
 }
 
-/* Panah dropdown di kanan */
 .dropdown .btn::after {
-    content: "\f078"; /* kode FontAwesome untuk panah bawah */
-    font-family: "Font Awesome 6 Free"; /* pastikan pakai font awesome */
+    content: "\f078";
+    font-family: "Font Awesome 6 Free";
     font-weight: 900;
     position: absolute;
-    right: 20px; /* jarak dari kanan */
+    right: 20px;
     top: 50%;
     transform: translateY(-50%);
-    pointer-events: none; /* supaya tidak mengganggu klik */
-    color: #4C4C4C; /* warna panah */
+    pointer-events: none;
+    color: #4C4C4C;
 }
 
-/* Dropdown menu */
 .dropdown-menu {
     border-radius: 12px;          
     border: 1px solid #e5e7eb;
@@ -357,16 +353,15 @@ h5 {
     margin-top: 8px;               
 }
 
-/* Item dropdown */
 .dropdown-item {
     padding: 12px 20px;
     font-size: 0.85rem;
     color: #4C4C4C;
     transition: background-color 0.2s ease;
     border-radius: 12px;
-    border: none;
 }
 
+/* Breadcrumb */
 .breadcrumb a {
     color: #002D72;
     text-decoration: none;
@@ -376,6 +371,7 @@ h5 {
     text-decoration: underline;
 }
 
+/* Card Field */
 .card-field {
     background: #fff;
     border-radius: 12px;
@@ -394,7 +390,7 @@ h5 {
     display: block;
 }
 
-/* -- SKEMA -- */
+/* Skema */
 .skema-container {
     display: flex;  
     justify-content: center;    
@@ -419,7 +415,7 @@ h5 {
     border-radius: 8px;
 }
 
-/* ---------- Header ---------- */
+/* Header */
 h3.fw-bold {
     color: #002D72;
     font-size: 1.75rem;
@@ -429,8 +425,7 @@ h3.fw-bold {
     color: #6c757d !important;
 }
 
-/* ---------- Form ---------- */
-/* Membuat label TUK muncul di tengah */
+/* Form */
 .text-center .form-label {
     font-weight: 600;
     font-size: 1rem;
@@ -459,18 +454,17 @@ h3.fw-bold {
     color: #555;
 }
 
-/* ---------- Radio Buttons Sejajar ---------- */
 .form-check-inline {
     display: flex;
     align-items: center;
-    margin-right: 1.5rem; /* jarak antar pilihan */
+    margin-right: 1.5rem;
 }
 
 .form-check-inline input {
     margin-right: 0.3rem;
 }
 
-/* ---------- Submit Button ---------- */
+/* Button */
 .btn-primary {
     background-color: #002D72;
     border-color: #002D72;
@@ -485,22 +479,19 @@ h3.fw-bold {
     transform: translateY(-1px);
 }
 
-/* ---------- Container ---------- */
-.container {
-    background-color: #fff;
-    border-radius: 8px;
-    margin-bottom: 30px;
-    box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+.simpan-btn {
+    background-color: #041562; 
+    color: white;
+    font-weight: 500;
+    padding: 10px 24px;
+    border-radius: 6px;
+    border: none;
+    transition: background 0.2s;
+    display: block;         
+    margin-left: auto;
 }
 
-/* ---------- Custom Box Above Header ---------- */
-.text-center > div > div {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Card Wrapper */
+/* Card Box */
 .card-box {
     background: #fff;
     border-radius: 10px;
@@ -509,7 +500,7 @@ h3.fw-bold {
     margin-bottom: 20px;
 }
 
-/* Penjelasan */
+/* Judul Box */
 .judul-box {
     background: #fff;
     border-radius: 8px;
@@ -555,16 +546,24 @@ h3.fw-bold {
     justify-content: center;
 }
 
-itu naha garis yang horizontal kagak ada 
+/* =========================
+   TABLES
+========================= */
+/* =========================
+   TABLES
+========================= */
 .custom-table {
-    border-collapse: separate;
-    border-spacing: 0;
-    border-radius: 15px;
-    overflow: hidden; 
+    width: 100%;
+    border-collapse: collapse; /* <-- biar garis nyatu */
+    border-radius: 8px;
+    overflow: hidden;
 }
 
+.custom-table th,
 .custom-table td {
-    background: #f9f9f9;
+    border: 1px solid #ddd;  /* garis horizontal & vertikal */
+    padding: 10px;
+    text-align: left;
 }
 
 thead.table-title th {
@@ -574,21 +573,15 @@ thead.table-title th {
     vertical-align: middle;
 }
 
-/* Penjelasan */
+/* =========================
+   KOMEN & TTD
+========================= */
 .komen_ttd-box {
     background: #fff;
     border-radius: 8px;
     overflow: hidden;
 }
 
-.komen_ttd-header {
-    background: #eaf2ff;
-    color: #0d47a1;
-    font-weight: 600;
-    padding: 10px 16px;
-}
-
-/* Header Box */
 .komen_ttd-header {
     background: #e5efff;
     color: #111827;
@@ -598,23 +591,6 @@ thead.table-title th {
     margin-bottom: 20px;
 }
 
-.simpan-btn {
-    background-color: #041562; 
-    color: white;
-    font-weight: 500;
-    padding: 10px 24px;
-    border-radius: 6px;
-    border: none;
-    transition: background 0.2s;
-    display: block;         
-    margin-left: auto;
-}
-
-.col-md-12 {
-    margin: 10px;
-}
-
-/* TANDA TANGAN */
 .signature-container {
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -629,10 +605,17 @@ thead.table-title th {
     cursor: crosshair;
 }
 
+/* =========================
+   MISC
+========================= */
+.col-md-12 {
+    margin: 10px;
+}
+
 .mapa-logo {
     width: 50px;
     height: 50px;
-    background-color: #001f60; /* biru tua */
+    background-color: #001f60;
     border-radius: 6px;
     margin: 0 auto 16px auto;
 }
@@ -641,11 +624,11 @@ thead.table-title th {
     margin: 20px;
     border: 1px solid #ccc;
     border-radius: 6px;
-    overflow: hidden; /* biar border nyatu */
+    overflow: hidden;
 }
 
 .box-header {
-    background-color: #001b68; /* biru tua */
+    background-color: #001b68;
     color: #fff;
     font-weight: bold;
     text-align: center;
@@ -655,9 +638,9 @@ thead.table-title th {
 
 .box-input {
     border: none;
-    border-top: 1px solid #ccc; /* nyambung sama header */
-    border-radius: 0 0 6px 6px; /* sudut bawah aja */
+    border-top: 1px solid #ccc;
+    border-radius: 0 0 6px 6px;
     width: 100%;
     padding: 8px;
-    resize: vertical; /* biar bisa tarik ke bawah */
+    resize: vertical;
 }
