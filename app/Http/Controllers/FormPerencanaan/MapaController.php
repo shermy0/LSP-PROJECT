@@ -11,7 +11,7 @@ class MapaController extends Controller
     public function create()
     {
         $skema = SkemaSertifikasi::where('status_skema', 'Aktif')->get();
-        return view('form_perencanaan.mapa01', compact('skema'));
+        return view('form_perencanaan.form_mapa_01.mapa01', compact('skema'));
     }
 
     public function getSkema($id)
