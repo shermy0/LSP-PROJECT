@@ -23,3 +23,12 @@ Route::get('/register/asesor', [RegisterController::class, 'showAsesorForm'])->n
 Route::post('/register/asesor', [RegisterController::class, 'storeAsesor'])->name('register.asesor.store');
 
 
+
+//dashboard
+use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
+use App\Http\Controllers\Asesor\DashboardController as AsesorDashboard;
+use App\Http\Controllers\Asesi\DashboardController as AsesiDashboard;
+
+// Asesor dashboard
+Route::get('/asesor/dashboard', [AsesorDashboard::class, 'index'])->name('asesor.dashboard');
+
