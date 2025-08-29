@@ -15,7 +15,7 @@
 <div class="container mt-4">
     <!-- Penyusun -->
     <div class="card-box">
-        <div class="judul-header">Instrumen Asesmen</div>
+        <div class="judul-header">Penyusun</div>
         <div class="table-responsive mt-4">
             <table class="table table-bordered custom-table" id="penyusun-table">
                 <thead class="table-title">
@@ -29,7 +29,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td><input type="text" name="nama[]" class="form-control" placeholder="Nama penyusun"></td>
+                        <td><input type="text" name="nama[]" class="form-control" placeholder="Nama Penyusun"></td>
                         <td><input type="text" name="nomet[]" class="form-control" placeholder="No Met"></td>
                         <td><input type="date" name="tanggal[]" class="form-control"></td>
                         <td class="text-center">
@@ -43,6 +43,55 @@
                 </tbody>
             </table>
             <button type="button" id="add-row" class="btn btn-success mt-2">+ Tambah Data Penyusun</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal tanda tangan -->
+<div class="modal fade" id="signatureModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Tanda Tangan</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <canvas id="signature-pad" style="border:1px solid #ccc; width:100%; height:300px;"></canvas>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="clear-signature" class="btn btn-danger">Hapus</button>
+        <button type="button" id="save-signature" class="btn btn-primary" data-bs-dismiss="modal">Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container mt-4">
+    <!-- Penyusun -->
+    <div class="card-box">
+        <div class="judul-header">Validator</div>
+        <div class="table-responsive mt-4">
+            <table class="table table-bordered custom-table" id="penyusun-table">
+                <thead class="table-title">
+                    <tr>
+                        <th class="text-center align-middle">Nama</th>
+                        <th class="text-center align-middle">No Met</th>
+                        <th class="text-center align-middle">Tanggal</th>
+                        <th class="text-center align-middle">Tanda Tangan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" name="nama[]" class="form-control" placeholder="Nama Validator"></td>
+                        <td><input type="text" name="nomet[]" class="form-control" placeholder="No Met"></td>
+                        <td><input type="date" name="tanggal[]" class="form-control"></td>
+                        <td class="text-center">
+                            <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc; cursor:pointer;"></canvas>
+                            <input type="hidden" name="tanda_tangan[]" class="tanda_tangan">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -88,7 +137,7 @@ document.addEventListener("DOMContentLoaded", function () {
     addRowBtn.addEventListener("click", function () {
         const newRow = document.createElement("tr");
         newRow.innerHTML = `
-            <td><input type="text" name="nama[]" class="form-control" placeholder="Nama penyusun"></td>
+            <td><input type="text" name="nama[]" class="form-control" placeholder="Nama Penyusun"></td>
             <td><input type="text" name="nomet[]" class="form-control" placeholder="No Met"></td>
             <td><input type="date" name="tanggal[]" class="form-control"></td>
             <td class="text-center">

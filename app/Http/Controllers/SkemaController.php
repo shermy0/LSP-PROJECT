@@ -24,5 +24,4 @@ class SkemaController extends Controller
         $skemas = Skema::all(); 
         return view('mapa02.mapa02', compact('skemas'));
     }
-
 }

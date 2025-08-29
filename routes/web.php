@@ -39,29 +39,20 @@ Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('f
 Route::post('/formperencanaan', [PerencanaanController::class, 'simpan'])->name('formperencanaan');
 
 // ============================
-// Dashboard
-// ============================
-// Dashboard Admin
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
-});
-
-// Dashboard Asesi
-Route::middleware(['auth', 'role:asesi'])->group(function () {
-    Route::get('/dashboard/asesi', [DashboardController::class, 'asesi'])->name('dashboard.asesi');
-});
-
-// ============================
 // Meninjau Asesmen
 // ============================
+// Halaman utama meninjau
 Route::get('/ninjau_asesemen', [SkemaController::class, 'ninjau_asesemen'])->name('ninjau_asesemen');
+// Lanjutin meninjau_asesor
 Route::get('/ninjau-asesmen-asesor', [PerencanaanController::class, 'ninjauAsesmenAsesor'])->name('ninjau_asesmen_asesor.view');
 Route::post('/ninjau-asesmen-asesor', [PerencanaanController::class, 'simpanLanjut'])->name('ninjau_asesmen_asesor');
 
 // ============================
 // Laporan
 // ============================
+// Halaman utama laporan
 Route::get('/laporan', [SkemaController::class, 'laporan'])->name('laporan');
+// Lanjutan laporan-asesor
 Route::get('/laporan-asesor', [PerencanaanController::class, 'laporan'])->name('laporan_asesor.show');
 Route::post('/laporan-asesor', [PerencanaanController::class, 'simpanLanjutLaporan'])->name('laporan_asesor');
 
@@ -70,8 +61,7 @@ Route::post('/laporan-asesor', [PerencanaanController::class, 'simpanLanjutLapor
 // ============================
 // Halaman utama MAPA02
 Route::get('/mapa02', [SkemaController::class, 'mapa02'])->name('mapa02');
-
-// Lanjutan MAPA02 Asesor
+// Lanjutan mapa02-asesor
 Route::get('/mapa02-asesor', [PerencanaanController::class, 'mapa02'])->name('mapa02_asesor.show');
 Route::post('/mapa02-asesor', [PerencanaanController::class, 'simpanLanjutmapa02'])->name('mapa02_asesor');
 

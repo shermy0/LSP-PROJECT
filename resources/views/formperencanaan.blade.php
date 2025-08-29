@@ -49,7 +49,7 @@
     <div class="mt-4 w-100">
         <div class="dropdown w-100">
             <a class="btn dropdown-toggle w-100 text-start custom-dropdown" href="#" id="dropdown5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fa-solid fa-stop me-2"></i> FR.VA - MEMBERIKAN KONTRIBUSI DALAM VALIDASI ASESMEN
+                <i class="fa-solid fa-stop me-2"></i>FR.VA - MEMBERIKAN KONTRIBUSI DALAM VALIDASI ASESMEN
             </a>
             <ul class="dropdown-menu w-100 custom-dropdown-menu" aria-labelledby="dropdown5">
                 <li><a class="dropdown-item" href="/fr-va-sebelum">FR.VA - SEBELUM ASESMEN</a></li>
@@ -58,5 +58,6 @@
             </ul>
         </div>
     </div>
+    <br>
 </div>
 @endsection
