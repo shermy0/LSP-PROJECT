@@ -1,10 +1,5 @@
 <?php
 
-<<<<<<< HEAD
-namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
-=======
 // app/Http/Controllers/AuthController.php
 namespace App\Http\Controllers;
 
@@ -12,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
->>>>>>> e85c83359a797ed6d029e7aa7d91b8b3d3aa010a
 
 class AuthController extends Controller
 {
@@ -23,9 +17,6 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-<<<<<<< HEAD
-        // sementara belum isi logika login
-=======
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
@@ -42,16 +33,12 @@ class AuthController extends Controller
         }
 
         return back()->with('error', 'Email atau password salah');
->>>>>>> e85c83359a797ed6d029e7aa7d91b8b3d3aa010a
     }
 
     public function showRegisterRole()
     {
         return view('auth.register-role');
     }
-<<<<<<< HEAD
-}
-=======
 
     public function register(Request $request)
     {
@@ -74,11 +61,10 @@ class AuthController extends Controller
 
     public function logout()
     {
-        Auth::logout();
+         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return redirect('/login');
     }
 }
->>>>>>> e85c83359a797ed6d029e7aa7d91b8b3d3aa010a
