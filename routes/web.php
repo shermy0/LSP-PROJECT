@@ -25,14 +25,11 @@ Route::post('/register/asesor', [RegisterController::class, 'storeAsesor'])->nam
 Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('formperencanaan');
 
 // Dashboard Admin
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
-});
+// Dashboard Admin (tanpa middleware)
+Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
 
-// Dashboard Asesi
-Route::middleware(['auth', 'role:asesi'])->group(function () {
-    Route::get('/dashboard/asesi', [DashboardController::class, 'asesi'])->name('dashboard.asesi');
-});
+// Dashboard Asesi (tanpa middleware)
+Route::get('/dashboard/asesi', [DashboardController::class, 'asesi'])->name('dashboard.asesi');
 
 // Logout
 Route::post('/logout', function () {
