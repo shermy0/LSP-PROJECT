@@ -1,11 +1,5 @@
 <?php
 
-<<<<<<< HEAD
-namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-=======
 // app/Http/Controllers/AuthController.php
 namespace App\Http\Controllers;
 
@@ -13,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
->>>>>>> sidebar
 
 class AuthController extends Controller
 {
@@ -22,35 +15,11 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-<<<<<<< HEAD
-  
-=======
->>>>>>> sidebar
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
-<<<<<<< HEAD
-            // Ambil user yang sedang login
-            $user = Auth::user();
-
-            // Cek role dan redirect
-            if ($user->role === 'admin') {
-                return redirect()->route('admin.dashboard');
-            } elseif ($user->role === 'asesor') {
-                return redirect()->route('asesor.dashboard');
-            } elseif ($user->role === 'asesi') {
-                return redirect()->route('asesi.dashboard');
-            } else {
-                Auth::logout();
-                return redirect()->route('login')->withErrors('Role tidak dikenali.');
-            }
-        }
-
-        // Kalau gagal login
-        return redirect()->route('login')->withErrors('Email atau password salah.');
-=======
             $user = Auth::user();
 
             // Redirect berdasarkan role
@@ -64,16 +33,12 @@ class AuthController extends Controller
         }
 
         return back()->with('error', 'Email atau password salah');
->>>>>>> sidebar
     }
 
     public function showRegisterRole()
     {
         return view('auth.register-role');
     }
-<<<<<<< HEAD
-}
-=======
 
     public function register(Request $request)
     {
@@ -94,7 +59,7 @@ class AuthController extends Controller
         return redirect()->route('login')->with('success', 'Registrasi berhasil, silakan login');
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
@@ -103,4 +68,3 @@ class AuthController extends Controller
         return redirect('/login');
     }
 }
->>>>>>> sidebar

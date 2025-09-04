@@ -26,11 +26,7 @@ class RegisterController extends Controller
             'name' => 'required|string',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6|confirmed',
-<<<<<<< HEAD
-            'nik' => 'required|digits:16',
-=======
             'nik' => 'required|digits_between:9,16',
->>>>>>> sidebar
             'nama_lengkap' => 'required|string',
             'tempat_lahir' => 'required|string',
             'tgl_lahir' => 'required|date',
@@ -87,8 +83,4 @@ class RegisterController extends Controller
 
         return redirect()->route('login')->with('success', 'Pendaftaran Asesor berhasil!');
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> sidebar
