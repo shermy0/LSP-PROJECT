@@ -66,6 +66,18 @@ Route::get('/mapa02-asesor', [PerencanaanController::class, 'mapa02'])->name('ma
 Route::post('/mapa02-asesor', [PerencanaanController::class, 'simpanLanjutmapa02'])->name('mapa02_asesor');
 
 // ============================
+// FR VA
+// ============================
+// FR VA (halaman awal dengan periode)
+Route::get('/fr-va/{periode}', [PerencanaanController::class, 'frVa'])->name('fr_va');
+
+// FR VA Asesor (halaman lanjutan)
+Route::get('/fr-va-asesor', [PerencanaanController::class, 'frVaAsesor'])->name('fr_va_asesor');
+
+// Simpan dari FR VA ke FR VA Asesor
+Route::post('/fr-va-asesor/simpan', [PerencanaanController::class, 'simpanLanjutfrVa'])->name('fr_va_asesor.simpan');
+
+// ============================
 // Logout
 // ============================
 Route::post('/logout', function () {

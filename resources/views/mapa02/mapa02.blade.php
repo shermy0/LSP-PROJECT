@@ -1,6 +1,6 @@
 @extends('master')
 @section('konten')
-<div class="container mt-4">
+<div class="card-box">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">

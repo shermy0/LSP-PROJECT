@@ -15,27 +15,26 @@ class PerencanaanController extends Controller
     {
         // logika simpan data ke DB di sini
         return redirect()->route('formperencanaan')
-            ->with('success', 'Data berhasil disimpan!');
+            ->with('success', 'Data berhasil');
     }
 
     public function simpanLanjut(Request $request)
     {
         return redirect()->route('ninjau_asesmen_asesor')
-            ->with('success', 'Data berhasil disimpan dan dilanjutkan!');
+            ->with('success', 'Data berhasil');
     }
 
     public function simpanLanjutLaporan(Request $request)
     {
         return redirect()->route('laporan_asesor')
-            ->with('success', 'Data berhasil disimpan dan lanjut ke laporan!');
+            ->with('success', 'Data berhasil');
     }
     
     public function simpanLanjutmapa02(Request $request)
     {
         return redirect()->route('mapa02_asesor.show')
-            ->with('success', 'Data berhasil disimpan dan lanjut ke MAPA 02 Asesor!');
+            ->with('success', 'Data berhasil');
     }
-    
 
     public function laporan() 
     {
@@ -49,6 +48,46 @@ class PerencanaanController extends Controller
     
     public function mapa02()
     {
-        return view('mapa02.mapa02_asesor'); // ini view khusus halaman setelah simpan
+        return view('mapa02.mapa02_asesor'); 
     }
+
+    public function frVa($periode)
+    {
+        $validPeriode = [
+            'sebelum' => 'Sebelum Asesmen',
+            'saat'    => 'Pada Saat Asesmen',
+            'sesudah' => 'Setelah Asesmen',
+        ];
+
+        if (!array_key_exists($periode, $validPeriode)) {
+            abort(404);
+        }
+
+        $periodeText = $validPeriode[$periode];
+
+        // kirim periode juga supaya bisa dipakai di form hidden & breadcrumb
+        return view('fr_va.fr_va', compact('periode', 'periodeText'));
+    }
+
+    // halaman FR VA Asesor
+    public function frVaAsesor(Request $request)
+    {
+        // Ambil periode dari query string atau session agar tahu asalnya
+        $periode = $request->query('periode', 'sebelum'); // default 'sebelum' kalau tidak ada
+
+        return view('fr_va.fr_va_asesor', compact('periode'));
+    }
+
+    // simpan data FR VA → redirect ke FR VA Asesor
+    public function simpanLanjutfrVa(Request $request)
+    {
+        $periode = $request->periode;
+
+        // proses simpan data di DB
+
+        // redirect ke FR VA Asesor, bawa parameter periode supaya bisa balik
+        return redirect()->route('fr_va_asesor', ['periode' => $periode])
+                        ->with('success', 'Data berhasil disimpan!');
+    }
+
 }

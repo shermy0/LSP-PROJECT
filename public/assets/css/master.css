@@ -644,3 +644,43 @@ thead.table-title th {
     padding: 8px;
     resize: vertical;
 }
+
+/* kasih jarak antar pilihan */
+.form-check {
+    padding: 6px 0;
+    border-bottom: 1px solid #eee; /* garis horizontal tipis */
+}
+
+.form-check:last-child {
+    border-bottom: none; /* biar baris terakhir ga ada garis */
+}
+
+/* kasih space input tambahan */
+.form-check.with-input {
+    padding-bottom: 10px;
+}
+
+.custom-table th {
+    background: #f4f6f9;
+}
+
+.form-check {
+    margin-bottom: 6px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 4px;
+  }
+
+.form-check:last-child { border-bottom: none; }
+.with-input input[type="text"] {
+    margin-top: 6px;
+}
+
+.form-check { display: flex; align-items: center; gap: 6px; }
+.form-check.with-input { flex-direction: column; align-items: flex-start; gap: 4px; }
+.form-check.with-input input[type="text"] { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; }
+
+/* Checkbox normal biru */
+.custom-checkbox {
+    width: 18px;
+    height: 18px;
+}

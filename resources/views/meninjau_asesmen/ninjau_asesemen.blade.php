@@ -1,8 +1,7 @@
 @extends('master')
 
 @section('konten')
-<div class="container mt-4">
-
+<div class="card-box">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -14,8 +13,7 @@
     <!-- Header -->
     <div class="text-center mb-4">
         <div class="mapa-logo"></div>
-        <h3 class="fw-bold">FR.AK.06 – Meninjau Proses Asesmen</h3>
-        <p class="text-muted">Peninjauan Proses Asesmen</p>
+        <h3 class="fw-bold">FR.AK.06 – MENINJAU PROSES ASESMEN</h3>
     </div>
 
     <!-- Skema -->
