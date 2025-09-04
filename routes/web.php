@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
+use App\Http\Controllers\DataPesertaUjiController;
 
 // login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -41,3 +42,10 @@ Route::post('/logout', function () {
     request()->session()->regenerateToken();
     return redirect('/login');
 })->name('logout');
+
+// Data Peserta Uji
+Route::get('/data-peserta-uji', [DataPesertaUjiController::class, 'index'])->name('datapesertauji');
+Route::resource('peserta', PesertaController::class);
+
+// Detail Peserta Uji
+Route::get('/peserta-uji/{id}', [DataPesertaUjiController::class, 'show'])->name('peserta.show');
