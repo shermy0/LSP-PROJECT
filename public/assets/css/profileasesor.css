@@ -1,0 +1,148 @@
+.container-profile {
+    font-family: 'Poppins', sans-serif;
+    padding: 20px;
+}
+
+.header-profile h1 {
+    font-size: 32px;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.header-profile .line {
+    width: 166px;
+    height: 4px;
+    background: #0284C7;
+    margin-bottom: 10px;
+    margin-left: 370px; /* tambah jarak ke kanan */
+
+}
+
+.profile-index .header-profile p {
+    font-size: 18px;
+    color: #4C4C4C;
+    margin-left: 150px; /* jarak khusus index */
+}
+
+/* Untuk halaman edit */
+.profile-edit .header-profile p {
+    font-size: 18px;
+    color: #4C4C4C;
+    margin-left: 250px; /* jarak khusus edit */
+}
+
+.profile-section {
+    display: flex;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.card-left {
+    width: 320px;
+    background: white;
+    border: 1px solid #EBEBEB;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-left .avatar {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(152deg, #0284C7 0%, #0369A1 100%);
+    border-radius: 50%;
+    margin: 0 auto 15px;
+}
+
+.card-left h2 {
+    font-size: 24px;
+    margin: 10px 0 5px;
+}
+
+.card-left .role {
+    font-size: 16px;
+    color: #666;
+}
+
+.card-right {
+    flex: 1;
+    background: white;
+    border: 1px solid #EBEBEB;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-right h3 {
+    font-size: 20px;
+    color: #2B76CD;
+    margin-bottom: 15px;
+}
+
+.card-right .info p {
+    font-size: 15px;
+    margin: 8px 0;
+}
+
+.card-right .info span {
+    color: #6E6464;
+    display: inline-block;
+    width: 150px;
+}
+
+.edit-btn {
+    background: #041562;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-top: 5px;
+    position: relative;
+    top: 5px; /* geser ke bawah */
+    cursor: pointer;
+}
+
+.edit-btn:hover {
+    background: #032050;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.back-btn {
+    background: #333;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-top: 5px;
+    position: relative;
+    top: 5px; /* geser ke bawah */
+    cursor: pointer;
+}
+
+.back-btn:hover {
+    background: #2b2b2b;
+}

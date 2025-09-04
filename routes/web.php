@@ -6,6 +6,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
 use App\Http\Controllers\DataPesertaUjiController;
+use App\Http\Controllers\ProfileAsesorController;
 
 // login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -49,3 +50,10 @@ Route::resource('peserta', PesertaController::class);
 
 // Detail Peserta Uji
 Route::get('/peserta-uji/{id}', [DataPesertaUjiController::class, 'show'])->name('peserta.show');
+
+//Profile Asesor
+Route::middleware('auth')->group(function () {
+    Route::get('/profileasesor/index', [ProfileAsesorController::class, 'show'])->name('profile.show');
+Route::get('/profileasesor/edit', [ProfileAsesorController::class, 'edit'])->name('profileasesor.edit');
+    Route::put('/profileasesor/update', [ProfileAsesorController::class, 'update'])->name('profile.update');
+});
