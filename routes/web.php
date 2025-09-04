@@ -8,6 +8,8 @@ use App\Http\Controllers\RegisterController;
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
+use App\Http\Controllers\PertanyaanEsai;
+
 
 // login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -41,10 +43,18 @@ Route::get('/akuntansikeuanganII', [FormAsesmenController::class, 'akuntansikeua
 // Form Perencanaan untuk Asesor
 Route::get('/formasesmen', [FormAsesmenController::class, 'index'])->name('formasesmen');
 
+// form assesmen
+Route::get('/form-asesmen/pertanyaan-esai', [FormAsesmenController::class, 'pertanyaanEsai'])->name('pertanyaan.esai');
+Route::post('/form-asesmen/pertanyaan-esai/store', [FormAsesmenController::class, 'storeEsai'])->name('pertanyaan.esai.store');
+Route::post('/form-asesmen/pertanyaan-esai/delete', [FormAsesmenController::class, 'deleteEsai'])->name('pertanyaan.esai.delete');
+
+
+
 // Dashboard Admin
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
 });
+
 
 //login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -63,6 +73,7 @@ Route::post('/register/asesor', [RegisterController::class, 'storeAsesor'])->nam
 Route::middleware(['auth', 'role:asesi'])->group(function () {
     Route::get('/dashboard/asesi', [DashboardController::class, 'asesi'])->name('dashboard.asesi');
 });
+
 
 // Logout
 Route::post('/logout', function () {

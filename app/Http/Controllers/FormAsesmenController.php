@@ -49,7 +49,30 @@ class FormAsesmenController extends Controller
         return view('akuntansikeuanganII'); 
     }
     
-    
+    public function pertanyaanEsai()
+    {
+       // arahkan ke essai.blade.php
+        return view('essai');
+    }
 
+    public function storeEsai(Request $request)
+    {
+        $request->validate([
+            'pertanyaan' => 'required|string',
+            'jawaban' => 'nullable|string'
+        ]);
 
+        PertanyaanEsai::create([
+            'pertanyaan' => $request->pertanyaan,
+            'jawaban' => $request->jawaban
+        ]);
+
+        return back()->with('success', 'Pertanyaan berhasil ditambahkan');
+    }
+
+    public function deleteEsai(Request $request)
+    {
+        PertanyaanEsai::destroy($request->id);
+        return back()->with('success', 'Pertanyaan berhasil dihapus');
+    }
 }
