@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
+
 {
     public function showLogin()
     {
@@ -26,7 +27,7 @@ class AuthController extends Controller
             if ($user->role === 'admin') {
                 return redirect()->route('dashboard.admin');
             } elseif ($user->role === 'asesor') {
-                return redirect()->route('formperencanaan');
+                return redirect()->route('dashboard.asesor');
             } else {
                 return redirect()->route('dashboard.asesi');
             }
@@ -61,7 +62,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        Auth::logout();
+         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

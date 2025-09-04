@@ -109,8 +109,4 @@ document.querySelector("form").addEventListener("submit", function(event) {
 });
 </script>
 </body>
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> sidebar
