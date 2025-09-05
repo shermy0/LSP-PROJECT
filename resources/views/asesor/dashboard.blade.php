@@ -1,79 +1,103 @@
 @extends('master')
 
+@section('title', 'Dashboard Asesor')
+
 @section('konten')
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body class="bg-gray-100 flex">
-<div class="container mx-auto mt-12 px-8">
-    <!-- Main Content -->
-    <main class="flex-1">
-        <h2 class="text-3xl font-bold mb-2">Dashboard Asesor</h2>
-        <p class="text-gray-500 mb-8 text-lg">Kelola asesmen dengan standar profesional terdepan</p>
+<h2 class="fw-bold mb-2">Dashboard Asesor</h2>
+<p class="text-muted mb-4">Kelola asesmen dengan standar profesional terdepan</p>
 
-        <!-- Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
-            <div class="bg-white p-8 rounded-2xl shadow-lg">
-                <p class="text-gray-400 text-lg">Total Peserta</p>
-                <h3 class="text-3xl font-bold">284</h3>
-                <p class="text-green-500 text-sm mt-2">12.5% Growth • This Month</p>
-            </div>
-            <div class="bg-white p-8 rounded-2xl shadow-lg">
-                <p class="text-gray-400 text-lg">Sertifikat</p>
-                <h3 class="text-3xl font-bold">284</h3>
-                <p class="text-green-500 text-sm mt-2">12.5% Growth • This Month</p>
-            </div>
-            <div class="bg-white p-8 rounded-2xl shadow-lg">
-                <p class="text-gray-400 text-lg">Dalam Progres</p>
-                <h3 class="text-3xl font-bold">284</h3>
-                <p class="text-yellow-500 text-sm mt-2">12.5% Growth • This Month</p>
-            </div>
-            <div class="bg-white p-8 rounded-2xl shadow-lg">
-                <p class="text-gray-400 text-lg">Penghargaan</p>
-                <h3 class="text-3xl font-bold">284</h3>
-                <p class="text-green-500 text-sm mt-2">12.5% Growth • This Month</p>
-            </div>
-        </div>
+{{-- Statistik rounded cards --}}
+<div class="row g-4">
+  @php
+  $stats = [
+    ['icon'=>'fa-chart-bar','color'=>'#3498db','label'=>'Total Peserta','value'=>$totalPeserta],
+    ['icon'=>'fa-certificate','color'=>'#2ecc71','label'=>'Sertifikat','value'=>$totalSertifikat],
+    ['icon'=>'fa-spinner','color'=>'#f1c40f','label'=>'Dalam Progres','value'=>$dalamProgres],
+    ['icon'=>'fa-award','color'=>'#9b59b6','label'=>'Penghargaan','value'=>$penghargaan],
+  ];
+@endphp
 
-        <!-- Chart -->
-        <div class="bg-white p-8 rounded-2xl shadow-lg">
-            <h3 class="text-xl font-semibold mb-6">Grafik Sertifikasi</h3>
-            <canvas id="sertifikasiChart" height="140"></canvas>
-            <div class="flex justify-between text-base text-gray-600 mt-6">
-                <span><strong>300</strong> Total Tersertifikasi</span>
-                <span><strong>18%</strong> Rata-rata Pertumbuhan</span>
-                <span><strong>MPLB</strong> Jurusan Terbanyak Sertifikasi</span>
-            </div>
-        </div>
-    </main>
+
+  @foreach($stats as $item)
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0 text-center p-4 rounded-4" style="background:#fff;">
+      <div class="d-flex justify-content-center align-items-center mb-3"
+           style="width:60px;height:60px;border-radius:16px;background:{{ $item['color'] }}15;">
+        <i class="fas {{ $item['icon'] }} fa-lg" style="color:{{ $item['color'] }}"></i>
+      </div>
+      <h4 class="fw-bold mb-0">{{ $item['value'] }}</h4>
+      <p class="mb-1">{{ $item['label'] }}</p>
+      <div class="badge bg-light text-dark px-3 py-2" style="font-size:12px;">
+        <span style="color:{{ $item['color'] }}">12.5% Growth</span> <br> This Month
+      </div>
+    </div>
+  </div>
+  @endforeach
 </div>
 
-<script>
-    const ctx = document.getElementById('sertifikasiChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['akl', 'mplb', 'pemasaran', 'mm-log', 'dkv', 'rpl', 'tjk'],
-            datasets: [{
-                label: 'Jumlah Peserta',
-                data: [40, 60, 30, 20, 50, 55, 15],
-                backgroundColor: ['#fbbf24','#3b82f6','#ef4444','#8b5cf6','#10b981','#6366f1','#9ca3af'],
-                borderRadius: 10
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false }},
-            scales: {
-                y: { beginAtZero: true, ticks: { stepSize: 20 }}
-            }
-        }
-    });
-</script>
-
+{{-- Grafik Sertifikasi --}}
+<div class="card shadow-sm border-0 mt-5 p-4 rounded-4" style="background:#fff;">
+  <h5 class="fw-bold mb-3">Grafik Sertifikasi</h5>
+  <div style="height:350px;">
+    <canvas id="sertifikasiChart"></canvas>
+  </div>
+<div class="d-flex justify-content-between mt-3 text-muted">
+  <div><span class="fw-bold text-primary">{{ $totalSertifikat }}</span> Total Tersertifikasi</div>
+  <div><span class="fw-bold text-success">18%</span> Rata-rata Pertumbuhan</div>
+  <div>
+    <span class="fw-bold" style="color:{{ $topColor }}">
+      {{ $topJurusan }}
+    </span> Jurusan Terbanyak Sertifikasi
+  </div>
+</div>
+</div>
 @endsection
+
+{{-- Chart.js --}}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const ctx = document.getElementById('sertifikasiChart').getContext('2d');
+
+  // Warna dasar
+  const baseColors = ["#f1c40f","#3498db","#e74c3c","#e67e22","#9b59b6","#2ecc71","#7f8c8d"];
+  const gradients = baseColors.map(color => {
+    let g = ctx.createLinearGradient(0, 0, 0, 350);
+    g.addColorStop(0, color);
+    g.addColorStop(1, color + "33"); // versi transparan
+    return g;
+  });
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: @json($labels),
+      datasets: [{
+        label: 'Total Sertifikasi',
+        data: @json($values),
+        backgroundColor: gradients.slice(0, @json(count($labels))),
+        borderRadius: 30,
+        barThickness:90
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            stepSize: 20,
+            callback: value => value + ' peserta'
+          },
+          grid: { color: '#eee' }
+        },
+        x: {
+          grid: { display: false }
+        }
+      }
+    }
+  });
+});
+</script>

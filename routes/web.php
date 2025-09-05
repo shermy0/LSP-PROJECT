@@ -10,6 +10,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
 
+
 // login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -27,6 +28,7 @@ Route::post('/register/asesor', [RegisterController::class, 'storeAsesor'])->nam
 
 // Form Perencanaan untuk Asesor
 Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('formperencanaan');
+
 Route::get('/pramuniaga', [FormAsesmenController::class, 'pramuniaga'])->name('formasesmen.pramuniaga');
 
 Route::get('/officeadministative', [FormAsesmenController::class, 'officeadministative'])->name('formasesmen.officeadministative');
@@ -42,32 +44,30 @@ Route::get('/akuntansikeuanganII', [FormAsesmenController::class, 'akuntansikeua
 // Form Perencanaan untuk Asesor
 Route::get('/formasesmen', [FormAsesmenController::class, 'index'])->name('formasesmen');
 
-// Dashboard Admin
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
-});
-
-// login
+//login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
-
-// pilih role register
 Route::get('/register-role', [AuthController::class, 'showRegisterRole'])->name('register.role');
 
-// register asesi
+//register
 Route::get('/register/asesi', [RegisterController::class, 'showAsesiForm'])->name('register.asesi');
 Route::post('/register/asesi', [RegisterController::class, 'storeAsesi'])->name('register.asesi.store');
 
-// register asesor
 Route::get('/register/asesor', [RegisterController::class, 'showAsesorForm'])->name('register.asesor');
 Route::post('/register/asesor', [RegisterController::class, 'storeAsesor'])->name('register.asesor.store');
 
-// Form Perencanaan untuk Asesor
-Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('formperencanaan');
+//dashboard
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-// Dashboard Asesi
-Route::middleware(['auth', 'role:asesi'])->group(function () {
-    Route::get('/dashboard/asesi', [DashboardController::class, 'asesi'])->name('dashboard.asesi');
+    // Admin
+    Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('dashboard.admin');
+
+    // Asesi
+    Route::get('/asesi/dashboard', [DashboardController::class, 'asesi'])->name('dashboard.asesi');
+
+    // Asesor
+    Route::get('/asesor/dashboard', [DashboardController::class, 'asesor'])->name('dashboard.asesor');
 });
 
 // Logout
