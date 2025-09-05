@@ -91,12 +91,12 @@
 
     <div class="container">
         <div class="card-new">
-        <p class="card-title-new">Apakah Asesi Menyatakan Kompeten?</p>
+        <p class="card-title-new">Rekomendasi Asesor</p>
             <label class="option-new">
-                <input type="radio" name="kompeten" value="ya"> Ya
+                <input type="radio" name="kompeten" value="ya"> Asesi dapat melanjutkan ke asesmen berikutnya
             </label>
             <label class="option">
-                <input type="radio" name="kompeten" value="tidak"> Tidak
+                <input type="radio" name="kompeten" value="tidak"> Asesi tidak dapat melanjutkan ke asesmen berikutnya
             </label>
         </div>
     </div>
@@ -108,7 +108,6 @@
 
     <!-- Card Asesi -->
     <div class="card">
-      <div class="card">
       <div class="card-title">Asesi</div>
       <form>
         <label for="nama-asesi">Nama Lengkap</label>
@@ -125,7 +124,6 @@
           <button type="button" class="download" onclick="downloadTTD('ttd-asesi','nama-asesi','tanggal-asesi')">Unduh</button>
         </div>
       </form>
-    </div>
     </div>
 
     <!-- Card Asesor -->
