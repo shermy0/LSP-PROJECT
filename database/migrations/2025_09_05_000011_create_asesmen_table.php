@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('asesmen', function (Blueprint $table) {
             $table->id('id_asesmen');
             $table->integer('id_permohonan')->nullable();
-            $table->integer('id_jadwal')->nullable();
+            $table->foreignId('id_jadwal')->nullable()->constrained(table: 'jadwal_asesmen', column: 'id_jadwal') ->nullOnDelete();      
             $table->enum('hasil', ['K', 'BK'])->nullable();
             $table->text('umpan_balik_asesi')->nullable();
             $table->text('catatan')->nullable();

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void {
         Schema::create('jenis_dokumen', function (Blueprint $table) {
-            $table->increments('id_jenis_dokumen');
+            $table->id('id_jenis_dokumen');
             $table->string('nama_jenis')->nullable();
             $table->text('keterangan')->nullable();
         });
