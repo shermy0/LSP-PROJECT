@@ -6,7 +6,7 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="#" class="text-primary">Form Asesmen</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('formasesmen') }}" class="text-primary">Form Asesmen</a></li>
             <li class="breadcrumb-item active" aria-current="page">FR.IA.07</li>
         </ol>
     </nav>
@@ -16,23 +16,16 @@
         <h4 class="fw-bold text-dark">FR.IA.07 – Lembar Pertanyaan Esai</h4>
         <p class="text-muted mb-1">Skema Sertifikasi Kompetensi</p>
 
-        <!-- Dropdown Skema -->
         <div class="d-inline-block mb-2">
-            <button class="btn" style="background-color:#003366; color:#fff;" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                JUNIOR OPERATOR DESAIN GRAFIS
+            <button class="btn" style="background-color:#003366; color:#fff;" type="button">
+                {{ strtoupper($skema->nama_skema) }}
             </button>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Junior Technical Support</a></li>
-                <li><a class="dropdown-item" href="#">Pemrograman Junior</a></li>
-                <li><a class="dropdown-item" href="#">Office Administrative</a></li>
-            </ul>
         </div>
 
-        <!-- Nomor Identifikasi -->
-        <p class="text-muted">085102432440</p>
+        <p class="text-muted">{{ $skema->kode_skema ?? 'N/A' }}</p>
     </div>
 
-    <!-- Panduan Bagi Asesor -->
+    <!-- Panduan -->
     <div class="card shadow-sm mb-5 border-0">
         <div class="card-header" style="background-color:#f0f6ff; color:#333; font-weight:bold;">
             Panduan Bagi Asesor
@@ -60,7 +53,7 @@
     </div>
 </div>
 
-<!-- Modal Tambah Pertanyaan -->
+<!-- Modal -->
 <div class="modal fade" id="modalPertanyaan" tabindex="-1" aria-labelledby="modalPertanyaanLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 350px;">
         <div class="modal-content" style="border-radius: 10px; border: none;">
@@ -69,15 +62,27 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body pt-2">
-                <input type="number" class="form-control mb-2" min="1" max="15" value="5">
+                <input type="number" id="jumlahPertanyaan" class="form-control mb-2" min="1" max="15" value="5">
                 <small class="text-danger">note: maksimal 15 pertanyaan</small>
             </div>
             <div class="modal-footer border-0">
-                <button type="button" class="btn w-100 text-white" style="background-color:#003366; font-weight:bold;">
+                <button type="button" onclick="redirectToForm()" class="btn w-100 text-white" style="background-color:#003366; font-weight:bold;">
                     Simpan
                 </button>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+function redirectToForm() {
+    let jumlah = document.getElementById('jumlahPertanyaan').value;
+    let id_skema = "{{ $skema->id_skema }}";
+    if(jumlah < 1 || jumlah > 15) {
+        alert("Jumlah pertanyaan harus antara 1-15");
+        return;
+    }
+    window.location.href = "{{ route('pertanyaan.esai.create') }}?jumlah=" + jumlah + "&id_skema=" + id_skema;
+}
+</script>
 @endsection
