@@ -7,9 +7,11 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void {
         Schema::create('kuk', function (Blueprint $table) {
-            $table->increments('id_kuk');
-            $table->foreignId('id_elemen')->nullable()->constrained('elemen_kompetensi')->onDelete('cascade');
-            $table->text('deskripsi_kuk')->nullable();
+            $table->id('id_kuk');
+            $table->foreignId('id_elemen')->nullable()
+            ->constrained(table: 'elemen_kompetensi', column: 'id_elemen')
+            ->cascadeOnDelete();
+                  $table->text('deskripsi_kuk')->nullable();
         });
     }
 
