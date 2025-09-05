@@ -73,14 +73,15 @@ class RegisterController extends Controller
         ]);
 
         Asesor::create([
-            'user_id' => $user->id,
+            
             'nama_asesor' => $request->nama_asesor,
             'nip' => $request->nip,
             'keahlian' => $request->keahlian,
             'jabatan' => $request->jabatan,
             'no_registrasi' => $request->no_registrasi,
+            
         ]);
 
         return redirect()->route('login')->with('success', 'Pendaftaran Asesor berhasil!');
     }
-}
+}      

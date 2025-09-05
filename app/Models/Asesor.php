@@ -11,7 +11,7 @@ class Asesor extends Model
 
     protected $table = 'asesor';
     protected $primaryKey = 'id_asesor';
-
+    public $timestamps = false;
     protected $fillable = [
         'user_id',
         'nama_asesor',

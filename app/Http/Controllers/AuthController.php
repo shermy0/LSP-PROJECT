@@ -1,6 +1,5 @@
 <?php
 
-// app/Http/Controllers/AuthController.php
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -9,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
+
 {
     public function showLogin()
     {
@@ -20,19 +20,24 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
+            // Ambil user yang sedang login
             $user = Auth::user();
 
-            // Redirect berdasarkan role
+            // Cek role dan redirect
             if ($user->role === 'admin') {
-                return redirect()->route('dashboard.admin');
+                return redirect()->route('admin.dashboard');
             } elseif ($user->role === 'asesor') {
-                return redirect()->route('formperencanaan');
+                return redirect()->route('asesor.dashboard');
+            } elseif ($user->role === 'asesi') {
+                return redirect()->route('asesi.dashboard');
             } else {
-                return redirect()->route('dashboard.asesi');
+                Auth::logout();
+                return redirect()->route('login')->withErrors('Role tidak dikenali.');
             }
         }
 
-        return back()->with('error', 'Email atau password salah');
+        // Kalau gagal login
+        return back()->withErrors(['login' => 'Email atau password salah']);
     }
 
     public function showRegisterRole()
@@ -59,11 +64,11 @@ class AuthController extends Controller
         return redirect()->route('login')->with('success', 'Registrasi berhasil, silakan login');
     }
 
-    public function logout(Request $request)
-    {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+   public function logout(Request $request)
+{
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
 
         return redirect('/login');
     }
