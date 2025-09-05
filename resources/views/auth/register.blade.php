@@ -7,8 +7,4 @@
     <h1>Halaman registrasi untuk role: {{ request('role') }}</h1>
     <p>Form registrasi detail akan dibuat nanti...</p>
 </body>
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> sidebar
