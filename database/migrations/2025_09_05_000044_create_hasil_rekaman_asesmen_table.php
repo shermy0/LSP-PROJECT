@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('hasil_rekaman_asesmen', function (Blueprint $table) {
             $table->id('id_bukti');
-            // $table->foreignId('id_rekaman')->nullable()->constrained('rekaman_asesmen')->nullOnDelete();
+            $table->foreignId('id_rekaman')->nullable()->constrained(table: 'rekaman_asesmen', column: 'id_rekaman') ->nullOnDelete();      
             $table->foreignId('id_unit')->nullable()->constrained(table: 'unit_kompetensi', column: 'id_unit') ->nullOnDelete();      
             $table->boolean('observasi')->nullable();
             $table->boolean('pernyataan_pihak_ketiga')->nullable();
