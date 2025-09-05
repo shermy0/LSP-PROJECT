@@ -6,8 +6,6 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
-use App\Http\Controllers\PertanyaanEsai;
-
 
 // login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -49,32 +47,11 @@ Route::post('/form-asesmen/pertanyaan-esai/delete', [FormAsesmenController::clas
 
 
 // Dashboard Admin
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
-});
+// Dashboard Admin (tanpa middleware)
+Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
 
-
-//login
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
-
-// pilih role register
-Route::get('/register-role', [AuthController::class, 'showRegisterRole'])->name('register.role');
-
-// register asesi
-Route::get('/register/asesi', [RegisterController::class, 'showAsesiForm'])->name('register.asesi');
-Route::post('/register/asesi', [RegisterController::class, 'storeAsesi'])->name('register.asesi.store');
-
-// register asesor
-Route::get('/register/asesor', [RegisterController::class, 'showAsesorForm'])->name('register.asesor');
-Route::post('/register/asesor', [RegisterController::class, 'storeAsesor'])->name('register.asesor.store');
-
-// Form Perencanaan untuk Asesor
-Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('formperencanaan');
-
-// Dashboard Asesi
+// Dashboard Asesi (tanpa middleware)
 Route::get('/dashboard/asesi', [DashboardController::class, 'asesi'])->name('dashboard.asesi');
-
 
 // Logout
 Route::post('/logout', function () {

@@ -23,15 +23,15 @@ class RegisterController extends Controller
     public function storeAsesi(Request $request)
     {
         $request->validate([
-            'name'           => 'required|string',
-            'email'          => 'required|email|unique:users',
-            'password'       => 'required|min:6|confirmed',
-            'nik'            => 'required|digits_between:9,16',
-            'nama_lengkap'   => 'required|string',
-            'tempat_lahir'   => 'required|string',
-            'tgl_lahir'      => 'required|date',
-            'jenis_kelamin'  => 'required|in:L,P',
-            'telepon'        => 'required|string',
+            'name' => 'required|string',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6|confirmed',
+            'nik' => 'required|digits_between:9,16',
+            'nama_lengkap' => 'required|string',
+            'tempat_lahir' => 'required|string',
+            'tgl_lahir' => 'required|date',
+            'jenis_kelamin' => 'required|in:L,P',
+            'telepon' => 'required|string',
         ]);
 
         $user = User::create([

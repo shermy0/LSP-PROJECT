@@ -13,21 +13,9 @@ class Asesi extends Model
     protected $primaryKey = 'id_asesi';
 
     protected $fillable = [
-        'user_id',
-        'nik',
-        'nama_lengkap',
-        'tempat_lahir',
-        'tgl_lahir',
-        'jenis_kelamin',
-        'kebangsaan',
-        'alamat',
-        'telepon',
-        'pendidikan_terakhir',
-        'institusi',
-        'jabatan',
-        'alamat_kantor',
-        'telepon_kantor',
-        'tanda_tangan',
+        'user_id','nik','nama_lengkap','tempat_lahir','tgl_lahir','jenis_kelamin',
+        'kebangsaan','alamat','telepon','email','pendidikan_terakhir',
+        'institusi','jabatan','alamat_kantor','telepon_kantor'
     ];
 
     public function user()
