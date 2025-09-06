@@ -9,6 +9,7 @@ use App\Http\Controllers\RegisterController;
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
+use App\Http\Controllers\Asesi\PermohonanController;
 
 
 // login
@@ -70,6 +71,12 @@ Route::middleware(['auth'])->group(function () {
 
     // Asesor
     Route::get('/asesor/dashboard', [DashboardController::class, 'asesor'])->name('dashboard.asesor');
+});
+
+// ============ Tambahan untuk Form Permohonan ============
+Route::prefix('asesi/permohonan')->name('asesi.permohonan.')->group(function () {
+    Route::get('/form1', [PermohonanController::class, 'form1'])->name('form1');
+    Route::get('/form2', [PermohonanController::class, 'form2'])->name('form2');
 });
 
 // Logout
