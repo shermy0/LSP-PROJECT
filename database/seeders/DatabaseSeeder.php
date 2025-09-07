@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             MigrationsSeeder::class,
             SkemaSertifikasiSeeder::class,
             TukSeeder::class,
+            AsesorSkemaSeeder::class,
         ]);
     }
 }
