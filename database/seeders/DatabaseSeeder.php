@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             SkemaSertifikasiSeeder::class,
             TukSeeder::class,
             AsesorSkemaSeeder::class,
+            UnitKompetensiSeeder::class,
         ]);
     }
 }
