@@ -25,7 +25,6 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             AsesiSeeder::class,
             AsesorSeeder::class,
-            MigrationsSeeder::class,
             SkemaSertifikasiSeeder::class,
             TukSeeder::class,
             AsesorSkemaSeeder::class,
