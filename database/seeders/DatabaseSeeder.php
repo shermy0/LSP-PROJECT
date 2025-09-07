@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
             AsesorSkemaSeeder::class,
             UnitKompetensiSeeder::class,
             ElemenKompetensiSeeder::class,
+            KukSeeder::class,
         ]);
     }
 }
