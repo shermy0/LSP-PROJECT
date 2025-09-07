@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             TukSeeder::class,
             AsesorSkemaSeeder::class,
             UnitKompetensiSeeder::class,
+            ElemenKompetensiSeeder::class,
         ]);
     }
 }
