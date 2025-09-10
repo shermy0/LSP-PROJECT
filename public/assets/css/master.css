@@ -1,8 +1,8 @@
 /* MASTER */
 body {
     margin: 0;
-    font-family: "Poppins", sans-serif;
     background-color: #f4f4f4;
+    font-family: 'Poppins', sans-serif !important;
 }
 
 /* Sidebar */
@@ -28,8 +28,8 @@ body {
 /* Header Toggle */
 .toggle-btn {
     display: flex;
-    align-items: flex-end; 
-    text-align: right; 
+    align-items: flex-end;
+    text-align: right;
     gap: 10px;
     background-color: #041562;
     color: white;
@@ -43,8 +43,8 @@ body {
 .toggle-left {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; 
-    text-align: left;   
+    align-items: flex-start;
+    text-align: left;
 }
 
 .sidebar.collapsed .toggle-left {
@@ -109,6 +109,12 @@ body {
     pointer-events: none;
 }
 
+.menu ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+}
+
 /* Footer */
 .sidebar-footer {
     padding: 15px;
@@ -118,7 +124,6 @@ body {
     gap: 10px;
 }
 
-/* Avatar Container */
 .avatar {
     display: flex;
     align-items: center;
@@ -179,10 +184,9 @@ body {
 }
 
 .sidebar.collapsed .menu ul li a {
-    display: none;         /* ❌ sembunyikan link/teks */
+    display: none;
 }
 
-/* Sidebar collapse: sembunyikan teks, icon tetap di tengah */
 .sidebar.collapsed .logout-btn {
     width: 50px;
     justify-content: center;
@@ -192,50 +196,33 @@ body {
     display: none;
 }
 
-
-/* Konten utama menyesuaikan sidebar */
+/* Konten utama */
 #main-content {
-    margin-left: 240px; /* default lebar sidebar */
+    margin-left: 240px;
     padding: 20px;
     transition: margin-left 0.3s ease;
 }
 
-/* Responsive sidebar */
 .sidebar.collapsed + #main-content {
-    margin-left: 70px; /* ketika sidebar collapse */
+    margin-left: 70px;
 }
 
-.menu ul li a {
-    color: white;
-    text-decoration: none;
-    font-size: 14px;
-}
-
-/* Untuk layar kecil */
+/* Responsive */
 @media (max-width: 768px) {
     .sidebar {
         width: 70px;
     }
 
     .sidebar .menu ul li a {
-        display: none;     /* ❌ sembunyikan teks */
+        display: none;
     }
 
     .sidebar .menu ul li {
-        justify-content: center; /* icon di tengah */
+        justify-content: center;
     }
 }
 
 /* FORM PERENCANAAN */
-/* Font & Body */
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #fafafa;
-    margin: 0;
-    padding: 0;
-}
-
-/* Judul */
 h1 {
     font-size: 1.5rem;
     font-weight: 600;
@@ -253,31 +240,30 @@ h5 {
 }
 
 .center-underline {
-    display: inline-block; /* pastikan lebarnya sesuai teks */
-    position: relative; 
-    text-align: center; /* tambahan */
+    display: inline-block;
+    position: relative;
+    text-align: center;
 }
 
 .center-underline::after {
     content: "";
     position: absolute;
     left: 50%;
-    bottom: -5px; /* jarak garis ke teks */
+    bottom: -5px;
     transform: translateX(-50%);
-    width: 60%; /* bisa disesuaikan */
+    width: 60%;
     height: 3px;
     background-color: #0284C7;
     border-radius: 2px;
 }
 
-/* Container */
 .container {
     max-width: 800px;
     margin: 20px auto;
     padding: 0 15px;
 }
 
-/* Accordion umum */
+/* Accordion */
 .accordion {
     display: flex;
     flex-direction: column;
@@ -289,7 +275,7 @@ h5 {
     border-radius: 12px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     overflow: hidden;
-    border: none; /* samakan border dengan dropdown */
+    border: none;
 }
 
 .accordion-header {
@@ -301,8 +287,7 @@ h5 {
     font-weight: 500;
     cursor: pointer;
     background-color: #fff;
-    border-radius: 12px; /* samakan dengan dropdown */
-    border: none; /* hilangkan border default */
+    border-radius: 12px;
     transition: background-color 0.2s ease;
 }
 
@@ -310,12 +295,11 @@ h5 {
     background-color: #f7f7f7;
 }
 
-/* Hapus panah default */
 .accordion-button::after {
     display: none;
 }
 
-/* Dropdown tampil seperti item accordion */
+/* Dropdown */
 .dropdown .btn {
     background-color: #fff;
     color: #4C4C4C;
@@ -330,39 +314,37 @@ h5 {
     gap: 10px;
     transition: background-color 0.2s ease;
     border: none;
+    position: relative;
 }
 
-/* Panah dropdown di kanan */
 .dropdown .btn::after {
-    content: "\f078"; /* kode FontAwesome untuk panah bawah */
-    font-family: "Font Awesome 6 Free"; /* pastikan pakai font awesome */
+    content: "\f078";
+    font-family: "Font Awesome 6 Free";
     font-weight: 900;
     position: absolute;
-    right: 20px; /* jarak dari kanan */
+    right: 20px;
     top: 50%;
     transform: translateY(-50%);
-    pointer-events: none; /* supaya tidak mengganggu klik */
-    color: #4C4C4C; /* warna panah */
+    pointer-events: none;
+    color: #4C4C4C;
 }
 
-/* Dropdown menu */
 .dropdown-menu {
-    border-radius: 12px;          /* sudut rounded */
-    border: 1px solid #e5e7eb;    /* abu halus */
-    background-color: #fff;       /* putih bersih */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* shadow lembut */
-    font-size: 0.9rem;            /* sedikit lebih besar dari aslinya */
-    min-width: 180px;             /* biar gak sempit */
-    padding: 6px 0;               /* rapetin */
-    margin-top: 8px;              /* jarak dari tombol */
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    font-size: 0.9rem;
+    min-width: 180px;
+    padding: 6px 0;
+    margin-top: 8px;
 }
 
-/* Item dropdown */
 .dropdown-item {
     padding: 12px 20px;
     font-size: 0.85rem;
     color: #4C4C4C;
     transition: background-color 0.2s ease;
-    border-radius: 12px; /* samakan radius semua item */
-    border: none; /* hilangkan garis pinggir */
+    border-radius: 12px;
+    border: none;
 }
