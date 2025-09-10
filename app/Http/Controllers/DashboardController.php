@@ -47,7 +47,7 @@ class DashboardController extends Controller
 
     public function asesor()
     {
-        return view('formperencanaan'); // resources/views/formperencanaan.blade.php
+        return view('dashboard.asesor'); // resources/views/formperencanaan.blade.php
     }
 
 }
