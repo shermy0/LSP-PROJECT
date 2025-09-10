@@ -13,7 +13,19 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        // sementara belum isi logika login
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string|min:6'
+        ]);
+
+        if (auth()->attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect()->intended('/banding-asesmen');
+        }
+
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ])->onlyInput('email');
     }
 
     public function showRegisterRole()
