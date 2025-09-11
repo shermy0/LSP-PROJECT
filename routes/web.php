@@ -4,8 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\PerencanaanController;
+use App\Http\Controllers\kerahasiaanController;
 use App\Http\Controllers\FormPerencanaan\MapaController;
+
+
 
 
 // login
@@ -23,8 +25,8 @@ Route::post('/register/asesi', [RegisterController::class, 'storeAsesi'])->name(
 Route::get('/register/asesor', [RegisterController::class, 'showAsesorForm'])->name('register.asesor');
 Route::post('/register/asesor', [RegisterController::class, 'storeAsesor'])->name('register.asesor.store');
 
-// Form Perencanaan untuk Asesor
-Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('formperencanaan');
+Route::get('/kerahasiaan', [KerahasiaanController::class, 'create'])->name('kerahasiaan');
+Route::post('/kerahasiaan', [KerahasiaanController::class, 'store'])->name('kerahasiaan.store');
 
 // form perencanaan mapa 01
 Route::prefix('form-perencanaan')->group(function () {

@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <form action="{{ route('asesmen.store') }}" method="POST">
+    <form action="{{ route('kerahasiaan.store') }}" method="POST">
         @csrf
 
         <h4 class="text-center fw-bold mb-4">PERSETUJUAN ASESMEN DAN KERAHASIAAN</h4>
@@ -15,11 +15,13 @@
         <div class="row mb-3">
             <div class="col-md-6">
                 <label class="form-label">Skema Sertifikasi</label>
-                <input type="text" class="form-control" name="skema" value="{{ $data->skema }}" readonly>
+                <input type="text" class="form-control" name="skema"
+                       value="{{ $persetujuan->skema->nama_skema ?? '' }}" readonly>
             </div>
             <div class="col-md-6">
                 <label class="form-label">Okupasi</label>
-                <input type="text" class="form-control" name="okupasi" value="{{ $data->okupasi }}" readonly>
+                <input type="text" class="form-control" name="okupasi"
+                       value="{{ $persetujuan->skema->okupasi ?? '' }}" readonly>
             </div>
         </div>
 
@@ -27,11 +29,13 @@
         <div class="row mb-3">
             <div class="col-md-6">
                 <label class="form-label">Nomor</label>
-                <input type="text" class="form-control" name="nomor" value="{{ $data->nomor }}" readonly>
+                <input type="text" class="form-control" name="nomor"
+                       value="{{ $persetujuan->id_persetujuan ?? '' }}" readonly>
             </div>
             <div class="col-md-6">
                 <label class="form-label">Tempat Uji Kompetensi</label>
-                <input type="text" class="form-control" name="tempat_uji" value="{{ $data->tempat_uji }}" readonly>
+                <input type="text" class="form-control" name="tempat_uji"
+                       value="{{ $persetujuan->tuk->nama_tuk ?? '' }}" readonly>
             </div>
         </div>
 
@@ -39,11 +43,13 @@
         <div class="row mb-3">
             <div class="col-md-6">
                 <label class="form-label">Nama Asesi</label>
-                <input type="text" class="form-control" name="nama_asesi" value="{{ $data->nama_asesi }}" readonly>
+                <input type="text" class="form-control" name="nama_asesi"
+                       value="{{ $persetujuan->asesi->nama ?? '' }}" readonly>
             </div>
             <div class="col-md-6">
                 <label class="form-label">Nama Asesor</label>
-                <input type="text" class="form-control" name="nama_asesor" value="{{ $data->nama_asesor }}" readonly>
+                <input type="text" class="form-control" name="nama_asesor"
+                       value="{{ $persetujuan->asesor->nama ?? '' }}" readonly>
             </div>
         </div>
 
@@ -51,7 +57,7 @@
         <div class="mb-3">
             <label class="form-label">Bukti yang Dikumpulkan</label>
             <div class="list-group">
-                @foreach($bukti as $key => $item)
+                @foreach($bukti as $item)
                     <div class="list-group-item">
                         <input type="checkbox" name="bukti[]" value="{{ $item->id }}">
                         {{ $item->nama_bukti }}
@@ -74,7 +80,11 @@
                 <label class="form-label">TUK</label>
                 <select name="tuk" class="form-control">
                     @foreach($tuk as $item)
-                        <option value="{{ $item->id }}">{{ $item->nama_tuk }}</option>
+                        <option value="{{ $item->id }}"
+    {{ $persetujuan?->tuk?->id == $item->id ? 'selected' : '' }}>
+    {{ $item->nama_tuk }}
+</option>
+
                     @endforeach
                 </select>
             </div>
