@@ -114,20 +114,19 @@ Route::get('/register/asesor', [RegisterController::class, 'showAsesorForm'])->n
 Route::post('/register/asesor', [RegisterController::class, 'storeAsesor'])->name('register.asesor.store');
 
 /*
-|--------------------------------------------------------------------------|
-| ROUTE DASHBOARD                                                           |
-|--------------------------------------------------------------------------|
+|--------------------------------------------------------------------------
+| DASHBOARD ROUTES
+|--------------------------------------------------------------------------
 */
+// Admin Dashboard
+Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('admin.dashboard');
 
-// Admin
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
-});
+// Asesor Dashboard
+Route::get('/dashboard/asesor', [DashboardController::class, 'asesor'])->name('asesor.dashboard');
 
-// Asesi
-Route::middleware(['auth', 'role:asesi'])->group(function () {
-    Route::get('/dashboard/asesi', [DashboardController::class, 'asesi'])->name('dashboard.asesi');
-});
+// Asesi Dashboard
+Route::get('/dashboard/asesi', [DashboardController::class, 'asesi'])->name('asesi.dashboard');
+
 
 /*
 |--------------------------------------------------------------------------|
