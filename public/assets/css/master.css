@@ -1,12 +1,5 @@
-<<<<<<< HEAD
 body {
     margin: 0;
-=======
-/* MASTER */
-body {
-    margin: 0;
-    font-family: "Poppins", sans-serif;
->>>>>>> 611046b1ace2ff58f20fcef5931dc36ff0f9e60d
     background-color: #f4f4f4;
     font-family: 'Poppins', sans-serif !important;
 }
@@ -71,32 +64,6 @@ body {
 /* Menu */
 .menu {
     flex-grow: 1;
-<<<<<<< HEAD
-=======
-}
-.menu ul {
-    list-style: none;
-    padding: 0;
-}
-.menu ul li {
-    padding: 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    white-space: nowrap;
-}
-.menu ul li:hover {
-    background-color: #003399;
-}
-.menu ul li i {
-    font-size: 18px;
-    min-width: 20px;
-    text-align: center;
-}
-.sidebar.collapsed .menu ul li span {
-    display: none;
->>>>>>> 611046b1ace2ff58f20fcef5931dc36ff0f9e60d
     margin-top: 10px;
 }
 
