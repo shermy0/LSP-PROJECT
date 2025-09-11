@@ -25,10 +25,10 @@
 
                 <div class="d-flex">
                     {{-- Edit --}}
-                    <a href="{{ route('pertanyaan.esai.edit', $p->id) }}" class="btn btn-sm btn-dark me-2">Edit</a>
+                    <a href="{{ route('pertanyaan.esai.edit', $p->id_pertanyaan) }}" class="btn btn-sm btn-dark me-2">Edit</a>
 
                     {{-- Hapus --}}
-                    <form action="{{ route('pertanyaan.esai.destroy', $p->id) }}" method="POST" onsubmit="return confirm('Hapus pertanyaan ini?')">
+                    <form action="{{ route('pertanyaan.esai.destroy', $p->id_pertanyaan) }}" method="POST" onsubmit="return confirm('Hapus pertanyaan ini?')">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-sm btn-danger">Hapus</button>

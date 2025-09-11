@@ -9,6 +9,10 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
 use App\Http\Controllers\PertanyaanController;
 
+
+Route::get('/form-asesmen/{id_skema}', [FormAsesmenController::class, 'showSkema'])
+    ->name('formasesmen.show');
+
 // Edit & Update
 Route::get('/pertanyaan/esai/{id}/edit', [PertanyaanController::class, 'editEsai'])->name('pertanyaan.esai.edit');
 Route::put('/pertanyaan/esai/{id}', [PertanyaanController::class, 'updateEsai'])->name('pertanyaan.esai.update');
@@ -68,8 +72,9 @@ Route::get('/formasesmen', [FormAsesmenController::class, 'index'])->name('forma
 |--------------------------------------------------------------------------|
 */
 
-// CRUD Esai
-Route::get('/esai-crud', [PertanyaanController::class, 'crudEsai'])->name('esai.crud');
+
+Route::get('/esai/{id_skema}', [PertanyaanController::class, 'crudEsai'])->name('esai.crud');
+
 
 // PertanyaanController → simpan esai
 Route::post('/pertanyaan/esai/store', [PertanyaanController::class, 'storeEsai'])->name('pertanyaan.esai.store');

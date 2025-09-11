@@ -22,5 +22,28 @@ class FormAsesmenController extends Controller
 
     return view('essai', compact('skema'));
 }
+
+public function showSkema($id_skema)
+{
+    $skema = Skema::findOrFail($id_skema);
+
+    // mapping nama skema ke blade langsung di /views/
+    $viewMap = [
+        'Junior Operator Desain Grafis' => 'junioroperatordesigngrafis',
+        'Junior Technical Support' => 'juniortechnicalsupport',
+        'Pemrogram Junior (Junior Coder)' => 'pemogramanjunior',
+        'Office Administrative' => 'officeadministative',
+        'Pramuniaga' => 'pramuniaga',
+        'Akuntansi dan Keuangan Lembaga 2' => 'akuntansikeuanganII',
+    ];
+
+    if (array_key_exists($skema->nama_skema, $viewMap)) {
+        return view($viewMap[$skema->nama_skema], compact('skema'));
+    }
+
+    // fallback kalau belum ada blade khusus
+    return view('default', compact('skema'));
+}
+
 }
 
