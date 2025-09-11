@@ -75,27 +75,15 @@ class RegisterController extends Controller
         ]);
 
         Asesor::create([
-<<<<<<< HEAD
             
             'nama_asesor' => $request->nama_asesor,
             'nip' => $request->nip,
             'keahlian' => $request->keahlian,
             'jabatan' => $request->jabatan,
-=======
-            'user_id'       => $user->id,
-            'nama_asesor'   => $request->nama_asesor,
-            'nip'           => $request->nip,
-            'keahlian'      => $request->keahlian,
-            'jabatan'       => $request->jabatan,
->>>>>>> 611046b1ace2ff58f20fcef5931dc36ff0f9e60d
             'no_registrasi' => $request->no_registrasi,
             
         ]);
 
         return redirect()->route('login')->with('success', 'Pendaftaran Asesor berhasil!');
     }
-<<<<<<< HEAD
 }      
-=======
-}
->>>>>>> 611046b1ace2ff58f20fcef5931dc36ff0f9e60d
