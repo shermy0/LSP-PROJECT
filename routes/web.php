@@ -47,3 +47,10 @@ Route::post('/logout', function () {
     request()->session()->regenerateToken();
     return redirect('/login');
 })->name('logout');
+
+
+//masuk langsung ke login
+Route::get('/', function () {
+    return redirect()->route('login');
+});
+

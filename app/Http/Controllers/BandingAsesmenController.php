@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Asesor; // pastikan model Asesor ada
 
 class BandingAsesmenController extends Controller
 {
     public function index()
     {
-        return view('banding-asesmen');
+        $asesors = Asesor::all(); // ambil semua data asesor
+        return view('banding-asesmen', compact('asesors'));
     }
+
 
     public function store(Request $request)
     {
