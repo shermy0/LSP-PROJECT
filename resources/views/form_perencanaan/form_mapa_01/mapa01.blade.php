@@ -3,10 +3,7 @@
 @section('konten')
 <link rel="stylesheet" href="{{ asset('assets/css/mapa01.css') }}">
 
-<div class="container mt-4">
-
-    <!-- Card utama -->
-    <div class="card mapa-card">
+        <div class="card mapa-card">
     <!-- Breadcrumb -->
          <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -14,13 +11,13 @@
             <li class="breadcrumb-item active" aria-current="page">FR.MAPA.01</li>
         </ol>
     </nav>
-        <div class="text-center">
-            <div class="mapa-logo"></div>
- <div class="text-center">
-        <h3 class="fw-bold">FR.MAPA 01. Merencanakan Aktivitas dan Proses </h3>
+
+    <!-- Header -->
+    <div class="text-center mb-4">
+        <div class="mapa-logo"></div>
+        <h3 class="fw-bold">FR.MAPA 01. Merencanakan Aktivitas dan Proses</h3>
         <p class="text-muted">Peninjauan Proses Asesmen</p>
     </div>
-        </div>
 
         <!-- Dropdown skema -->
 <div class="skema-container">
@@ -61,11 +58,13 @@
             </div>
         </div>
     </div>
+        </div>
 
     <!-- Menentukan Pendekatan Asesmen -->
 <div class="mapa-section">
     <div class="card mapa-card">
-        <div class="mapa-section-header-light">Menentukan Pendekatan Asesmen</div>
+                <div class="judul-header">Menentukan Pendekatan Asesmen</div>
+
             <div class="mapa-subsection">
                 <div class="mapa-subsection-header">Asesi</div>
                 <div class="mapa-options">
@@ -90,7 +89,6 @@
                         <label for="asesi5">Pelatihan / belajar mandiri atau otodidak.</label>
                     </div>
             </div>
-        </div>
         <!-- Tujuan Asesmen -->
 <div class="mapa-section">
     <div class="mapa-subsection-header">Tujuan Asesmen</div>
@@ -256,7 +254,7 @@
 
 </div>
 <!-- Simpan dan Lanjut -->
-<form id="simpan-lanjut-form" action="{{ route('form.mapa01.kodeunit') }}" method="GET" class="simpan-form">
+<form id="simpan-lanjut-form" action="" method="GET" class="simpan-form">
     @csrf
     <button type="submit" class="simpan-btn">
         <span>Simpan dan Lanjut</span>
@@ -264,6 +262,15 @@
 </form>
 
 <script>
+    document.getElementById('simpan-lanjut-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const skemaId = document.getElementById('skema_id').value;
+    if (skemaId) {
+        window.location.href = "/form-perencanaan/mapa01/kode-unit/" + skemaId;
+    } else {
+        alert("Silakan pilih skema terlebih dahulu");
+    }
+});
      document.getElementById('skema_id').addEventListener('change', function() {
         let selected = this.options[this.selectedIndex];
         let kode = selected.getAttribute('data-kode');

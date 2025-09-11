@@ -1,8 +1,4 @@
-/* Styling untuk FR.MAPA.01 */
 
-/* Card utama */
-
-/* Dropdown skema */
 .mapa-dropdown {
     display: inline-block;
     width: auto;
@@ -14,6 +10,17 @@
     padding: 6px 12px;
     margin-left: 8px;
 }
+
+
+.mapa-card {
+    border: none;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.214);
+    margin-bottom: 40px;
+}
+
+
 
 /* Box form input */
 .mapa-box {
