@@ -5,17 +5,12 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegisterController;
-<<<<<<< HEAD
 
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
 use App\Http\Controllers\Asesi\PermohonanController;
 
-=======
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\PerencanaanController;
->>>>>>> 611046b1ace2ff58f20fcef5931dc36ff0f9e60d
 
 // login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -34,7 +29,6 @@ Route::post('/register/asesor', [RegisterController::class, 'storeAsesor'])->nam
 
 // Form Perencanaan untuk Asesor
 Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('formperencanaan');
-<<<<<<< HEAD
 Route::get('/dashboard/asesor', [DashboardController::class, 'asesor'])
     ->name('asesor.dashboard');
 
@@ -84,36 +78,6 @@ Route::prefix('asesi/permohonan')->name('asesi.permohonan.')->group(function () 
     Route::get('/form1', [PermohonanController::class, 'form1'])->name('form1');
     Route::get('/form2', [PermohonanController::class, 'form2'])->name('form2');
 });
-=======
-Route::get('/pramuniaga', [FormAsesmenController::class, 'pramuniaga'])->name('formasesmen.pramuniaga');
-
-Route::get('/officeadministative', [FormAsesmenController::class, 'officeadministative'])->name('formasesmen.officeadministative');
-
-Route::get('/pemogramanjunior', [FormAsesmenController::class, 'pemogramanjunior'])->name('formasesmen.pemogramanjunior');
-
-Route::get('/juniortechnicalsupport', [FormAsesmenController::class, 'juniortechnicalsupport'])->name('formasesmen.juniortechnicalsupport');
-
-Route::get('/junioroperatordesigngrafis', [FormAsesmenController::class, 'junioroperatordesigngrafis'])->name('formasesmen.junioroperatordesigngrafis');
-
-Route::get('/akuntansikeuanganII', [FormAsesmenController::class, 'akuntansikeuanganII'])->name('formasesmen.akuntansikeuanganII');
-
-// Form Perencanaan untuk Asesor
-Route::get('/formasesmen', [FormAsesmenController::class, 'index'])->name('formasesmen');
-
-// form assesmen
-Route::get('/form-asesmen/pertanyaan-esai', [FormAsesmenController::class, 'pertanyaanEsai'])->name('pertanyaan.esai');
-Route::post('/form-asesmen/pertanyaan-esai/store', [FormAsesmenController::class, 'storeEsai'])->name('pertanyaan.esai.store');
-Route::post('/form-asesmen/pertanyaan-esai/delete', [FormAsesmenController::class, 'deleteEsai'])->name('pertanyaan.esai.delete');
-
-
-
-// Dashboard Admin
-// Dashboard Admin (tanpa middleware)
-Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
-
-// Dashboard Asesi (tanpa middleware)
-Route::get('/dashboard/asesi', [DashboardController::class, 'asesi'])->name('dashboard.asesi');
->>>>>>> 611046b1ace2ff58f20fcef5931dc36ff0f9e60d
 
 // Logout
 Route::post('/logout', function () {
