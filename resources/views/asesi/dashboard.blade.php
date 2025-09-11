@@ -1,91 +1,119 @@
 @extends('master')
 
-@section('content')
-<div class="container mt-4">
+@section('title', 'Dashboard Asesor')
 
-    <!-- Judul -->
-    <h2 class="fw-bold">Dashboard Asesi</h2>
-    <p class="text-muted">Kelola asesmen dengan standar profesional terdepan</p>
+@section('konten')
+<div class="container py-4">
 
-    <!-- Kartu Statistik -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card shadow-sm p-3 border-0 rounded-4">
-                <h5 class="fw-bold">284</h5>
-                <p class="mb-1">Total Peserta</p>
-                <span class="badge bg-info text-dark">12.5 % Growth</span>
-                <small class="d-block text-muted">This Month</small>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm p-3 border-0 rounded-4">
-                <h5 class="fw-bold">284</h5>
-                <p class="mb-1">Sertifikat</p>
-                <span class="badge bg-success">12.5 % Growth</span>
-                <small class="d-block text-muted">This Month</small>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm p-3 border-0 rounded-4">
-                <h5 class="fw-bold">284</h5>
-                <p class="mb-1">Dalam Progres</p>
-                <span class="badge bg-warning text-dark">12.5 % Growth</span>
-                <small class="d-block text-muted">This Month</small>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm p-3 border-0 rounded-4">
-                <h5 class="fw-bold">284</h5>
-                <p class="mb-1">Penghargaan</p>
-                <span class="badge bg-primary">12.5 % Growth</span>
-                <small class="d-block text-muted">This Month</small>
-            </div>
-        </div>
+  {{-- Header --}}
+  <div class="mb-4">
+    <h2 class="fw-bold">Selamat Datang Maura</h2>
+    <p class="text-muted mb-1">Rekayasa Perangkat Lunak</p>
+    <span class="text-secondary">085102432440</span>
+  </div>
+
+  {{-- Status Sertifikasi --}}
+  <h5 class="fw-bold mb-3">Status Sertifikasi</h5>
+  <div class="row g-3 mb-5">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm rounded-4 p-3 text-center">
+        <p class="text-muted mb-1">Status Asesmen</p>
+        <h6 class="fw-bold text-primary">Proses Verifikasi</h6>
+      </div>
     </div>
-
-    <!-- Grafik -->
-    <div class="card shadow-sm border-0 rounded-4 p-4">
-        <h5 class="fw-bold mb-3">Grafik Sertifikasi</h5>
-        <canvas id="chartSertifikasi" height="120"></canvas>
-
-        <div class="d-flex justify-content-between mt-3">
-            <div><span class="fw-bold text-primary">300</span><br><small>Total Tersertifikasi</small></div>
-            <div><span class="fw-bold text-success">18%</span><br><small>Rata-rata Pertumbuhan</small></div>
-            <div><span class="fw-bold text-warning">MPLB</span><br><small>Jurusan Terbanyak Sertifikasi</small></div>
-        </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm rounded-4 p-3 text-center">
+        <p class="text-muted mb-1">Status Sertifikasi</p>
+        <h6 class="fw-bold text-primary">Kompeten</h6>
+      </div>
     </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm rounded-4 p-3 text-center">
+        <p class="text-muted mb-1">Status Ujian</p>
+        <h6 class="fw-bold text-primary">Sedang Ujian</h6>
+      </div>
+    </div>
+  </div>
+
+  {{-- Progress --}}
+  <h5 class="fw-bold mb-3">Progress</h5>
+  <div class="row g-4 align-items-center">
+    <div class="col-md-4 text-center">
+      <div class="position-relative d-inline-block">
+        <!-- Chart lingkaran -->
+        <canvas id="progressChart" width="160" height="160"></canvas>
+        <!-- Angka di tengah chart -->
+        <div class="position-absolute top-50 start-50 translate-middle fw-bold fs-3 text-primary" id="progressValue">
+          8
+        </div>
+      </div>
+      <p class="mt-2 text-muted">unit yang diselesaikan</p>
+    </div>
+    <div class="col-md-8">
+      <div class="d-flex flex-column gap-3">
+        <div class="card shadow-sm border-0 p-3 rounded-3 active-step">
+          Permohonan Sertifikasi Kompetensi
+        </div>
+        <div class="card shadow-sm border-0 p-3 rounded-3 text-muted d-flex justify-content-between align-items-center">
+          Asesmen Mandiri <span>🔒</span>
+        </div>
+        <div class="card shadow-sm border-0 p-3 rounded-3 text-muted d-flex justify-content-between align-items-center">
+          Persetujuan Asesmen dan Kerahasiaan <span>🔒</span>
+        </div>
+        <div class="card shadow-sm border-0 p-3 rounded-3 text-muted d-flex justify-content-between align-items-center">
+          Ceklis Penyesuaian Yang Wajar Dan Beralasan <span>🔒</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </div>
-
-
 @endsection
 
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const ctx = document.getElementById('chartSertifikasi').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['akl', 'mplb', 'pemasaran', 'm-log', 'dkv', 'rpl', 'tjkt'],
-            datasets: [{
-                label: 'Jumlah Peserta',
-                data: [40, 70, 35, 20, 45, 50, 25],
-                backgroundColor: [
-                    '#FFD54F', '#4FC3F7', '#E57373',
-                    '#FFB74D', '#BA68C8', '#81C784', '#90A4AE'
-                ],
-                borderRadius: 10
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { beginAtZero: true, ticks: { stepSize: 20 } }
-            }
-        }
-    });
-</script>
+@push('styles')
+<style>
+.active-step {
+  border-left: 6px solid #1E3A8A;
+  font-weight: bold;
+  color: #1E3A8A;
+}
+</style>
 @endpush
 
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const total = 10;      // total unit
+  const selesai = 8;     // unit selesai
+  const sisa = total - selesai;
+
+  // update angka di tengah
+  document.getElementById("progressValue").textContent = selesai;
+
+  // render chart lingkaran
+  const ctx = document.getElementById('progressChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: [selesai, sisa], // 8 terisi, 2 kosong
+        backgroundColor: ['#1E3A8A', '#e5e7eb'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      cutout: '75%',          // lubang di tengah
+      responsive: false,      // biar sesuai ukuran canvas
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: false }
+      },
+      animation: {
+        duration: 1200,       // animasi isi dari 0 → 8
+      }
+    }
+  });
+});
+</script>
+@endpush
