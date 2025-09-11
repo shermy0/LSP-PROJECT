@@ -1,5 +1,9 @@
 <?php
 
+<<<<<<< HEAD
+=======
+// app/Http/Controllers/AuthController.php
+>>>>>>> 611046b1ace2ff58f20fcef5931dc36ff0f9e60d
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -20,6 +24,7 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
+<<<<<<< HEAD
             // Ambil user yang sedang login
             $user = Auth::user();
 
@@ -38,6 +43,21 @@ class AuthController extends Controller
 
         // Kalau gagal login
         return back()->withErrors(['login' => 'Email atau password salah']);
+=======
+            $user = Auth::user();
+
+            // Redirect berdasarkan role
+            if ($user->role === 'admin') {
+                return redirect()->route('dashboard.admin');
+            } elseif ($user->role === 'asesor') {
+                return redirect()->route('formperencanaan');
+            } else {
+                return redirect()->route('dashboard.asesi');
+            }
+        }
+
+        return back()->with('error', 'Email atau password salah');
+>>>>>>> 611046b1ace2ff58f20fcef5931dc36ff0f9e60d
     }
 
     public function showRegisterRole()

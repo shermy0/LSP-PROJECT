@@ -35,53 +35,67 @@ class RegisterController extends Controller
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
+            'name'     => $request->name,
+            'email'    => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'asesi',
+            'role'     => 'asesi',
         ]);
 
         Asesi::create([
-            'user_id' => $user->id,
-            'nik' => $request->nik,
-            'nama_lengkap' => $request->nama_lengkap,
-            'tempat_lahir' => $request->tempat_lahir,
-            'tgl_lahir' => $request->tgl_lahir,
+            'user_id'       => $user->id,
+            'nik'           => $request->nik,
+            'nama_lengkap'  => $request->nama_lengkap,
+            'tempat_lahir'  => $request->tempat_lahir,
+            'tgl_lahir'     => $request->tgl_lahir,
             'jenis_kelamin' => $request->jenis_kelamin,
-            'telepon' => $request->telepon,
+            'telepon'       => $request->telepon,
         ]);
 
         return redirect()->route('login')->with('success', 'Pendaftaran Asesi berhasil!');
     }
 
-
     public function storeAsesor(Request $request)
     {
         $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6|confirmed',
-            'nama_asesor' => 'required',
-            'nip' => 'nullable|digits:18',
+            'name'        => 'required|string',
+            'email'       => 'required|email|unique:users',
+            'password'    => 'required|min:6|confirmed',
+            'nama_asesor' => 'required|string',
+            'nip'         => 'nullable|digits:18',
+            'keahlian'    => 'nullable|string',
+            'jabatan'     => 'nullable|string',
+            'no_registrasi' => 'nullable|string',
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
+            'name'     => $request->name,
+            'email'    => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'asesor',
+            'role'     => 'asesor',
         ]);
 
         Asesor::create([
+<<<<<<< HEAD
             
             'nama_asesor' => $request->nama_asesor,
             'nip' => $request->nip,
             'keahlian' => $request->keahlian,
             'jabatan' => $request->jabatan,
+=======
+            'user_id'       => $user->id,
+            'nama_asesor'   => $request->nama_asesor,
+            'nip'           => $request->nip,
+            'keahlian'      => $request->keahlian,
+            'jabatan'       => $request->jabatan,
+>>>>>>> 611046b1ace2ff58f20fcef5931dc36ff0f9e60d
             'no_registrasi' => $request->no_registrasi,
             
         ]);
 
         return redirect()->route('login')->with('success', 'Pendaftaran Asesor berhasil!');
     }
+<<<<<<< HEAD
 }      
+=======
+}
+>>>>>>> 611046b1ace2ff58f20fcef5931dc36ff0f9e60d

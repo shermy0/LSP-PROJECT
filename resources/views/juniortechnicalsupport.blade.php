@@ -5,7 +5,11 @@
     <h1 class="fw-bold">Form Asesmen</h1>
     <div class="text-center mb-3">
         <h5 class="center-underline">
+<<<<<<< HEAD
             Sistem Manajemen Asesmen Siswa tkj - AsesKom
+=======
+            Sistem Manajemen Asesmen Siswa TJKT - AsesKom
+>>>>>>> 611046b1ace2ff58f20fcef5931dc36ff0f9e60d
         </h5>
     </div>
 
@@ -20,10 +24,20 @@
         <!-- Item 2 -->
         <div class="accordion-item mb-2">
             <h2 class="accordion-header p-3 border rounded">
+<<<<<<< HEAD
                 <i class="fa-solid fa-stop me-2"></i> Pertanyaan Esai
             </h2>
         </div>
 
+=======
+                <a href="{{ route('pertanyaan.esai') }}" class="text-dark text-decoration-none">
+                    <i class="fa-solid fa-stop me-2"></i> Pertanyaan Esai
+                </a>
+            </h2>
+        </div>
+
+
+>>>>>>> 611046b1ace2ff58f20fcef5931dc36ff0f9e60d
         <!-- Item 3 -->
         <div class="accordion-item mb-2">
             <h2 class="accordion-header p-3 border rounded">
