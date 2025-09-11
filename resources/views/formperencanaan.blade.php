@@ -20,18 +20,38 @@
         <!-- Item 2 -->
         <div class="accordion-item">
             <h2 class="accordion-header">
+<<<<<<< HEAD
                 <a href="{{ route('mapa02') }}" class="text-decoration-none text-dark">
                     <i class="fa-solid fa-stop me-2"></i> FR.MAPA.02 - PETA INSTRUMEN ASESMEN HASIL PENDEKATAN ASESMEN DAN PERENCANAAN ASESMEN
                 </a>
+=======
+<<<<<<< HEAD
+                <i class="fa-solid fa-stop me-2"></i> FR.MAPA.02 - PETA INSTRUMEN ASESMEN HASIL PENDEKATAN ASESMEN DAN PERENCANAAN ASESMEN
+=======
+                <a href="{{ route('mapa02') }}" class="text-decoration-none text-dark">
+                    <i class="fa-solid fa-stop me-2"></i> FR.MAPA.02 - PETA INSTRUMEN ASESMEN HASIL PENDEKATAN ASESMEN DAN PERENCANAAN ASESMEN
+                </a>
+>>>>>>> d3a3bf8 (FR.AK.03 umpan balik dan catatan asesmen)
+>>>>>>> 2f7384d (styling frak3)
             </h2>
         </div>
 
         <!-- Item 3 -->
         <div class="accordion-item">
             <h2 class="accordion-header">
+<<<<<<< HEAD
                 <a href="{{ route('laporan') }}" class="text-decoration-none text-dark">
                     <i class="fa-solid fa-stop me-2"></i> FR.AK.06 - LAPORAN ASESMEN
                 </a>
+=======
+<<<<<<< HEAD
+                <i class="fa-solid fa-stop me-2"></i> FR.AK.05 - LAPORAN ASESMEN
+=======
+                <a href="{{ route('laporan') }}" class="text-decoration-none text-dark">
+                    <i class="fa-solid fa-stop me-2"></i> FR.AK.06 - LAPORAN ASESMEN
+                </a>
+>>>>>>> d3a3bf8 (FR.AK.03 umpan balik dan catatan asesmen)
+>>>>>>> 2f7384d (styling frak3)
             </h2>
         </div>
 

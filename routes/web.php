@@ -41,54 +41,43 @@ Route::post('/formperencanaan', [PerencanaanController::class, 'simpan'])->name(
 // ============================
 // Meninjau Asesmen
 // ============================
-// Halaman utama meninjau
 Route::get('/ninjau_asesemen', [SkemaController::class, 'ninjau_asesemen'])->name('ninjau_asesemen');
-// Lanjutin meninjau_asesor
 Route::get('/ninjau-asesmen-asesor', [PerencanaanController::class, 'ninjauAsesmenAsesor'])->name('ninjau_asesmen_asesor.view');
 Route::post('/ninjau-asesmen-asesor', [PerencanaanController::class, 'simpanLanjut'])->name('ninjau_asesmen_asesor');
 
 // ============================
 // Laporan
 // ============================
-// Halaman utama laporan
 Route::get('/laporan', [SkemaController::class, 'laporan'])->name('laporan');
-// Lanjutan laporan-asesor
 Route::get('/laporan-asesor', [PerencanaanController::class, 'laporan'])->name('laporan_asesor.show');
 Route::post('/laporan-asesor', [PerencanaanController::class, 'simpanLanjutLaporan'])->name('laporan_asesor');
 
 // ============================
 // MAPA 02
 // ============================
-// Halaman utama MAPA02
 Route::get('/mapa02', [SkemaController::class, 'mapa02'])->name('mapa02');
-// Lanjutan mapa02-asesor
 Route::get('/mapa02-asesor', [PerencanaanController::class, 'mapa02'])->name('mapa02_asesor.show');
 Route::post('/mapa02-asesor', [PerencanaanController::class, 'simpanLanjutmapa02'])->name('mapa02_asesor');
 
 // ============================
 // FR.AK.03
 // ============================
-Route::get('/frak3', [SkemaController::class, 'frak3'])->name('frak3');       // tampil halaman FR.AK.03
-Route::post('/frak3', [PerencanaanController::class, 'simpanFrak3'])->name('frak3.simpan'); // simpan data
+Route::get('/frak3', [SkemaController::class, 'frak3'])->name('frak3');
+Route::post('/frak3', [PerencanaanController::class, 'simpanFrak3'])->name('frak3.simpan');
 
-// ============================
 // validator
-// ============================
 Route::get('/fr-ak-03', function () {
     return view('fr.fr_ak_03');
 });
 
-
-//dashboard
-use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
-use App\Http\Controllers\Asesor\DashboardController as AsesorDashboard;
-use App\Http\Controllers\Asesi\DashboardController as AsesiDashboard;
-
-// Asesor dashboard
-Route::get('/asesor/dashboard', [AsesorDashboard::class, 'index'])->name('asesor.dashboard');
-
-
-
+// ============================
+// Dashboard (dengan middleware auth)
+// ============================
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('dashboard.admin');
+    Route::get('/dashboard/asesor', [DashboardController::class, 'asesor'])->name(name: 'dashboard.asesor');
+});
 
 // ============================
 // Logout
