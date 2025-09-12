@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LSP 11</title>
 <link rel="stylesheet" href="{{ asset('assets/css/master.css')}}">
+<link rel="stylesheet" href="{{ asset('assets/css/logo.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <!-- Bootstrap CSS -->
@@ -42,8 +43,8 @@
             @endif
 
             @if(Auth::user()->role == 'asesi')
-                <li><i class="bi bi-house-door-fill"></i><a href="#">Dashboard</a></li>
-                <li><i class="bi bi-pencil-square"></i><a href="#">Form Asesmen </a></li>
+                <li><i class="bi bi-house-door-fill"></i><a href="dashboard">Dashboard</a></li>
+                <li><i class="bi bi-pencil-square"></i><a href="formasesmen">Form Asesmen </a></li>
                 <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
             @endif
         </ul>

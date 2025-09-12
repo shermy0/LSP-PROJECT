@@ -4,16 +4,31 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Asesor; // pastikan model Asesor ada
+use Illuminate\Support\Facades\Auth;
 
 class BandingAsesmenController extends Controller
 {
-    public function index()
+    // Halaman utama form banding asesmen
+    public function index(Request $request)
     {
-        $asesors = Asesor::all(); // ambil semua data asesor
-        return view('banding-asesmen', compact('asesors'));
+        $asesors = Asesor::all();
+
+        // Data dari session
+        $namaAsesor = session('asesor');
+        $tanggalAsesmen = session('tanggal');
+
+        // Nama asesi dari user yang login
+        $namaAsesi = Auth::user()->name ?? null;
+
+        return view('banding-asesmen', compact(
+            'asesors',
+            'namaAsesi',
+            'namaAsesor',
+            'tanggalAsesmen'
+        ));
     }
 
-
+    // Simpan data form banding asesmen
     public function store(Request $request)
     {
         $request->validate([
@@ -30,9 +45,20 @@ class BandingAsesmenController extends Controller
             'tanggal' => 'required|date'
         ]);
 
-        // Simpan ke database kalau model sudah siap
+        // Kalau model BandingAsesmen sudah ada:
         // BandingAsesmen::create($request->all());
 
         return redirect()->back()->with('success', 'Form berhasil dikirim!');
+    }
+
+    // Simpan pilihan asesor & tanggal dari halaman sebelumnya
+    public function simpanAsesor(Request $request)
+    {
+        session([
+            'asesor' => $request->asesor,
+            'tanggal' => $request->tanggal
+        ]);
+
+        return redirect()->route('banding.asesmen');
     }
 }

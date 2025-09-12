@@ -11,6 +11,10 @@ use App\Http\Controllers\BandingAsesmenController;
 Route::get('/banding-asesmen', [BandingAsesmenController::class, 'index'])->name('banding.index');
 Route::post('/banding-asesmen', [BandingAsesmenController::class, 'store'])->name('banding.store');
 
+Route::get('/banding-asesmen', [BandingAsesmenController::class, 'index'])->name('banding.asesmen');
+Route::post('/banding-asesmen', [BandingAsesmenController::class, 'store'])->name('banding.store');
+Route::post('/simpan-asesor', [BandingAsesmenController::class, 'simpanAsesor'])->name('simpan.asesor');
+
 
 // login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -53,4 +57,3 @@ Route::post('/logout', function () {
 Route::get('/', function () {
     return redirect()->route('login');
 });
-

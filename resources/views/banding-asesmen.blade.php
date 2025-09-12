@@ -2,16 +2,17 @@
 
 @section('konten')
 <div class="container my-4">
-    <div class="avatar-img">
-                <img src="{{ asset('assets/poto/potta.png') }}" alt="Potta" class="img-fluid">
-</div>
-    <h4 class="text-center mb-4">Banding Asesmen</h4>
 
     <form action="{{ route('banding.store') }}" method="POST">
         @csrf
 
         <!-- Rincian Data Pemohon Sertifikasi -->
         <div class="card mb-4 p-3">
+            <div class="avatar-imgs mb-3" >
+    <img src="{{ asset('assets/poto/potta.png') }}" alt="Potta" class="img-fluid" style="align-items: center;">
+            </div>
+
+    <h4 class="text-center mb-4">Banding Asesmen</h4>
             <!-- Pertanyaan Ya/Tidak -->
                 <div class="card mb-4 p-3">
                     <!-- Pesan Informasi -->
@@ -25,24 +26,22 @@
                 <!-- isi form seperti sebelumnya -->
             </form>
             <div class="mb-3">
-                <label class="form-label">Nama Asesi</label>
-                <input type="text" name="nama_asesi" class="form-control" required>
+                <label for="asesi" class="form-label">Nama Asesi</label>
+                <input type="text" id="asesi" class="form-control"
+                    value="{{ Auth::user()->name }}" readonly>
+            </div>
+            <div class="mb-3">
+                <label for="asesor" class="form-label">Nama Asesor</label>
+                <input type="text" id="asesor" class="form-control"
+                    value="{{ session('asesor') }}" readonly>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Nama Asesor</label>
-                <select name="nama_asesor" class="form-control" required>
-                    <option value="">-- Pilih Asesor --</option>
-                    @foreach($asesors as $asesor)
-                        <option value="{{ $asesor->id }}">{{ $asesor->nama_asesor }}</option>
-                    @endforeach
-                </select>
+                <label for="tanggal" class="form-label">Tanggal</label>
+                <input type="date" id="tanggal" class="form-control"
+                    value="{{ session('tanggal') }}" readonly>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Tanggal Asesmen</label>
-                <input type="date" name="tanggal_asesmen" class="form-control" required>
-            </div>
         </div>
 
         <!-- Pertanyaan Ya/Tidak -->
@@ -159,7 +158,6 @@
 
         <button type="submit" class="btn btn-primary w-100">Simpan dan Kirim Form</button>
     </form>
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
 <script>
@@ -196,4 +194,5 @@
         }
     });
 </script>
+</div>
 @endsection
