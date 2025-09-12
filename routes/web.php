@@ -10,6 +10,9 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
 use App\Http\Controllers\Asesi\PermohonanController;
+use App\Http\Controllers\Asesi\WajarAlasanController;
+use App\Http\Controllers\Asesor\WajarAlasanController as AsesorWajarAlasanController;
+
 
 
 // login
@@ -77,6 +80,22 @@ Route::middleware(['auth'])->group(function () {
 Route::prefix('asesi/permohonan')->name('asesi.permohonan.')->group(function () {
     Route::get('/form1', [PermohonanController::class, 'form1'])->name('form1');
     Route::get('/form2', [PermohonanController::class, 'form2'])->name('form2');
+});
+
+
+// ============ Tambahan untuk Form Wajar Alasan ============
+Route::prefix('asesi/wajar-alasan')->name('asesi.wajar_alasan.')->group(function () {
+    Route::get('/form1', [WajarAlasanController::class, 'form1'])->name('form1');
+    Route::get('/form2', [WajarAlasanController::class, 'form2'])->name('form2');
+    Route::get('/form3', [WajarAlasanController::class, 'form3'])->name('form3');
+});
+
+// ============ Form Wajar Alasan untuk Asesor ============
+Route::prefix('asesor/wajar-alasan')->name('asesor.wajar_alasan.')->group(function () {
+    Route::get('/form1', [App\Http\Controllers\Asesor\WajarAlasanController::class, 'form1'])->name('form1');
+    Route::get('/form2', [App\Http\Controllers\Asesor\WajarAlasanController::class, 'form2'])->name('form2');
+    Route::get('/form3', [App\Http\Controllers\Asesor\WajarAlasanController::class, 'form3'])->name('form3');
+
 });
 
 // Logout
