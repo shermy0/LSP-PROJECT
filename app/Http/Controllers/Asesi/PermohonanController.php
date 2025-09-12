@@ -20,11 +20,15 @@ class PermohonanController extends Controller
 
     public function form2()
     {
-        // ambil semua daftar skema untuk dropdown
+        $user = auth()->user();
         $skema = DB::table('skema_sertifikasi')->get();
 
-        return view('asesi.permohonan.form2', compact('skema'));
+        // ambil data asesi untuk ditampilkan
+        $asesi = DB::table('asesi')->where('user_id', $user->id)->first();
+
+        return view('asesi.permohonan.form2', compact('skema', 'asesi'));
     }
+
 
     public function store(Request $request)
     {
@@ -49,13 +53,16 @@ class PermohonanController extends Controller
         if ($asesi) {
             // hanya update field yang diisi
             $toUpdate = array_filter($validated, fn($v) => $v !== null && $v !== '');
-            DB::table('asesi')->where('user_id', $user->id)->update($toUpdate + ['updated_at' => now()]);
+            DB::table('asesi')
+                ->where('user_id', $user->id)
+                ->update($toUpdate + ['updated_at' => now()]);
         } else {
             $validated['created_at'] = now();
             DB::table('asesi')->insert($validated);
         }
 
-        return redirect()->route('asesi.permohonan.form2')->with('success', 'Data berhasil disimpan');
+        return redirect()->route('asesi.permohonan.form2')
+            ->with('success', 'Data berhasil disimpan');
     }
 
     /**
@@ -63,21 +70,20 @@ class PermohonanController extends Controller
      */
     public function getSkema($id)
     {
-        $skema = DB::table('skema_sertifikasi')->where('id_skema', $id)->first();
+        $skema = DB::table('skema_sertifikasi')
+            ->where('id_skema', $id)
+            ->select('id_skema', 'nama_skema', 'kode_skema', 'judul_skema', 'deskripsi')
+            ->first();
 
         $units = DB::table('unit_kompetensi')
-            ->join('skema_unit', 'unit_kompetensi.id_unit', '=', 'skema_unit.unit_id')
-            ->where('skema_unit.skema_id', $id)
-            ->select(
-                'unit_kompetensi.kode_unit',
-                'unit_kompetensi.judul_unit',
-                'unit_kompetensi.standar_kompetensi'
-            )
+            ->where('id_skema', $id)
+            ->select('kode_unit', 'judul_unit', 'standar_kompetensi')
             ->get();
 
         return response()->json([
             'skema' => $skema,
-            'units' => $units
+            'units' => $units,
         ]);
     }
+
 }

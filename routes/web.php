@@ -85,6 +85,7 @@ Route::get('/get-skema/{id}', [\App\Http\Controllers\Asesi\PermohonanController:
 
 
 
+
 // Logout
 Route::post('/logout', function () {
     Auth::logout();
