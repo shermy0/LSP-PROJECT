@@ -15,4 +15,19 @@ class PermohonanController extends Controller
     {
         return view('asesi.permohonan.form2');
     }
+
+    public function form3()
+    {
+        return view('asesi.permohonan.form3');
+    }
+
+    public function form4()
+    {
+        return view('asesi.permohonan.form4');
+    }
+
+    public function form5()
+    {
+        return view('asesi.permohonan.form5');
+    }
 }

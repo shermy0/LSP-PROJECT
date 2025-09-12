@@ -77,6 +77,9 @@ Route::middleware(['auth'])->group(function () {
 Route::prefix('asesi/permohonan')->name('asesi.permohonan.')->group(function () {
     Route::get('/form1', [PermohonanController::class, 'form1'])->name('form1');
     Route::get('/form2', [PermohonanController::class, 'form2'])->name('form2');
+    Route::get('/form3', [PermohonanController::class, 'form3'])->name('form3');
+    Route::get('/form4', [PermohonanController::class, 'form4'])->name('form4');
+    Route::get('/form5', [PermohonanController::class, 'form5'])->name('form5');
 });
 
 // Logout

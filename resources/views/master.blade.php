@@ -31,21 +31,21 @@
     <div class="menu">
         <ul>
             @if(Auth::user()->role == 'admin')
-                <li><i class="bi bi-house-door-fill"></i><a href="#">Dashboard</a></li>
+                <li><i class="bi bi-house-door-fill"></i><a href="{{ route('dashboard.asesor') }}">Dashboard</a></li>
             @endif
 
             @if(Auth::user()->role == 'asesor')
 
             <li> <i class="bi bi-house-door-fill"></i><a href="{{ route('dashboard.asesor') }}">Dashboard</a></li>
-                <li><i class="bi bi-journal-album"></i><a href="{{ route('formasesmen') }}">Form Asesmen</a></li>
+                <li><i class="bi bi-journal-album"></i><a href="{{ route('asesi.permohonan.form1') }}">Form Asesmen</a></li>
                 <li><i class="bi bi-people-fill"></i><a href="#">Data Peserta Uji</a></li>
                 <li><i class="bi bi-pencil-square"></i><a href="{{ route('formperencanaan') }}">Form Perencanaan</a></li>
                 <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
             @endif
 
             @if(Auth::user()->role == 'asesi')
-                <li><i class="bi bi-house-door-fill"></i><a href="#">Dashboard</a></li>
-                <li><i class="bi bi-pencil-square"></i><a href="#">Form Asesmen </a></li>
+                <li><i class="bi bi-house-door-fill"></i><a href="{{ route('dashboard.asesi') }}">Dashboard</a></li>
+                <li><i class="bi bi-pencil-square"></i><a href="{{ route('asesi.permohonan.form1') }}">Form Asesmen </a></li>
                 <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
             @endif
         </ul>
