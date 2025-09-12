@@ -76,8 +76,14 @@ Route::middleware(['auth'])->group(function () {
 // ============ Tambahan untuk Form Permohonan ============
 Route::prefix('asesi/permohonan')->name('asesi.permohonan.')->group(function () {
     Route::get('/form1', [PermohonanController::class, 'form1'])->name('form1');
+    Route::post('/store', [PermohonanController::class, 'store'])->name('store');
     Route::get('/form2', [PermohonanController::class, 'form2'])->name('form2');
 });
+
+// routes/web.php
+Route::get('/get-skema/{id}', [\App\Http\Controllers\Asesi\PermohonanController::class, 'getSkema'])->name('get.skema');
+
+
 
 // Logout
 Route::post('/logout', function () {

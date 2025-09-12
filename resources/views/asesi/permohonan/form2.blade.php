@@ -26,22 +26,24 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Skema Sertifikasi</label>
-                    <input type="text" class="form-control rounded-3" placeholder="Pilih Skema Sertifikasi">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Judul Sertifikasi</label>
-                    <select class="form-select rounded-3">
-                        <option selected disabled>Pilih Judul Sertifikasi</option>
+                    <select id="skemaSelect" class="form-select rounded-3">
+                        <option selected disabled>Pilih Skema Sertifikasi</option>
+                        @foreach($skema as $s)
+                            <option value="{{ $s->id_skema }}">{{ $s->nama_skema }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="mb-3">
+                    <label class="form-label">Judul Sertifikasi</label>
+                    <input type="text" id="judulSertifikasi" class="form-control rounded-3" readonly>
+                </div>
+                <div class="mb-3">
                     <label class="form-label">Nomor Skema</label>
-                    <input type="text" class="form-control rounded-3" placeholder="Menyesuaikan dengan Judul Sertifikasi">
+                    <input type="text" id="nomorSkema" class="form-control rounded-3" readonly>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Tujuan Asesmen</label>
-                    <input type="text" class="form-control rounded-3">
+                    <input type="text" id="tujuanAsesmen" class="form-control rounded-3" readonly>
                 </div>
             </div>
 
@@ -62,34 +64,9 @@
                                 <th>Standar Kompetensi Kerja</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="unitTable">
                             <tr>
-                                <td>1</td>
-                                <td>J.591MT00.010.01</td>
-                                <td>Menterjemahkan Arah Visual ke Dalam Langkah Kerja</td>
-                                <td rowspan="5" class="text-center">
-                                    SKKNI No 067 Tahun 2018 <br> KATEGORI INFORMASI DAN KOMUNIKASI <br> BIDANG MULTIMEDIA
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>J.591MT00.011.01</td>
-                                <td>Membuat Asset Visual Berdasarkan Langkah Kerja</td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>J.59MT00.020.01</td>
-                                <td>Mengumpulkan Asset Multimedia</td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>J.59MT00.028.01</td>
-                                <td>Membuat Dua Dimensi Multimedia</td>
-                            </tr>
-                            <tr>
-                                <td>5</td>
-                                <td>J.59MT00.029.01</td>
-                                <td>Mendistribusikan Asset Multimedia</td>
+                                <td colspan="4" class="text-center text-muted">Pilih skema sertifikasi terlebih dahulu</td>
                             </tr>
                         </tbody>
                     </table>
@@ -105,7 +82,6 @@
 
                 <h6 class="fw-bold mb-3">3.1 Bukti Persyaratan Dasar Pemohon</h6>
 
-                <!-- Upload -->
                 <div class="mb-3">
                     <label class="form-label">1. Fotokopi Rapor semester 1 s/d 5</label>
                     <div class="upload-box" onclick="document.getElementById('file1').click()">
@@ -127,7 +103,7 @@
                 <h6 class="fw-bold mt-4 mb-3">3.2 Bukti Administratif</h6>
 
                 <div class="mb-3">
-                    <label class="form-label">3. Fotokopi Kartu Siswa SMKN 11 Bandung Kompetensi DKV</label>
+                    <label class="form-label">3. Fotokopi Kartu Siswa</label>
                     <div class="upload-box" onclick="document.getElementById('file3').click()">
                         <i class="bi bi-cloud-arrow-up"></i>
                         <span>Upload dokumen</span>
@@ -145,7 +121,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">5. Pas Foto 3x4 berwarna background merah (2 lembar)</label>
+                    <label class="form-label">5. Pas Foto 3x4</label>
                     <div class="upload-box" onclick="document.getElementById('file5').click()">
                         <i class="bi bi-cloud-arrow-up"></i>
                         <span>Upload dokumen</span>
@@ -176,12 +152,12 @@
                 </div>
             </div>
 
-            {{-- Buttons --}}
+            <!-- Buttons -->
             <div class="d-flex justify-content-end gap-2">
                 <a href="{{ route('asesi.permohonan.form1') }}" class="btn btn-danger">Kembali</a>
-                <a href="{{ route('asesi.permohonan.form1') }}" class="btn" style="background-color:#041562; color:#fff;">Simpan dan Kirim</a>
+                <a href="{{ route('asesi.permohonan.form1') }}" class="btn"
+                    style="background-color:#041562; color:#fff;">Simpan dan Kirim</a>
             </div>
-            
 
         </div>
     </div>
@@ -220,4 +196,36 @@
             display: none;
         }
     </style>
+
+    <script>
+        document.getElementById('skemaSelect').addEventListener('change', function () {
+            let skemaId = this.value;
+            fetch(`/get-skema/${skemaId}`)
+                .then(res => res.json())
+                .then(data => {
+                    // isi input
+                    document.getElementById('judulSertifikasi').value = data.skema.judul_skema ?? '';
+                    document.getElementById('nomorSkema').value = data.skema.nomor_skema ?? '';
+                    document.getElementById('tujuanAsesmen').value = data.skema.tujuan ?? '';
+
+                    // isi tabel
+                    let tbody = document.getElementById('unitTable');
+                    tbody.innerHTML = '';
+                    if (data.units.length > 0) {
+                        data.units.forEach((u, i) => {
+                            tbody.innerHTML += `
+                            <tr>
+                                <td>${i + 1}</td>
+                                <td>${u.kode_unit}</td>
+                                <td>${u.judul_unit}</td>
+                                <td>${u.standar_kompetensi}</td>
+                            </tr>
+                        `;
+                        });
+                    } else {
+                        tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">Unit kompetensi belum tersedia</td></tr>`;
+                    }
+                });
+        });
+    </script>
 @endsection
