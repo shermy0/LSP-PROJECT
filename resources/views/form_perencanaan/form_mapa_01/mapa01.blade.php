@@ -19,46 +19,44 @@
         <p class="text-muted">Peninjauan Proses Asesmen</p>
     </div>
 
-        <!-- Dropdown skema -->
+<!-- Dropdown skema -->
 <div class="skema-container">
-        <div class="skema-group">
+    <div class="skema-group">
         <span class="skema-label">SKEMA:</span>
-            <select name="skema_id" id="skema_id" class="skema-select">
-                <option value="">-- Pilih Skema --</option>
-                @foreach($skemas as $skema)
-                    <option value="{{ $skema->id_skema }}"
-                            data-kode="{{ $skema->kode_skema }}"
-                            data-jenjang="{{ $skema->jenjang }}">
-                        {{ $skema->nama_skema }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+        <select name="skema_id" id="skema_id" class="skema-select">
+            <option value="">-- Pilih Skema --</option>
+            @foreach($skemas as $skema)
+                <option value="{{ $skema->id_skema }}"
+                        data-kode="{{ $skema->kode_skema }}"
+                        data-jenjang="{{ $skema->jenjang }}">
+                    {{ $skema->nama_skema }}
+                </option>
+            @endforeach
+        </select>
     </div>
+</div>
 
-        <!-- Form input -->
-        <div class="row g-3">
-            <div class="col-md-6">
-                <div class="mapa-box">
-                    <label class="fw-semibold d-block mb-2">Skema Sertifikasi</label>
-                    <div class="jenis-skema">
-                        <input type="radio" id="kkni" name="skema" class="form-check-input me-2">
-                        <label for="kkni">KKNI</label>
-                        <input type="radio" id="okupasi" name="skema" class="form-check-input me-2" checked>
-                        <label for="okupasi">Okupasi</label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="mapa-box">
-                    <label for="nomorSkema" class="fw-semibold d-block mb-2">Nomor</label>
-                    <input type="text" id="nomorSkema" class="form-control" placeholder="Nomor Skema">
-                </div>
+<!-- Form input -->
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="mapa-box">
+            <label class="fw-semibold d-block mb-2">Skema Sertifikasi</label>
+            <div class="jenis-skema">
+                <input type="radio" id="kkni" name="skema" class="form-check-input me-2">
+                <label for="kkni">KKNI</label>
+                <input type="radio" id="okupasi" name="skema" class="form-check-input me-2">
+                <label for="okupasi">Okupasi</label>
             </div>
         </div>
     </div>
+
+    <div class="col-md-6">
+        <div class="mapa-box">
+            <label for="nomorSkema" class="fw-semibold d-block mb-2">Nomor</label>
+            <input type="text" id="nomorSkema" class="form-control" placeholder="Nomor Skema">
         </div>
+    </div>
+</div>
 
     <!-- Menentukan Pendekatan Asesmen -->
 <div class="mapa-section">
@@ -262,6 +260,99 @@
 </form>
 
 <script>
+document.getElementById('skema_id').addEventListener('change', function() {
+    let selected = this.options[this.selectedIndex];
+    let kode = selected.getAttribute('data-kode');
+    let jenjang = selected.getAttribute('data-jenjang');
+
+    // isi nomor otomatis dari kode_skema
+    document.getElementById('nomorSkema').value = kode || '';
+
+    // pilih radio otomatis sesuai jenjang
+    if (jenjang) {
+        if (jenjang.toLowerCase().includes("kkni")) {
+            document.getElementById('kkni').checked = true;
+        } else if (jenjang.toLowerCase().includes("okupasi")) {
+            document.getElementById('okupasi').checked = true;
+        }
+    }
+});
+
+// fungsi untuk simpan data ke localStorage
+function simpanKeLocal() {
+    let data = {};
+
+    // ambil nilai select skema
+    data.skema_id = document.getElementById('skema_id').value;
+    data.nomorSkema = document.getElementById('nomorSkema').value;
+
+    // ambil radio skema
+    let skemaRadio = document.querySelector('input[name="skema"]:checked');
+    data.skema = skemaRadio ? skemaRadio.id : null;
+
+    // ambil checkbox asesi
+    data.asesi = [];
+    document.querySelectorAll('input[name="asesi[]"]:checked').forEach(cb => {
+        data.asesi.push(cb.value);
+    });
+
+    // ambil tujuan asesmen
+    data.tujuan = [];
+    document.querySelectorAll('input[name="tujuan[]"]:checked').forEach(cb => {
+        data.tujuan.push(cb.value);
+    });
+
+    localStorage.setItem("mapa01Data", JSON.stringify(data));
+}
+
+// fungsi untuk load data dari localStorage
+function loadDariLocal() {
+    let data = localStorage.getItem("mapa01Data");
+    if (!data) return;
+    data = JSON.parse(data);
+
+    // isi kembali select
+    if (data.skema_id) {
+        document.getElementById('skema_id').value = data.skema_id;
+    }
+
+    // isi kembali nomor
+    if (data.nomorSkema) {
+        document.getElementById('nomorSkema').value = data.nomorSkema;
+    }
+
+    // radio skema
+    if (data.skema) {
+        let radio = document.getElementById(data.skema);
+        if (radio) radio.checked = true;
+    }
+
+    // checkbox asesi
+    if (data.asesi) {
+        document.querySelectorAll('input[name="asesi[]"]').forEach(cb => {
+            if (data.asesi.includes(cb.value)) {
+                cb.checked = true;
+            }
+        });
+    }
+
+    // tujuan asesmen
+    if (data.tujuan) {
+        document.querySelectorAll('input[name="tujuan[]"]').forEach(cb => {
+            if (data.tujuan.includes(cb.value)) {
+                cb.checked = true;
+            }
+        });
+    }
+}
+
+// simpan otomatis setiap ada perubahan input
+document.addEventListener("input", simpanKeLocal);
+document.addEventListener("change", simpanKeLocal);
+
+// load data ketika halaman dibuka
+document.addEventListener("DOMContentLoaded", loadDariLocal);
+
     document.getElementById('simpan-lanjut-form').addEventListener('submit', function(e) {
     e.preventDefault();
     const skemaId = document.getElementById('skema_id').value;
