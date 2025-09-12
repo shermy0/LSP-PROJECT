@@ -102,7 +102,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="tanggal-asesi">Tanggal</label>
-                        <input type="date" id="tanggal-asesi" class="form-control" value="{{ date('Y-m-d') }}">
+                        <input type="date" id="tanggal-asesi" class="form-control" value="{{ date('Y-m-d') }}" readonly>
                     </div>
                     <div class="mb-3">
                         <label for="ttd-asesi">Tanda Tangan</label>
