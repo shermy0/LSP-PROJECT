@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use App\Models\Pertanyaan;
 use App\Models\JawabanAsesmen;
 use App\Models\Asesi;
@@ -24,7 +26,7 @@ class JawabanController extends Controller
         // Cek data Asesi
         $asesi = Asesi::where('user_id', $user->id)->first();
         if (!$asesi) {
-            return redirect()->route('dashboard')->withErrors([
+            return redirect()->route('login')->withErrors([
                 'error' => 'Data Asesi tidak ditemukan. Hubungi admin.'
             ]);
         }
@@ -45,7 +47,7 @@ class JawabanController extends Controller
         $timer = $pembuatan ? $pembuatan->timer : 0; // menit
         $timescap = $pembuatan ? $pembuatan->timescap : null;
 
-        return view('essai_asesi', compact('pertanyaan', 'id_skema', 'jawaban', 'timer', 'timescap'));
+        return view('essai_asesi', compact('pertanyaan', 'id_skema', 'jawaban', 'timer', 'timescap', 'asesi'));
     }
 
     /**
@@ -68,7 +70,7 @@ class JawabanController extends Controller
         // Cek data Asesi
         $asesi = Asesi::where('user_id', $user->id)->first();
         if (!$asesi) {
-            return redirect()->route('dashboard')->withErrors([
+            return redirect()->route('login')->withErrors([
                 'error' => 'Data Asesi tidak ditemukan. Hubungi admin.'
             ]);
         }
@@ -90,11 +92,52 @@ class JawabanController extends Controller
             );
         }
 
+        // Simpan tanda tangan jika ada
+        if ($request->has('ttd_asesi') && !empty($request->ttd_asesi)) {
+            // Ubah base64 menjadi file gambar
+            $ttdData = $request->ttd_asesi;
+            $ttdData = preg_replace('#^data:image/\w+;base64,#i', '', $ttdData);
+            $ttdData = str_replace(' ', '+', $ttdData);
+            $imageData = base64_decode($ttdData);
+
+            // Nama file: nama_as esi + tanggal
+            $namaAsesi = Str::slug($asesi->nama_lengkap, '_');
+            $tanggal = $request->tgl_ttd_asesi ?: date('Y-m-d');
+            $fileName = $namaAsesi . '_' . $tanggal . '.png';
+            $filePath = storage_path('app/public/ttd/' . $fileName);
+
+            // Pastikan folder ada
+            if (!file_exists(dirname($filePath))) {
+                mkdir(dirname($filePath), 0755, true);
+            }
+
+            // Simpan file ke storage
+            file_put_contents($filePath, $imageData);
+
+            // Cari id_jawaban terakhir
+            $id_jawaban = JawabanAsesmen::where('id_asesi', $idAsesi)
+                ->where('id_skema', $request->id_skema)
+                ->orderBy('id_jawaban', 'desc')
+                ->first()
+                ->id_jawaban ?? null;
+
+            // Simpan ke tabel jawaban_asesmen_persetujuan
+            DB::table('jawaban_asesmen_persetujuan')->updateOrInsert(
+                ['id_jawaban' => $id_jawaban],
+                [
+                    'tgl_ttd_asesi' => $tanggal,
+                    'ttd_asesi' => 'storage/ttd/' . $fileName, // simpan path, bukan base64
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+        }
+
         // Kalau request dari AJAX, balikin JSON biar bisa redirect otomatis
         if ($request->ajax()) {
             return response()->json(['success' => true]);
         }
 
-        return back()->with('success', 'Jawaban berhasil disimpan!');
+        return redirect()->route('asesi.dashboard')->with('success', 'Jawaban berhasil disimpan!');
     }
 }

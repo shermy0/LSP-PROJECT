@@ -15,6 +15,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_unit');
             $table->unsignedBigInteger('id_instrumen')->nullable();
             $table->unsignedBigInteger('id_jenis_bukti')->nullable();
+            $table->unsignedBigInteger('id_kelompok')->nullable();
             $table->text('catatan')->nullable();
             $table->enum('status', ['kompeten', 'belum kompeten'])->nullable();
             $table->timestamp('created_at')->useCurrent();
@@ -22,6 +23,7 @@ return new class extends Migration
             $table->foreign('id_asesor')->references('id_asesor')->on('asesor')->onDelete('cascade');
             $table->foreign('id_asesi')->references('id_asesi')->on('asesi')->onDelete('cascade');
             $table->foreign('id_unit')->references('id_unit')->on('unit_kompetensi')->onDelete('cascade');
+            $table->foreign('id_kelompok')->references('id_kelompok')->on('kelompok_pekerjaan')->onDelete('cascade');
             $table->foreign('id_instrumen')->references('id_instrumen')->on('instrumen_asesmen')->onDelete('set null');
             $table->foreign('id_jenis_bukti')->references('id_jenis_bukti')->on('master_jenis_bukti')->onDelete('set null');
         });
