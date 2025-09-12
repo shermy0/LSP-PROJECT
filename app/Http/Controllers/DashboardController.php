@@ -2,17 +2,52 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Skema;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function ninjau_asesemen()
+    public function index()
     {
-        // Ambil salah satu data skema (contoh id=1)
-        $skema = Skema::first(); 
-        
-        // Kirim ke view
-        return view('ninjau_asesemen', compact('skema'));
+        $user = auth()->user();
+
+        // Menu otomatis berdasarkan role
+        $menus = [];
+        if ($user->role == 'admin') {
+            $menus = [
+                ['name' => 'Dashboard', 'route' => route('dashboard.admin'), 'icon' => 'fas fa-home'],
+                ['name' => 'Data Peserta Uji', 'route' => '#', 'icon' => 'fas fa-users'],
+            ];
+        } elseif ($user->role == 'asesor') {
+            $menus = [
+                ['name' => 'Form Perencanaan', 'route' => route('formperencanaan'), 'icon' => 'fas fa-file-alt'],
+            ];
+        } elseif ($user->role == 'asesi') {
+            $menus = [
+                ['name' => 'Dashboard', 'route' => route('dashboard.asesi'), 'icon' => 'fas fa-home'],
+                ['name' => 'Form Perencanaan', 'route' => route('formperencanaan'), 'icon' => 'fas fa-edit'],
+            ];
+        }
+
+        return view('dashboard', compact('menus'));
     }
+
+    public function admin()
+    {
+        $totalAsesi  = DB::table('asesi')->count();
+        $totalAsesor = DB::table('asesor')->count();
+        $totalAdmin  = DB::table('admin')->count();
+
+        return view('dashboard.admin', compact('totalAsesi', 'totalAsesor', 'totalAdmin'));
+    }
+
+    public function asesi()
+    {
+        return view('dashboard.asesi');
+    }
+
+    public function asesor()
+    {
+        return view('formperencanaan'); // resources/views/formperencanaan.blade.php
+    }
+
 }

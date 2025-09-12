@@ -13,45 +13,27 @@
         <!-- Item 1 -->
         <div class="accordion-item">
             <h2 class="accordion-header">
-                <i class="fa-solid fa-stop me-2"></i> FR.MAPA.01 - MERENCANAKAN AKTIVITAS DAN PROSES ASESMEN
+                <a href="{{ route('form.mapa01') }}" class="text-decoration-none text-dark">
+                    <i class="fa-solid fa-stop me-2"></i> FR.MAPA.01 - MERENCANAKAN AKTIVITAS DAN PROSES ASESMEN
+                </a>
             </h2>
         </div>
 
         <!-- Item 2 -->
         <div class="accordion-item">
             <h2 class="accordion-header">
-<<<<<<< HEAD
                 <a href="{{ route('mapa02') }}" class="text-decoration-none text-dark">
                     <i class="fa-solid fa-stop me-2"></i> FR.MAPA.02 - PETA INSTRUMEN ASESMEN HASIL PENDEKATAN ASESMEN DAN PERENCANAAN ASESMEN
                 </a>
-=======
-<<<<<<< HEAD
-                <i class="fa-solid fa-stop me-2"></i> FR.MAPA.02 - PETA INSTRUMEN ASESMEN HASIL PENDEKATAN ASESMEN DAN PERENCANAAN ASESMEN
-=======
-                <a href="{{ route('mapa02') }}" class="text-decoration-none text-dark">
-                    <i class="fa-solid fa-stop me-2"></i> FR.MAPA.02 - PETA INSTRUMEN ASESMEN HASIL PENDEKATAN ASESMEN DAN PERENCANAAN ASESMEN
-                </a>
->>>>>>> d3a3bf8 (FR.AK.03 umpan balik dan catatan asesmen)
->>>>>>> 2f7384d (styling frak3)
             </h2>
         </div>
 
         <!-- Item 3 -->
         <div class="accordion-item">
             <h2 class="accordion-header">
-<<<<<<< HEAD
                 <a href="{{ route('laporan') }}" class="text-decoration-none text-dark">
                     <i class="fa-solid fa-stop me-2"></i> FR.AK.06 - LAPORAN ASESMEN
                 </a>
-=======
-<<<<<<< HEAD
-                <i class="fa-solid fa-stop me-2"></i> FR.AK.05 - LAPORAN ASESMEN
-=======
-                <a href="{{ route('laporan') }}" class="text-decoration-none text-dark">
-                    <i class="fa-solid fa-stop me-2"></i> FR.AK.06 - LAPORAN ASESMEN
-                </a>
->>>>>>> d3a3bf8 (FR.AK.03 umpan balik dan catatan asesmen)
->>>>>>> 2f7384d (styling frak3)
             </h2>
         </div>
 
@@ -69,7 +51,7 @@
     <div class="mt-4 w-100">
         <div class="dropdown w-100">
             <a class="btn dropdown-toggle w-100 text-start custom-dropdown" href="#" id="dropdown5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fa-solid fa-stop me-2"></i>FR.VA - MEMBERIKAN KONTRIBUSI DALAM VALIDASI ASESMEN
+                <i class="fa-solid fa-stop me-2"></i> FR.VA - MEMBERIKAN KONTRIBUSI DALAM VALIDASI ASESMEN
             </a>
             <ul class="dropdown-menu w-100 custom-dropdown-menu" aria-labelledby="dropdown5">
                 <li><a class="dropdown-item" href="/fr-va-sebelum">FR.VA - SEBELUM ASESMEN</a></li>
@@ -78,6 +60,7 @@
             </ul>
         </div>
     </div>
+
     <br>
 </div>
 @endsection

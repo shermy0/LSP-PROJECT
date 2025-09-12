@@ -8,15 +8,11 @@ class Frak3Controller extends Controller
 {
     public function index()
     {
-        return view('frak3'); // pastikan file blade kamu namanya frak3.blade.php
+        return view('frak3'); 
     }
 
     public function simpan(Request $request)
     {
-        // buat cek dulu datanya masuk atau belum
-        // dd($request->all());
-
-        // nanti bisa lanjut simpan ke database
         return redirect()->route('frak3.index')->with('success', 'Data FR.AK.03 berhasil disimpan!');
     }
 }

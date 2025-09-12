@@ -1,13 +1,15 @@
+/* MASTER */
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: "Poppins", sans-serif;
     background-color: #f4f4f4;
 }
 
+/* Sidebar */
 .sidebar {
     height: 100vh;
     width: 240px;
-    background-color: #002366; /* Biru Navy */
+    background-color: #041562;
     color: white;
     transition: width 0.3s ease;
     overflow: hidden;
@@ -16,91 +18,621 @@ body {
     left: 0;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
 }
 
 .sidebar.collapsed {
     width: 70px;
 }
 
-/* Tombol toggle di atas */
+/* Header Toggle */
 .toggle-btn {
-    background: transparent;
-    border: none;
+    display: flex;
+    align-items: flex-end; 
+    text-align: right; 
+    gap: 10px;
+    background-color: #041562;
     color: white;
-    font-size: 22px;
-    cursor: pointer;
+    border: none;
     padding: 15px;
-    align-self: flex-end;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-/* Logo / Judul */
-.logo {
-    padding: 15px;
-    font-size: 18px;
+.toggle-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; 
+    text-align: left;   
+}
+
+.sidebar.collapsed .toggle-left {
+    opacity: 0;
+    transform: translateX(-10px);
+}
+
+.lsp-title {
     font-weight: bold;
+    font-size: 18px;
 }
-.logo span {
-    display: inline;
-}
-.sidebar.collapsed .logo span {
-    display: none;
+
+.lsp-subtitle {
+    font-size: 12px;
+    color: #ccc;
 }
 
 /* Menu */
 .menu {
     flex-grow: 1;
+    margin-top: 10px;
 }
+
 .menu ul {
     list-style: none;
     padding: 0;
+    margin: 0;
 }
+
 .menu ul li {
-    padding: 15px;
+    padding: 12px 20px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     cursor: pointer;
     white-space: nowrap;
+    border-radius: 8px;
+    transition: all 0.3s ease;
 }
-.menu ul li:hover {
-    background-color: #003399;
-}
+
 .menu ul li i {
-    font-size: 18px;
-    min-width: 20px;
-    text-align: center;
+    width: 24px;
+    height: 24px;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
+.menu ul li:hover {
+    background: linear-gradient(90deg, #0284C7, #0369A1);
+    border: 1px solid #0284C7;
+}
+
+.menu ul li:hover i,
+.menu ul li:hover span {
+    color: white;
+}
+
 .sidebar.collapsed .menu ul li span {
-    display: none;
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* Footer */
 .sidebar-footer {
     padding: 15px;
-    border-top: 1px solid rgba(255,255,255,0.2);
-    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
+
+/* Avatar Container */
 .avatar {
-    background-color: #0099cc;
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
+
+.avatar-img {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+}
+
+.avatar-img img {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 1.2;
+}
+
+.username {
+    font-size: 16px;
+    font-weight: 500;
+    color: white;
+}
+
 .role {
-    margin-top: 5px;
     font-size: 14px;
+    color: #ccc;
 }
-.sidebar.collapsed .role {
+
+/* Logout Button */
+.logout-btn {
+    background: #f44336;
+    color: #fff;
+    width: 200px;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.3s ease;
+}
+
+.logout-btn:hover {
+    background: #d32f2f;
+}
+
+.sidebar.collapsed .menu ul li a {
     display: none;
 }
-.logout-btn {
-    background-color: #ff7b7b;
+
+/* Sidebar collapse: sembunyikan teks, icon tetap di tengah */
+.sidebar.collapsed .logout-btn {
+    width: 50px;
+    justify-content: center;
+}
+
+.sidebar.collapsed .logout-btn span {
+    display: none;
+}
+
+
+/* Konten utama menyesuaikan sidebar */
+#main-content {
+    margin-left: 240px;
+    padding: 20px;
+    transition: margin-left 0.3s ease;
+}
+
+/* Responsive sidebar */
+.sidebar.collapsed + #main-content {
+    margin-left: 70px; 
+}
+
+.menu ul li a {
     color: white;
-    border: none;
-    padding: 10px;
-    width: 100%;
-    border-radius: 5px;
-    margin-top: 10px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+/* Untuk layar kecil */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 70px;
+    }
+
+    .sidebar .menu ul li a {
+        display: none;  
+    }
+
+    .sidebar .menu ul li {
+        justify-content: center;
+    }
+}
+
+/* FORM PERENCANAAN */
+/* Font & Body */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #fafafa;
+    margin: 0;
+    padding: 0;
+}
+
+/* Judul */
+h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 20px;
+}
+
+h5 {
+    display: block;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 500;
+    margin-top: 0;
+    color: #4C4C4C;
+}
+
+.center-underline {
+    display: inline-block; /* pastikan lebarnya sesuai teks */
+    position: relative; 
+    text-align: center; /* tambahan */
+}
+
+.center-underline::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -5px; /* jarak garis ke teks */
+    transform: translateX(-50%);
+    width: 60%; /* bisa disesuaikan */
+    height: 3px;
+    background-color: #0284C7;
+    border-radius: 2px;
+}
+
+/* Container */
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 0 15px;
+}
+
+/* Accordion umum */
+.accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.accordion-item {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    overflow: hidden;
+    border: none; 
+}
+
+.accordion-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
     cursor: pointer;
+    background-color: #fff;
+    border-radius: 12px; 
+    border: none;
+    transition: background-color 0.2s ease;
+}
+
+.accordion-header:hover {
+    background-color: #f7f7f7;
+}
+
+/* Hapus panah default */
+.accordion-button::after {
+    display: none;
+}
+
+/* Dropdown tampil seperti item accordion */
+.dropdown .btn {
+    background-color: #fff;
+    color: #4C4C4C;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    padding: 15px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.2s ease;
+    border: none;
+}
+
+/* Panah dropdown di kanan */
+.dropdown .btn::after {
+    content: "\f078"; /* kode FontAwesome untuk panah bawah */
+    font-family: "Font Awesome 6 Free"; /* pastikan pakai font awesome */
+    font-weight: 900;
+    position: absolute;
+    right: 20px; /* jarak dari kanan */
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; /* supaya tidak mengganggu klik */
+    color: #4C4C4C; /* warna panah */
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+    border-radius: 12px;          
+    border: 1px solid #e5e7eb;
+    background-color: #fff;      
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+    font-size: 0.9rem;        
+    min-width: 180px;            
+    padding: 6px 0;               
+    margin-top: 8px;               
+}
+
+/* Item dropdown */
+.dropdown-item {
+    padding: 12px 20px;
+    font-size: 0.85rem;
+    color: #4C4C4C;
+    transition: background-color 0.2s ease;
+    border-radius: 12px;
+    border: none;
+}
+
+.breadcrumb a {
+    color: #002D72;
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+.card-field {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    transition: all 0.2s ease-in-out;
+}
+
+.card-field:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.card-field .form-label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* -- SKEMA -- */
+.skema-container {
+    display: flex;  
+    justify-content: center;    
+    margin: 20px 0;          
+}
+
+.skema-label {
+    font-weight: 600;
+    color: #0d6efd;
+    padding: 6px 12px;
+    white-space: nowrap;
+}
+
+.skema-select {
+    border: none;
+    outline: none;
+    background-color: #e7f1ff;
+    color: #0d6efd;
+    font-weight: 500;
+    padding: 6px 12px;
+    border: 1px solid #cbd5e1; 
+    border-radius: 8px;
+}
+
+/* ---------- Header ---------- */
+h3.fw-bold {
+    color: #002D72;
+    font-size: 1.75rem;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+/* ---------- Form ---------- */
+/* Membuat label TUK muncul di tengah */
+.text-center .form-label {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.form-control {
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    padding: 0.5rem 0.75rem;
+    transition: border 0.3s, box-shadow 0.3s;
+}
+
+.form-control:focus {
+    border-color: #002D72;
+    box-shadow: 0 0 0 0.2rem rgba(0,45,114,0.25);
+}
+
+.form-check-input:checked {
+    background-color: #002D72;
+    border-color: #002D72;
+}
+
+.form-check-label {
+    margin-left: 0.3rem;
+    font-weight: 500;
+    color: #555;
+}
+
+/* ---------- Radio Buttons Sejajar ---------- */
+.form-check-inline {
+    display: flex;
+    align-items: center;
+    margin-right: 1.5rem; /* jarak antar pilihan */
+}
+
+.form-check-inline input {
+    margin-right: 0.3rem;
+}
+
+/* ---------- Submit Button ---------- */
+.btn-primary {
+    background-color: #002D72;
+    border-color: #002D72;
+    border-radius: 6px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #001f54;
+    transform: translateY(-1px);
+}
+
+/* ---------- Container ---------- */
+.container {
+    background-color: #fff;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+}
+
+/* ---------- Custom Box Above Header ---------- */
+.text-center > div > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Card Wrapper */
+.card-box {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+/* Penjelasan */
+.penjelasan-box {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.penjelasan-header {
+    background: #eaf2ff;
+    color: #0d47a1;
+    font-weight: 600;
+    padding: 10px 16px;
+}
+
+.penjelasan-list {
+    list-style: none;
+    margin: 0;
+    padding: 16px;
+    counter-reset: list-counter;
+}
+
+.penjelasan-list li {
+    position: relative;
+    padding-left: 40px;
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.penjelasan-list li::before {
+    counter-increment: list-counter;
+    content: counter(list-counter);
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: linear-gradient(#0284C7, #041562);
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+itu naha garis yang horizontal kagak ada 
+.custom-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 15px;
+    overflow: hidden; 
+}
+
+.custom-table td {
+    background: #f9f9f9;
+}
+
+thead.table-title th {
+    background-color: #041562;
+    color: white;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Penjelasan */
+.komen_ttd-box {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.komen_ttd-header {
+    background: #eaf2ff;
+    color: #0d47a1;
+    font-weight: 600;
+    padding: 10px 16px;
+}
+
+/* Header Box */
+.komen_ttd-header {
+    background: #e5efff;
+    color: #111827;
+    font-weight: 600;
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.simpan-btn {
+    background-color: #041562; 
+    color: white;
+    font-weight: 500;
+    padding: 10px 24px;
+    border-radius: 6px;
+    border: none;
+    transition: background 0.2s;
+    display: block;         
+    margin-left: auto;
+}
+
+.col-md-12 {
+    margin: 10px;
+}
+
+/* TANDA TANGAN */
+.signature-container {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 100%;
+    height: 200px;
+    position: relative;
+}
+
+.signature-pad {
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+}
+
+.mapa-logo {
+    width: 50px;
+    height: 50px;
+    background-color: #001f60; /* biru tua */
+    border-radius: 6px;
+    margin: 0 auto 16px auto;
 }

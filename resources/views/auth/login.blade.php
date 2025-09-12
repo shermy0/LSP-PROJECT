@@ -76,4 +76,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ asset('assets/js/login.js') }}" defer></script>
 </body>
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> 4714937511aa82bf1fa4459ed2b8c28b925a9ea6

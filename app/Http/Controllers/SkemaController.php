@@ -12,13 +12,7 @@ class SkemaController extends Controller
         $skemas = Skema::all();
         return view('laporan_asesmen.laporan', compact('skemas'));
     }    
-    
-    public function ninjau_asesemen() 
-    {
-        $skemas = Skema::all();
-        return view('meninjau_asesmen.ninjau_asesemen', compact('skemas'));
-    }
-    
+
     public function mapa02()
     {
         $skemas = Skema::all(); 
@@ -26,8 +20,8 @@ class SkemaController extends Controller
     }
     public function frak3()
     {
-        $skemas = Skema::all(); // kalau mau nampilin data skema
-        return view('frak3', compact('skemas')); // arah ke resources/views/frak3.blade.php
+        $skemas = Skema::all();
+        return view('frak3', compact('skemas')); // resources/views/frak3.blade.php
     }
 
     public function simpanFrak3(Request $request)
@@ -37,4 +31,17 @@ class SkemaController extends Controller
 
         return redirect()->route('frak3')->with('success', 'FR.AK.03 berhasil disimpan!');
     }
+    public function ninjau_asesemen()
+    {
+        $skemas = Skema::all(); 
+        return view('meninjau_asesmen/ninjau_asesemen', compact('skemas'));
+    }
+    public function formMapa01()
+    {
+        $skemas = Skema::all();
+        return view('form_perencanaan.form_mapa_01.mapa01', compact('skemas'));
+    }
 }
+    
+
+
