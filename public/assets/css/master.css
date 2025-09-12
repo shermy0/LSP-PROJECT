@@ -106,21 +106,12 @@ body {
 .sidebar.collapsed .menu ul li span {
     opacity: 0;
     pointer-events: none;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
 }
 
 .menu ul li a {
     color: white;
     text-decoration: none;
     font-size: 14px;
->>>>>>> 6533871cbcd10e4d5925208337c267483fb9decf
->>>>>>> ee70e639e3e4e5d9bbef76e32a84764314b7de34
-=======
->>>>>>> 611046b1ace2ff58f20fcef5931dc36ff0f9e60d
 }
 
 /* Footer */

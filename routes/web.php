@@ -70,7 +70,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('dashboard.admin');
 
     // Asesi
-    Route::get('/asesi/dashboard', [DashboardController::class, 'asesi'])->name('dashboard.asesi');
+    // Asesi
+Route::get('/asesi/dashboard', [DashboardController::class, 'asesi'])->name('asesi.dashboard');
+
 
     // Asesor
     Route::get('/asesor/dashboard', [DashboardController::class, 'asesor'])->name('dashboard.asesor');
@@ -79,24 +81,15 @@ Route::middleware(['auth'])->group(function () {
 // ============ Tambahan untuk Form Permohonan ============
 Route::prefix('asesi/permohonan')->name('asesi.permohonan.')->group(function () {
     Route::get('/form1', [PermohonanController::class, 'form1'])->name('form1');
+    Route::post('/store', [PermohonanController::class, 'store'])->name('store');
     Route::get('/form2', [PermohonanController::class, 'form2'])->name('form2');
 });
 
+// routes/web.php
+Route::get('/get-skema/{id}', [\App\Http\Controllers\Asesi\PermohonanController::class, 'getSkema'])->name('get.skema');
 
-// ============ Tambahan untuk Form Wajar Alasan ============
-Route::prefix('asesi/wajar-alasan')->name('asesi.wajar_alasan.')->group(function () {
-    Route::get('/form1', [WajarAlasanController::class, 'form1'])->name('form1');
-    Route::get('/form2', [WajarAlasanController::class, 'form2'])->name('form2');
-    Route::get('/form3', [WajarAlasanController::class, 'form3'])->name('form3');
-});
 
-// ============ Form Wajar Alasan untuk Asesor ============
-Route::prefix('asesor/wajar-alasan')->name('asesor.wajar_alasan.')->group(function () {
-    Route::get('/form1', [App\Http\Controllers\Asesor\WajarAlasanController::class, 'form1'])->name('form1');
-    Route::get('/form2', [App\Http\Controllers\Asesor\WajarAlasanController::class, 'form2'])->name('form2');
-    Route::get('/form3', [App\Http\Controllers\Asesor\WajarAlasanController::class, 'form3'])->name('form3');
 
-});
 
 // Logout
 Route::post('/logout', function () {
