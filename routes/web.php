@@ -67,7 +67,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('dashboard.admin');
 
     // Asesi
-    Route::get('/asesi/dashboard', [DashboardController::class, 'asesi'])->name('dashboard.asesi');
+    // Asesi
+Route::get('/asesi/dashboard', [DashboardController::class, 'asesi'])->name('asesi.dashboard');
+
 
     // Asesor
     Route::get('/asesor/dashboard', [DashboardController::class, 'asesor'])->name('dashboard.asesor');
