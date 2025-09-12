@@ -1,5 +1,8 @@
 @extends('master')
 @section('konten')
+
+<link rel="stylesheet" href="{{ asset('assets/css/mapa01.css') }}">
+
         <div class="card-box">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
@@ -14,14 +17,14 @@
 <div class="container">
 
     <div class="card p-3">
-        <h6 class="fw-bold">Kelompok Pekerjaan 1</h6>
+        <h6 class="judul-header">Kelompok Pekerjaan 1</h6>
 
 <form action="{{ route('form.mapa01.simpanunit', $skema->id_skema) }}" method="POST">
     @csrf
         <div class="row mb-3">
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label>Kode Unit</label>
+                    <label class="">Kode Unit</label>
                     <select id="kode_unit" name="kode_unit" class="form-control">
                         <option value="">-- Pilih Kode Unit --</option>
                         @foreach($units as $unit)
@@ -55,7 +58,7 @@
     <label>Jenis Bukti</label><br>
     @foreach ($jenisBukti as $bukti)
         <label>
-            <input type="checkbox" name="jenis_bukti[]" value="{{ $bukti->id_jenis_bukti }}">
+            <input type="checkbox" class="form-check-input me-2" name="jenis_bukti[]" value="{{ $bukti->id_jenis_bukti }}">
             {{ $bukti->nama_bukti }}
         </label><br>
     @endforeach
@@ -66,8 +69,8 @@
     <label>Metode dan Perangkat Asesmen</label><br>
 @foreach ($perangkat as $p)
     <label>
-        <input type="checkbox" name="metode[]" value="{{ $p->id_perangkat }}">
-        {{ $p->jenisBukti->nama_bukti ?? '-' }} ({{ $p->catatan_penerapan }})
+        <input type="checkbox" class="form-check-input me-2" name="metode[]" value="{{ $p->id_perangkat }}">
+        {{ $p->jenisBukti->nama_bukti ?? '' }} ({{ $p->catatan_penerapan }})
     </label><br>
 @endforeach
 
@@ -77,13 +80,14 @@
 
 
 
+    </div>
+    
+</div>
             <div class="d-flex justify-content-between">
                 <a href="{{ route('form.mapa01.kodeunit', $skema->id_skema) }}" class="btn btn-secondary">Kembali</a>
                 <button class="btn btn-primary">Simpan dan lanjut</button>
             </div>
         </form>
-    </div>
-</div>
 
 <script>
     const kodeUnitSelect = document.getElementById('kode_unit');

@@ -142,7 +142,7 @@ public function hapusUnit($skema_id, $id)
     $hasil = HasilAsesmen::findOrFail($id);
     $hasil->delete();
 
-    return redirect()->route('form.mapa01.tambahunit', $skema_id)
+    return redirect()->route('form.mapa01.kodeunit', $skema_id)
                      ->with('success', 'Unit berhasil dihapus.');
 }
 
