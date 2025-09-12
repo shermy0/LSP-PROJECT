@@ -42,7 +42,7 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <h4 class="text-center">Dashboard</h4>
-        <a href="{{ route('asesor.dashboard') }}">Dashboard</a>
+        <a href="{{ route('dashboard.asesor') }}">Dashboard</a>
         <a href="#">Menu 1</a>
         <a href="#">Menu 2</a>
         <a href="#">Menu 3</a>
