@@ -34,27 +34,30 @@ Route::prefix('form-perencanaan')->group(function () {
     Route::get('/mapa01', [MapaController::class, 'create'])->name('form.mapa01');
 
     Route::get('/mapa01/kode-unit/{skema_id}', [MapaController::class, 'kodeUnit'])->name('form.mapa01.kodeunit');
-    Route::get('/mapa01/tambah-unit/{skema_id}', [MapaController::class, 'tambahUnit'])->name('form.mapa01.tambahunit');
 
-    Route::post('/mapa01/{skema_id}/simpan-unit', [MapaController::class, 'simpanUnit'])->name('form.mapa01.simpanunit');
+    // Unit per kelompok
+Route::get('/mapa01/{skema_id}/kelompok/{kelompok_id}/tambah-unit', [MapaController::class, 'tambahUnit'])
+    ->name('form.mapa01.tambahunit');
+    Route::post('/mapa01/{skema_id}/kelompok/{kelompok_id}/simpan-unit', [MapaController::class, 'simpanUnit'])->name('form.mapa01.simpanunit');
+
     Route::delete('/mapa01/{skema_id}/hapus-unit/{id}', [MapaController::class, 'hapusUnit'])->name('form.mapa01.hapusunit');
 
+    // Kelompok pekerjaan
+    Route::post('/{skema_id}/tambah-kelompok', [MapaController::class, 'tambahKelompok'])->name('form.mapa01.tambahKelompok');
+    Route::delete('/{skema_id}/hapus-kelompok/{kelompok_id}', [MapaController::class, 'hapusKelompok'])->name('form.mapa01.hapusKelompok');
+
+    // Get skema
     Route::get('/get-skema/{id}', [MapaController::class, 'getSkema']);
 
-Route::post('/mapa01/{skema_id}/tambah-kelompok', [MapaController::class, 'tambahKelompok'])->name('form.mapa01.tambahkelompok');
-Route::delete('/mapa01/{skema_id}/hapus-kelompok/{kelompok_id}', [MapaController::class, 'hapusKelompok'])->name('form.mapa01.hapuskelompok');
-
-
+    // Modifikasi & konfirmasi
     Route::get('/mapa01/modifikasi/{skema_id}', [ModifikasiController::class, 'index'])->name('form.mapa01.modifikasi');
     Route::get('/mapa01/konfirmasi/{skema_id}', [MapaController::class, 'index'])->name('form.mapa01.konfirmasi');
 
-    Route::get('/mapa01/edit-unit/{skema_id}/{id}', [MapaController::class, 'editUnit'])
-    ->name('form.mapa01.editunit');
-
-Route::put('/mapa01/update-unit/{skema_id}/{id}', [MapaController::class, 'updateUnit'])
-    ->name('form.mapa01.updateunit');
-
+    // Edit & update unit
+    Route::get('/mapa01/edit-unit/{skema_id}/{id}', [MapaController::class, 'editUnit'])->name('form.mapa01.editunit');
+    Route::put('/mapa01/update-unit/{skema_id}/{id}', [MapaController::class, 'updateUnit'])->name('form.mapa01.updateunit');
 });
+
 
 
 

@@ -19,7 +19,7 @@
     <div class="card p-3">
         <h6 class="judul-header">Kelompok Pekerjaan 1</h6>
 
-<form action="{{ route('form.mapa01.simpanunit', $skema->id_skema) }}" method="POST">
+<form action="{{ route('form.mapa01.simpanunit', [$skema->id_skema, $kelompok_id]) }}" method="POST">
     @csrf
         <div class="row mb-3">
             <div class="row mb-3">
