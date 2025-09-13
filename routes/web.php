@@ -7,6 +7,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
 use App\Http\Controllers\DataPesertaUjiController;
 use App\Http\Controllers\ProfileAsesorController;
+use App\Http\Controllers\Pgia07Controller;
+use App\Http\Controllers\PertanyaanController;
+use App\Http\Controllers\TambahAsesorController;
 
 // login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -54,6 +57,26 @@ Route::get('/peserta-uji/{id}', [DataPesertaUjiController::class, 'show'])->name
 //Profile Asesor
 Route::middleware('auth')->group(function () {
     Route::get('/profileasesor/index', [ProfileAsesorController::class, 'show'])->name('profile.show');
-Route::get('/profileasesor/edit', [ProfileAsesorController::class, 'edit'])->name('profileasesor.edit');
+    Route::get('/profileasesor/edit', [ProfileAsesorController::class, 'edit'])->name('profileasesor.edit');
     Route::put('/profileasesor/update', [ProfileAsesorController::class, 'update'])->name('profile.update');
 });
+
+//Lembar Pertanyaan PG
+Route::get('/pgia07', [Pgia07Controller::class, 'index']);
+
+//Pertanyaan Tertulis PG
+Route::get('/fria05a', function () {
+    return view('fria05a'); // pakai nama view kamu
+})->name('form.pertanyaan');
+
+Route::post('/simpan-pertanyaan', [PertanyaanController::class, 'simpan'])->name('simpan.pertanyaan');
+
+Route::get('/fria05a1', function () {
+    return view('fria05a1'); // pakai nama view kamu
+})->name('form.pertanyaan');
+
+Route::get('/fria05a2', function () {
+    return view('fria05a2'); // pakai nama view kamu
+})->name('form.pertanyaan');
+
+Route::get('/tambahasesor', [TambahAsesorController::class, 'index']);
