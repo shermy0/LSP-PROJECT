@@ -20,7 +20,7 @@ class AuthController extends Controller
 
         if (auth()->attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('/banding-asesmen');
+            return redirect()->intended('/dashboard');
         }
 
         return back()->withErrors([
