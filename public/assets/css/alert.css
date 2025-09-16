@@ -1,0 +1,31 @@
+/* public/css/alert.css */
+
+.custom-alert {
+    position: fixed;
+    top: 20px;
+    right: -300px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    color: white;
+    opacity: 0;
+    transition: all 0.5s ease-in-out;
+    z-index: 9999;
+}
+
+/* Warna alert */
+.custom-alert.success {
+    background: linear-gradient(45deg, #22c55e, #16a34a);
+}
+.custom-alert.info {
+    background: linear-gradient(45deg, #3b82f6, #2563eb);
+}
+.custom-alert.error {
+    background: linear-gradient(45deg, #ef4444, #dc2626);
+}
+
+/* Animasi muncul */
+.custom-alert.show {
+    right: 20px;
+    opacity: 1;
+}
