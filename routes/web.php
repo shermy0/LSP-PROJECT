@@ -6,8 +6,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
-use App\Http\Controllers\FormAsesmenController;
 use App\Http\Controllers\PertanyaanController;
+use App\Http\Controllers\FormAsesmenController; 
+
+Route::get('/form-asesmen/{id_skema}', [FormAsesmenController::class, 'showSkema'])
+    ->name('formasesmen.show');
 
 // Edit & Update
 Route::get('/pertanyaan/esai/{id}/edit', [PertanyaanController::class, 'editEsai'])->name('pertanyaan.esai.edit');
@@ -15,6 +18,30 @@ Route::put('/pertanyaan/esai/{id}', [PertanyaanController::class, 'updateEsai'])
 
 // Hapus
 Route::delete('/pertanyaan/esai/{id}', [PertanyaanController::class, 'destroyEsai'])->name('pertanyaan.esai.destroy');
+
+// CRUD Lisan
+Route::get('/pertanyaan/lisan/create', [PertanyaanController::class, 'createLisan'])->name('lisan.create');
+Route::post('/pertanyaan/lisan/store', [PertanyaanController::class, 'storeLisan'])->name('lisan.store');
+Route::get('/pertanyaan/lisan/{id_skema}/crud', [PertanyaanController::class, 'crudLisan'])->name('lisan.crud');
+Route::get('/pertanyaan/lisan/{id}/edit', [PertanyaanController::class, 'editLisan'])->name('lisan.edit');
+Route::put('/pertanyaan/lisan/{id}/update', [PertanyaanController::class, 'updateLisan'])->name('lisan.update');
+Route::delete('/pertanyaan/lisan/{id}/delete', [PertanyaanController::class, 'destroyLisan'])->name('lisan.destroy');
+// Route untuk pertanyaan Lisan per skema
+Route::get('/form-asesmen/pertanyaan-lisan/{id_skema}', [FormAsesmenController::class, 'pertanyaanLisan'])
+    ->name('formasesmen.pertanyaanLisan');
+Route::get('/lisan/{id_skema}/crud', [PertanyaanController::class, 'crudLisan'])
+    ->name('lisan.crud');
+
+    
+// Form input esai via query string (jumlah & id_skema)
+Route::get('/pertanyaan/esai/create', [PertanyaanController::class, 'createEsai'])
+    ->name('pertanyaan.esai.create'); // <-- gunakan ini di Blade
+
+// Form Asesmen → pilih skema → input esai (dynamic berdasarkan id_skema)
+Route::get('/form-asesmen/pertanyaan-esai/{id_skema}', [FormAsesmenController::class, 'pertanyaanEsai'])
+    ->name('formasesmen.pertanyaanEsai');
+
+
 
 // login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -33,6 +60,8 @@ Route::post('/register/asesor', [RegisterController::class, 'storeAsesor'])->nam
 
 // Form Perencanaan untuk Asesor
 Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('formperencanaan');
+Route::get('/dashboard/asesor', [DashboardController::class, 'asesor'])
+    ->name('asesor.dashboard');
 
 Route::get('/pramuniaga', [FormAsesmenController::class, 'pramuniaga'])->name('formasesmen.pramuniaga');
 
@@ -55,8 +84,9 @@ Route::get('/formasesmen', [FormAsesmenController::class, 'index'])->name('forma
 |--------------------------------------------------------------------------|
 */
 
-// CRUD Esai
-Route::get('/esai-crud', [PertanyaanController::class, 'crudEsai'])->name('esai.crud');
+
+Route::get('/esai/{id_skema}', [PertanyaanController::class, 'crudEsai'])->name('esai.crud');
+
 
 // PertanyaanController → simpan esai
 Route::post('/pertanyaan/esai/store', [PertanyaanController::class, 'storeEsai'])->name('pertanyaan.esai.store');
@@ -112,6 +142,27 @@ Route::post('/register/asesi', [RegisterController::class, 'storeAsesi'])->name(
 Route::get('/register/asesor', [RegisterController::class, 'showAsesorForm'])->name('register.asesor');
 Route::post('/register/asesor', [RegisterController::class, 'storeAsesor'])->name('register.asesor.store');
 
+/*
+|--------------------------------------------------------------------------|
+| ROUTE DASHBOARD                                                           |
+|--------------------------------------------------------------------------|
+*/
+
+// Admin
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
+});
+
+// Asesi
+Route::middleware(['auth', 'role:asesi'])->group(function () {
+    Route::get('/dashboard/asesi', [DashboardController::class, 'asesi'])->name('dashboard.asesi');
+});
+
+/*
+|--------------------------------------------------------------------------|
+| ROUTE LOGOUT                                                              |
+|--------------------------------------------------------------------------|
+*/
 //dashboard
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

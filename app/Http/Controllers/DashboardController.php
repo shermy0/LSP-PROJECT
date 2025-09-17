@@ -42,7 +42,7 @@ class DashboardController extends Controller
 
     public function asesi()
     {
-        return view('dashboard.asesi');
+        return view('asesi.dashboard');
     }
 
    public function asesor()
