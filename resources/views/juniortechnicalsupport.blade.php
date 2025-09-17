@@ -27,9 +27,6 @@
         </a>
     </h2>
 </div>
-
-
-
         <!-- Item 3 -->
         <div class="accordion-item mb-2">
             <h2 class="accordion-header p-3 border rounded">

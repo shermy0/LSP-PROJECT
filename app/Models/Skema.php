@@ -2,16 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Skema extends Model
 {
-    use HasFactory;
-
-    protected $table = 'skema_sertifikasi';           // Nama tabel
-    protected $primaryKey = 'id_skema';   // Primary key
-    public $timestamps = false;           // Tidak ada created_at & updated_at
+    protected $table = 'skema_sertifikasi';
+    protected $primaryKey = 'id_skema';
+    public $timestamps = true;
 
     protected $fillable = [
         'nama_skema',
