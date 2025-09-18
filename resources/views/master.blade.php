@@ -65,7 +65,6 @@
                 <span class="role">{{ ucfirst(Auth::user()->role) }}</span>
             </div>
         </div>
-
         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="logout-form">
             @csrf
             <button type="button" id="logout-btn" class="logout-btn">
