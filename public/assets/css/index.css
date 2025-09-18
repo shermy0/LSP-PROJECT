@@ -192,6 +192,8 @@ h1, h2, .judul, .nomorSkema {
     font-weight: 500;
 }
 
+
+
 /*Error State */
 .input-error {
     border: 2px solid #e74c3c !important;

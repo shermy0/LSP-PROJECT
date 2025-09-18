@@ -101,47 +101,46 @@
         </div>
     </div>
 
-<div class="container">
-  <div class="main-header">Tanda Tangan Asesor</div>
-
-  <div class="signature-section">
+<div class="ttd-container">
+  <div class="ttd-header">Tanda Tangan Asesor</div>
+  <div class="ttd-signature-section">
 
     <!-- Card Asesi -->
-    <div class="card">
-      <div class="card-title">Asesi</div>
+    <div class="ttd-card">
+      <div class="ttd-card-title">Asesi</div>
       <form>
-        <label for="nama-asesi">Nama Lengkap</label>
-        <input type="text" id="nama-asesi" placeholder="Masukkan nama lengkap asesi">
+        <label for="nama-asesi2" class="ttd-label">Nama Lengkap</label>
+        <input type="text" id="nama-asesi2" class="ttd-input" placeholder="Masukkan nama lengkap asesi">
 
-        <label for="tanggal-asesi">Tanggal</label>
-        <input type="date" id="tanggal-asesi">
+        <label for="tanggal-asesi2" class="ttd-label">Tanggal</label>
+        <input type="date" id="tanggal-asesi2" class="ttd-input">
 
-        <label for="ttd-asesi">Tanda Tangan</label>
-        <canvas id="ttd-asesi"></canvas>
+        <label for="ttd-asesi2" class="ttd-label">Tanda Tangan</label>
+        <canvas id="ttd-asesi2" class="ttd-canvas"></canvas>
 
-        <div class="btns">
-          <button type="button" class="clear" onclick="clearCanvas('ttd-asesi')">Hapus</button>
-          <button type="button" class="download" onclick="downloadTTD('ttd-asesi','nama-asesi','tanggal-asesi')">Unduh</button>
+        <div class="ttd-btns">
+          <button type="button" class="ttd-btn ttd-clear" onclick="clearCanvas('ttd-asesi2')">Hapus</button>
+          <button type="button" class="ttd-btn ttd-download" onclick="downloadTTD('ttd-asesi2','nama-asesi2','tanggal-asesi2')">Unduh</button>
         </div>
       </form>
     </div>
 
     <!-- Card Asesor -->
-    <div class="card">
-      <div class="card-title">Asesor</div>
+    <div class="ttd-card">
+      <div class="ttd-card-title">Asesor</div>
       <form>
-        <label for="nama-asesor">Nama Lengkap</label>
-        <input type="text" id="nama-asesor" placeholder="Masukkan nama lengkap asesor">
+        <label for="nama-asesor" class="ttd-label">Nama Lengkap</label>
+        <input type="text" id="nama-asesor" class="ttd-input" placeholder="Masukkan nama lengkap asesor">
 
-        <label for="tanggal-asesor">Tanggal</label>
-        <input type="date" id="tanggal-asesor">
+        <label for="tanggal-asesor" class="ttd-label">Tanggal</label>
+        <input type="date" id="tanggal-asesor" class="ttd-input">
 
-        <label for="ttd-asesor">Tanda Tangan</label>
-        <canvas id="ttd-asesor"></canvas>
+        <label for="ttd-asesor" class="ttd-label">Tanda Tangan</label>
+        <canvas id="ttd-asesor" class="ttd-canvas"></canvas>
 
-        <div class="btns">
-          <button type="button" class="clear" onclick="clearCanvas('ttd-asesor')">Hapus</button>
-          <button type="button" class="download" onclick="downloadTTD('ttd-asesor','nama-asesor','tanggal-asesor')">Unduh</button>
+        <div class="ttd-btns">
+          <button type="button" class="ttd-btn ttd-clear" onclick="clearCanvas('ttd-asesor')">Hapus</button>
+          <button type="button" class="ttd-btn ttd-download" onclick="downloadTTD('ttd-asesor','nama-asesor','tanggal-asesor')">Unduh</button>
         </div>
       </form>
     </div>
@@ -156,8 +155,8 @@
 
     <!-- Tombol Aksi -->
     <div class="container button-group">
-        <a href="{{ route('verifasesmen') }}" class="btn btn-back">Kembali</a>
-        <a href="#" class="btn btn-next" >Simpan dan Lanjut</a>
+        <a href="{{ route('verifasesmen') }}" class="btn-back">Kembali</a>
+        <a href="#" class="btn-next" >Simpan dan Lanjut</a>
     </div>
     
     <div id="imageModal" class="modal">

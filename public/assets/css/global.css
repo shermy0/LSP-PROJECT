@@ -45,6 +45,10 @@ h1, h2, h3 {
 .btn-back {
     background-color: #e63946;
     color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
 }
 
 .btn-back:hover {

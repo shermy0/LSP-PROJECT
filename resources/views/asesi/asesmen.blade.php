@@ -168,8 +168,8 @@
 
         <!-- Tombol Aksi -->
         <div class="container button-group">
-            <a href="{{ route('index') }}" class="btn btn-back">Kembali</a>
-            <a href="{{ route('asesmen2') }}" class="btn btn-next">Simpan dan Lanjut</a>
+            <a href="{{ route('index') }}" class="btn-back">Kembali</a>
+            <a href="{{ route('asesmen2') }}" class="btn-next">Simpan dan Lanjut</a>
         </div>
 
         <!-- Modal Preview -->

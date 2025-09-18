@@ -89,34 +89,34 @@
         </div>
     </div> 
     
-    <div class="container">
-        <div class="main-header">Tanda Tangan Asesi</div>
-            <div class="card">
-            <div class="card-title">Asesi</div>
-            <form>
-        <label for="nama-asesi">Nama Lengkap</label>
-        <input type="text" id="nama-asesi" placeholder="Masukkan nama lengkap asesi">
+<div class="ttd-container">
+  <div class="ttd-header">Tanda Tangan Asesi</div>
+  <div class="ttd-card">
+    <div class="ttd-card-title">Asesi</div>
+    <form>
+      <label for="nama-asesi" class="ttd-label">Nama Lengkap</label>
+      <input type="text" id="nama-asesi" class="ttd-input" placeholder="Masukkan nama lengkap asesi">
 
-        <label for="tanggal-asesi">Tanggal</label>
-        <input type="date" id="tanggal-asesi">
+      <label for="tanggal-asesi" class="ttd-label">Tanggal</label>
+      <input type="date" id="tanggal-asesi" class="ttd-input">
 
-        <label for="ttd-asesi">Tanda Tangan</label>
-        <canvas id="ttd-asesi"></canvas>
+      <label for="ttd-asesi" class="ttd-label">Tanda Tangan</label>
+      <canvas id="ttd-asesi" class="ttd-canvas"></canvas>
 
-        <div class="btns">
-          <button type="button" class="clear" onclick="clearCanvas('ttd-asesi')">Hapus</button>
-          <button type="button" class="download" onclick="downloadTTD('ttd-asesi','nama-asesi','tanggal-asesi')">Unduh</button>
-        </div>
-      </form>
-        </div>
-     </div>
+      <div class="ttd-btns">
+        <button type="button" class="ttd-btn ttd-clear" onclick="clearCanvas('ttd-asesi')">Hapus</button>
+        <button type="button" class="ttd-btn ttd-download" onclick="downloadTTD('ttd-asesi','nama-asesi','tanggal-asesi')">Unduh</button>
+      </div>
+    </form>
+  </div>
+</div>
 
   <script src="{{ asset('assets/js/asesmen.js') }}"></script>
 
     <!-- Tombol Aksi -->
     <div class="container button-group">
-        <a href="{{ route('asesmen2') }}" class="btn btn-back">Kembali</a>
-        <a href="#" class="btn btn-next" >Simpan dan Lanjut</a>
+        <a href="{{ route('asesmen2') }}" class="btn-back">Kembali</a>
+        <a href="#" class="btn-next" >Simpan dan Lanjut</a>
     </div>
     
     <div id="imageModal" class="modal">

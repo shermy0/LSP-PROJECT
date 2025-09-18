@@ -177,8 +177,8 @@
 
     <!-- Tombol Aksi -->
     <div class="container button-group">
-        <a href="{{ route('asesmen') }}" class="btn btn-back">Kembali</a>
-        <a href="{{ route('asesmen3') }}" class="btn btn-next" >Simpan dan Lanjut</a>
+        <a href="{{ route('asesmen') }}" class="btn-back">Kembali</a>
+        <a href="{{ route('asesmen3') }}" class="btn-next" >Simpan dan Lanjut</a>
     </div>
 
     <div id="imageModal" class="modal">

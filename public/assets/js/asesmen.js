@@ -38,7 +38,7 @@ function handleFileUpload(event) {
 }
 
 window.addEventListener("load", () => {
-  const canvases = ["ttd-asesi", "ttd-asesor"];
+  const canvases = ["ttd-asesi", "ttd-asesi2", "ttd-asesor"];
 
   canvases.forEach(id => {
     const canvas = document.getElementById(id);

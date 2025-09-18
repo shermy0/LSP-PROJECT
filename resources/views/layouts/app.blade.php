@@ -10,7 +10,7 @@
 <body>
 
     {{-- Sidebar include --}}
-    @include('layouts.sidebar')
+    @include('layouts.master')
 
     <div id="content" style="margin-left:240px; padding:20px; transition: margin-left 0.3s ease;">
         @yield('content')
