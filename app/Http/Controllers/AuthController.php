@@ -17,7 +17,6 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-<<<<<<< HEAD
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
@@ -39,21 +38,6 @@ class AuthController extends Controller
 
         // Kalau gagal login
         return back()->withErrors(['login' => 'Email atau password salah']);
-=======
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string|min:6'
-        ]);
-
-        if (auth()->attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect()->intended('/dashboard');
-        }
-
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->onlyInput('email');
->>>>>>> 4d5eaa9f1287169d8c46f6ecf08760c0f5063c7d
     }
 
     public function showRegisterRole()
