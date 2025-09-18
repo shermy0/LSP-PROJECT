@@ -96,6 +96,6 @@
         </div>
     </div>
 
-    <a href="{{ route('admin.form1.index') }}" class="btn btn-secondary">Kembali</a>
+    <a href="{{ route('admin.permohonan.index') }}" class="btn btn-secondary">Kembali</a>
 </div>
 @endsection

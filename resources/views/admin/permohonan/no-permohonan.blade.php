@@ -9,7 +9,7 @@
         <p>Asesi <strong>{{ $asesi->nama_lengkap }}</strong> (NIK: {{ $asesi->nik }}) 
         belum mengisi Form Permohonan Sertifikasi (FR.APL.02).</p>
         <hr>
-        <a href="{{ route('admin.form1.index') }}" class="btn btn-secondary">Kembali ke Daftar Asesi</a>
+        <a href="{{ route('admin.permohonan.index') }}" class="btn btn-secondary">Kembali ke Daftar Asesi</a>
     </div>
 </div>
 @endsection

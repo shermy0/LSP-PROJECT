@@ -24,7 +24,7 @@ class Form1AdminController extends Controller
             ->orderBy('updated_at', 'desc')
             ->get();
 
-        return view('admin.form1.index', compact('asesi'));
+        return view('admin.permohonan.index', compact('asesi'));
     }
 
     public function show($id_asesi)
@@ -40,7 +40,7 @@ class Form1AdminController extends Controller
             ->first();
 
         if (!$permohonan) {
-            return view('admin.form1.no-permohonan', compact('asesi'));
+            return view('admin.permohonan.no-permohonan', compact('asesi'));
         }
 
         $skema = null;
@@ -60,7 +60,7 @@ class Form1AdminController extends Controller
 
         $tuk = DB::table('tuk')->first();
 
-        return view('admin.form1.show', compact('asesi', 'permohonan', 'skema', 'units', 'tuk'));
+        return view('admin.permohonan.show', compact('asesi', 'permohonan', 'skema', 'units', 'tuk'));
     }
 
 

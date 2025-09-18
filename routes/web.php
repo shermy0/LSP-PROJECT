@@ -55,7 +55,7 @@ Route::middleware(['auth'])->group(function () {
 
     // ================== ADMIN (FR.APL.01 - Form1) ==================
     Route::prefix('admin')->name('admin.')->group(function () {
-        Route::prefix('form1')->name('form1.')->group(function () {
+        Route::prefix('permohonan')->name('permohonan.')->group(function () {
             Route::get('/', [Form1AdminController::class, 'index'])->name('index');
             Route::get('/{user_id}', [Form1AdminController::class, 'show'])->name('show');
         });
