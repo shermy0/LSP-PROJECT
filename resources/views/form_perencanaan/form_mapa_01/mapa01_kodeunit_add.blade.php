@@ -19,7 +19,7 @@
     <div class="card p-3">
         <h6 class="judul-header">Kelompok Pekerjaan 1</h6>
 
-<form action="{{ route('form.mapa01.simpanunit', [$skema->id_skema, $kelompok_id]) }}" method="POST">
+<form id="formUnit" action="{{ route('form.mapa01.simpanunit', [$skema->id_skema, $kelompok_id]) }}" method="POST">
     @csrf
         <div class="row mb-3">
             <div class="row mb-3">
@@ -47,10 +47,9 @@
                 </div>
             </div>
 
-
             <div class="mb-3">
                 <label>Bukti-Bukti</label>
-                <textarea class="form-control" name="bukti"></textarea>
+                <textarea class="form-control" name="bukti" id="bukti"></textarea>
             </div>
 
 {{-- Jenis Bukti --}}
@@ -76,35 +75,49 @@
 
 </div>
 
-
-
-
-
     </div>
     
 </div>
             <div class="d-flex justify-content-between">
                 <a href="{{ route('form.mapa01.kodeunit', $skema->id_skema) }}" class="btn btn-secondary">Kembali</a>
-                <button class="btn btn-primary">Simpan Unit</button>
+                <button class="btn btn-primary" type="submit">Simpan Unit</button>
             </div>
         </form>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     const kodeUnitSelect = document.getElementById('kode_unit');
     const judulUnitSelect = document.getElementById('judul_unit');
 
-    // kalau kode unit dipilih → otomatis pilih judul unit
+    // sinkronisasi dropdown
     kodeUnitSelect.addEventListener('change', function() {
         const selectedId = this.value;
         judulUnitSelect.value = selectedId;
     });
-
-    // kalau judul unit dipilih → otomatis pilih kode unit
     judulUnitSelect.addEventListener('change', function() {
         const selectedId = this.value;
         kodeUnitSelect.value = selectedId;
     });
+
+    // VALIDASI FORM
+    document.getElementById("formUnit").addEventListener("submit", function(e) {
+        let kode = kodeUnitSelect.value.trim();
+        let judul = judulUnitSelect.value.trim();
+        let bukti = document.getElementById("bukti").value.trim();
+        let jenisBukti = document.querySelectorAll('input[name="jenis_bukti[]"]:checked');
+        let metode = document.querySelectorAll('input[name="metode[]"]:checked');
+
+        if(kode === "" || judul === "" || bukti === "" || jenisBukti.length === 0 || metode.length === 0) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Form belum lengkap!',
+                text: 'Pastikan semua field wajib diisi dan checkbox dipilih minimal satu.',
+                confirmButtonText: 'OK'
+            });
+        }
+    });
 </script>
 
 @endsection
-

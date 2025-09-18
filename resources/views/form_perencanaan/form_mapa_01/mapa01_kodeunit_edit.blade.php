@@ -18,7 +18,7 @@
     <div class="card p-3">
         <h6 class="judul-header">Edit Kode Unit</h6>
 
-        <form action="{{ route('form.mapa01.updateunit', [$skema->id_skema, $hasil->id_hasil]) }}" method="POST">
+        <form id="formEditUnit" action="{{ route('form.mapa01.updateunit', [$skema->id_skema, $hasil->id_hasil]) }}" method="POST">
             @csrf
             @method('PUT')
 
@@ -26,6 +26,7 @@
                 <div class="col-md-6">
                     <label>Kode Unit</label>
                     <select id="kode_unit" name="kode_unit" class="form-control">
+                        <option value="">-- Pilih Kode Unit --</option>
                         @foreach($units as $unit)
                             <option value="{{ $unit->id_unit }}" 
                                 {{ $hasil->id_unit == $unit->id_unit ? 'selected' : '' }}>
@@ -37,6 +38,7 @@
                 <div class="col-md-6">
                     <label>Judul Unit</label>
                     <select id="judul_unit" name="judul_unit" class="form-control">
+                        <option value="">-- Pilih Judul Unit --</option>
                         @foreach($units as $unit)
                             <option value="{{ $unit->id_unit }}" 
                                 {{ $hasil->id_unit == $unit->id_unit ? 'selected' : '' }}>
@@ -49,7 +51,7 @@
 
             <div class="mb-3">
                 <label>Bukti-Bukti</label>
-                <textarea class="form-control" name="bukti">{{ $hasil->catatan }}</textarea>
+                <textarea class="form-control" name="bukti" id="bukti">{{ $hasil->catatan }}</textarea>
             </div>
 
             <div class="mb-3">
@@ -84,15 +86,36 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     const kodeUnitSelect = document.getElementById('kode_unit');
     const judulUnitSelect = document.getElementById('judul_unit');
 
+    // sinkronisasi dropdown
     kodeUnitSelect.addEventListener('change', function() {
         judulUnitSelect.value = this.value;
     });
     judulUnitSelect.addEventListener('change', function() {
         kodeUnitSelect.value = this.value;
+    });
+
+    // VALIDASI FORM
+    document.getElementById("formEditUnit").addEventListener("submit", function(e) {
+        let kode = kodeUnitSelect.value.trim();
+        let judul = judulUnitSelect.value.trim();
+        let bukti = document.getElementById("bukti").value.trim();
+        let jenisBukti = document.querySelectorAll('input[name="jenis_bukti[]"]:checked');
+        let metode = document.querySelectorAll('input[name="metode[]"]:checked');
+
+        if(kode === "" || judul === "" || bukti === "" || jenisBukti.length === 0 || metode.length === 0) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Form belum lengkap!',
+                text: 'Pastikan semua field wajib diisi dan minimal satu checkbox dipilih.',
+                confirmButtonText: 'OK'
+            });
+        }
     });
 </script>
 
