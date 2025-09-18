@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SkemaSertifikasi extends Model
+class Skema extends Model
 {
     protected $table = 'skema_sertifikasi';
     protected $primaryKey = 'id_skema';
+    public $timestamps = true;
+
     protected $fillable = [
         'nama_skema',
         'kode_skema',
@@ -17,4 +19,3 @@ class SkemaSertifikasi extends Model
         'status_skema',
     ];
 }
-

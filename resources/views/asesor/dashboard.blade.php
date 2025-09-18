@@ -15,8 +15,7 @@
     ['icon'=>'fa-spinner','color'=>'#f1c40f','label'=>'Dalam Progres','value'=>$dalamProgres],
     ['icon'=>'fa-award','color'=>'#9b59b6','label'=>'Penghargaan','value'=>$penghargaan],
   ];
-@endphp
-
+  @endphp
 
   @foreach($stats as $item)
   <div class="col-md-3">
@@ -35,21 +34,37 @@
   @endforeach
 </div>
 
+{{-- Kompeten vs Belum Kompeten --}}
+<div class="row mt-4">
+  <div class="col-md-6">
+    <div class="card shadow-sm border-0 text-center p-4 rounded-4">
+      <h5 class="fw-bold text-success">Kompeten</h5>
+      <p class="mb-0">{{ $kompeten }} Asesi</p>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card shadow-sm border-0 text-center p-4 rounded-4">
+      <h5 class="fw-bold text-danger">Belum Kompeten</h5>
+      <p class="mb-0">{{ $belumKompeten }} Asesi</p>
+    </div>
+  </div>
+</div>
+
 {{-- Grafik Sertifikasi --}}
 <div class="card shadow-sm border-0 mt-5 p-4 rounded-4" style="background:#fff;">
   <h5 class="fw-bold mb-3">Grafik Sertifikasi</h5>
   <div style="height:350px;">
     <canvas id="sertifikasiChart"></canvas>
   </div>
-<div class="d-flex justify-content-between mt-3 text-muted">
-  <div><span class="fw-bold text-primary">{{ $totalSertifikat }}</span> Total Tersertifikasi</div>
-  <div><span class="fw-bold text-success">18%</span> Rata-rata Pertumbuhan</div>
-  <div>
-    <span class="fw-bold" style="color:{{ $topColor }}">
-      {{ $topJurusan }}
-    </span> Jurusan Terbanyak Sertifikasi
+  <div class="d-flex justify-content-between mt-3 text-muted">
+    <div><span class="fw-bold text-primary">{{ $totalSertifikat }}</span> Total Tersertifikasi</div>
+    <div><span class="fw-bold text-success">18%</span> Rata-rata Pertumbuhan</div>
+    <div>
+      <span class="fw-bold" style="color:{{ $topColor }}">
+        {{ $topJurusan }}
+      </span> Jurusan Terbanyak Sertifikasi
+    </div>
   </div>
-</div>
 </div>
 @endsection
 
@@ -77,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function() {
         data: @json($values),
         backgroundColor: gradients.slice(0, @json(count($labels))),
         borderRadius: 30,
-        barThickness:90
+        barThickness: 90
       }]
     },
     options: {

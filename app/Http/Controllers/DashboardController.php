@@ -45,34 +45,40 @@ class DashboardController extends Controller
         return view('asesi.dashboard');
     }
 
-   public function asesor()
-{
-    $totalPeserta    = 284;
-    $totalSertifikat = 284;
-    $dalamProgres    = 284;
-    $penghargaan     = 284;
+    public function asesor()
+    {
+        // --- REAL DATA ---
+        $totalPeserta    = DB::table('asesi')->count();
+        $totalSertifikat = DB::table('sertifikat')->count();
+        $dalamProgres    = DB::table('asesmen')->where('status', 'proses')->count();
 
-    // Data chart
-    $labels = collect(['AKL', 'MPLB', 'PEMASARAN', 'M-LOG', 'DKV', 'RPL', 'TJKT']);
-    $values = collect([45, 65, 30, 15, 40, 50, 10]);
+        $kompeten        = DB::table('hasil_asesmen')->where('status', 'kompeten')->count();
+        $belumKompeten   = DB::table('hasil_asesmen')->where('status', 'belum kompeten')->count();
 
-    // Warna dasar sama dengan di chart.js
-    $colors = ["#f1c40f","#3498db","#e74c3c","#e67e22","#9b59b6","#2ecc71","#7f8c8d"];
+        // --- DUMMY DATA (sementara) ---
+        $penghargaan     = 0;
 
-    $maxIndex   = $values->search($values->max());
-    $topJurusan = $labels[$maxIndex];
-    $topColor   = $colors[$maxIndex];
+        // Grafik sertifikasi per jurusan (sementara dummy karena di tabel asesi belum ada field jurusan)
+        $labels = collect(['AKL', 'MPLB', 'PEMASARAN', 'M-LOG', 'DKV', 'RPL', 'TJKT']);
+        $values = collect([45, 65, 30, 15, 40, 50, 10]);
 
-    return view('asesor.dashboard', compact(
-        'totalPeserta',
-        'totalSertifikat',
-        'dalamProgres',
-        'penghargaan',
-        'labels',
-        'values',
-        'topJurusan',
-        'topColor'
-    ));
-}
+        $colors = ["#f1c40f","#3498db","#e74c3c","#e67e22","#9b59b6","#2ecc71","#7f8c8d"];
 
+        $maxIndex   = $values->search($values->max());
+        $topJurusan = $labels[$maxIndex];
+        $topColor   = $colors[$maxIndex];
+
+        return view('asesor.dashboard', compact(
+            'totalPeserta',
+            'totalSertifikat',
+            'dalamProgres',
+            'penghargaan',
+            'labels',
+            'values',
+            'topJurusan',
+            'topColor',
+            'kompeten',
+            'belumKompeten'
+        ));
+    }
 }
