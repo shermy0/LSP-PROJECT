@@ -67,9 +67,9 @@ Route::post('/logout', function () {
     return redirect('/login');
 })->name('logout');
 
-Route::get('/', function () {
+Route::get('/asesi', function () {
     return view('asesi.index');
-})->name('index');
+})->name('index-asesi');
 
 Route::get('/asesmen', function () {
     return view('asesi.asesmen');
