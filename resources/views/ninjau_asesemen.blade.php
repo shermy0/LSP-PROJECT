@@ -22,11 +22,12 @@
             <span class="skema-label">SKEMA:</span>
             <select name="skema_id" id="skema_id" class="skema-select">
                 <option value="">-- Pilih Skema --</option>
-                @foreach($skemas as $skema)
-                    <option value="{{ $skema->id_skema }}"
-                            data-kode="{{ $skema->kode_skema }}"
-                            data-jenjang="{{ $skema->jenjang }}">
-                        {{ $skema->nama_skema }}
+                @foreach($skemas as $s)
+                    <option value="{{ $s->id_skema }}"
+                            data-kode="{{ $s->kode_skema }}"
+                            data-jenjang="{{ $s->jenjang }}"
+                            {{ $s->id_skema == ($currentSkemaId ?? '') ? 'selected' : '' }}>
+                        {{ $s->nama_skema }}
                     </option>
                 @endforeach
             </select>
@@ -232,22 +233,25 @@
 </form>
 
 <script>
-    document.getElementById('skema_id').addEventListener('change', function() {
-        let selected = this.options[this.selectedIndex];
-        let kode = selected.getAttribute('data-kode');
-        let jenjang = selected.getAttribute('data-jenjang');
+function setSkemaData() {
+    const select = document.getElementById('skema_id');
+    if (!select) return;
 
-        // biar bisa isi nomor otomatis
-        document.getElementById('nomor').value = kode || '';
+    const selected = select.options[select.selectedIndex];
+    const kode = selected?.getAttribute('data-kode') ?? '';
+    const jenjang = selected?.getAttribute('data-jenjang') ?? '';
 
-        // pilih radio otomatis sesuai skemanya
-        if (jenjang) {
-            if (jenjang.toLowerCase().includes("kkni")) {
-                document.getElementById('skema1').checked = true;
-            } else if (jenjang.toLowerCase().includes("okupasi")) {
-                document.getElementById('skema2').checked = true;
-            }
-        }
-    });
+    document.getElementById('nomor') && (document.getElementById('nomor').value = kode);
+
+    if (jenjang) {
+        const skema1 = document.getElementById('skema1');
+        const skema2 = document.getElementById('skema2');
+        if (skema1) skema1.checked = jenjang.toLowerCase().includes('kkni');
+        if (skema2) skema2.checked = jenjang.toLowerCase().includes('okupasi');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', setSkemaData);
+document.getElementById('skema_id')?.addEventListener('change', setSkemaData);
 </script>
 @endsection

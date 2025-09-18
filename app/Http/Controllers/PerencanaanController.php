@@ -1,93 +1,94 @@
 <?php
 
-namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PerencanaanController;
+use App\Http\Controllers\SkemaController;
+use App\Http\Controllers\InstrumenController;
 
-use Illuminate\Http\Request;
+// ============================
+// Halaman Utama
+// ============================
+Route::get('/', function () {
+    return view('welcome');
+});
 
-class PerencanaanController extends Controller
-{
-    public function index()
-    {
-        return view('formperencanaan'); 
-    }
+// ============================
+// Login & Register
+// ============================
+// Login
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
 
-    public function simpan(Request $request)
-    {
-        // logika simpan data ke DB di sini
-        return redirect()->route('formperencanaan')
-            ->with('success', 'Data berhasil');
-    }
+// Pilih Role Register
+Route::get('/register-role', [AuthController::class, 'showRegisterRole'])->name('register.role');
 
-    public function simpanLanjut(Request $request)
-    {
-        return redirect()->route('ninjau_asesmen_asesor')
-            ->with('success', 'Data berhasil');
-    }
+// Register Asesi
+Route::get('/register/asesi', [RegisterController::class, 'showAsesiForm'])->name('register.asesi');
+Route::post('/register/asesi', [RegisterController::class, 'storeAsesi'])->name('register.asesi.store');
 
-    public function simpanLanjutLaporan(Request $request)
-    {
-        return redirect()->route('laporan_asesor')
-            ->with('success', 'Data berhasil');
-    }
-    
-    public function simpanLanjutmapa02(Request $request)
-    {
-        return redirect()->route('mapa02_asesor.show')
-            ->with('success', 'Data berhasil');
-    }
+// Register Asesor
+Route::get('/register/asesor', [RegisterController::class, 'showAsesorForm'])->name('register.asesor');
+Route::post('/register/asesor', [RegisterController::class, 'storeAsesor'])->name('register.asesor.store');
 
-    public function laporan() 
-    {
-        return view('laporan_asesmen.laporan_asesor');
-    }
+// ============================
+// Form Perencanaan (Asesor)
+// ============================
+Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('formperencanaan');
+Route::post('/formperencanaan', [PerencanaanController::class, 'simpan'])->name('formperencanaan.simpan');
 
-    public function ninjauAsesmenAsesor() 
-    {
-        return view('meninjau_asesmen.ninjau_asesmen_asesor');
-    }
-    
-    public function mapa02()
-    {
-        return view('mapa02.mapa02_asesor'); 
-    }
+// ============================
+// Meninjau Asesmen
+// ============================
+Route::get('/ninjau_asesemen', [SkemaController::class, 'ninjau_asesemen'])->name('ninjau_asesemen');
+Route::get('/ninjau_asesemen/ninjau-asesmen-asesor', [PerencanaanController::class, 'ninjauAsesmenAsesor'])->name('ninjau_asesmen_asesor');
+Route::post('/ninjau_asesemen/ninjau-asesmen-asesor', [PerencanaanController::class, 'simpanLanjut'])->name('ninjau_asesmen_asesor.simpan');
 
-    public function frVa($periode)
-    {
-        $validPeriode = [
-            'sebelum' => 'Sebelum Asesmen',
-            'saat'    => 'Pada Saat Asesmen',
-            'sesudah' => 'Setelah Asesmen',
-        ];
+// ============================
+// Laporan
+// ============================
+// Halaman utama laporan
+Route::get('/laporan', [SkemaController::class, 'laporan'])->name('laporan');
+Route::get('/laporan/skema/{id_skema}/asesor', [SkemaController::class, 'showAsesor']);
 
-        if (!array_key_exists($periode, $validPeriode)) {
-            abort(404);
-        }
+// Laporan Asesor (FR.AK.05)
+Route::get('/laporan_asesor', [PerencanaanController::class, 'laporanAsesor'])->name('laporan_asesor');
+Route::post('/laporan_asesor', [PerencanaanController::class, 'store'])->name('laporan_asesor.store');
 
-        $periodeText = $validPeriode[$periode];
+Route::get('/get-asesor/{skemaId}', [SkemaController::class, 'getAsesor']);
+Route::get('/get-asesi/{skemaId}/{asesorId}', [SkemaController::class, 'getAsesi']);
 
-        // kirim periode juga supaya bisa dipakai di form hidden & breadcrumb
-        return view('fr_va.fr_va', compact('periode', 'periodeText'));
-    }
+// ============================
+// MAPA 02
+// ============================
+Route::get('/mapa02', [SkemaController::class, 'showForm'])->name('mapa02');
+Route::get('/mapa02/mapa02-asesor', [PerencanaanController::class, 'mapa02'])->name('mapa02_asesor.index');
+Route::post('/mapa02/mapa02-asesor', [PerencanaanController::class, 'simpanLanjutmapa02'])->name('mapa02_asesor.store');
 
-    // halaman FR VA Asesor
-    public function frVaAsesor(Request $request)
-    {
-        // Ambil periode dari query string atau session agar tahu asalnya
-        $periode = $request->query('periode', 'sebelum'); // default 'sebelum' kalau tidak ada
+Route::get('/mapa02/skema/{skemaId}/instrumen', [SkemaController::class, 'getInstrumenBySkema']);
+Route::get('/mapa02/skema/{skemaId}/asesor', [SkemaController::class, 'getAsesor']); // ambil asesor
+Route::get('/mapa02/skema/{skemaId}/units', [SkemaController::class, 'getUnits']);
 
-        return view('fr_va.fr_va_asesor', compact('periode'));
-    }
+Route::post('/instrumen/simpan-potensi', [InstrumenController::class, 'simpanPotensi'])->name('instrumen.simpanPotensi');
 
-    // simpan data FR VA → redirect ke FR VA Asesor
-    public function simpanLanjutfrVa(Request $request)
-    {
-        $periode = $request->periode;
+// ============================
+// FR VA
+// ============================
+// FR VA (halaman awal dengan periode)
+Route::get('/fr-va/{periode}', [PerencanaanController::class, 'frVa'])->name('fr_va');
 
-        // proses simpan data di DB
+// FR VA Asesor (lanjutan)
+Route::get('/fr-va-asesor', [PerencanaanController::class, 'frVaAsesor'])->name('fr_va_asesor');
+Route::post('/fr-va-asesor/simpan', [PerencanaanController::class, 'simpanLanjutfrVa'])->name('fr_va_asesor.simpan');
 
-        // redirect ke FR VA Asesor, bawa parameter periode supaya bisa balik
-        return redirect()->route('fr_va_asesor', ['periode' => $periode])
-                        ->with('success', 'Data berhasil disimpan!');
-    }
-
-}
+// ============================
+// Logout
+// ============================
+Route::post('/logout', function () {
+    Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect('/login');
+})->name('logout');

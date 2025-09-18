@@ -20,7 +20,7 @@
 <!-- Komentar dan TTD -->
 <div class="card-box">
     <div class="judul-box">
-        <div class="judul-header">Penjelasan</div>
+        <div class="judul-header">Komentar Asesor & Tanda Tangan</div>
             <h5 style="text-align: left;">Asesor</h5>
             <div class="col-md-12">
                 <label for="namaAsesor" class="form-label fw-semibold">Nama Asesor</label>

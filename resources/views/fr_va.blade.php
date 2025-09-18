@@ -76,7 +76,7 @@
         <div class="mb-3">
             <div class="form-check">
                 <input class="form-check-input toggle-section" type="checkbox" id="asesorCheckbox" data-target="asesorForm">
-                <label class="form-check-label fw-bold" for="asesorCheckbox">Asesor Kompetensi (wajib)</label>
+                <label class="form-check-label" for="asesorCheckbox">Asesor Kompetensi (wajib)</label>
             </div>
             <div id="asesorForm" class="mt-2" style="display:none;"></div>
         </div>

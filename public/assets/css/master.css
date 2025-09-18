@@ -371,25 +371,6 @@ h5 {
     text-decoration: underline;
 }
 
-/* Card Field */
-.card-field {
-    background: #fff;
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    transition: all 0.2s ease-in-out;
-}
-
-.card-field:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-}
-
-.card-field .form-label {
-    font-weight: 600;
-    margin-bottom: 8px;
-    display: block;
-}
-
 /* Skema */
 .skema-container {
     display: flex;  
@@ -517,13 +498,15 @@ h3.fw-bold {
 }
 
 .judul-list {
-    padding-left: 1.5rem;
+    counter-reset: list-counter;
+    list-style: none;   /* ❌ ilangin angka bawaan <ol> */
+    padding-left: 0;    /* hilangin indent bawaan <ol> */
     margin: 0;
 }
 
 .judul-list li {
     position: relative;
-    padding-left: 40px;
+    padding-left: 40px;  /* kasih space buat bulatan angka custom */
     margin-bottom: 12px;
     line-height: 1.5;
 }

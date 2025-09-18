@@ -69,7 +69,7 @@
 
 <!-- Judul -->
 <div class="card-box">
-    <div class="judul-header">Data Asesi</div>
+    <div class="judul-header">Kelompok Pekerjaan 1 </div>
     <div class="table-responsive mt-4">
         <table class="table table-bordered custom-table">
             <thead class="table-title">
@@ -79,72 +79,66 @@
                     <th rowspan="2" class="text-center align-middle">Judul Unit</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>J.59MTM00.027.1</td>
-                    <td>Mengumpulkan Aset Multimedia</td>
-                </tr>
+            <tbody id="unit-kompetensi-body">
+                <!-- Data unit akan muncul otomatis via JS -->
             </tbody>
         </table>
     </div>
 </div>
 
 <!-- Instrumen Asesmen -->
-<div class="card-box">
-    <div class="judul-header">Instrumen Asesmen</div>
-    <div class="table-responsive mt-4">
-        <table class="table table-bordered custom-table">
-            <thead class="table-title">
-                <tr>
-                    <th rowspan="2" class="text-center align-middle">No</th>
-                    <th rowspan="2" class="text-center align-middle">Instrumen Asesi</th>
-                    <th colspan="5" class="text-center">Potensi Asesi</th>
-                </tr>
-                <tr>
-                    <th class="text-center">1</th>
-                    <th class="text-center">2</th>
-                    <th class="text-center">3</th>
-                    <th class="text-center">4</th>
-                    <th class="text-center">5</th>
-                </tr>
-            </thead>
-            <tbody>
-                @php
-                    $instrumen = [
-                        'FR.IA.01. CL - Ceklis Observasi Aktivitas Di Tempat Kerja atau Tempat Kerja Simulasi',
-                        'FR.IA.02. TPD - Tugas Praktik Demonstrasi',
-                        'FR.IA.03. PMO – Pertanyaan Untuk Mendukung Observasi',
-                        'FR.IA.04. DIT - Daftar Instruksi Tertulis (Pengerjaan Singkat Proyek/Teknik/Pekerjaan/ Kegiatan Terstruktur Lainnya)',
-                        'FR.IA.05. DPT – Daftar Pertanyaan Tertulis Pilihan Ganda',
-                        'FR.IA.06. DPT – Daftar Pertanyaan Tertulis Pilihan Esai',
-                        'FR.IA.07. DPT – Daftar Pertanyaan Uraian',
-                        'FR.IA.08. CVP – Ceklis Verifikasi Portofolio',
-                        'FR.IA.09. PW – Pertanyaan Wawancara',
-                        'FR.IA.10. VPK – Verifikasi Pihak Ketiga',
-                        'FR.IA.11. CRP – Ceklis Reviu Produk',
-                    ];
-                @endphp
-
-                @foreach($instrumen as $i => $judul)
+<form action="{{ route('instrumen.simpanPotensi') }}" method="POST">
+    @csrf
+    <div class="card-box">
+        <div class="judul-header">Instrumen Asesmen</div>
+        <div class="table-responsive mt-4">
+            <table class="table table-bordered custom-table">
+                <thead class="table-title">
                     <tr>
-                        <td class="text-center">{{ $i+1 }}</td>
-                        <td>{{ $judul }}</td>
-                        @for($j=1; $j<=5; $j++)
-                            <td class="text-center">
-                                <input type="radio" name="potensi{{ $i+1 }}" value="{{ $j }}">
-                            </td>
-                        @endfor
+                        <th rowspan="2" class="text-center align-middle">No</th>
+                        <th rowspan="2" class="text-center align-middle">Instrumen Asesi</th>
+                        <th colspan="5" class="text-center">Potensi Asesi</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-        <div class="text-danger mt-2">
-            *diisi berdasarkan hasil penentuan pendekatan asesmen dan perencanaan asesmen
+                    <tr>
+                        <th class="text-center">1</th>
+                        <th class="text-center">2</th>
+                        <th class="text-center">3</th>
+                        <th class="text-center">4</th>
+                        <th class="text-center">5</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($instrumen as $i => $item)
+                        <tr>
+                            <td class="text-center">{{ $i+1 }}</td>
+                            <td>
+                                <strong>{{ $item->kode_instrumen ?? '' }}</strong>
+                                - {{ $item->nama_instrumen ?? 'Nama instrumen belum ada' }}
+                                <br><small class="text-muted">({{ $item->jenis_instrumen ?? '-' }})</small>
+                            </td>
+                            @for($j=1; $j<=5; $j++)
+                                <td class="text-center">
+                                    <input type="radio" name="potensi[{{ $item->id_instrumen }}]" 
+                                           value="{{ $j }}" 
+                                           {{ $item->potensi_asesi == $j ? 'checked' : '' }}>
+                                </td>
+                            @endfor
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center">Belum ada instrumen untuk skema ini.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
-</div>
+
+    <div class="mt-3">
+        <button type="submit" class="btn btn-primary">Simpan</button>
+    </div>
+</form>
+
 
 <!-- Penjelasan -->
 <div class="card-box">
@@ -170,6 +164,7 @@
 
 <script>
     document.getElementById('skema_id').addEventListener('change', function() {
+    localStorage.setItem('selectedSkemaId', this.value);
         let selected = this.options[this.selectedIndex];
         let kode = selected.getAttribute('data-kode');
         let jenjang = selected.getAttribute('data-jenjang');
@@ -186,5 +181,61 @@
             }
         }
     });
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const skemaId = {{ $skema->id_skema ?? 'null' }}; // pastikan $skema dikirim ke view
+    if (skemaId) {
+        fetch(`/mapa02/skema/${skemaId}/instrumen`)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById("instrumen-body");
+                tbody.innerHTML = "";
+                data.forEach((instrumen, i) => {
+                    let row = `<tr>
+                        <td class="text-center">${i+1}</td>
+                        <td>${instrumen.kode_instrumen} - ${instrumen.nama_instrumen}</td>`;
+                    for (let j = 1; j <= 5; j++) {
+                        row += `<td class="text-center">
+                                    <input type="radio" name="potensi[${instrumen.id_instrumen}]" value="${j}">
+                                </td>`;
+                    }
+                    row += `</tr>`;
+                    tbody.innerHTML += row;
+                });
+            });
+    }
+});
+</script>
+
+<script>
+const skemaData = @json($skemas);
+const skemaId = {{ $skemaId ?? 'null' }};
+
+document.getElementById('skema_id').addEventListener('change', function() {
+    let selectedId = this.value;
+    let tbody = document.getElementById('unit-kompetensi-body');
+    tbody.innerHTML = '';
+
+    if (selectedId) {
+        let selectedSkema = skemaData.find(s => s.id_skema == selectedId);
+
+        if (selectedSkema && selectedSkema.units.length > 0) {
+            selectedSkema.units.forEach((unit, index) => {
+                let row = `
+                    <tr>
+                        <td class="text-center">${index+1}</td>
+                        <td>${unit.kode_unit}</td>
+                        <td>${unit.judul_unit}</td>
+                    </tr>
+                `;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+        } else {
+            tbody.innerHTML = `<tr><td colspan="3" class="text-center">Tidak ada unit kompetensi</td></tr>`;
+        }
+    }
+});
 </script>
 @endsection
