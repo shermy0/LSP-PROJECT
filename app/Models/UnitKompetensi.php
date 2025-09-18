@@ -9,20 +9,20 @@ class UnitKompetensi extends Model
 {
     use HasFactory;
 
-    protected $table = 'unit_kompetensi';   // nama tabel
-    protected $primaryKey = 'id_unit';      // primary key sesuai migrasi
+    protected $table = 'unit_kompetensi';
+    protected $primaryKey = 'id_unit';
 
     protected $fillable = [
-        'id_skema',
-        'kode_unit',
-        'judul_unit',
-        'standar_kompetensi',
-        'deskripsi_unit'
+        'id_skema','kode_unit','judul_unit','deskripsi_unit'
     ];
 
-    // relasi ke skema_sertifikasi
     public function skema()
     {
-        return $this->belongsTo(SkemaSertifikasi::class, 'id_skema', 'id_skema');
+        return $this->belongsTo(SkemaSertifikasi::class, 'id_skema');
+    }
+
+    public function elemenKompetensi()
+    {
+        return $this->hasMany(ElemenKompetensi::class, 'id_unit');
     }
 }

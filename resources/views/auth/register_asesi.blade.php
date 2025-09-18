@@ -109,8 +109,5 @@ document.querySelector("form").addEventListener("submit", function(event) {
 });
 </script>
 </body>
-<<<<<<< HEAD
+
 </html>
-=======
-</html>
->>>>>>> 4714937511aa82bf1fa4459ed2b8c28b925a9ea6
