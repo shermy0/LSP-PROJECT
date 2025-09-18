@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Pertanyaan;
 use App\Models\Skema;
+use App\Models\PembuatanPertanyaan;
+use Carbon\Carbon;
 
 class PertanyaanController extends Controller
 {
@@ -48,7 +50,8 @@ class PertanyaanController extends Controller
             ]);
         }
 
-        return redirect()->route('pertanyaan.index')->with('success', 'Pertanyaan lisan berhasil ditambahkan!');
+        return redirect()->route('pertanyaan.index')
+                         ->with('success', 'Pertanyaan lisan berhasil ditambahkan!');
     }
 
     // ================================
@@ -72,18 +75,29 @@ class PertanyaanController extends Controller
             'isi_pertanyaan.*' => 'required|string',
             'kunci_jawaban.*'  => 'nullable|string',
             'file.*'           => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
+            'timer'            => 'required|integer',
         ]);
 
         $id_skema  = $request->id_skema;
         $id_asesor = $request->id_asesor;
+        $timer     = $request->timer;
 
+        // Simpan ke tabel pembuatan_pertanyaan
+        $pembuatan = PembuatanPertanyaan::create([
+            'id_skema' => $id_skema,
+            'timer'    => $timer,
+            'timescap' => now(),
+        ]);
+
+        // Simpan pertanyaan esai
         foreach ($request->isi_pertanyaan as $key => $isi) {
             $pertanyaan = new Pertanyaan();
-            $pertanyaan->id_skema         = $id_skema;
-            $pertanyaan->id_asesor        = $id_asesor;
+            $pertanyaan->id_skema = $id_skema;
+            $pertanyaan->id_asesor = $id_asesor;
+            $pertanyaan->id_pembuatan_pertanyaan = $pembuatan->id_pembuatan_pertanyaan;
             $pertanyaan->jenis_pertanyaan = 'esai';
-            $pertanyaan->isi_pertanyaan   = $isi;
-            $pertanyaan->kunci_jawaban    = $request->kunci_jawaban[$key] ?? null;
+            $pertanyaan->isi_pertanyaan = $isi;
+            $pertanyaan->kunci_jawaban = $request->kunci_jawaban[$key] ?? null;
 
             if ($request->hasFile("file.$key")) {
                 $file = $request->file("file.$key");
@@ -96,23 +110,19 @@ class PertanyaanController extends Controller
         }
 
         return redirect()->route('esai.crud', ['id_skema' => $id_skema])
-                 ->with('success', 'Semua pertanyaan esai berhasil disimpan!');
-
+                         ->with('success', 'Semua pertanyaan esai berhasil disimpan dengan timer!');
     }
 
     public function crudEsai($id_skema)
-{
-    // Ambil skema
-    $skema = Skema::findOrFail($id_skema);
+    {
+        $skema = Skema::findOrFail($id_skema);
 
-    // Ambil pertanyaan esai hanya untuk skema ini
-    $pertanyaan = Pertanyaan::where('jenis_pertanyaan', 'esai')
-                             ->where('id_skema', $id_skema)
-                             ->get();
+        $pertanyaan = Pertanyaan::where('jenis_pertanyaan', 'esai')
+                                ->where('id_skema', $id_skema)
+                                ->get();
 
-    return view('esai_crud', compact('pertanyaan', 'skema'));
-}
-
+        return view('esai_crud', compact('pertanyaan', 'skema'));
+    }
 
     public function editEsai($id)
     {
@@ -195,9 +205,10 @@ class PertanyaanController extends Controller
                 'kunci_jawaban'    => $request->kunci_jawaban[$index] ?? null,
             ]);
 
-            // kalau mau simpan opsi ke tabel opsi_jawaban, bisa tambahin di sini
+            // Kalau mau simpan opsi ke tabel opsi_jawaban, bisa ditambahkan di sini
         }
 
-        return redirect()->route('pertanyaan.index')->with('success', 'Pertanyaan PG berhasil ditambahkan!');
+        return redirect()->route('pertanyaan.index')
+                         ->with('success', 'Pertanyaan PG berhasil ditambahkan!');
     }
 }
