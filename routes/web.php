@@ -14,6 +14,7 @@ use App\Http\Controllers\FormAsesmenController;
 use App\Http\Controllers\Asesi\PermohonanController;
 use App\Http\Controllers\Admin\Form1AdminController;
 use App\Models\UnitKompetensi;
+use App\Http\Controllers\UmpanBalikController;
 
 /*
 |--------------------------------------------------------------------------
@@ -111,7 +112,7 @@ Route::post('/laporan-asesor', [PerencanaanController::class, 'simpanLanjutLapor
 |--------------------------------------------------------------------------
 */
 Route::get('/frak3', [SkemaController::class, 'frak3'])->name('frak3');
-Route::post('/frak3', [PerencanaanController::class, 'simpanFrak3'])->name('frak3.simpan');
+Route::post('/umpan-balik', [UmpanBalikController::class, 'store'])->name('umpan-balik.store');
 
 // validator (sementara static view)
 Route::get('/fr-ak-03', function () {
