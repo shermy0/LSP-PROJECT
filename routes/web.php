@@ -58,7 +58,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Asesi
 Route::get('/asesi/dashboard', [DashboardController::class, 'asesi'])->name('asesi.dashboard');
-Route::get('/asesi/formasesmen', [FormAsesmenController::class, 'asesi'])->name('formasesmen');
+Route::get('/asesi/formasesmen', [FormAsesmenController::class, 'asesi'])->name('asesi.formasesmen');
 Route::get('/pramuniaga', [FormAsesmenController::class, 'pramuniaga'])->name('formasesmen.pramuniaga');
 Route::get('/officeadministative', [FormAsesmenController::class, 'officeadministative'])->name('formasesmen.officeadministative');
 Route::get('/pemogramanjunior', [FormAsesmenController::class, 'pemogramanjunior'])->name('formasesmen.pemogramanjunior');
