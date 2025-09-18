@@ -3,7 +3,7 @@
 
 <link rel="stylesheet" href="{{ asset('assets/css/mapa01.css') }}">
 
-        <div class="card-box">
+<div class="card-box">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -85,7 +85,7 @@
 </div>
             <div class="d-flex justify-content-between">
                 <a href="{{ route('form.mapa01.kodeunit', $skema->id_skema) }}" class="btn btn-secondary">Kembali</a>
-                <button class="btn btn-primary">Simpan dan lanjut</button>
+                <button class="btn btn-primary">Simpan Unit</button>
             </div>
         </form>
 

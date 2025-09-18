@@ -49,7 +49,6 @@
             </div>
         </div>
     </div>
-
     <div class="col-md-6">
         <div class="mapa-box">
             <label for="nomorSkema" class="fw-semibold d-block mb-2">Nomor</label>
@@ -57,7 +56,7 @@
         </div>
     </div>
 </div>
-
+        </div>
     <!-- Menentukan Pendekatan Asesmen -->
 <div class="mapa-section">
     <div class="card mapa-card">
@@ -177,7 +176,7 @@
                 <div class="mapa-options">
                     <div>
                         <input type="checkbox" id="asesi1" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2">
-                        <label for="asesi1">Manajer sertifikasi LSP P1 SMKN 11 Bandungi</label>
+                        <label for="asesi1">Manajer sertifikasi LSP P1 SMKN 11 Bandung</label>
                     </div>
                     <div>
                         <input type="checkbox" id="asesi2" name="asesi[]" value="Pelatihan dengan kurikulum belum berbasis kompetensi" class="form-check-input me-2">
@@ -245,7 +244,7 @@
 </div>
 
 
-        </div>
+        
     </div>
 </div>
 

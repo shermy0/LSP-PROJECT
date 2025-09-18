@@ -169,4 +169,70 @@ public function hapusKelompok($skema_id, $kelompok_id)
                      ->with('success', 'Kelompok Pekerjaan berhasil dihapus.');
 }
 
+public function editUnit($skema_id, $id)
+{
+    $skema = SkemaSertifikasi::findOrFail($skema_id);
+    $hasil = HasilAsesmen::with(['unit','bukti','perangkat'])->findOrFail($id);
+
+    $units = UnitKompetensi::where('id_skema', $skema_id)->get();
+    $jenisBukti = MasterJenisBukti::all();
+    $perangkat = PerangkatAsesmen::with('jenisBukti')->get();
+
+    return view('form_perencanaan.form_mapa_01.mapa01_kodeunit_edit', compact(
+        'skema',
+        'hasil',
+        'units',
+        'jenisBukti',
+        'perangkat'
+    ));
+}
+
+public function updateUnit(Request $request, $skema_id, $id)
+{
+    $request->validate([
+        'kode_unit'   => 'required|exists:unit_kompetensi,id_unit',
+        'bukti'       => 'nullable|string',
+        'jenis_bukti' => 'nullable|array',
+        'metode'      => 'nullable|array',
+    ]);
+
+    $hasil = HasilAsesmen::findOrFail($id);
+    $hasil->id_unit = $request->kode_unit;
+    $hasil->catatan = $request->bukti;
+    $hasil->save();
+
+    // Hapus dulu relasi lama
+    HasilAsesmenBukti::where('id_hasil', $hasil->id_hasil)->delete();
+    HasilAsesmenPerangkat::where('id_hasil', $hasil->id_hasil)->delete();
+
+    // Simpan ulang
+    if ($request->filled('jenis_bukti')) {
+        foreach ($request->jenis_bukti as $idJenis) {
+            HasilAsesmenBukti::create([
+                'id_hasil' => $hasil->id_hasil,
+                'id_jenis_bukti' => $idJenis
+            ]);
+        }
+    }
+
+    if ($request->filled('metode')) {
+        foreach ($request->metode as $idPerangkat) {
+            HasilAsesmenPerangkat::create([
+                'id_hasil' => $hasil->id_hasil,
+                'id_perangkat' => $idPerangkat
+            ]);
+        }
+    }
+
+    return redirect()->route('form.mapa01.kodeunit', $skema_id)
+                     ->with('success', 'Unit berhasil diperbarui.');
+}
+
+public function getUnitsBySkema($skema_id)
+{
+    $units = UnitKompetensi::where('id_skema', $skema_id)->get();
+    return response()->json($units);
+}
+
+
 }

@@ -31,23 +31,21 @@ Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('f
 
 // form perencanaan mapa 01
 Route::prefix('form-perencanaan')->group(function () {
+    // MAPA01
     Route::get('/mapa01', [MapaController::class, 'create'])->name('form.mapa01');
 
+    // Unit per skema & kelompok
     Route::get('/mapa01/kode-unit/{skema_id}', [MapaController::class, 'kodeUnit'])->name('form.mapa01.kodeunit');
-
-    // Unit per kelompok
-Route::get('/mapa01/{skema_id}/kelompok/{kelompok_id}/tambah-unit', [MapaController::class, 'tambahUnit'])
-    ->name('form.mapa01.tambahunit');
+    Route::get('/mapa01/{skema_id}/kelompok/{kelompok_id}/tambah-unit', [MapaController::class, 'tambahUnit'])->name('form.mapa01.tambahunit');
     Route::post('/mapa01/{skema_id}/kelompok/{kelompok_id}/simpan-unit', [MapaController::class, 'simpanUnit'])->name('form.mapa01.simpanunit');
-
     Route::delete('/mapa01/{skema_id}/hapus-unit/{id}', [MapaController::class, 'hapusUnit'])->name('form.mapa01.hapusunit');
 
     // Kelompok pekerjaan
-    Route::post('/{skema_id}/tambah-kelompok', [MapaController::class, 'tambahKelompok'])->name('form.mapa01.tambahKelompok');
-    Route::delete('/{skema_id}/hapus-kelompok/{kelompok_id}', [MapaController::class, 'hapusKelompok'])->name('form.mapa01.hapusKelompok');
+    Route::post('/mapa01/{skema_id}/tambah-kelompok', [MapaController::class, 'tambahKelompok'])->name('form.mapa01.tambahKelompok');
+    Route::delete('/mapa01/{skema_id}/hapus-kelompok/{kelompok_id}', [MapaController::class, 'hapusKelompok'])->name('form.mapa01.hapusKelompok');
 
     // Get skema
-    Route::get('/get-skema/{id}', [MapaController::class, 'getSkema']);
+    Route::get('/mapa01/get-skema/{id}', [MapaController::class, 'getSkema'])->name('form.mapa01.getskema');
 
     // Modifikasi & konfirmasi
     Route::get('/mapa01/modifikasi/{skema_id}', [ModifikasiController::class, 'index'])->name('form.mapa01.modifikasi');
@@ -59,6 +57,8 @@ Route::get('/mapa01/{skema_id}/kelompok/{kelompok_id}/tambah-unit', [MapaControl
 });
 
 
+
+Route::get('/get-unit/{skema_id}', [MapaController::class, 'getUnitsBySkema']);
 
 
 Route::get('/get-unit/{id}', [MapaController::class, 'getUnit'])->name('form.mapa01.getunit');
