@@ -54,7 +54,6 @@ class RegisterController extends Controller
         return redirect()->route('login')->with('success', 'Pendaftaran Asesi berhasil!');
     }
 
-
     public function storeAsesor(Request $request)
     {
         $request->validate([
@@ -83,8 +82,4 @@ class RegisterController extends Controller
 
         return redirect()->route('login')->with('success', 'Pendaftaran Asesor berhasil!');
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 4714937511aa82bf1fa4459ed2b8c28b925a9ea6
