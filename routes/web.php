@@ -14,6 +14,16 @@ use App\Http\Controllers\SkemaController;
 use App\Models\UnitKompetensi;
 use App\Http\Controllers\ModifikasiController;
 
+Route::get('/pembuatan/{id_pembuatan}', [FormAsesmenController::class, 'showPembuatan'])
+    ->name('pembuatan.show');
+
+Route::get('/formasesmen/{id_skema}/esai', [FormAsesmenController::class, 'pertanyaanEsai'])->name('pertanyaan.esai');
+Route::get('/formasesmen/pertanyaan-esai/create', [FormAsesmenController::class, 'createPertanyaanEsai'])->name('pertanyaan.esai.create');
+
+
+Route::get('/pertanyaan/esai/create', [FormAsesmenController::class, 'createPertanyaanEsai'])->name('pertanyaan.esai.create');
+
+
 Route::get('/form-asesmen/{id_skema}', [FormAsesmenController::class, 'showSkema'])
     ->name('formasesmen.show');
 
