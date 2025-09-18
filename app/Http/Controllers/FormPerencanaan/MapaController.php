@@ -10,6 +10,7 @@ use App\Models\HasilAsesmenBukti;
 use App\Models\HasilAsesmenPerangkat;
 use App\Models\MasterJenisBukti;
 use App\Models\PerangkatAsesmen;
+use App\Models\KelompokPekerjaan;
 use Illuminate\Http\Request;
 
 
@@ -27,47 +28,45 @@ class MapaController extends Controller
         return response()->json($skema);
     }
 
-public function kodeUnit($skema_id)
+    public function kodeUnit($skema_id)
+    {
+        $skema = SkemaSertifikasi::findOrFail($skema_id);
+
+        $kelompokPekerjaan = KelompokPekerjaan::with([
+                'hasilAsesmen.unit',
+                'hasilAsesmen.bukti.jenisBukti',
+                'hasilAsesmen.perangkat.perangkat'
+            ])
+            ->where('id_skema', $skema_id)
+            ->get();
+
+        return view('form_perencanaan.form_mapa_01.mapa01_kodeunit', compact('skema', 'kelompokPekerjaan'));
+    }
+
+public function tambahUnit($skema_id, $kelompok_id)
 {
     $skema = SkemaSertifikasi::findOrFail($skema_id);
     $units = UnitKompetensi::where('id_skema', $skema_id)->get();
-    $hasilAsesmen = HasilAsesmen::where('id_asesor', auth()->id())
-                                ->where('id_asesi', 1) // nanti bisa dinamis
-                                ->whereHas('unitKompetensi', function ($q) use ($skema_id) {
-                                    $q->where('id_skema', $skema_id);
-                                })
-                                ->get();
 
-    return view('form_perencanaan.form_mapa_01.mapa01_kodeunit', compact('skema', 'units', 'hasilAsesmen'));
-}
-
-
-public function tambahUnit($skema_id)
-{
-    $skema = SkemaSertifikasi::findOrFail($skema_id);
-    $units = UnitKompetensi::where('id_skema', $skema_id)->get();
-
-    // ambil semua hasil asesmen untuk skema ini
     $hasilAsesmen = HasilAsesmen::with('unit')
-                    ->whereHas('unit', function ($q) use ($skema_id) {
-                        $q->where('id_skema', $skema_id);
-                    })
-                    ->get();
+        ->whereHas('unit', function ($q) use ($skema_id) {
+            $q->where('id_skema', $skema_id);
+        })
+        ->get();
 
-    // ambil master jenis bukti
     $jenisBukti = MasterJenisBukti::all();
-
-    // ambil perangkat asesmen (berdasarkan skema ini)
-$perangkat = PerangkatAsesmen::with('jenisBukti')->get();
+    $perangkat = PerangkatAsesmen::with('jenisBukti')->get();
 
     return view('form_perencanaan.form_mapa_01.mapa01_kodeunit_add', compact(
         'skema',
         'units',
         'hasilAsesmen',
         'jenisBukti',
-        'perangkat'
+        'perangkat',
+        'kelompok_id'
     ));
 }
+
 
     public function getUnit($id)
 {
@@ -98,7 +97,7 @@ public function index($skema_id)
     return view('form_perencanaan.form_mapa_01.mapa01_konfirmasi', compact('skema'));
 }
 
-public function simpanUnit(Request $request, $skema_id)
+public function simpanUnit(Request $request, $skema_id, $kelompok_id)
 {
     $request->validate([
         'kode_unit'   => 'required|exists:unit_kompetensi,id_unit',
@@ -111,6 +110,7 @@ public function simpanUnit(Request $request, $skema_id)
     $hasil->id_asesor    = auth()->id();
     $hasil->id_asesi     = 1;
     $hasil->id_unit      = $request->kode_unit;
+    $hasil->id_kelompok  = $kelompok_id; // 🔥 assign ke kelompok pekerjaan
     $hasil->catatan      = $request->bukti;
     $hasil->status       = null;
     $hasil->save();
@@ -142,9 +142,31 @@ public function hapusUnit($skema_id, $id)
     $hasil = HasilAsesmen::findOrFail($id);
     $hasil->delete();
 
-    return redirect()->route('form.mapa01.tambahunit', $skema_id)
+    return redirect()->route('form.mapa01.kodeunit', $skema_id)
                      ->with('success', 'Unit berhasil dihapus.');
 }
 
+public function tambahKelompok($skema_id)
+{
+    $skema = SkemaSertifikasi::findOrFail($skema_id);
+    $jumlah = KelompokPekerjaan::where('id_skema', $skema_id)->count();
+
+    KelompokPekerjaan::create([
+        'id_skema' => $skema_id,
+        'nama_kelompok' => 'Kelompok Pekerjaan ' . ($jumlah + 1),
+    ]);
+
+    return redirect()->route('form.mapa01.kodeunit', $skema_id)
+                     ->with('success', 'Kelompok Pekerjaan baru ditambahkan.');
+}
+
+public function hapusKelompok($skema_id, $kelompok_id)
+{
+    $kelompok = KelompokPekerjaan::findOrFail($kelompok_id);
+    $kelompok->delete();
+
+    return redirect()->route('form.mapa01.kodeunit', $skema_id)
+                     ->with('success', 'Kelompok Pekerjaan berhasil dihapus.');
+}
 
 }

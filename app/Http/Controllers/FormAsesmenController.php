@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Models\Skema;
+use App\Models\PembuatanPertanyaan;
 class FormAsesmenController extends Controller
 {
-     public function index()
+    public function index()
     {
-        // kalo cuma mau nampilin view
-        return view('formasesmen'); 
+        // ambil data dari DB
+        $skema = Skema::orderBy('nama_skema', 'asc')->get();
+
+        return view('formasesmen', compact('skema'));
     }
 
     public function pramuniaga()
@@ -47,5 +50,31 @@ class FormAsesmenController extends Controller
     {
         // kalo cuma mau nampilin view
         return view('akuntansikeuanganII'); 
+    }
+    public function pertanyaanEsai()
+    {
+       // arahkan ke essai.blade.php
+        return view('essai');
+    }
+
+    public function storeEsai(Request $request)
+    {
+        $request->validate([
+            'pertanyaan' => 'required|string',
+            'jawaban' => 'nullable|string'
+        ]);
+
+        PertanyaanEsai::create([
+            'pertanyaan' => $request->pertanyaan,
+            'jawaban' => $request->jawaban
+        ]);
+
+        return back()->with('success', 'Pertanyaan berhasil ditambahkan');
+    }
+
+    public function deleteEsai(Request $request)
+    {
+        PertanyaanEsai::destroy($request->id);
+        return back()->with('success', 'Pertanyaan berhasil dihapus');
     }
 }
