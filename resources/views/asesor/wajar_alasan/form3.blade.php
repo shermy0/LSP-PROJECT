@@ -69,51 +69,76 @@
         font-size: 14px;
     }
 
+    /* Container dalam agar ukurannya konsisten dengan form */
+    .inner-form {
+        max-width: 600px; /* sesuaikan dengan ukuran form atas */
+        margin: auto;
+    }
+
+    .signature-wrapper {
+        width: 100%;
+        height: 150px; /* tinggi canvas */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
     .signature-pad {
         border: 1px solid #ccc;
         border-radius: 6px;
-        width: 100%;
-        height: 100px; /* sesuai gambar */
+        width: 100% !important;
+        height: 100% !important;
         background: #fff;
+        display: block;
     }
 
     .btn-clean {
         background: #e74c3c;
         color: #fff;
-        font-size: 12px;
-        padding: 5px 15px;
+        font-size: 13px;
+        padding: 6px 16px;
         border-radius: 6px;
         border: none;
-        margin-right: 4px;
     }
 
     .btn-download {
         background: #041562;
         color: #fff;
-        font-size: 12px;
-        padding: 5px 15px;
+        font-size: 13px;
+        padding: 6px 16px;
         border-radius: 6px;
         border: none;
     }
 
-    .btn-main {
-        font-size: 15px;
-        font-weight: 500;
-        padding: 8px 28px;
-        border-radius: 8px;
-        border: none;
-        margin-right: 10px;
-    }
+    /* Tombol utama bawah */
+.btn-main {
+    font-size: 15px;
+    font-weight: 500;
+    padding: 10px 28px;
+    border-radius: 8px;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
 
-    .btn-simpan {
-        background: #041562;
-        color: white;
-    }
+/* Tombol Simpan */
+.btn-simpan {
+    background: #041562;
+    color: #fff;
+}
+.btn-simpan:hover {
+    background: #06268f;
+}
 
-    .btn-unduh {
-        background: #007a6e;
-        color: white;
-    }
+/* Tombol Unduh */
+.btn-unduh {
+    background: #007a6e;
+    color: #fff;
+}
+.btn-unduh:hover {
+    background: #005f54;
+}
+
 </style>
 
 <div class="container mt-4">
@@ -140,35 +165,42 @@
         </div>
     </div>
 
-    {{-- Bagian Tanda Tangan --}}
-    <div class="card-custom">
-        <div class="section-header">
-            Tanda Tangan & Persetujuan
+{{-- Bagian Tanda Tangan Asesor --}}
+<div class="card-custom mt-4">
+    <div class="section-header">
+        Tanda Tangan & Persetujuan
+    </div>
+    <div class="p-3" style="max-width:600px; margin:auto;">
+        <h6 class="fw-bold mb-3">Asesor</h6>
+
+        <div class="mb-3">
+            <label class="form-label">Nama Lengkap</label>
+            <input type="text" class="form-control" value="Reno Suswanto">
         </div>
-        <div class="col-md-12 mb-3">
-            <h6 class="fw-bold">Asesor</h6>
-            <div class="mb-3">
-                <label class="form-label">Nama Lengkap</label>
-                <input type="text" class="form-control" value="Reno Suswanto">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">No. Registrasi</label>
-                <input type="text" class="form-control" value="081237654">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Tanggal</label>
-                <input type="date" class="form-control" value="2026-08-23">
-            </div>
-            <div class="mb-2">
-                <label class="form-label">Tanda Tangan</label>
+
+        <div class="mb-3">
+            <label class="form-label">No. Registrasi</label>
+            <input type="text" class="form-control" value="081237654">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Tanggal</label>
+            <input type="date" class="form-control" value="2026-08-23">
+        </div>
+
+        <div class="mb-2">
+            <label class="form-label">Tanda Tangan</label>
+            <div class="signature-wrapper">
                 <canvas id="signatureAsesor" class="signature-pad"></canvas>
             </div>
-            <div>
-                <button class="btn-clean" onclick="clearSignature()">Bersihkan</button>
-                <button class="btn-download" onclick="downloadSignature()">Unduh</button>
-            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn-clean" onclick="clearSignatureAsesor()">Bersihkan</button>
+            <button class="btn-download" onclick="downloadSignatureAsesor()">Unduh</button>
         </div>
     </div>
+</div>
 
     {{-- Tombol Simpan & Unduh --}}
     <div class="text-end mb-5">
@@ -177,24 +209,37 @@
     </div>
 </div>
 
-{{-- Script SignaturePad --}}
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
 <script>
     let signatureAsesor;
 
-    window.onload = function() {
+    function resizeCanvas(canvas) {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext("2d").scale(ratio, ratio);
+    }
+
+    window.addEventListener("load", () => {
         const canvas = document.getElementById("signatureAsesor");
+        resizeCanvas(canvas);
         signatureAsesor = new SignaturePad(canvas, {
             backgroundColor: 'rgba(255,255,255,1)',
             penColor: 'black'
         });
-    };
+    });
 
-    function clearSignature() {
+    window.addEventListener("resize", () => {
+        const canvas = document.getElementById("signatureAsesor");
+        resizeCanvas(canvas);
+        signatureAsesor.clear();
+    });
+
+    function clearSignatureAsesor() {
         signatureAsesor.clear();
     }
 
-    function downloadSignature() {
+    function downloadSignatureAsesor() {
         if (signatureAsesor.isEmpty()) {
             alert("Tanda tangan masih kosong!");
             return;
@@ -206,4 +251,6 @@
         link.click();
     }
 </script>
+
+
 @endsection

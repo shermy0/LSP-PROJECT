@@ -85,11 +85,23 @@ Route::prefix('asesi/permohonan')->name('asesi.permohonan.')->group(function () 
     Route::get('/form2', [PermohonanController::class, 'form2'])->name('form2');
 });
 
+// ============ Tambahan untuk Wajar Alasan Asesi ============
+Route::prefix('asesi/wajar-alasan')->name('asesi.wajar_alasan.')->group(function () {
+    Route::get('/form1', [WajarAlasanController::class, 'form1'])->name('form1');
+    Route::get('/form2', [WajarAlasanController::class, 'form2'])->name('form2');
+    Route::get('/form3', [WajarAlasanController::class, 'form3'])->name('form3');
+});
+
+// ============ Tambahan untuk Wajar Alasan Asesor ============
+Route::prefix('asesor/wajar-alasan')->name('asesor.wajar_alasan.')->group(function () {
+    Route::get('/form1', [AsesorWajarAlasanController::class, 'form1'])->name('form1');
+    Route::get('/form2', [AsesorWajarAlasanController::class, 'form2'])->name('form2');
+    Route::get('/form3', [AsesorWajarAlasanController::class, 'form3'])->name('form3');
+});
+
+
 // routes/web.php
 Route::get('/get-skema/{id}', [\App\Http\Controllers\Asesi\PermohonanController::class, 'getSkema'])->name('get.skema');
-
-
-
 
 // Logout
 Route::post('/logout', function () {

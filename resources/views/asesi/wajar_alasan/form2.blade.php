@@ -67,6 +67,28 @@
             </div>
         </div>
 
+
+<!-- Modal -->
+<div class="modal fade" id="warningModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <h5 class="modal-title fw-bold">Peringatan</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Harap memilih salah satu jawaban, "Ya" atau "Tidak".</strong></p>
+        <p>❌ Mohon tidak memilih kedua opsi secara bersamaan.</p>
+        <p>✅ Sistem hanya mengizinkan satu pilihan yang sah.</p>
+        <p>Pastikan jawaban yang Anda pilih sesuai dengan kondisi asesmen.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" data-bs-dismiss="modal">Mengerti</button>
+      </div>
+    </div>
+  </div>
+</div>
+
         <!-- Instrumen Asesmen -->
         <div class="asesmen-card mb-4">
             <div class="asesmen-header">
@@ -262,5 +284,161 @@
 .potensi-text { flex:1; color:#333; }
 .asesmen-table { font-size:13px; }
 .asesmen-table th { font-weight:600; text-align:center; font-size:13px; }
+
+/* >>> Tambahan CSS baru <<< */
+
+/* Pertebal tombol Ya/Tidak */
+.form-check-input {
+    border: 2px solid #2874c9 !important;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+.form-check-input:checked {
+    background-color: #2874c9 !important;
+    border-color: #2874c9 !important;
+}
+
+/* Checkbox bulat untuk keterangan */
+.asesmen-body input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #2874c9;
+    border-radius: 50%; /* jadi bulat */
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    margin-right: 8px;
+}
+.asesmen-body input[type="checkbox"]:checked {
+    background-color: #2874c9;
+}
+.asesmen-body input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fff;
+}
+.asesmen-body input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Popup Overlay */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* Box */
+.modal-box {
+    background: #fff;
+    border-radius: 10px;
+    width: 420px;
+    max-width: 90%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+/* Header */
+.modal-header {
+    background: #d32f2f;
+    color: white;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+}
+.modal-header h5 {
+    margin: 0;
+    font-weight: 600;
+}
+.icon-box {
+    background: white;
+    color: #d32f2f;
+    font-size: 20px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin-right: 10px;
+}
+
+/* Body */
+.modal-body {
+    padding: 18px;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Footer */
+.modal-footer {
+    padding: 12px 18px;
+    text-align: right;
+}
+.btn-ok {
+    background: #041562;
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-ok:hover {
+    background: #06268f;
+}
+
 </style>
+
+
+<script>
+// JS untuk kontrol Ya/Tidak -> aktifkan/disable checkbox
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll("tbody tr").forEach(function(row) {
+        const yesRadio = row.querySelector('input[type="radio"][id$="ya"]');
+        const noRadio  = row.querySelector('input[type="radio"][id$="tidak"]');
+        const checkboxes = row.querySelectorAll('td:last-child input[type="checkbox"]');
+
+        function updateCheckboxState() {
+            if (yesRadio.checked) {
+                checkboxes.forEach(cb => cb.disabled = false);
+            } else {
+                checkboxes.forEach(cb => {
+                    cb.disabled = true;
+                    cb.checked = false; // reset kalau pilih Tidak
+                });
+            }
+        }
+
+        if (yesRadio && noRadio) {
+            yesRadio.addEventListener("change", updateCheckboxState);
+            noRadio.addEventListener("change", updateCheckboxState);
+        }
+
+        // Set default pas load
+        updateCheckboxState();
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Flag supaya popup hanya sekali muncul
+    if (!localStorage.getItem("popupShown")) {
+        let warningModal = new bootstrap.Modal(document.getElementById('warningModal'));
+        warningModal.show();
+        localStorage.setItem("popupShown", "true"); // tandai sudah ditampilkan
+    }
+});
+</script>
 @endsection
