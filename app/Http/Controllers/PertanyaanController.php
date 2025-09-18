@@ -53,59 +53,8 @@ class PertanyaanController extends Controller
         $pertanyaan->save();
         }
 
-
-        return redirect()->route('lisan.crud', ['id_skema' => $id_skema])
-                        ->with('success', 'Pertanyaan lisan berhasil disimpan!');
-    }
-
-    public function crudLisan($id_skema)
-    {
-        $skema = Skema::findOrFail($id_skema);
-
-        $pertanyaan = Pertanyaan::where('jenis_pertanyaan', 'lisan')
-                    ->where('id_skema', $id_skema)
-                    ->get();
-
-        return view('lisan_crud', compact('pertanyaan', 'skema'));
-    }
-
-
-    public function editLisan($id)
-    {
-        $pertanyaan = Pertanyaan::findOrFail($id);
-     return redirect()->route('lisan.crud', ['id_skema' => $pertanyaan->id_skema])
-                 ->with('success', 'Pertanyaan lisan berhasil diupdate!');
-
-
-    }
-
-
-    public function updateLisan(Request $request, $id)
-    {
-        $pertanyaan = Pertanyaan::findOrFail($id);
-
-        $request->validate([
-            'isi_pertanyaan' => 'required|string',
-            'kunci_jawaban'  => 'nullable|string',
-        ]);
-
-        $pertanyaan->isi_pertanyaan = $request->isi_pertanyaan;
-        $pertanyaan->kunci_jawaban  = $request->kunci_jawaban;
-        $pertanyaan->save();
-
-        return redirect()->route('lisan.crud', ['id_skema' => $pertanyaan->id_skema])
-                        ->with('success', 'Pertanyaan lisan berhasil diupdate!');
-    }
-
-    public function destroyLisan($id)
-    {
-        $pertanyaan = Pertanyaan::findOrFail($id);
-        $id_skema   = $pertanyaan->id_skema;
-
-        $pertanyaan->delete();
-
-        return redirect()->route('lisan.crud', ['id_skema' => $id_skema])
-                        ->with('success', 'Pertanyaan lisan berhasil dihapus!');
+        return redirect()->route('pertanyaan.index')
+                         ->with('success', 'Pertanyaan lisan berhasil ditambahkan!');
     }
 
     // ================================
@@ -265,4 +214,16 @@ class PertanyaanController extends Controller
         return redirect()->route('pertanyaan.index')
                          ->with('success', 'Pertanyaan PG berhasil ditambahkan!');
     }
+public function kelompokPekerjaan(Request $request, $id_skema)
+{
+    $timer = $request->query('timer');
+
+    $kelompok = \App\Models\KelompokPekerjaan::with(['unitKompetensi' => function ($q) use ($id_skema) {
+        $q->where('unit_kompetensi.id_skema', $id_skema);
+    }])->where('id_skema', $id_skema)->get();
+
+    return view('kelompok_pekerjaan_lisan', compact('kelompok', 'timer', 'id_skema'));
+}
+
+
 }

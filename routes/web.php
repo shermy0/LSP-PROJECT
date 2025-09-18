@@ -14,6 +14,7 @@ use App\Models\UnitKompetensi;
 use App\Http\Controllers\ModifikasiController;
 use App\Http\Controllers\FormAsesmenController;
 
+
 Route::get('/pembuatan/{id_pembuatan}', [FormAsesmenController::class, 'showPembuatan'])
     ->name('pembuatan.show');
 
@@ -253,3 +254,7 @@ Route::post('/logout', function () {
     request()->session()->regenerateToken();
     return redirect('/login');
 })->name('logout');
+
+// tampilkan kelompok pekerjaan per skema
+Route::get('/form-asesmen/{id_skema}/kelompok', [PertanyaanController::class, 'kelompokPekerjaan'])
+    ->name('pertanyaan.lisan.kelompok');

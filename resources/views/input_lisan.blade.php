@@ -33,7 +33,7 @@
 
         <!-- Tombol simpan -->
         <div class="text-center mt-4">
-            <button type="button" class="btn btn-primary px-4" onclick="konfirmasiSimpan()">Simpan</button>
+            <button type="button" class="btn px-4" style="background-color:#041562; color:#fff; font-weight:bold;" onclick="konfirmasiSimpan()">Simpan</button>
         </div>
     </form>
 </div>
@@ -41,7 +41,6 @@
 <script>
 let totalPertanyaan = {{ $jumlah }};
 
-// Fungsi popup konfirmasi
 // Fungsi popup konfirmasi
 function konfirmasiSimpan() {
     Swal.fire({
@@ -55,8 +54,21 @@ function konfirmasiSimpan() {
         customClass: {
             popup: 'rounded-4 shadow-lg p-4',
             title: 'fw-bold fs-5 mb-2',
-            confirmButton: 'btn btn-primary px-4 py-2 me-2',
-            denyButton: 'btn btn-success px-4 py-2',
+            confirmButton: 'btn text-white fw-bold px-4 py-2 me-2',
+            denyButton: 'btn text-white fw-bold px-4 py-2',
+        },
+        didRender: () => {
+            let confirmBtn = document.querySelector('.swal2-confirm');
+            let denyBtn = document.querySelector('.swal2-deny');
+
+            if (confirmBtn) {
+                confirmBtn.style.backgroundColor = '#041562'; // biru dashboard
+                confirmBtn.style.cursor = 'pointer';
+            }
+            if (denyBtn) {
+                denyBtn.style.backgroundColor = '#28a745'; // hijau
+                denyBtn.style.cursor = 'pointer';
+            }
         }
     }).then((result) => {
         if (result.isConfirmed) {
@@ -69,7 +81,7 @@ function konfirmasiSimpan() {
                            min="1" max="15" value="1">
                     <small class="text-danger d-block mb-3">note: maksimal 15 pertanyaan</small>
                     <button type="button" id="btnTambahPertanyaan" 
-                        class="btn btn-primary w-100 fw-bold">Simpan</button>
+                        class="btn w-100 fw-bold text-white" style="background-color:#041562; cursor:pointer;">Simpan</button>
                 `,
                 showConfirmButton: false,
                 allowOutsideClick: false,
@@ -78,7 +90,6 @@ function konfirmasiSimpan() {
                     title: 'fw-bold fs-5 mb-2',
                 },
                 didRender: () => {
-                    // pas DOM udah siap, baru binding tombol
                     document.getElementById('btnTambahPertanyaan').addEventListener('click', () => {
                         let jumlah = parseInt(document.getElementById('jumlahPertanyaan').value);
 
@@ -99,6 +110,8 @@ function konfirmasiSimpan() {
         }
     });
 }
+
+
 
 // Tambah pertanyaan baru
 function tambahPertanyaan(jumlahBaru) {
