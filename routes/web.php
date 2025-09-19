@@ -24,9 +24,6 @@ Route::get('/formasesmen/{id_skema}/esai', [FormAsesmenController::class, 'perta
 Route::get('/formasesmen/pertanyaan-esai/create', [FormAsesmenController::class, 'createPertanyaanEsai'])->name('pertanyaan.esai.create');
 
 
-Route::get('/pertanyaan/esai/create', [FormAsesmenController::class, 'createPertanyaanEsai'])->name('pertanyaan.esai.create');
-
-
 Route::get('/form-asesmen/{id_skema}', [FormAsesmenController::class, 'showSkema'])
     ->name('formasesmen.show');
 
@@ -275,7 +272,9 @@ Route::post('/logout', function () {
 })->name('logout');
 
 // tampilkan kelompok pekerjaan per skema
+// web.php
 Route::get('/form-asesmen/{id_skema}/kelompok', [PertanyaanController::class, 'kelompokPekerjaan'])
+    ->defaults('jenis', 'lisan')
     ->name('pertanyaan.lisan.kelompok');
 
     

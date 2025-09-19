@@ -48,34 +48,26 @@
     <!-- Tombol Masukkan Pertanyaan -->
     <div class="text-end">
         <button class="btn text-white px-4 py-2" style="background-color:#003366;" data-bs-toggle="modal" data-bs-target="#modalPertanyaan">
-            Masukkan Pertanyaan
+            Selanjutnya
         </button>
     </div>
 </div>
 
 <!-- Modal -->
-<!-- Modal -->
 <div class="modal fade" id="modalPertanyaan" tabindex="-1" aria-labelledby="modalPertanyaanLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 350px;">
         <div class="modal-content" style="border-radius: 10px; border: none;">
             <div class="modal-header border-0 pb-0">
-                <h6 class="modal-title fw-bold" id="modalPertanyaanLabel">Pengaturan Pertanyaan</h6>
+                <h6 class="modal-title fw-bold" id="modalPertanyaanLabel">Atur Timer</h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form method="GET" action="{{ route('pertanyaan.esai.create') }}">
+            {{-- Arahkan ke form pertanyaan esai --}}
+            <form method="GET" action="{{ route('pertanyaan.essai.kelompok', $skema->id_skema) }}">
                 <div class="modal-body pt-2">
-                    <!-- Jumlah pertanyaan -->
-                    <label for="jumlahPertanyaan" class="fw-bold small">Jumlah Pertanyaan</label>
-                    <input type="number" name="jumlah" id="jumlahPertanyaan" class="form-control mb-2" min="1" max="15" value="5" required>
-                    <small class="text-danger">Maksimal 15 pertanyaan</small>
-
                     <!-- Timer -->
                     <label for="timer" class="fw-bold small mt-3">Timer (menit)</label>
                     <input type="number" name="timer" id="timer" class="form-control" min="1" value="30" required>
-
-                    <!-- id_skema -->
-                    <input type="hidden" name="id_skema" value="{{ $skema->id_skema }}">
                 </div>
 
                 <div class="modal-footer border-0">
@@ -88,23 +80,17 @@
     </div>
 </div>
 
-
 <script>
 function redirectToForm() {
-    let jumlah = document.getElementById('jumlahPertanyaan').value;
     let timer = document.getElementById('timer').value;
     let id_skema = "{{ $skema->id_skema }}";
 
-    if(jumlah < 1 || jumlah > 15) {
-        alert("Jumlah pertanyaan harus antara 1-15");
-        return;
-    }
     if(timer < 1 || timer > 180) {
         alert("Timer harus antara 1 - 180 menit");
         return;
     }
 
-    window.location.href = "{{ route('pertanyaan.esai.create') }}?jumlah=" + jumlah + "&id_skema=" + id_skema + "&timer=" + timer;
+    window.location.href = "{{ route('pertanyaan.esai.create') }}?id_skema=" + id_skema + "&timer=" + timer;
 }
 </script>
 @endsection
