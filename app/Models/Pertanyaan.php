@@ -9,6 +9,27 @@ class Pertanyaan extends Model
 {
     use HasFactory;
 
-    protected $table = 'pertanyaans'; // nama tabel di DB
-    protected $fillable = ['judul_unit', 'pertanyaan', 'pilihan_a', 'pilihan_b', 'pilihan_c', 'pilihan_d'];
+    protected $table = 'pertanyaan';
+    protected $primaryKey = 'id_pertanyaan';
+    public $timestamps = false;
+
+    protected $fillable = [
+        'id_skema',
+        'id_pembuatan_pertanyaan',
+        'id_asesor',
+        'jenis_pertanyaan',
+        'isi_pertanyaan',
+        'file_path',
+        'file_type',
+        'deskripsi_pertanyaan',
+        'kunci_jawaban',
+    ];
+
+    // 🔹 Relasi ke tabel pembuatan_pertanyaan
+    public function pembuatan()
+    {
+        return $this->belongsTo(PembuatanPertanyaan::class, 'id_pembuatan_pertanyaan', 'id_pembuatan_pertanyaan');
+    }
+
+    
 }

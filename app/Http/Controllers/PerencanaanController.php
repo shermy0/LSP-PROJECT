@@ -11,4 +11,6 @@ class PerencanaanController extends Controller
         // kalo cuma mau nampilin view
         return view('formperencanaan'); 
     }
+
+     
 }
