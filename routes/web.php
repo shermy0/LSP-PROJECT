@@ -104,6 +104,11 @@ Route::post('/pertanyaan/lisan', [PertanyaanController::class, 'storeLisan'])->n
 Route::get('/pertanyaan/pg', [PertanyaanController::class, 'createPG'])->name('pertanyaan.pg.create');
 Route::post('/pertanyaan/pg', [PertanyaanController::class, 'storePG'])->name('pertanyaan.pg.store');
 
+// Tugas Praktik Demonstrasi
+Route::get('/formasesmen/tugasdemonstrasi', [FormAsesmenController::class, 'tugasDemonstrasi'])
+    ->name('formasesmen.tugasdemonstrasi');
+
+
 /*
 |--------------------------------------------------------------------------|
 | ROUTE JAWABAN                                                            |

@@ -68,6 +68,12 @@ public function createEsai(Request $request)
     $pembuatan = PembuatanPertanyaan::with('pertanyaan')->findOrFail($id_pembuatan);
 
 }
+public function tugasDemonstrasi()
+{
+    return view('tugasdemonstrasi'); // tanpa folder demonstrasi
+}
+
+
 
 
 }
