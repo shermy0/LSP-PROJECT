@@ -135,7 +135,23 @@ class PertanyaanController extends Controller
     return view('esai_crud', compact('pertanyaan', 'skema', 'id_kelompok'));
 }
 
-   public function updateEsai(Request $request, $id)
+   public function editEsai($id)
+{
+    $pertanyaan = Pertanyaan::findOrFail($id);
+    $skema = Skema::find($pertanyaan->id_skema);
+
+    return view('input_esai_edit', [
+        'pertanyaan' => $pertanyaan,
+        'skema'      => $skema,
+        'id_skema'   => $pertanyaan->id_skema,
+        'id_kelompok'=> $pertanyaan->id_kelompok
+    ]);
+
+    
+}
+
+
+    public function updateEsai(Request $request, $id)
 {
     $pertanyaan = Pertanyaan::findOrFail($id);
 
