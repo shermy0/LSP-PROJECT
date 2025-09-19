@@ -5,6 +5,7 @@ namespace App\Http\Controllers\FormPerencanaan;
 use Illuminate\Support\Facades\DB;  
 use App\Http\Controllers\Controller;
 use App\Models\Skema;
+use App\Models\TujuanAsesmen;
 use App\Models\UnitKompetensi;
 use App\Models\HasilAsesmen;
 use App\Models\HasilAsesmenBukti;
@@ -17,6 +18,27 @@ use Illuminate\Http\Request;
 
 class MapaController extends Controller
 {
+    public function simpanTujuan(Request $request)
+{
+    $request->validate([
+        'skema_id' => 'required|exists:skema_sertifikasi,id_skema',
+        'tujuan'   => 'required|array'
+    ]);
+
+    $skema = Skema::findOrFail($request->skema_id);
+
+    $tujuanIds = [];
+    foreach ($request->tujuan as $tujuanNama) {
+        $tujuan = TujuanAsesmen::firstOrCreate(['nama_tujuan' => $tujuanNama]);
+        $tujuanIds[] = $tujuan->id_tujuan;
+    }
+
+    // Sync pivot table tanpa menghapus tujuan lama
+    $skema->tujuans()->syncWithoutDetaching($tujuanIds);
+
+    return response()->json(['status' => 'success', 'message' => 'Tujuan berhasil disimpan']);
+}
+
     public function create()
     {
         $skemas = Skema::where('status_skema', 'Aktif')->get();

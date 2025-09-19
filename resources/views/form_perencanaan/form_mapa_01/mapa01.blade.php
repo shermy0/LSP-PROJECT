@@ -352,32 +352,49 @@ document.addEventListener("change", simpanKeLocal);
 // load data ketika halaman dibuka
 document.addEventListener("DOMContentLoaded", loadDariLocal);
 
-    document.getElementById('simpan-lanjut-form').addEventListener('submit', function(e) {
+document.getElementById('simpan-lanjut-form').addEventListener('submit', function(e) {
     e.preventDefault();
+
     const skemaId = document.getElementById('skema_id').value;
-    if (skemaId) {
-        window.location.href = "/form-perencanaan/mapa01/kode-unit/" + skemaId;
-    } else {
+    if (!skemaId) {
         alert("Silakan pilih skema terlebih dahulu");
+        return;
     }
-});
-     document.getElementById('skema_id').addEventListener('change', function() {
-        let selected = this.options[this.selectedIndex];
-        let kode = selected.getAttribute('data-kode');
-        let jenjang = selected.getAttribute('data-jenjang');
 
-        // biar bisa isi nomor otomatis
-        document.getElementById('nomor').value = kode || '';
-
-        // pilih radio otomatis sesuai skemanya
-        if (jenjang) {
-            if (jenjang.toLowerCase().includes("kkni")) {
-                document.getElementById('skema1').checked = true;
-            } else if (jenjang.toLowerCase().includes("okupasi")) {
-                document.getElementById('skema2').checked = true;
-            }
-        }
+    // ambil semua tujuan yang di-checklist
+    let tujuan = [];
+    document.querySelectorAll('input[name="tujuan[]"]:checked').forEach(cb => {
+        tujuan.push(cb.value);
     });
+
+    if (tujuan.length === 0) {
+        alert("Silakan pilih minimal 1 tujuan asesmen");
+        return;
+    }
+
+    fetch("{{ route('mapa01.simpanTujuan') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({ skema_id: skemaId, tujuan: tujuan })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === 'success') {
+            // arahkan ke halaman kode-unit
+            window.location.href = "/form-perencanaan/mapa01/kode-unit/" + skemaId;
+        } else {
+            alert("Gagal menyimpan tujuan");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Terjadi kesalahan, coba lagi");
+    });
+});
+
 document.getElementById('simpanTujuan').addEventListener('click', function() {
     let input = document.getElementById('tujuanBaru');
     let value = input.value.trim();

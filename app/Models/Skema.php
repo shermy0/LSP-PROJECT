@@ -30,6 +30,16 @@ class Skema extends Model
     }
     public function kelompokPekerjaan()
 {
-    return $this->hasMany(KelompokPekerjaan::class, 'id_skema', 'id_skema');
-}
+        return $this->hasMany(KelompokPekerjaan::class, 'id_skema', 'id_skema');
+    }
+    public function tujuans()
+    {
+        return $this->belongsToMany(
+            TujuanAsesmen::class,
+            'skema_tujuan',   // nama pivot
+            'skema_id',       // foreign key di pivot untuk skema
+            'tujuan_id'       // foreign key di pivot untuk tujuan
+        );
+    }
+
 }
