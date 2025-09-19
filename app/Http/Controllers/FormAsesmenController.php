@@ -30,6 +30,7 @@ public function pertanyaanLisan($id_skema)
     return view('lisan', compact('skema'));
 }
 
+
 public function showSkema($id_skema)
 {
     $skema = Skema::findOrFail($id_skema);
@@ -74,14 +75,6 @@ public function createEsai(Request $request)
     // Ambil data pembuatan + pertanyaan-pertanyaannya
     $pembuatan = PembuatanPertanyaan::with('pertanyaan')->findOrFail($id_pembuatan);
 
-}
-public function tugasDemonstrasi()
-{
-    return view('tugasdemonstrasi'); // tanpa folder demonstrasi
-}
-
-
-
-
+} 
 }
 

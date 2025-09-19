@@ -180,8 +180,8 @@
 
     <h2>FR.IA.02 – Tugas Praktik Demonstrasi</h2>
     <p class="subtitle">Skema Sertifikasi Kompetensi</p>
-    <span class="badge">JUNIOR OPERATOR DESAIN GRAFIS</span>
-
+      <!-- ✅ Ambil nama skema dari database -->
+    <span class="badge">{{ strtoupper($skema->nama_skema) }}</span>
     <!-- Petunjuk -->
     <div class="card">
       <h3>Petunjuk</h3>

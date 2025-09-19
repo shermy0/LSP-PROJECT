@@ -16,34 +16,32 @@
                 <i class="fa-solid fa-stop me-2"></i> Pertanyaan Pilihan Ganda
             </h2>
         </div>
+
         
         <!-- Item 2 -->
+<div class="accordion-item mb-2">
+    <h2 class="accordion-header p-3 border rounded">
+        <a href="{{ route('formasesmen.pertanyaanEsai', ['id_skema' => $skema->id_skema]) }}" 
+           class="text-dark text-decoration-none">
+            <i class="fa-solid fa-stop me-2"></i> Pertanyaan Esai
+        </a>
+    </h2>
+</div>
+        <!-- Item 3 -->
         <div class="accordion-item mb-2">
             <h2 class="accordion-header p-3 border rounded">
-                <a href="{{ route('formasesmen.pertanyaanEsai', ['id_skema' => $skema->id_skema]) }}" 
-                class="text-dark text-decoration-none">
-                    <i class="fa-solid fa-stop me-2"></i> Pertanyaan Esai
-                </a>
-            </h2>
-        </div>
- 
-        <!-- Item 3 -->
-               <div class="accordion-item mb-2">
-            <h2 class="accordion-header p-3 border rounded">
-                <a href="{{ route('formasesmen.pertanyaanLisan', ['id_skema' => $skema->id_skema]) }}" 
-                class="text-dark text-decoration-none">
-                    <i class="fa-solid fa-stop me-2"></i> Pertanyaan Lisan
-                </a>
+                <i class="fa-solid fa-stop me-2"></i> Pertanyaan Lisan
             </h2>
         </div>
 
         <!-- Item 4 -->
 <div class="accordion-item mb-3">
     <h2 class="accordion-header p-3 border rounded">
-        <a href="{{ route('formasesmen.tugasdemonstrasi') }}" 
-           class="text-dark text-decoration-none">
-            <i class="fa-solid fa-stop me-2"></i> Tugas Praktik Demonstrasi
-        </a>
+        <a href="{{ route('formasesmen.pertanyaanDemonstrasi', ['id_skema' => $skema->id_skema]) }}" 
+   class="text-dark text-decoration-none">
+    <i class="fa-solid fa-stop me-2"></i> Tugas Praktik Demonstrasi
+</a>
+
     </h2>
 </div>
 

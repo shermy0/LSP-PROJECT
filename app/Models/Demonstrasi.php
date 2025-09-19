@@ -9,7 +9,7 @@ class Demonstrasi extends Model
     protected $primaryKey = 'id_demonstrasi';
     public $timestamps = false;
     protected $fillable = [
-        'id_asesmen', 'id_tuk', 'id_kuk', 'id_asesor'
+        'id_asesmen', 'id_tuk', 'id_kuk', 'id_asesor', 'timer'
     ];
 
     public function Asesor()

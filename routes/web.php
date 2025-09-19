@@ -13,6 +13,8 @@ use App\Http\Controllers\SkemaController;
 use App\Models\UnitKompetensi;
 use App\Http\Controllers\ModifikasiController;
 use App\Http\Controllers\FormAsesmenController;
+use App\Http\Controllers\DemonstrasiController;
+
 
 
 Route::get('/pembuatan/{id_pembuatan}', [FormAsesmenController::class, 'showPembuatan'])
@@ -118,9 +120,21 @@ Route::post('/pertanyaan/lisan', [PertanyaanController::class, 'storeLisan'])->n
 Route::get('/pertanyaan/pg', [PertanyaanController::class, 'createPG'])->name('pertanyaan.pg.create');
 Route::post('/pertanyaan/pg', [PertanyaanController::class, 'storePG'])->name('pertanyaan.pg.store');
 
-// Tugas Praktik Demonstrasi
-Route::get('/formasesmen/tugasdemonstrasi', [FormAsesmenController::class, 'tugasDemonstrasi'])
-    ->name('formasesmen.tugasdemonstrasi');
+// CRUD Demonstrasi
+Route::get('/demonstrasi/create', [DemonstrasiController::class, 'create'])->name('demonstrasi.create');
+Route::post('/demonstrasi/store', [DemonstrasiController::class, 'store'])->name('demonstrasi.store');
+Route::get('/demonstrasi/{id_skema}/crud', [DemonstrasiController::class, 'crud'])->name('demonstrasi.crud');
+Route::get('/demonstrasi/{id}/edit', [DemonstrasiController::class, 'edit'])->name('demonstrasi.edit');
+Route::put('/demonstrasi/{id}/update', [DemonstrasiController::class, 'update'])->name('demonstrasi.update');
+Route::delete('/demonstrasi/{id}/delete', [DemonstrasiController::class, 'destroy'])->name('demonstrasi.destroy');
+// Form Asesmen → per skema → masuk ke pertanyaan demonstrasi
+Route::get('/form-asesmen/pertanyaan-demonstrasi/{id_skema}', [DemonstrasiController::class, 'index'])
+    ->name('formasesmen.pertanyaanDemonstrasi');
+
+// Kelompok pekerjaan demonstrasi
+Route::get('/form-asesmen/{id_skema}/kelompok-demonstrasi', [PertanyaanController::class, 'kelompokPekerjaan'])
+    ->name('pertanyaan.demonstrasi.kelompok');
+
 
 
 /*
@@ -263,3 +277,5 @@ Route::post('/logout', function () {
 // tampilkan kelompok pekerjaan per skema
 Route::get('/form-asesmen/{id_skema}/kelompok', [PertanyaanController::class, 'kelompokPekerjaan'])
     ->name('pertanyaan.lisan.kelompok');
+
+    
