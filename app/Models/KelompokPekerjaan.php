@@ -25,4 +25,10 @@ class KelompokPekerjaan extends Model
         return $this->belongsToMany(UnitKompetensi::class, 'hasil_asesmen', 'id_kelompok', 'id_unit')
                     ->withPivot('id_hasil', 'status', 'catatan'); 
     }
+    public function pertanyaan()
+    {
+        return $this->hasMany(Pertanyaan::class, 'id_kelompok', 'id_kelompok');
+    }
+
 }
+ 

@@ -23,6 +23,7 @@ class Pertanyaan extends Model
         'file_type',
         'deskripsi_pertanyaan',
         'kunci_jawaban',
+        'id_kelompok'
     ];
 
     // 🔹 Relasi ke tabel pembuatan_pertanyaan
@@ -31,5 +32,9 @@ class Pertanyaan extends Model
         return $this->belongsTo(PembuatanPertanyaan::class, 'id_pembuatan_pertanyaan', 'id_pembuatan_pertanyaan');
     }
 
-    
+        public function kelompok()
+    {
+        return $this->belongsTo(KelompokPekerjaan::class, 'id_kelompok', 'id_kelompok');
+    }
+
 }
