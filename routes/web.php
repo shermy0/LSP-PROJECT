@@ -43,7 +43,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Admin
-    Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('dashboard.admin');
+    Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
 
     // Asesi
     Route::get('/asesi/dashboard', [DashboardController::class, 'asesi'])->name('asesi.dashboard');
