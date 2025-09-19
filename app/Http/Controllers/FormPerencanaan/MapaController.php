@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\FormPerencanaan;
 
+use Illuminate\Support\Facades\DB;  
 use App\Http\Controllers\Controller;
 use App\Models\SkemaSertifikasi;
+use App\Models\Skema;
 use App\Models\UnitKompetensi;
 use App\Models\HasilAsesmen;
 use App\Models\HasilAsesmenBukti;
@@ -90,12 +92,13 @@ public function searchUnit(Request $request)
 
     return response()->json($units);
 }
-public function index($skema_id)
-{
+
+// public function index($skema_id)
+// {
     
-    $skema = SkemaSertifikasi::findOrFail($skema_id);
-    return view('form_perencanaan.form_mapa_01.mapa01_konfirmasi', compact('skema'));
-}
+//     $skema = SkemaSertifikasi::findOrFail($skema_id);
+//     return view('form_perencanaan.form_mapa_01.mapa01_konfirmasi', compact('skema'));
+// }
 
 public function simpanUnit(Request $request, $skema_id, $kelompok_id)
 {
@@ -232,6 +235,51 @@ public function getUnitsBySkema($skema_id)
 {
     $units = UnitKompetensi::where('id_skema', $skema_id)->get();
     return response()->json($units);
+}
+
+// BUAT NYARI ASESOR SESUAI SKEMA DI FILE KONFIRMASI
+public function search(Request $request)
+{
+    $term = $request->get('q');
+    $skemaId = $request->get('skema_id');
+
+    $asesors = DB::table('asesor')
+        ->join('asesor_skema', 'asesor.id_asesor', '=', 'asesor_skema.asesor_id')
+        ->where('asesor_skema.skema_id', $skemaId)
+        ->where('asesor.nama_asesor', 'LIKE', "%{$term}%")
+        ->select('asesor.id_asesor', 'asesor.nama_asesor')
+        ->limit(10)
+        ->get();
+
+    return response()->json($asesors);
+}
+public function konfirmasi($idSkema)
+{
+    $skema = SkemaSertifikasi::findOrFail($idSkema);
+
+    // Ambil semua asesor yg terkait dengan skema ini
+    $asesors = DB::table('asesor')
+        ->join('asesor_skema', 'asesor.id_asesor', '=', 'asesor_skema.asesor_id')
+        ->where('asesor_skema.skema_id', $skema->id_skema)
+        ->select('asesor.id_asesor', 'asesor.nama_asesor')
+        ->get();
+
+return view('form_perencanaan.form_mapa_01.mapa01_konfirmasi', compact('skema', 'asesors'));
+}
+
+public function simpanKonfirmasi(Request $request, $skema_id)
+{
+    // Simpan data ke database
+    // Contoh umum:
+    // ModelKonfirmasi::create([
+    //     'skema_id' => $skema_id,
+    //     'field1' => $request->input('field1'),
+    //     'field2' => $request->input('field2'),
+    // ]);
+
+    // Setelah simpan, redirect ke view formperencanaan.blade.php
+    return redirect()->route('formperencanaan')
+                     ->with('success', 'Data berhasil disimpan!');
 }
 
 

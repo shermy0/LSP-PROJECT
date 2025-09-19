@@ -49,13 +49,21 @@ Route::prefix('form-perencanaan')->group(function () {
 
     // Modifikasi & konfirmasi
     Route::get('/mapa01/modifikasi/{skema_id}', [ModifikasiController::class, 'index'])->name('form.mapa01.modifikasi');
-    Route::get('/mapa01/konfirmasi/{skema_id}', [MapaController::class, 'index'])->name('form.mapa01.konfirmasi');
+// Konfirmasi
+Route::get('/mapa01/konfirmasi/{skema_id}', [MapaController::class, 'konfirmasi'])
+    ->name('form.mapa01.konfirmasi');
+
+Route::post('/mapa01/konfirmasi/{skema_id}/simpan', [MapaController::class, 'simpanKonfirmasi'])
+    ->name('form.mapa01.konfirmasi.simpan');
 
     // Edit & update unit
     Route::get('/mapa01/edit-unit/{skema_id}/{id}', [MapaController::class, 'editUnit'])->name('form.mapa01.editunit');
     Route::put('/mapa01/update-unit/{skema_id}/{id}', [MapaController::class, 'updateUnit'])->name('form.mapa01.updateunit');
+
+
 });
 
+Route::get('/asesor/search', [AsesorController::class, 'search'])->name('asesor.search');
 
 
 Route::get('/get-unit/{skema_id}', [MapaController::class, 'getUnitsBySkema']);

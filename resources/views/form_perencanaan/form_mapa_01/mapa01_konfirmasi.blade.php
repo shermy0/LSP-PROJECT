@@ -16,11 +16,10 @@
 </div>
 
 <div class="container mt-4">
-    <!-- Penyusun -->
     <div class="card-box">
         <div class="judul-header">Konfirmasi Dengan Orang Yang Relevan</div>
         <div class="table-responsive mt-4">
-            <table class="table table-bordered custom-table" id="penyusun-table">
+            <table class="table table-bordered custom-table">
                 <thead class="table-title">
                     <tr>
                         <th class="text-center align-middle">Orang yang relevan</th>
@@ -30,16 +29,36 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><input type="text" name="nama[]" class="form-control" placeholder="Nama Penyusun"></td>
-                        <td><input type="text" name="nomet[]" class="form-control" placeholder="No Met"></td>
-                        <td><input type="date" name="tanggal[]" class="form-control"></td>
-                        <td class="text-center">
-                            <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc; cursor:pointer;"></canvas>
-                            <input type="hidden" name="tanda_tangan[]" class="tanda_tangan">
-                        </td>
+                    @php
+                        $roles = [
+                            'Manajer sertifikasi LSP',
+                            'Master Asesor / Master Trainer / Lead Asesor Kompetensi',
+                            'Manajer pelatihan Lembaga Training terakreditasi / Lembaga Training terdaftar',
+                            'Manajer atau supervisor ditempat kerja'
+                        ];
+                    @endphp
 
-                    </tr>
+                    @foreach($roles as $role)
+                        <tr>
+                            <td>{{ $role }}</td>
+                            <td>
+                                <select name="asesor[{{ $role }}]" class="form-select">
+                                    <option value="">-- Pilih Nama --</option>
+                                    @foreach($asesors as $asesor)
+                                        <option value="{{ $asesor->id_asesor }}">
+                                            {{ $asesor->nama_asesor }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </td>
+
+                            <td><input type="date" name="tanggal[{{ $role }}]" class="form-control"></td>
+                            <td class="text-center">
+                                <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc; cursor:pointer;"></canvas>
+                                <input type="hidden" name="tanda_tangan[{{ $role }}]" class="tanda_tangan">
+                            </td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
@@ -150,16 +169,48 @@
 </div>
 
 <!-- Simpan dan Lanjut -->
-<form id="simpan-form" action="{{ route('formperencanaan') }}" method="POST" class="simpan-form">
+<form id="simpan-form" 
+      action="{{ route('form.mapa01.konfirmasi.simpan', $skema->id_skema) }}" 
+      method="POST" 
+      class="simpan-form">
     @csrf
     <button type="submit" class="simpan-btn">
         <span>Simpan</span>
     </button>
 </form>
 
+
+
 <!-- Script -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.5/dist/signature_pad.umd.min.js"></script>
 <script>
+
+    $(function(){
+    $(".asesor-autocomplete").autocomplete({
+        source: function(request, response) {
+            $.ajax({
+                url: "{{ route('asesor.search') }}",
+                data: {
+                    q: request.term,
+                    skema_id: "{{ $skema->id_skema }}"
+                },
+                success: function(data) {
+                    response($.map(data, function(item) {
+                        return {
+                            label: item.nama_asesor + " (" + item.jabatan + ")",
+                            value: item.nama_asesor,
+                            id: item.id_asesor
+                        };
+                    }));
+                }
+            });
+        },
+        minLength: 2
+    });
+});
 document.addEventListener("DOMContentLoaded", function () {
     const tableBody = document.querySelector("#penyusun-table tbody");
     const addRowBtn = document.getElementById("add-row");
