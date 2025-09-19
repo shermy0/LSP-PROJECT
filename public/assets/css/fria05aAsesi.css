@@ -1,0 +1,205 @@
+/* === General Styles === */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #F8F9FA;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* Header Section */
+.form-asesmen-header {
+    text-align: center;
+    margin: 30px auto;
+}
+
+.form-asesmen-header .breadcrumb {
+    font-size: 14px;
+    color: #0D6EFD;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.form-asesmen-header .form-title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.form-asesmen-header .icon-box {
+    width: 60px;
+    height: 60px;
+    background: #041C5C;
+    margin: 15px auto;
+    border-radius: 8px;
+}
+
+.main-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.sub-title {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 12px;
+}
+
+.skema-box {
+    background: #E6F0FF;
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #041C5C;
+}
+
+.kode-asesor {
+    font-size: 14px;
+    color: #333;
+}
+
+/* ================== SECTION BOX ================== */
+.section-box {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* ================== FORM GROUP ================== */
+.form-group {
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #333;
+    font-size: 14px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
+}
+
+/* ==== HEADER STRIP ==== */
+.header {
+    position: relative;
+    width: 100%;
+    background: #E5EEFF;
+    border-radius: 15px;
+    border: 1px solid #EBEBEB;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding-left: 30px;
+    margin: 15px 0 20px;
+    box-sizing: border-box;
+}
+.header-strip {
+    width: 10px;
+    height: 100%;
+    background: #0284C7;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+.header-title {
+    color: #2B2B2B;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* ==== CONTAINER ==== */
+.container {
+    max-width: 700px;
+    margin: 20px auto 100px;
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+
+/* ================== PERTANYAAN ================== */
+.pertanyaan-box {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    background: #fff;
+}
+
+.pertanyaan-box .nomor {
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 14px;
+    color: #041C5C;
+}
+
+.teks-pertanyaan {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.pilihan-jawaban {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pilihan-jawaban label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fafafa;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.pilihan-jawaban label:hover {
+    background: #f0f0f0;
+}
+
+.pilihan-jawaban input[type="radio"] {
+    accent-color: #0D6EFD; /* warna biru sesuai tema */
+}
+
+/* ================== BUTTON ================== */
+.btn-submit {
+    background: #007bff;
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s ease-in-out;
+    margin-left: -125px;
+}
+
+.btn-submit:hover {
+    background: #0056b3;
+}

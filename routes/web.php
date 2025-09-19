@@ -10,6 +10,12 @@ use App\Http\Controllers\ProfileAsesorController;
 use App\Http\Controllers\Pgia07Controller;
 use App\Http\Controllers\PertanyaanController;
 use App\Http\Controllers\TambahAsesorController;
+use App\Http\Controllers\Fria05aAsesiController;
+use App\Http\Controllers\Fria05cController;
+use App\Http\Controllers\Fria05cAdminController;
+use App\Http\Controllers\PdfController;
+use App\Http\Controllers\Fria05bAdminController;
+use App\Http\Controllers\Fria05aAdminController;
 
 // login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -61,22 +67,41 @@ Route::middleware('auth')->group(function () {
     Route::put('/profileasesor/update', [ProfileAsesorController::class, 'update'])->name('profile.update');
 });
 
+//Asesor
 //Lembar Pertanyaan PG
 Route::get('/pgia07', [Pgia07Controller::class, 'index']);
 
 //Pertanyaan Tertulis PG
 Route::get('/fria05a', function () {
     return view('fria05a'); // pakai nama view kamu
-})->name('form.pertanyaan');
+})->name('fria05a');
 
 Route::post('/simpan-pertanyaan', [PertanyaanController::class, 'simpan'])->name('simpan.pertanyaan');
 
 Route::get('/fria05a1', function () {
     return view('fria05a1'); // pakai nama view kamu
-})->name('form.pertanyaan');
+})->name('fria05a1');
 
 Route::get('/fria05a2', function () {
     return view('fria05a2'); // pakai nama view kamu
-})->name('form.pertanyaan');
+})->name('fria05a2');
 
 Route::get('/tambahasesor', [TambahAsesorController::class, 'index']);
+
+//Asesi
+Route::get('/fria05a-asesi', [Fria05aAsesiController::class, 'index'])->name('fria05aAsesi.index');
+Route::post('/fria05a-asesi/store', [Fria05aAsesiController::class, 'store'])->name('fria05aAsesi.store');
+
+Route::get('/fria05c', [Fria05cController::class, 'index'])->name('fria05c.index');
+
+// FRIA05B
+Route::get('/fria05bAdmin', [Fria05bAdminController::class, 'index'])->name('fria05bAdmin');
+Route::post('/unduh/fria05b', [PdfController::class, 'unduhFria05b'])->name('unduh.fria05b');
+
+// FRIA05C
+Route::get('/fria05cAdmin', [Fria05cAdminController::class, 'index'])->name('fria05cAdmin');
+Route::post('/unduh/fria05c', [PdfController::class, 'unduhFria05c'])->name('unduh.fria05c');
+
+// FRIA05A Admin
+Route::get('/fria05aAdmin', [Fria05aAdminController::class, 'index'])->name('fria05aAdmin');
+Route::post('/unduh/fria05aAdmin', [PdfController::class, 'unduhFria05aAdmin'])->name('unduh.fria05a');
