@@ -11,6 +11,7 @@ class UnitKompetensi extends Model
 
     protected $table = 'unit_kompetensi';   // nama tabel
     protected $primaryKey = 'id_unit';      // primary key sesuai migrasi
+    public $timestamps = false;
 
     protected $fillable = [
         'id_skema',
@@ -20,7 +21,6 @@ class UnitKompetensi extends Model
         'deskripsi_unit'
     ];
 
-    // relasi ke skema_sertifikasi
     public function skema()
     {
         return $this->belongsTo(SkemaSertifikasi::class, 'id_skema', 'id_skema');

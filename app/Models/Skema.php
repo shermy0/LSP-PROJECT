@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Skema extends Model
 {
-    protected $table = 'skema_sertifikasi';
+    protected $table = 'skema_sertifikasi'; 
     protected $primaryKey = 'id_skema';
-    public $timestamps = true;
+    public $timestamps = false;
 
     protected $fillable = [
         'nama_skema',
@@ -16,6 +16,16 @@ class Skema extends Model
         'jenjang',
         'bidang_keahlian',
         'deskripsi',
-        'status_skema',
+        'status_skema'
     ];
+
+    public function units()
+    {
+        return $this->hasMany(UnitKompetensi::class, 'id_skema', 'id_skema');
+    }
+
+    public function instrumen()
+    {
+        return $this->hasMany(InstrumenAsesmen::class, 'skema_id', 'id_skema');
+    }
 }
