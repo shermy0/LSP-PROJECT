@@ -68,23 +68,9 @@
 </div>
 
 <!-- Judul -->
-<div class="card-box">
-    <div class="judul-header">Kelompok Pekerjaan 1 </div>
-    <div class="table-responsive mt-4">
-        <table class="table table-bordered custom-table">
-            <thead class="table-title">
-                <tr>
-                    <th rowspan="2" class="text-center align-middle">No</th>
-                    <th rowspan="2" class="text-center align-middle">Kode Unit</th>
-                    <th rowspan="2" class="text-center align-middle">Judul Unit</th>
-                </tr>
-            </thead>
-            <tbody id="unit-kompetensi-body">
-                <!-- Data unit akan muncul otomatis via JS -->
-            </tbody>
-        </table>
-    </div>
-</div>
+<!-- Kelompok Pekerjaan (dinamis) -->
+<div id="kelompok-container"></div>
+
 
 <!-- Instrumen Asesmen -->
 <form action="{{ route('instrumen.simpanPotensi') }}" method="POST">
@@ -181,9 +167,6 @@
             }
         }
     });
-</script>
-
-<script>
 document.addEventListener("DOMContentLoaded", function () {
     const skemaId = {{ $skema->id_skema ?? 'null' }}; // pastikan $skema dikirim ke view
     if (skemaId) {
@@ -207,34 +190,71 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 });
-</script>
-
-<script>
 const skemaData = @json($skemas);
 const skemaId = {{ $skemaId ?? 'null' }};
 
 document.getElementById('skema_id').addEventListener('change', function() {
     let selectedId = this.value;
-    let tbody = document.getElementById('unit-kompetensi-body');
-    tbody.innerHTML = '';
+    let container = document.getElementById('kelompok-container'); 
+    container.innerHTML = ''; // reset isi
 
     if (selectedId) {
-        let selectedSkema = skemaData.find(s => s.id_skema == selectedId);
+        fetch(`/mapa02/skema/${selectedId}/kelompok`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.length > 0) {
+                    data.forEach((kelompok, i) => {
+                        // bikin tabel baru per kelompok
+                        let tableHtml = `
+                            <div class="card-box mt-4">
+                                <div class="judul-header">Kelompok Pekerjaan ${i+1}</div>
+                                <div class="table-responsive mt-3">
+                                    <table class="table table-bordered custom-table">
+                                        <thead class="table-title">
+                                            <tr>
+                                                <th class="text-center">No</th>
+                                                <th class="text-center">Kode Unit</th>
+                                                <th class="text-center">Judul Unit</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                        `;
 
-        if (selectedSkema && selectedSkema.units.length > 0) {
-            selectedSkema.units.forEach((unit, index) => {
-                let row = `
-                    <tr>
-                        <td class="text-center">${index+1}</td>
-                        <td>${unit.kode_unit}</td>
-                        <td>${unit.judul_unit}</td>
-                    </tr>
-                `;
-                tbody.insertAdjacentHTML('beforeend', row);
+                        if (kelompok.units.length > 0) {
+                            kelompok.units.forEach((unit, j) => {
+                                tableHtml += `
+                                    <tr>
+                                        <td class="text-center">${j+1}</td>
+                                        <td>${unit.kode_unit}</td>
+                                        <td>${unit.judul_unit}</td>
+                                    </tr>
+                                `;
+                            });
+                        } else {
+                            tableHtml += `
+                                <tr>
+                                    <td colspan="3" class="text-center">Tidak ada unit kompetensi</td>
+                                </tr>
+                            `;
+                        }
+
+                        tableHtml += `
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        `;
+
+                        container.insertAdjacentHTML('beforeend', tableHtml);
+                    });
+                } else {
+                    container.innerHTML = `
+                        <div class="card-box mt-4">
+                            <div class="judul-header">Belum ada kelompok pekerjaan</div>
+                        </div>
+                    `;
+                }
             });
-        } else {
-            tbody.innerHTML = `<tr><td colspan="3" class="text-center">Tidak ada unit kompetensi</td></tr>`;
-        }
     }
 });
 </script>

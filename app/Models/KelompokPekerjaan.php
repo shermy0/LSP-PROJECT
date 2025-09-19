@@ -20,4 +20,17 @@ class KelompokPekerjaan extends Model
     {
         return $this->belongsTo(SkemaSertifikasi::class, 'id_skema', 'id_skema');
     }
+
+public function units()
+{
+    return $this->hasManyThrough(
+        UnitKompetensi::class, 
+        HasilAsesmen::class,
+        'id_kelompok', // Foreign key di hasil_asesmen
+        'id_unit',     // Foreign key di unit_kompetensi
+        'id_kelompok', // Local key di kelompok_pekerjaan
+        'id_unit'      // Local key di hasil_asesmen
+    );
+}
+
 }

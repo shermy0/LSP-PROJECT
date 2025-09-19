@@ -73,10 +73,25 @@ Route::post('/mapa01/konfirmasi/{skema_id}/simpan', [MapaController::class, 'sim
     // Edit & update unit
     Route::get('/mapa01/edit-unit/{skema_id}/{id}', [MapaController::class, 'editUnit'])->name('form.mapa01.editunit');
     Route::put('/mapa01/update-unit/{skema_id}/{id}', [MapaController::class, 'updateUnit'])->name('form.mapa01.updateunit');
+    // ============================
+// MAPA 01 & MAPA 02
+// ============================
+Route::get('/mapa02', [PerencanaanController::class, 'mapa02'])->name('form.mapa02');
 
 
 });
-
+// ============================
+// MAPA 02
+// ============================
+Route::get('/mapa02', [SkemaController::class, 'showForm'])->name('mapa02.show');
+Route::get('/mapa02/skema/{skemaId}/kelompok', [MapaController::class, 'getKelompokBySkema']);
+Route::get('mapa02/mapa02-asesor', [PerencanaanController::class, 'mapa02'])->name('mapa02_asesor.show');
+Route::post('mapa02/mapa02-asesor', [PerencanaanController::class, 'simpanLanjutmapa02'])->name('mapa02_asesor');
+Route::get('/mapa02/skema/{skemaId}/instrumen', [SkemaController::class, 'getInstrumenBySkema']);
+// AMBIL ASESOR
+Route::get('/mapa02/skema/{skemaId}/asesor', [SkemaController::class, 'getAsesor']);
+Route::post('/instrumen/simpan-potensi', [InstrumenController::class, 'simpanPotensi'])->name('instrumen.simpanPotensi');
+Route::get('/mapa02/skema/{skemaId}/units', [SkemaController::class, 'getUnits']);
 Route::get('/asesor/search', [AsesorController::class, 'search'])->name('asesor.search');
 
 
@@ -122,17 +137,6 @@ Route::post('/laporan_asesor', [PerencanaanController::class, 'store'])->name('l
 Route::get('/get-asesor/{skemaId}', [SkemaController::class, 'getAsesor']);
 Route::get('/get-asesi/{skemaId}/{asesorId}', [SkemaController::class, 'getAsesi']);
 
-// ============================
-// MAPA 02
-// ============================
-Route::get('/mapa02', [SkemaController::class, 'showForm'])->name('mapa02');
-Route::get('mapa02/mapa02-asesor', [PerencanaanController::class, 'mapa02'])->name('mapa02_asesor.show');
-Route::post('mapa02/mapa02-asesor', [PerencanaanController::class, 'simpanLanjutmapa02'])->name('mapa02_asesor');
-Route::get('/mapa02/skema/{skemaId}/instrumen', [SkemaController::class, 'getInstrumenBySkema']);
-// AMBIL ASESOR
-Route::get('/mapa02/skema/{skemaId}/asesor', [SkemaController::class, 'getAsesor']);
-Route::post('/instrumen/simpan-potensi', [InstrumenController::class, 'simpanPotensi'])->name('instrumen.simpanPotensi');
-Route::get('/mapa02/skema/{skemaId}/units', [SkemaController::class, 'getUnits']);
 // ============================
 // FR VA
 // ============================

@@ -28,4 +28,8 @@ class Skema extends Model
     {
         return $this->hasMany(InstrumenAsesmen::class, 'skema_id', 'id_skema');
     }
+    public function kelompokPekerjaan()
+{
+    return $this->hasMany(KelompokPekerjaan::class, 'id_skema', 'id_skema');
+}
 }

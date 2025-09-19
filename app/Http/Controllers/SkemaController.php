@@ -9,6 +9,15 @@ use Illuminate\Http\Request;
 
 class SkemaController extends Controller
 {
+    public function getUnitsFromMapa01($skema_id)
+{
+    $kelompokPekerjaan = \App\Models\KelompokPekerjaan::with([
+        'hasilAsesmen.unit'
+    ])->where('id_skema', $skema_id)->get();
+
+    return view('mapa02', compact('kelompokPekerjaan'));
+}
+
         // Meninjau Asesmen yang Menampilkan semua skema
     public function ninjau_asesemen() 
     {
@@ -71,13 +80,14 @@ class SkemaController extends Controller
         ]);
     }
 
-    public function showForm()
-    {
-        $skemas = Skema::with('units')->get();
-        $instrumen = InstrumenAsesmen::all();
+public function showForm()
+{
+    $skemas = Skema::with('units')->get();
+    $instrumen = InstrumenAsesmen::all();
+    $kelompokPekerjaan = collect(); // biar ga error Undefined variable
 
-        return view('mapa02', compact('skemas', 'instrumen'));
-    }
+    return view('mapa02', compact('skemas', 'instrumen', 'kelompokPekerjaan'));
+}
 
     // Ambil data Asesor berdasarkan skema
     public function getAsesor($skemaId)

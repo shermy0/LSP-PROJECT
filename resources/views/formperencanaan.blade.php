@@ -22,7 +22,7 @@
         <!-- Item 2 -->
         <div class="accordion-item">
             <h2 class="accordion-header">
-                <a href="{{ route('mapa02') }}" class="text-decoration-none text-dark">
+                <a href="{{ route('mapa02.show') }}" class="text-decoration-none text-dark">
                     <i class="fa-solid fa-stop me-2"></i> FR.MAPA.02 - PETA INSTRUMEN ASESMEN HASIL PENDEKATAN ASESMEN DAN PERENCANAAN ASESMEN
                 </a>
             </h2>

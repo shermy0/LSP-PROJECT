@@ -4,7 +4,6 @@ namespace App\Http\Controllers\FormPerencanaan;
 
 use Illuminate\Support\Facades\DB;  
 use App\Http\Controllers\Controller;
-use App\Models\SkemaSertifikasi;
 use App\Models\Skema;
 use App\Models\UnitKompetensi;
 use App\Models\HasilAsesmen;
@@ -20,19 +19,19 @@ class MapaController extends Controller
 {
     public function create()
     {
-        $skemas = SkemaSertifikasi::where('status_skema', 'Aktif')->get();
+        $skemas = Skema::where('status_skema', 'Aktif')->get();
         return view('form_perencanaan.form_mapa_01.mapa01', compact('skemas'));
     }
 
     public function getSkema($id)
     {
-        $skema = SkemaSertifikasi::findOrFail($id);
+        $skema = Skema::findOrFail($id);
         return response()->json($skema);
     }
 
     public function kodeUnit($skema_id)
     {
-        $skema = SkemaSertifikasi::findOrFail($skema_id);
+        $skema = Skema::findOrFail($skema_id);
 
         $kelompokPekerjaan = KelompokPekerjaan::with([
                 'hasilAsesmen.unit',
@@ -47,7 +46,7 @@ class MapaController extends Controller
 
 public function tambahUnit($skema_id, $kelompok_id)
 {
-    $skema = SkemaSertifikasi::findOrFail($skema_id);
+    $skema = Skema::findOrFail($skema_id);
     $units = UnitKompetensi::where('id_skema', $skema_id)->get();
 
     $hasilAsesmen = HasilAsesmen::with('unit')
@@ -96,7 +95,7 @@ public function searchUnit(Request $request)
 // public function index($skema_id)
 // {
     
-//     $skema = SkemaSertifikasi::findOrFail($skema_id);
+//     $skema = Skema::findOrFail($skema_id);
 //     return view('form_perencanaan.form_mapa_01.mapa01_konfirmasi', compact('skema'));
 // }
 
@@ -151,7 +150,7 @@ public function hapusUnit($skema_id, $id)
 
 public function tambahKelompok($skema_id)
 {
-    $skema = SkemaSertifikasi::findOrFail($skema_id);
+    $skema = Skema::findOrFail($skema_id);
     $jumlah = KelompokPekerjaan::where('id_skema', $skema_id)->count();
 
     KelompokPekerjaan::create([
@@ -174,7 +173,7 @@ public function hapusKelompok($skema_id, $kelompok_id)
 
 public function editUnit($skema_id, $id)
 {
-    $skema = SkemaSertifikasi::findOrFail($skema_id);
+    $skema = Skema::findOrFail($skema_id);
     $hasil = HasilAsesmen::with(['unit','bukti','perangkat'])->findOrFail($id);
 
     $units = UnitKompetensi::where('id_skema', $skema_id)->get();
@@ -255,7 +254,7 @@ public function search(Request $request)
 }
 public function konfirmasi($idSkema)
 {
-    $skema = SkemaSertifikasi::findOrFail($idSkema);
+    $skema = Skema::findOrFail($idSkema);
 
     // Ambil semua asesor yg terkait dengan skema ini
     $asesors = DB::table('asesor')
@@ -281,6 +280,24 @@ public function simpanKonfirmasi(Request $request, $skema_id)
     return redirect()->route('formperencanaan')
                      ->with('success', 'Data berhasil disimpan!');
 }
+
+public function getKelompokBySkema($skemaId)
+{
+    $kelompok = KelompokPekerjaan::with('units')
+                ->where('id_skema', $skemaId)
+                ->get();
+
+    return response()->json($kelompok);
+}
+
+
+// MapaController
+public function createMapa02()
+{
+    $skemas = Skema::with(['kelompokPekerjaan.units'])->get();
+    return view('mapa02', compact('skemas'));
+}
+
 
 
 }

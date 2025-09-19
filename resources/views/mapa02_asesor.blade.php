@@ -6,7 +6,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('formperencanaan') }}">Form Perencanaan</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('mapa02') }}">FR.MAPA.02</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('mapa02.show') }}">FR.MAPA.02</a></li>
             <li class="breadcrumb-item active" aria-current="page">Data Penyusun & Validator</li>
         </ol>
     </nav>
