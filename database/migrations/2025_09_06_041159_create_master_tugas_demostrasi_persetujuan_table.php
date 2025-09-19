@@ -15,7 +15,7 @@ return new class extends Migration
             $table->date('tgl_ttd_asesor')->nullable();
             $table->string('ttd_asesor')->nullable();
 
-            $table->foreign('id_tugas')->references('id_tugas')->on('master_tugas_demostrasi')->onDelete('cascade');
+            $table->foreign('id_tugas')->references('id_tugas')->on('master_tugas_demonstrasi')->onDelete('cascade');
             $table->foreign('id_asesor')->references('id_asesor')->on('asesor')->onDelete('cascade');
         });
     }
