@@ -23,6 +23,13 @@ class FormAsesmenController extends Controller
     return view('essai', compact('skema'));
 }
 
+public function pertanyaanLisan($id_skema)
+{
+    $skema = Skema::findOrFail($id_skema);
+
+    return view('lisan', compact('skema'));
+}
+
 public function showSkema($id_skema)
 {
     $skema = Skema::findOrFail($id_skema);

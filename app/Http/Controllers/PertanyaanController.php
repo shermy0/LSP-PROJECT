@@ -24,30 +24,33 @@ class PertanyaanController extends Controller
     // ================================
     public function createLisan(Request $request)
     {
-        $jumlah   = $request->get('jumlah', 5); // default 5 pertanyaan
-        $id_unit  = 1; 
-        $id_skema = 1;
+        $jumlah   = $request->query('jumlah', 5); 
+        $id_skema = $request->query('id_skema');
 
-        return view('pertanyaan.input_lisan', compact('id_unit', 'id_skema', 'jumlah'));
+        $skema = Skema::findOrFail($id_skema);
+        return view('input_lisan', compact('skema', 'jumlah'));
     }
 
-    public function storeLisan(Request $request)
+        public function storeLisan(Request $request)
     {
         $request->validate([
-            'id_unit'        => 'required|integer',
-            'id_skema'       => 'required|integer',
-            'id_asesor'      => 'required|integer',
-            'isi_pertanyaan' => 'required|array|min:1',
+            'id_skema'           => 'required|integer',
+            'id_asesor'          => 'required|integer',
+            'isi_pertanyaan.*'   => 'required|string',
+            'kunci_jawaban.*'    => 'nullable|string',
         ]);
 
-        foreach ($request->isi_pertanyaan as $isi) {
-            Pertanyaan::create([
-                'id_unit'          => $request->id_unit,
-                'id_skema'         => $request->id_skema,
-                'id_asesor'        => $request->id_asesor,
-                'jenis_pertanyaan' => 'lisan',
-                'isi_pertanyaan'   => $isi,
-            ]);
+        $id_skema  = $request->id_skema;
+        $id_asesor = $request->id_asesor;
+
+        foreach ($request->isi_pertanyaan as $key => $isi) {
+        $pertanyaan = new Pertanyaan();
+        $pertanyaan->id_skema         = $id_skema;
+        $pertanyaan->id_asesor        = $id_asesor; // ambil dari form request
+        $pertanyaan->jenis_pertanyaan = 'lisan';
+        $pertanyaan->isi_pertanyaan   = $isi;
+        $pertanyaan->kunci_jawaban    = $request->kunci_jawaban[$key] ?? null;
+        $pertanyaan->save();
         }
 
         return redirect()->route('pertanyaan.index')
@@ -211,4 +214,16 @@ class PertanyaanController extends Controller
         return redirect()->route('pertanyaan.index')
                          ->with('success', 'Pertanyaan PG berhasil ditambahkan!');
     }
+public function kelompokPekerjaan(Request $request, $id_skema)
+{
+    $timer = $request->query('timer');
+
+    $kelompok = \App\Models\KelompokPekerjaan::with(['unitKompetensi' => function ($q) use ($id_skema) {
+        $q->where('unit_kompetensi.id_skema', $id_skema);
+    }])->where('id_skema', $id_skema)->get();
+
+    return view('kelompok_pekerjaan_lisan', compact('kelompok', 'timer', 'id_skema'));
+}
+
+
 }
