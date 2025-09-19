@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\FormAsesmenController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
@@ -13,6 +12,8 @@ use App\Http\Controllers\FormPerencanaan\MapaController;
 use App\Http\Controllers\SkemaController;
 use App\Models\UnitKompetensi;
 use App\Http\Controllers\ModifikasiController;
+use App\Http\Controllers\FormAsesmenController;
+
 
 Route::get('/pembuatan/{id_pembuatan}', [FormAsesmenController::class, 'showPembuatan'])
     ->name('pembuatan.show');
@@ -34,7 +35,20 @@ Route::put('/pertanyaan/esai/{id}', [PertanyaanController::class, 'updateEsai'])
 // Hapus
 Route::delete('/pertanyaan/esai/{id}', [PertanyaanController::class, 'destroyEsai'])->name('pertanyaan.esai.destroy');
 
+// CRUD Lisan
+Route::get('/pertanyaan/lisan/create', [PertanyaanController::class, 'createLisan'])->name('lisan.create');
+Route::post('/pertanyaan/lisan/store', [PertanyaanController::class, 'storeLisan'])->name('lisan.store');
+Route::get('/pertanyaan/lisan/{id_skema}/crud', [PertanyaanController::class, 'crudLisan'])->name('lisan.crud');
+Route::get('/pertanyaan/lisan/{id}/edit', [PertanyaanController::class, 'editLisan'])->name('lisan.edit');
+Route::put('/pertanyaan/lisan/{id}/update', [PertanyaanController::class, 'updateLisan'])->name('lisan.update');
+Route::delete('/pertanyaan/lisan/{id}/delete', [PertanyaanController::class, 'destroyLisan'])->name('lisan.destroy');
+// Route untuk pertanyaan Lisan per skema
+Route::get('/form-asesmen/pertanyaan-lisan/{id_skema}', [FormAsesmenController::class, 'pertanyaanLisan'])
+    ->name('formasesmen.pertanyaanLisan');
+Route::get('/lisan/{id_skema}/crud', [PertanyaanController::class, 'crudLisan'])
+    ->name('lisan.crud');
 
+    
 // Form input esai via query string (jumlah & id_skema)
 Route::get('/pertanyaan/esai/create', [PertanyaanController::class, 'createEsai'])
     ->name('pertanyaan.esai.create'); // <-- gunakan ini di Blade
@@ -240,3 +254,7 @@ Route::post('/logout', function () {
     request()->session()->regenerateToken();
     return redirect('/login');
 })->name('logout');
+
+// tampilkan kelompok pekerjaan per skema
+Route::get('/form-asesmen/{id_skema}/kelompok', [PertanyaanController::class, 'kelompokPekerjaan'])
+    ->name('pertanyaan.lisan.kelompok');
