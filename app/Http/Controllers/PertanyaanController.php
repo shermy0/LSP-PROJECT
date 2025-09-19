@@ -71,50 +71,54 @@ class PertanyaanController extends Controller
     }
 
     public function storeEsai(Request $request)
-    {
-        $request->validate([
-            'id_skema'         => 'required|integer',
-            'id_asesor'        => 'required|integer',
-            'isi_pertanyaan.*' => 'required|string',
-            'kunci_jawaban.*'  => 'nullable|string',
-            'file.*'           => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
-            'timer'            => 'required|integer',
-        ]);
+{
+    $request->validate([
+        'id_skema'         => 'required|integer',
+        'id_asesor'        => 'required|integer',
+        'id_kelompok'      => 'required|integer', // 🔹
+        'isi_pertanyaan.*' => 'required|string',
+        'kunci_jawaban.*'  => 'nullable|string',
+        'file.*'           => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
+        'timer'            => 'required|integer',
+    ]);
 
-        $id_skema  = $request->id_skema;
-        $id_asesor = $request->id_asesor;
-        $timer     = $request->timer;
+    $id_skema    = $request->id_skema;
+    $id_asesor   = $request->id_asesor;
+    $id_kelompok = $request->id_kelompok; // 🔹
+    $timer       = $request->timer;
 
-        // Simpan ke tabel pembuatan_pertanyaan
-        $pembuatan = PembuatanPertanyaan::create([
-            'id_skema' => $id_skema,
-            'timer'    => $timer,
-            'timescap' => now(),
-        ]);
+    // Simpan ke tabel pembuatan_pertanyaan
+    $pembuatan = PembuatanPertanyaan::create([
+        'id_skema' => $id_skema,
+        'timer'    => $timer,
+        'timescap' => now(),
+    ]);
 
-        // Simpan pertanyaan esai
-        foreach ($request->isi_pertanyaan as $key => $isi) {
-            $pertanyaan = new Pertanyaan();
-            $pertanyaan->id_skema = $id_skema;
-            $pertanyaan->id_asesor = $id_asesor;
-            $pertanyaan->id_pembuatan_pertanyaan = $pembuatan->id_pembuatan_pertanyaan;
-            $pertanyaan->jenis_pertanyaan = 'esai';
-            $pertanyaan->isi_pertanyaan = $isi;
-            $pertanyaan->kunci_jawaban = $request->kunci_jawaban[$key] ?? null;
+    // Simpan pertanyaan esai
+    foreach ($request->isi_pertanyaan as $key => $isi) {
+        $pertanyaan = new Pertanyaan();
+        $pertanyaan->id_skema = $id_skema;
+        $pertanyaan->id_kelompok = $id_kelompok; // 🔹 masuk sini
+        $pertanyaan->id_asesor = $id_asesor;
+        $pertanyaan->id_pembuatan_pertanyaan = $pembuatan->id_pembuatan_pertanyaan;
+        $pertanyaan->jenis_pertanyaan = 'esai';
+        $pertanyaan->isi_pertanyaan = $isi;
+        $pertanyaan->kunci_jawaban = $request->kunci_jawaban[$key] ?? null;
 
-            if ($request->hasFile("file.$key")) {
-                $file = $request->file("file.$key");
-                $filePath = $file->store('uploads/pertanyaan', 'public');
-                $pertanyaan->file_path = $filePath;
-                $pertanyaan->file_type = $file->getClientOriginalExtension();
-            }
-
-            $pertanyaan->save();
+        if ($request->hasFile("file.$key")) {
+            $file = $request->file("file.$key");
+            $filePath = $file->store('uploads/pertanyaan', 'public');
+            $pertanyaan->file_path = $filePath;
+            $pertanyaan->file_type = $file->getClientOriginalExtension();
         }
 
-        return redirect()->route('esai.crud', ['id_skema' => $id_skema])
-                         ->with('success', 'Semua pertanyaan esai berhasil disimpan dengan timer!');
+        $pertanyaan->save();
     }
+
+    return redirect()->route('esai.crud', ['id_skema' => $id_skema])
+                     ->with('success', 'Semua pertanyaan esai berhasil disimpan dengan timer!');
+}
+
 
     public function crudEsai($id_skema)
     {
@@ -214,7 +218,7 @@ class PertanyaanController extends Controller
         return redirect()->route('pertanyaan.index')
                          ->with('success', 'Pertanyaan PG berhasil ditambahkan!');
     }
-public function kelompokPekerjaan(Request $request, $id_skema)
+public function kelompokPekerjaan(Request $request, $id_skema, $jenis = 'lisan')
 {
     $timer = $request->query('timer');
 
@@ -222,8 +226,15 @@ public function kelompokPekerjaan(Request $request, $id_skema)
         $q->where('unit_kompetensi.id_skema', $id_skema);
     }])->where('id_skema', $id_skema)->get();
 
+    // Tentukan view berdasarkan jenis dari defaults() route
+    if ($jenis === 'essai') {
+        return view('kelompok_pekerjaan_essai', compact('kelompok', 'timer', 'id_skema'));
+    }
+
     return view('kelompok_pekerjaan_lisan', compact('kelompok', 'timer', 'id_skema'));
 }
+
+
 
 
 }
