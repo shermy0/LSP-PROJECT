@@ -98,7 +98,9 @@ Route::get('/formasesmen', [FormAsesmenController::class, 'index'])->name('forma
 */
 
 
-Route::get('/esai/{id_skema}', [PertanyaanController::class, 'crudEsai'])->name('esai.crud');
+Route::get('/esai/{id_skema}/{id_kelompok}', [PertanyaanController::class, 'crudEsai'])
+    ->name('esai.crud');
+
 
 
 // PertanyaanController → simpan esai

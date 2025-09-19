@@ -115,54 +115,52 @@ class PertanyaanController extends Controller
         $pertanyaan->save();
     }
 
-    return redirect()->route('esai.crud', ['id_skema' => $id_skema])
-                     ->with('success', 'Semua pertanyaan esai berhasil disimpan dengan timer!');
+   return redirect()->route('esai.crud', [
+    'id_skema'   => $id_skema,
+    'id_kelompok'=> $id_kelompok
+])->with('success', 'Semua pertanyaan esai berhasil disimpan dengan timer!');
+
 }
 
 
-    public function crudEsai($id_skema)
-    {
-        $skema = Skema::findOrFail($id_skema);
+    public function crudEsai($id_skema, $id_kelompok)
+{
+    $skema = Skema::findOrFail($id_skema);
 
-        $pertanyaan = Pertanyaan::where('jenis_pertanyaan', 'esai')
-                                ->where('id_skema', $id_skema)
-                                ->get();
+    $pertanyaan = Pertanyaan::where('jenis_pertanyaan', 'esai')
+                            ->where('id_skema', $id_skema)
+                            ->where('id_kelompok', $id_kelompok) // ✅ filter kelompok juga
+                            ->get();
 
-        return view('esai_crud', compact('pertanyaan', 'skema'));
+    return view('esai_crud', compact('pertanyaan', 'skema', 'id_kelompok'));
+}
+
+   public function updateEsai(Request $request, $id)
+{
+    $pertanyaan = Pertanyaan::findOrFail($id);
+
+    $request->validate([
+        'isi_pertanyaan' => 'required|string',
+        'kunci_jawaban'  => 'nullable|string',
+        'file'           => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
+    ]);
+
+    if ($request->hasFile('file') && $request->file('file')->isValid()) {
+        $file = $request->file('file');
+        $filePath = $file->store('uploads/pertanyaan', 'public');
+        $pertanyaan->file_path = $filePath;
+        $pertanyaan->file_type = $file->getClientOriginalExtension();
     }
 
-    public function editEsai($id)
-    {
-        $pertanyaan = Pertanyaan::findOrFail($id);
-        $skema = Skema::find($pertanyaan->id_skema);
+    $pertanyaan->isi_pertanyaan = $request->isi_pertanyaan;
+    $pertanyaan->kunci_jawaban  = $request->kunci_jawaban;
+    $pertanyaan->save();
 
-        return view('input_esai_edit', compact('pertanyaan', 'skema'));
-    }
-
-    public function updateEsai(Request $request, $id)
-    {
-        $pertanyaan = Pertanyaan::findOrFail($id);
-
-        $request->validate([
-            'isi_pertanyaan' => 'required|string',
-            'kunci_jawaban'  => 'nullable|string',
-            'file'           => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
-        ]);
-
-        if ($request->hasFile('file') && $request->file('file')->isValid()) {
-            $file = $request->file('file');
-            $filePath = $file->store('uploads/pertanyaan', 'public');
-            $pertanyaan->file_path = $filePath;
-            $pertanyaan->file_type = $file->getClientOriginalExtension();
-        }
-
-        $pertanyaan->isi_pertanyaan = $request->isi_pertanyaan;
-        $pertanyaan->kunci_jawaban  = $request->kunci_jawaban;
-        $pertanyaan->save();
-
-        return redirect()->route('esai.crud', ['id_skema' => $pertanyaan->id_skema])
-                         ->with('success', 'Pertanyaan esai berhasil diupdate!');
-    }
+    return redirect()->route('esai.crud', [
+        'id_skema'    => $pertanyaan->id_skema,
+        'id_kelompok' => $pertanyaan->id_kelompok
+    ])->with('success', 'Pertanyaan esai berhasil diupdate!');
+}
 
     public function destroyEsai($id)
     {
@@ -175,8 +173,10 @@ class PertanyaanController extends Controller
 
         $pertanyaan->delete();
 
-        return redirect()->route('esai.crud', ['id_skema' => $id_skema])
-                         ->with('success', 'Pertanyaan esai berhasil dihapus!');
+       return redirect()->route('esai.crud', [
+    'id_skema'   => $id_skema,
+    'id_kelompok'=> $pertanyaan->id_kelompok
+])->with('success', 'Pertanyaan esai berhasil dihapus!');
     }
 
     // ================================
