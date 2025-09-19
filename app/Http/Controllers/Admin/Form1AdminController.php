@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 class Form1AdminController extends Controller
 {
@@ -50,7 +51,7 @@ class Form1AdminController extends Controller
                 ->get();
         }
 
-        // Data TUK (pekerjaan/institusi)
+        // Data TUK
         $tuk = null;
         if (isset($permohonan->id_tuk)) {
             $tuk = DB::table('tuk')->where('id_tuk', $permohonan->id_tuk)->first();
@@ -83,5 +84,69 @@ class Form1AdminController extends Controller
             'persetujuan',
             'tuk'
         ));
+    }
+
+    public function update(Request $request, $id_permohonan)
+    {
+        // validasi input
+        $request->validate([
+            'status_permohonan' => 'required|in:Diterima,Ditolak',
+            'catatan' => 'nullable|string',
+            'syarat' => 'array',
+            'ttd_admin' => 'nullable|string', // base64 image
+            'tanggal_admin' => 'nullable|date'
+        ]);
+
+        // ambil id_admin berdasarkan user yang login
+        $adminId = DB::table('admin')
+            ->where('user_id', Auth::id())
+            ->value('id_admin');
+
+        // 1. Update permohonan
+        DB::table('permohonan')
+            ->where('id_permohonan', $id_permohonan)
+            ->update([
+                'status'     => $request->status_permohonan,
+                'catatan'    => $request->catatan,
+                'id_admin'   => $adminId,
+                'updated_at' => now(),
+            ]);
+
+        // 2. Update dokumen persyaratan
+        if ($request->has('syarat')) {
+            foreach ($request->syarat as $id_dokumen => $val) {
+                DB::table('dokumen_persyaratan')
+                    ->where('id_dokumen', $id_dokumen)
+                    ->update([
+                        'memenuhi_syarat' => $val === 'Ya' ? 1 : 0,
+                        'updated_at' => now(),
+                    ]);
+            }
+        }
+
+        // 3. Update persetujuan (tanda tangan admin)
+        if ($request->filled('ttd_admin')) {
+            $img = $request->ttd_admin;
+            $img = str_replace('data:image/png;base64,', '', $img);
+            $img = str_replace(' ', '+', $img);
+            $fileName = 'ttd_admin_' . time() . '.png';
+            $filePath = 'tanda_tangan/' . $fileName;
+
+            // simpan ke storage
+            \Storage::disk('public')->put($filePath, base64_decode($img));
+
+            DB::table('permohonan_persetujuan')
+                ->updateOrInsert(
+                    ['id_permohonan' => $id_permohonan],
+                    [
+                        'tgl_ttd_admin' => $request->tanggal_admin ?? now(),
+                        'ttd_admin'     => $filePath,
+                        'updated_at'    => now(),
+                    ]
+                );
+        }
+
+        return redirect()->route('admin.permohonan.index')
+            ->with('success', 'Permohonan berhasil diperbarui.');
     }
 }

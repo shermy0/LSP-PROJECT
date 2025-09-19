@@ -85,6 +85,10 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
+Route::post('/admin/permohonan/{id_permohonan}/update', 
+    [Form1AdminController::class, 'update'])->name('admin.permohonan.update');
+
+
 // ================== LOGOUT ==================
 Route::post('/logout', function () {
     Auth::logout();
