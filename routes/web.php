@@ -54,6 +54,14 @@ Route::get('/pertanyaan/esai/create', [PertanyaanController::class, 'createEsai'
 Route::get('/form-asesmen/pertanyaan-esai/{id_skema}', [FormAsesmenController::class, 'pertanyaanEsai'])
     ->name('formasesmen.pertanyaanEsai');
 
+// tanda tangan asesor untuk pembuatan soal
+Route::get('/tanda_tangan_asesmen/{id_skema}/{id_pembuatan_pertanyaan}',  
+    [PertanyaanController::class, 'formTTDAsesor']
+)->name('tanda.tangan.asesmen');
+
+Route::post('/tanda_tangan_asesmen/{id_skema}/{id_pembuatan_pertanyaan}/simpan',  
+    [PertanyaanController::class, 'simpanTTDAsesor']
+)->name('tanda.tangan.asesmen.simpan');
 
 
 // login

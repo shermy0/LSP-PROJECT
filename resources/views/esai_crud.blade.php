@@ -37,5 +37,51 @@
             </div>
         </div>
     @endforeach
+
+    <a href="{{ route('tanda.tangan.asesmen', [$skema->id_skema, $pembuatan_pertanyaan->id_pembuatan_pertanyaan]) }}"class="btn btn-primary">
+        Tanda Tangan Asesmen
+    </a>
+
+    <div class="card mt-3">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">PENYUSUN</h5>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-bordered mb-0">
+            <thead class="table-primary text-center">
+                <tr>
+                    <th>STATUS</th>
+                    <th>No.</th>
+                    <th>NAMA</th>
+                    <th>NOMOR MET</th>
+                    <th>TANGGAL TANDA TANGAN</th>
+                </tr>
+            </thead>
+            <tbody>
+            @php $i = 1; @endphp
+            @foreach($asesor as $index => $p)
+                @if(!empty($p->tgl_ttd_asesor)) {{-- hanya tampil kalau sudah tanda tangan --}}
+                    <tr>
+                        <td class="text-center">PENYUSUN</td>
+                        <td class="text-center">{{ $i++ }}</td>
+                        <td>{{ $p->nama_asesor }}</td>
+                        <td>{{ $p->no_registrasi }}</td>
+                        <td>{{ $p->tgl_ttd_asesor }}</td>
+                    </tr>
+                @endif
+            @endforeach
+        </tbody>
+
+        </table>
+    </div>
+</div>
+
+
+
+
+</form>
+
+
+
 </div>
 @endsection
