@@ -71,10 +71,7 @@
         </div>
     </div>
 </div>
-
-    <div class="container">
     <a href="{{ url('fria05c') }}" class="btn-submit">Simpan</a>
-    </div>
 </div>
 
 <!-- ✅ Library tanda tangan -->

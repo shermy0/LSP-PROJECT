@@ -9,7 +9,7 @@ class Pertanyaan extends Model
 {
     use HasFactory;
 
-    protected $table = 'pertanyaan';
+    protected $table = 'pertanyaans';
     protected $primaryKey = 'id_pertanyaan';
     public $timestamps = false;
 
@@ -30,6 +30,4 @@ class Pertanyaan extends Model
     {
         return $this->belongsTo(PembuatanPertanyaan::class, 'id_pembuatan_pertanyaan', 'id_pembuatan_pertanyaan');
     }
-
-    
 }

@@ -184,6 +184,7 @@ body {
 }
 
 /* ================== BUTTON ================== */
+
 .btn-submit {
     background: #041C5C;
     color: #fff;
@@ -193,7 +194,8 @@ body {
     cursor: pointer;
     font-weight: 600;
     transition: background 0.2s ease-in-out;
-    margin-left: 700px;
+    margin-left: 825px;
+
 }
 
 .btn-submit:hover {

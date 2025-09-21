@@ -155,7 +155,7 @@
 
 {{-- ================= ACTION BUTTON ================= --}}
 <div class="button-group">
-    <form action="{{ route('unduh.fria05b') }}" method="POST" id="downloadForm">
+    <form action="{{ route('unduh.fria05a') }}" method="POST" id="downloadForm">
         @csrf
         <button type="submit" class="btn-unduh">Unduh</button>
     </form>

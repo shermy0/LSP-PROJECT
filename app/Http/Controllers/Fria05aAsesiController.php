@@ -14,18 +14,18 @@ class Fria05aAsesiController extends Controller
     }
 
     public function store(Request $request)
-    {
-        // simpan jawaban
-        foreach ($request->jawaban as $id => $jawaban) {
-            // contoh simpan ke tabel jawaban_asesi
-            \DB::table('jawaban_asesi')->insert([
-                'pertanyaan_id' => $id,
-                'jawaban' => $jawaban,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
-
-        return redirect()->route('fria05aAsesi')->with('success', 'Jawaban berhasil disimpan!');
+{
+    foreach ($request->jawaban as $id => $jawaban) {
+        \DB::table('jawaban_asesi')->insert([
+            'pertanyaan_id' => $id,
+            'jawaban' => $jawaban,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
+
+    // langsung ke FRIA05C
+    return redirect()->route('fria05c.index')->with('success', 'Jawaban berhasil disimpan!');
+}
+
 }

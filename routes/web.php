@@ -13,7 +13,18 @@ use App\Http\Controllers\SkemaController;
 use App\Models\UnitKompetensi;
 use App\Http\Controllers\ModifikasiController;
 use App\Http\Controllers\FormAsesmenController;
-
+use App\Http\Controllers\Pgia07Controller;
+use App\Http\Controllers\Fria05aController;
+use App\Http\Controllers\Fria05a1Controller;
+use App\Http\Controllers\Fria05a2Controller;
+use App\Http\Controllers\Fria05aAsesiController;
+use App\Http\Controllers\Fria05cController;
+use App\Http\Controllers\Fria05aAdminController;
+use App\Http\Controllers\Fria05bAdminController;
+use App\Http\Controllers\Fria05cAdminController;
+use App\Http\Controllers\PdfController;
+use App\Http\Controllers\DataPesertaUjiController;
+use App\Http\Controllers\ProfileAsesorController;
 
 Route::get('/pembuatan/{id_pembuatan}', [FormAsesmenController::class, 'showPembuatan'])
     ->name('pembuatan.show');
@@ -206,9 +217,6 @@ Route::get('/mapa01/{skema_id}/kelompok/{kelompok_id}/tambah-unit', [MapaControl
     Route::put('/mapa01/update-unit/{skema_id}/{id}', [MapaController::class, 'updateUnit'])->name('form.mapa01.updateunit');
 });
 
-
-
-
 Route::get('/get-unit/{id}', [MapaController::class, 'getUnit'])->name('form.mapa01.getunit');
 Route::get('/search-unit', [MapaController::class, 'searchUnit'])->name('form.mapa01.searchunit');
 
@@ -258,3 +266,38 @@ Route::post('/logout', function () {
 // tampilkan kelompok pekerjaan per skema
 Route::get('/form-asesmen/{id_skema}/kelompok', [PertanyaanController::class, 'kelompokPekerjaan'])
     ->name('pertanyaan.lisan.kelompok');
+
+// ========== ROUTE PILIHAN GANDA (FLOW ADMIN/ASESI/ASESOR) ==========
+
+//asesor
+Route::get('/pgia07', [Pgia07Controller::class, 'index'])->name('pgia07.index');
+Route::get('/fria05a', [Fria05aController::class, 'index'])->name('fria05a.index');
+Route::get('/fria05a1', [Fria05aController::class, 'step1'])->name('fria05a.step1');
+Route::get('/fria05a2', [Fria05aController::class, 'step2'])->name('fria05a.step2');
+Route::get('/tambahasesor', [Fria05aController::class, 'tambahAsesor'])->name('tambah.asesor');
+Route::post('/fria05a/store', [Fria05aController::class, 'store'])->name('fria05a.store');
+
+//asesi 
+Route::get('/fria05aAsesi', [Fria05aAsesiController::class, 'index'])->name('fria05aAsesi.index');
+Route::post('/fria05aAsesi/store', [Fria05aAsesiController::class, 'store'])->name('fria05aAsesi.store');
+Route::get('/fria05c', [Fria05cController::class, 'index'])->name('fria05c.index');
+
+//admin
+Route::get('fria05aAdmin', [Fria05aAdminController::class, 'index'])->name('fria05aAdmin');
+Route::get('fria05bAdmin', [Fria05bAdminController::class, 'index'])->name('fria05bAdmin');
+Route::get('fria05cAdmin', [Fria05cAdminController::class, 'index'])->name('fria05cAdmin');
+
+Route::post('fria05cAdmin/unduh', [PdfController::class, 'unduhFria05c'])->name('unduh.fria05c');
+Route::post('fria05bAdmin/unduh', [PdfController::class, 'unduhFria05b'])->name('unduh.fria05b');
+Route::post('fria05aAdmin/unduh', [PdfController::class, 'unduhFria05a'])->name('unduh.fria05a');
+
+// ================== DATA PESERTA UJI ==================
+Route::get('datapesertauji', [DataPesertaUjiController::class, 'index'])->name('datapesertauji');
+Route::resource('peserta', DataPesertaUjiController::class);
+
+// ================== PROFILE ASESOR ==================
+Route::prefix('profileasesor')->group(function () {
+    Route::get('/', [ProfileAsesorController::class, 'show'])->name('profile.show');
+    Route::get('/edit', [ProfileAsesorController::class, 'edit'])->name('profileasesor.edit');
+    Route::put('/update', [ProfileAsesorController::class, 'update'])->name('profile.update');
+});
