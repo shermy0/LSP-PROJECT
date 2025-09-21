@@ -13,11 +13,10 @@
         @foreach($skema as $s)
         <div class="accordion-item">
             <h2 class="accordion-header">
-                <a href="{{ route('formasesmen.pertanyaanDemonstrasi', ['id_skema' => $skema->id_skema]) }}" 
-   class="text-dark text-decoration-none">
-    <i class="fa-solid fa-stop me-2"></i> Tugas Praktik Demonstrasi
-</a>
-
+                <a href="{{ route('formasesmen.show', ['id_skema' => $s->id_skema]) }}" 
+                   class="text-dark text-decoration-none d-block">
+                    <i class="fa-solid fa-stop me-2"></i> {{ strtoupper($s->nama_skema) }}
+                </a>
             </h2>
         </div>
         @endforeach

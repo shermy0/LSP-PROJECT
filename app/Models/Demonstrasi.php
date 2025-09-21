@@ -8,17 +8,37 @@ class Demonstrasi extends Model
     protected $table = 'demonstrasi';
     protected $primaryKey = 'id_demonstrasi';
     public $timestamps = false;
+
     protected $fillable = [
-        'id_asesmen', 'id_tuk', 'id_kuk', 'id_asesor', 'timer'
+        'id_asesmen',
+        'id_kelompok',
+        'id_skema',
+        'id_asesor',
+        'instruksi',
+        'timer',
     ];
 
-    public function Asesor()
+    // Relasi ke Skema
+     public function skema()
+    {
+        return $this->belongsTo(SkemaSertifikasi::class, 'id_skema', 'id_skema');
+    }
+
+    // Relasi ke Asesor
+    public function asesor()
     {
         return $this->belongsTo(Asesor::class, 'id_asesor');
     }
 
-    public function kuk()
+    // Relasi ke Kelompok (jika ada tabel kelompok)
+    public function kelompok()
     {
-        return $this->belongsTo(Kuk::class, 'id_kuk');
+        return $this->belongsTo(Kelompok::class, 'id_kelompok');
+    }
+
+    // Relasi ke Asesmen (jika ada tabel asesmen)
+    public function asesmen()
+    {
+        return $this->belongsTo(Asesmen::class, 'id_asesmen');
     }
 }

@@ -5,43 +5,60 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Demonstrasi;
 use App\Models\Skema;
+use Illuminate\Support\Facades\Storage;
 
 class DemonstrasiController extends Controller
 {
-    // ================================
-    // INDEX: List Semua Tugas Demonstrasi
-    // ================================
-    public function index()
+    /**
+     * Menampilkan daftar demonstrasi untuk sebuah skema
+     * Route yang disarankan: GET /form-asesmen/pertanyaan-demonstrasi/{id_skema}
+     */
+    public function index($id_skema)
     {
-        $demonstrasi = Demonstrasi::with('Asesor', 'kuk')->get();
-        return view('demonstrasi', compact('demonstrasi'));
+        $skema = Skema::findOrFail($id_skema);
 
+        $demonstrasi = Demonstrasi::with(['Asesor', 'kuk'])
+            ->where('id_skema', $id_skema)
+            ->get();
+
+        return view('demonstrasi', compact('skema', 'demonstrasi'));
     }
 
-    // ================================
-    // CREATE: Form Buat Tugas Demonstrasi
-    // ================================
-    public function create(Request $request)
+    /**
+     * Tampilkan form create (mengambil id_skema dari route param atau query string)
+     * Route yang disarankan: GET /demonstrasi/create/{id_skema}
+     */
+    public function create(Request $request, $id_skema = null)
     {
-        $id_skema = $request->query('id_skema');
-        $skema    = Skema::findOrFail($id_skema);
+        // Ambil id_skema dari route param dulu; kalau null, fallback ke query string
+        if (!$id_skema) {
+            $id_skema = $request->query('id_skema');
+        }
 
-        return view('input_demonstrasi', compact('skema'));
+        $skema = Skema::findOrFail($id_skema);
+
+        // jika ingin form yang membuat beberapa pertanyaan (jumlah & timer),
+        // kamu bisa menambahkan query parameter ?jumlah=5&timer=30 saat redirect dari blade demonstrasi
+        $jumlah = $request->query('jumlah', 1);
+        $timer  = $request->query('timer', 30);
+
+        return view('input_demonstrasi', compact('skema', 'jumlah', 'timer'));
     }
 
-    // ================================
-    // STORE: Simpan Tugas Demonstrasi ke DB
-    // ================================
+    /**
+     * Simpan demonstrasi baru ke DB
+     * Route: POST /demonstrasi/store
+     */
     public function store(Request $request)
     {
         $request->validate([
-            'id_skema'   => 'required|integer',
-            'id_asesor'  => 'required|integer',
-            'id_tuk'     => 'nullable|integer',
-            'id_kuk'     => 'nullable|integer',
-            'instruksi'  => 'required|string',
-            'timer'      => 'required|integer|min:1',
-            'file'       => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:10240'
+            'id_skema'  => 'required|integer',
+            'id_asesor' => 'required|integer',
+            'id_tuk'    => 'nullable|integer',
+            'id_kuk'    => 'nullable|integer',
+            'instruksi' => 'required|string',
+            'timer'     => 'required|integer|min:1',
+            'file'      => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:10240'
         ]);
 
         $demonstrasi = new Demonstrasi();
@@ -52,7 +69,6 @@ class DemonstrasiController extends Controller
         $demonstrasi->instruksi = $request->instruksi;
         $demonstrasi->timer     = $request->timer;
 
-        // Upload file jika ada
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $filePath = $file->store('uploads/demonstrasi', 'public');
@@ -62,13 +78,15 @@ class DemonstrasiController extends Controller
 
         $demonstrasi->save();
 
-        return redirect()->route('demonstrasi.index')
+        // IMPORTANT: gunakan route yang benar. Saya rekomendasikan redirect ke halaman CRUD per skema
+        return redirect()->route('demonstrasi.crud', $demonstrasi->id_skema)
                          ->with('success', 'Tugas demonstrasi berhasil dibuat!');
     }
 
-    // ================================
-    // CRUD PER SKEMA
-    // ================================
+    /**
+     * CRUD per skema (list demonstrasi untuk skema)
+     * Route: GET /demonstrasi/{id_skema}/crud
+     */
     public function crud($id_skema)
     {
         $skema = Skema::findOrFail($id_skema);
@@ -77,9 +95,9 @@ class DemonstrasiController extends Controller
         return view('demonstrasi_crud', compact('demonstrasi', 'skema'));
     }
 
-    // ================================
-    // EDIT
-    // ================================
+    /**
+     * Edit form
+     */
     public function edit($id)
     {
         $demonstrasi = Demonstrasi::findOrFail($id);
@@ -88,9 +106,9 @@ class DemonstrasiController extends Controller
         return view('input_demonstrasi_edit', compact('demonstrasi', 'skema'));
     }
 
-    // ================================
-    // UPDATE
-    // ================================
+    /**
+     * Update
+     */
     public function update(Request $request, $id)
     {
         $demonstrasi = Demonstrasi::findOrFail($id);
@@ -104,8 +122,11 @@ class DemonstrasiController extends Controller
         $demonstrasi->instruksi = $request->instruksi;
         $demonstrasi->timer     = $request->timer;
 
-        // Update file jika ada upload baru
         if ($request->hasFile('file') && $request->file('file')->isValid()) {
+            // hapus file lama jika perlu
+            if ($demonstrasi->file_path && Storage::disk('public')->exists($demonstrasi->file_path)) {
+                Storage::disk('public')->delete($demonstrasi->file_path);
+            }
             $file = $request->file('file');
             $filePath = $file->store('uploads/demonstrasi', 'public');
             $demonstrasi->file_path = $filePath;
@@ -118,17 +139,16 @@ class DemonstrasiController extends Controller
                          ->with('success', 'Tugas demonstrasi berhasil diupdate!');
     }
 
-    // ================================
-    // DESTROY
-    // ================================
+    /**
+     * Hapus
+     */
     public function destroy($id)
     {
         $demonstrasi = Demonstrasi::findOrFail($id);
-        $id_skema    = $demonstrasi->id_skema;
+        $id_skema = $demonstrasi->id_skema;
 
-        // Hapus file kalau ada
-        if ($demonstrasi->file_path && \Storage::disk('public')->exists($demonstrasi->file_path)) {
-            \Storage::disk('public')->delete($demonstrasi->file_path);
+        if ($demonstrasi->file_path && Storage::disk('public')->exists($demonstrasi->file_path)) {
+            Storage::disk('public')->delete($demonstrasi->file_path);
         }
 
         $demonstrasi->delete();

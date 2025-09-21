@@ -210,16 +210,45 @@
       <p><b>Result:</b> Poster Produk</p>
     </div>   
         <div class="action-btns">
-          
-          <button type="submit" class="btn btn-primary">Buat Pertanyaan</button>
+    <!-- Tombol buka modal -->
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalPertanyaan">
+        Buat Pertanyaan
+    </button>
+</div>
+
+<!-- Modal Buat Pertanyaan -->
+<div class="modal fade" id="modalPertanyaan" tabindex="-1" aria-labelledby="modalPertanyaanLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+        <div class="modal-content" style="border-radius: 10px; border: none;">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title fw-bold" id="modalPertanyaanLabel">Atur Pertanyaan Demonstrasi</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form method="POST" action="{{ route('demonstrasi.store') }}">
+                @csrf
+                <div class="modal-body pt-2">
+                    <!-- Hidden id_skema -->
+                    <input type="hidden" name="id_skema" value="{{ $skema->id_skema }}">
+                    <!-- Asesor bisa login, sementara manual -->
+                    <input type="hidden" name="id_asesor" value="1">
+
+                    <!-- Timer -->
+                    <label for="timer" class="fw-bold small mt-3">Timer (menit)</label>
+                    <input type="number" name="timer" id="timer" class="form-control" min="1" value="30" required>
+
+                   
+                </div>
+
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn w-100 text-white" style="background-color:#041562; font-weight:bold;">
+                        Simpan
+                    </button>
+                </div>
+            </form>
         </div>
-      </form>
     </div>
-
-</form>
-    </div>
-
-  </div>
+</div>
 </body>
 </html>
 

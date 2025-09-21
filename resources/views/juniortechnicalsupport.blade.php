@@ -39,7 +39,9 @@
     <h2 class="accordion-header p-3 border rounded">
         <a href="{{ route('formasesmen.pertanyaanDemonstrasi', ['id_skema' => $skema->id_skema]) }}" 
    class="text-dark text-decoration-none">
-    <i class="fa-solid fa-stop me-2"></i> Tugas Praktik Demonstrasi
+   <i class="fa-solid fa-stop me-2"></i> Tugas Praktik Demonstrasi
+</a>
+
 </a>
 
     </h2>

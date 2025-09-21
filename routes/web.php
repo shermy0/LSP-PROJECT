@@ -125,8 +125,11 @@ Route::get('/demonstrasi/{id}/edit', [DemonstrasiController::class, 'edit'])->na
 Route::put('/demonstrasi/{id}/update', [DemonstrasiController::class, 'update'])->name('demonstrasi.update');
 Route::delete('/demonstrasi/{id}/delete', [DemonstrasiController::class, 'destroy'])->name('demonstrasi.destroy');
 // Form Asesmen → per skema → masuk ke pertanyaan demonstrasi
-Route::get('/form-asesmen/pertanyaan-demonstrasi/{id_skema}', [DemonstrasiController::class, 'index'])
-    ->name('formasesmen.pertanyaanDemonstrasi');
+// Form Asesmen → per skema → masuk ke pertanyaan demonstrasi
+Route::get('/form-asesmen/pertanyaan-demonstrasi/{id_skema}', 
+    [DemonstrasiController::class, 'index']
+)->name('formasesmen.pertanyaanDemonstrasi');
+
 
 // Kelompok pekerjaan demonstrasi
 Route::get('/form-asesmen/{id_skema}/kelompok-demonstrasi', [PertanyaanController::class, 'kelompokPekerjaan'])
