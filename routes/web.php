@@ -33,9 +33,6 @@ Route::get('/formasesmen/{id_skema}/esai', [FormAsesmenController::class, 'perta
 Route::get('/formasesmen/pertanyaan-esai/create', [FormAsesmenController::class, 'createPertanyaanEsai'])->name('pertanyaan.esai.create');
 
 
-Route::get('/pertanyaan/esai/create', [FormAsesmenController::class, 'createPertanyaanEsai'])->name('pertanyaan.esai.create');
-
-
 Route::get('/form-asesmen/{id_skema}', [FormAsesmenController::class, 'showSkema'])
     ->name('formasesmen.show');
 
@@ -68,6 +65,14 @@ Route::get('/pertanyaan/esai/create', [PertanyaanController::class, 'createEsai'
 Route::get('/form-asesmen/pertanyaan-esai/{id_skema}', [FormAsesmenController::class, 'pertanyaanEsai'])
     ->name('formasesmen.pertanyaanEsai');
 
+// tanda tangan asesor untuk pembuatan soal
+Route::get('/tanda_tangan_asesmen/{id_skema}/{id_pembuatan_pertanyaan}',  
+    [PertanyaanController::class, 'formTTDAsesor']
+)->name('tanda.tangan.asesmen');
+
+Route::post('/tanda_tangan_asesmen/{id_skema}/{id_pembuatan_pertanyaan}/simpan',  
+    [PertanyaanController::class, 'simpanTTDAsesor']
+)->name('tanda.tangan.asesmen.simpan');
 
 
 // login
@@ -112,7 +117,9 @@ Route::get('/formasesmen', [FormAsesmenController::class, 'index'])->name('forma
 */
 
 
-Route::get('/esai/{id_skema}', [PertanyaanController::class, 'crudEsai'])->name('esai.crud');
+Route::get('/esai/{id_skema}/{id_kelompok}', [PertanyaanController::class, 'crudEsai'])
+    ->name('esai.crud');
+
 
 
 // PertanyaanController → simpan esai
@@ -264,7 +271,9 @@ Route::post('/logout', function () {
 })->name('logout');
 
 // tampilkan kelompok pekerjaan per skema
+// web.php
 Route::get('/form-asesmen/{id_skema}/kelompok', [PertanyaanController::class, 'kelompokPekerjaan'])
+    ->defaults('jenis', 'lisan')
     ->name('pertanyaan.lisan.kelompok');
 
 // ========== ROUTE PILIHAN GANDA (FLOW ADMIN/ASESI/ASESOR) ==========
@@ -301,3 +310,6 @@ Route::prefix('profileasesor')->group(function () {
     Route::get('/edit', [ProfileAsesorController::class, 'edit'])->name('profileasesor.edit');
     Route::put('/update', [ProfileAsesorController::class, 'update'])->name('profile.update');
 });
+Route::get('/form-asesmen/{id_skema}/kelompok-essai', [PertanyaanController::class, 'kelompokPekerjaan'])
+    ->defaults('jenis', 'essai')
+    ->name('pertanyaan.essai.kelompok');
