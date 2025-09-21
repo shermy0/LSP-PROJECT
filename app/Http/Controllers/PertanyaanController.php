@@ -13,135 +13,69 @@ class PertanyaanController extends Controller
     // ================================
     // INDEX (CRUD List Semua Pertanyaan)
     // ================================
-       public function index(Request $request)
-{
-    $id_skema  = $request->query('id_skema'); 
-    $jenis     = $request->query('jenis'); // filter opsional: lisan/esai/pg
-    $perKelompok = $request->query('kelompok', false);
-
-    $skema = $id_skema ? \App\Models\Skema::find($id_skema) : null;
-
-    // =============================
-    // 1) Kalau per kelompok + lisan
-    // =============================
-   if ($perKelompok && $id_skema && $jenis === 'lisan') {
-    $kelompok = \App\Models\KelompokPekerjaan::with(['pertanyaan' => function ($q) use ($id_skema) {
-        $q->where('jenis_pertanyaan', 'lisan');
-    }])
-    ->where('id_skema', $id_skema)
-    ->get();
-
-    return view('lisan_crud', compact('skema', 'kelompok'));
+    public function index()
+    {
+        $pertanyaan = Pertanyaan::all();
+        return view('pertanyaan.index', compact('pertanyaan'));
     }
-    // =============================
-    // 2) Default: CRUD per jenis
-    // =============================
-    $pertanyaan = Pertanyaan::query()
-        ->when($id_skema, fn($q) => $q->where('id_skema', $id_skema))
-        ->when($jenis, fn($q) => $q->where('jenis_pertanyaan', $jenis))
-        ->get();
-
-    // Kalau jenis lisan → pakai lisan_crud
-    if ($jenis === 'lisan') {
-        return view('lisan_crud', compact('pertanyaan', 'skema'));
-    }
-
-    // Kalau jenis esai → pakai esai_crud
-    if ($jenis === 'esai') {
-        return view('esai_crud', compact('pertanyaan', 'skema'));
-    }
-
-    // Kalau jenis lain / belum dipilih → fallback
-    return view('lisan_crud', compact('pertanyaan', 'skema'));
-}
 
     // ================================
     // FORM LISAN
     // ================================
-    public function createLisan(Request $request)
-    {
-        $jumlah   = $request->query('jumlah', 5); 
-        $id_skema = $request->query('id_skema');
+    
+    public function show($id_skema)
+{
+    $skema = Skema::findOrFail($id_skema);
 
-        $skema = Skema::findOrFail($id_skema);
-        return view('input_lisan', compact('skema', 'jumlah'));
+    // contoh alur, kamu bisa bedain berdasarkan tipe asesmen
+    if ($skema->tipe == 'lisan') {
+        return view('formasesmen.lisan', compact('skema'));
+    } elseif ($skema->tipe == 'tertulis') {
+        return view('formasesmen.tertulis', compact('skema'));
+    } else {
+        return view('formasesmen.praktek', compact('skema'));
     }
+}
+
+   public function createLisan(Request $request)
+{
+    $jumlah   = $request->query('jumlah', 5); 
+    $id_skema = $request->query('id_skema');
+
+    // Ambil dari query (atau bisa dari database / logic lain sesuai kebutuhanmu)
+    $idPembuatanPertanyaan = $request->query('id_pembuatan_pertanyaan', null);
+    $idKelompok = $request->query('id_kelompok', null);
+
+    $skema = Skema::findOrFail($id_skema);
+
+    return view('input_lisan', compact('skema', 'jumlah', 'idPembuatanPertanyaan', 'idKelompok'));
+}
+
 
         public function storeLisan(Request $request)
     {
-       $request->validate([
-    'id_skema'   => 'required|exists:skema_sertifikasi,id_skema',
-    'pertanyaan' => 'required|string',
-    ]);
-        $pertanyaan = new Pertanyaan();
-        $pertanyaan->id_skema = $request->id_skema;
-        $pertanyaan->jenis = 'lisan';
-        $pertanyaan->pertanyaan = $request->pertanyaan;
-        $pertanyaan->save();
-
-        // ✅ redirect ke CRUD lisan per skema
-        return redirect()->route('lisan.crud', ['id_skema' => $request->id_skema])
-                        ->with('success', 'Pertanyaan lisan berhasil ditambahkan!');
-    }
-
-
-         public function editLisan($id)
-    {
-        $pertanyaan = Pertanyaan::findOrFail($id);
-        $skema = Skema::find($pertanyaan->id_skema);
-
-        return view('input_lisan', compact('pertanyaan', 'skema'));
-    }
-
-    public function updateLisan(Request $request, $id)
-    {
-        $pertanyaan = Pertanyaan::findOrFail($id);
-
         $request->validate([
-            'isi_pertanyaan' => 'required|string',
-            'kunci_jawaban'  => 'nullable|string',
-            'file'           => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
+            'id_skema'           => 'required|integer',
+            'id_asesor'          => 'required|integer',
+            'isi_pertanyaan.*'   => 'required|string',
+            'kunci_jawaban.*'    => 'nullable|string',
         ]);
 
-        // upload file baru jika ada
-        if ($request->hasFile('file') && $request->file('file')->isValid()) {
-            $file = $request->file('file');
-            $filePath = $file->store('uploads/pertanyaan', 'public');
-            $pertanyaan->file_path = $filePath;
-            $pertanyaan->file_type = $file->getClientOriginalExtension();
-        }
+        $id_skema  = $request->id_skema;
+        $id_asesor = $request->id_asesor;
 
-        $pertanyaan->isi_pertanyaan = $request->isi_pertanyaan;
-        $pertanyaan->kunci_jawaban  = $request->kunci_jawaban;
+        foreach ($request->isi_pertanyaan as $key => $isi) {
+        $pertanyaan = new Pertanyaan();
+        $pertanyaan->id_skema         = $id_skema;
+        $pertanyaan->id_asesor        = $id_asesor; // ambil dari form request
+        $pertanyaan->jenis_pertanyaan = 'lisan';
+        $pertanyaan->isi_pertanyaan   = $isi;
+        $pertanyaan->kunci_jawaban    = $request->kunci_jawaban[$key] ?? null;
         $pertanyaan->save();
-
-        return redirect()->route('lisan.crud', ['id_skema' => $pertanyaan->id_skema])
-                         ->with('success', 'Pertanyaan lisan berhasil diupdate!');
-    }
-
-    public function destroyLisan($id)
-    {
-        $pertanyaan = Pertanyaan::findOrFail($id);
-        $id_skema   = $pertanyaan->id_skema;
-
-        if ($pertanyaan->file_path && \Storage::disk('public')->exists($pertanyaan->file_path)) {
-            \Storage::disk('public')->delete($pertanyaan->file_path);
         }
 
-        $pertanyaan->delete();
-
-        return redirect()->route('lisan.crud', ['id_skema' => $id_skema])
-                         ->with('success', 'Pertanyaan lisan berhasil dihapus!');
-    }
-        public function crudLisan($id_skema)
-    {
-        $skema = Skema::findOrFail($id_skema);
-
-        $pertanyaan = Pertanyaan::where('jenis_pertanyaan', 'lisan')
-                                ->where('id_skema', $id_skema)
-                                ->get();
-
-        return view('lisan_crud', compact('pertanyaan', 'skema'));
+        return redirect()->route('pertanyaan.index')
+                         ->with('success', 'Pertanyaan lisan berhasil ditambahkan!');
     }
 
     // ================================
@@ -158,50 +92,54 @@ class PertanyaanController extends Controller
     }
 
     public function storeEsai(Request $request)
-    {
-        $request->validate([
-            'id_skema'         => 'required|integer',
-            'id_asesor'        => 'required|integer',
-            'isi_pertanyaan.*' => 'required|string',
-            'kunci_jawaban.*'  => 'nullable|string',
-            'file.*'           => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
-            'timer'            => 'required|integer',
-        ]);
+{
+    $request->validate([
+        'id_skema'         => 'required|integer',
+        'id_asesor'        => 'required|integer',
+        'id_kelompok'      => 'required|integer', // 🔹
+        'isi_pertanyaan.*' => 'required|string',
+        'kunci_jawaban.*'  => 'nullable|string',
+        'file.*'           => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
+        'timer'            => 'required|integer',
+    ]);
 
-        $id_skema  = $request->id_skema;
-        $id_asesor = $request->id_asesor;
-        $timer     = $request->timer;
+    $id_skema    = $request->id_skema;
+    $id_asesor   = $request->id_asesor;
+    $id_kelompok = $request->id_kelompok; // 🔹
+    $timer       = $request->timer;
 
-        // Simpan ke tabel pembuatan_pertanyaan
-        $pembuatan = PembuatanPertanyaan::create([
-            'id_skema' => $id_skema,
-            'timer'    => $timer,
-            'timescap' => now(),
-        ]);
+    // Simpan ke tabel pembuatan_pertanyaan
+    $pembuatan = PembuatanPertanyaan::create([
+        'id_skema' => $id_skema,
+        'timer'    => $timer,
+        'timescap' => now(),
+    ]);
 
-        // Simpan pertanyaan esai
-        foreach ($request->isi_pertanyaan as $key => $isi) {
-            $pertanyaan = new Pertanyaan();
-            $pertanyaan->id_skema = $id_skema;
-            $pertanyaan->id_asesor = $id_asesor;
-            $pertanyaan->id_pembuatan_pertanyaan = $pembuatan->id_pembuatan_pertanyaan;
-            $pertanyaan->jenis_pertanyaan = 'esai';
-            $pertanyaan->isi_pertanyaan = $isi;
-            $pertanyaan->kunci_jawaban = $request->kunci_jawaban[$key] ?? null;
+    // Simpan pertanyaan esai
+    foreach ($request->isi_pertanyaan as $key => $isi) {
+        $pertanyaan = new Pertanyaan();
+        $pertanyaan->id_skema = $id_skema;
+        $pertanyaan->id_kelompok = $id_kelompok; // 🔹 masuk sini
+        $pertanyaan->id_asesor = $id_asesor;
+        $pertanyaan->id_pembuatan_pertanyaan = $pembuatan->id_pembuatan_pertanyaan;
+        $pertanyaan->jenis_pertanyaan = 'esai';
+        $pertanyaan->isi_pertanyaan = $isi;
+        $pertanyaan->kunci_jawaban = $request->kunci_jawaban[$key] ?? null;
 
-            if ($request->hasFile("file.$key")) {
-                $file = $request->file("file.$key");
-                $filePath = $file->store('uploads/pertanyaan', 'public');
-                $pertanyaan->file_path = $filePath;
-                $pertanyaan->file_type = $file->getClientOriginalExtension();
-            }
-
-            $pertanyaan->save();
+        if ($request->hasFile("file.$key")) {
+            $file = $request->file("file.$key");
+            $filePath = $file->store('uploads/pertanyaan', 'public');
+            $pertanyaan->file_path = $filePath;
+            $pertanyaan->file_type = $file->getClientOriginalExtension();
         }
 
-        return redirect()->route('esai.crud', ['id_skema' => $id_skema])
-                         ->with('success', 'Semua pertanyaan esai berhasil disimpan dengan timer!');
+        $pertanyaan->save();
     }
+
+    return redirect()->route('esai.crud', ['id_skema' => $id_skema])
+                     ->with('success', 'Semua pertanyaan esai berhasil disimpan dengan timer!');
+}
+
 
     public function crudEsai($id_skema)
     {
@@ -301,7 +239,7 @@ class PertanyaanController extends Controller
         return redirect()->route('pertanyaan.index')
                          ->with('success', 'Pertanyaan PG berhasil ditambahkan!');
     }
-public function kelompokPekerjaan(Request $request, $id_skema)
+public function kelompokPekerjaan(Request $request, $id_skema, $jenis = 'lisan')
 {
     $timer = $request->query('timer');
 
@@ -309,8 +247,15 @@ public function kelompokPekerjaan(Request $request, $id_skema)
         $q->where('unit_kompetensi.id_skema', $id_skema);
     }])->where('id_skema', $id_skema)->get();
 
+    // Tentukan view berdasarkan jenis dari defaults() route
+    if ($jenis === 'essai') {
+        return view('kelompok_pekerjaan_essai', compact('kelompok', 'timer', 'id_skema'));
+    }
+
     return view('kelompok_pekerjaan_lisan', compact('kelompok', 'timer', 'id_skema'));
 }
+
+
 
 
 }

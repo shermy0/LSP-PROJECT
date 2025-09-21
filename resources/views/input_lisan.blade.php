@@ -6,9 +6,14 @@
     <p class="text-center text-muted">Skema: <span class="fw-bold">{{ $skema->nama_skema }}</span></p>
 
     <form id="formPertanyaanLisan" action="{{ route('pertanyaan.lisan.store') }}" method="POST">
-        @csrf
-        <input type="hidden" name="id_skema" value="{{ $skema->id_skema }}">
-        <input type="hidden" name="id_asesor" value="1">
+    @csrf
+    <input type="hidden" name="id_skema" value="{{ $skema->id_skema }}">
+    <input type="hidden" name="id_asesor" value="1">
+
+    <!-- Tambahan hidden input -->
+    <input type="hidden" name="id_pembuatan_pertanyaan" value="{{ $idPembuatanPertanyaan }}">
+    <input type="hidden" name="id_kelompok" value="{{ $idKelompok }}">
+
 
         <!-- Daftar pertanyaan -->
         <div id="daftarPertanyaanLisan">

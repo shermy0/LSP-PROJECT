@@ -27,6 +27,8 @@ class AsesiSeeder extends Seeder
                 'alamat' => null,
                 'telepon' => '09887645567546',
                 'email' => null,
+                'kelas' => '12 RPL 1',
+                'bidang_keahlian' => 'RPL',
                 'pendidikan_terakhir' => null,
                 'institusi' => null,
                 'jabatan' => null,
