@@ -18,6 +18,7 @@
   </span>
 </div>
 
+
   {{-- Status Sertifikasi --}}
   <h5 class="fw-bold mb-3">Status Sertifikasi</h5>
   <div class="row g-3 mb-5">
