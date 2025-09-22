@@ -255,6 +255,7 @@ h5 {
 .center-underline {
     display: inline-block;
     position: relative;
+    border-top: 1px solid rgba(255,255,255,0.2);
     text-align: center;
 }
 
@@ -500,6 +501,106 @@ h3.fw-bold {
 .card-box {
     background: #fff;
     border-radius: 10px;
+    display: inline-block;
+}
+.role {
+    margin-top: 5px;
+    font-size: 14px;
+}
+.sidebar.collapsed .role {
+    display: none;
+}
+.logout-btn {
+    background-color: #ff7b7b;
+    color: white;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    border-radius: 5px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Avatar */
+.avatar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.avatar-img {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+}
+
+.avatar-img img {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 1.2;
+}
+
+.username {
+    font-size: 16px;
+    font-weight: 500;
+    color: white;
+}
+
+.role {
+    font-size: 14px;
+    color: #ccc;
+}
+
+/* Logout Button */
+.logout-btn {
+    background: #f44336;
+    color: #fff;
+    width: 200px;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.3s ease;
+}
+
+.logout-btn:hover {
+    background: #d32f2f;
+}
+
+.sidebar.collapsed .menu ul li a {
+    display: none;
+}
+
+.sidebar.collapsed .logout-btn {
+    width: 50px;
+    justify-content: center;
+}
+
+.sidebar.collapsed .logout-btn span {
+    display: none;
+}
+
+/* Konten utama */
+#main-content {
+    margin-left: 240px;
     padding: 20px;
     box-shadow: 0 3px 8px rgba(0,0,0,0.1);
     margin-bottom: 20px;

@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
             ElemenKompetensiSeeder::class,
             KukSeeder::class,
             KelompokPekerjaanSeeder::class,
+            JenisDokumenSeeder::class,
         ]);
     }
 }
