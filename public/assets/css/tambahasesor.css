@@ -1,0 +1,300 @@
+/* Content Card */
+.content-card {
+    width: 90%;
+    max-width: 850px;
+    background: #fff;
+    border-radius: 12px;
+    margin: 20px auto;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Header full width, menyesuaikan layar */
+.header {
+    position: relative;   /* bisa juga fixed/absolute kalau mau menempel di atas */
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: #E5EEFF;
+    border-radius: 15px;
+    border: 1px solid #EBEBEB;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding-left: 30px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    margin-top: 15px;
+}
+
+/* Strip biru */
+.header-strip {
+    width: 10px;
+    height: 100%;
+    background: #0284C7;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+/* Judul */
+.header-title {
+    color: #2B2B2B;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Container compact tetap seperti biasa */
+.container {
+    max-width: 700px;
+    margin: 20px auto 100px auto;
+    font-family: Poppins, sans-serif;
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+
+/* Panduan item sejajar angka dan teks */
+.panduan-item {
+    display: flex;
+    align-items: flex-start; /* rata atas */
+    margin-bottom: 12px;
+}
+
+/* Lingkaran angka */
+.panduan-item .circle {
+    width: 24px;
+    height: 24px;
+    background: #0284C7;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 12px; /* jarak antara angka dan teks */
+    flex-shrink: 0; /* jangan mengecil */
+}
+
+/* Teks isi panduan */
+.panduan-item p {
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+    color: #333;
+}
+
+/* ===== Jumlah Penyusun ===== */
+.jumlah-card {
+    background: #f9fbff;
+    border: 1px solid #dbe3f4;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.jumlah-card label {
+    font-weight: 600;
+    font-size: 18px;
+    color: #041562;
+    margin-right: 10px;
+}
+
+.jumlah-input {
+    width: 120px;
+    padding: 6px;
+    font-size: 16px;
+    border: 1px solid #041562;
+    border-radius: 6px;
+    text-align: center;
+    margin-right: 10px;
+}
+
+/* Card penyusun */
+.penyusun-card {
+    background: #fff;
+    border: 1px solid #ebebeb;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+/* Header biru di atas card */
+.penyusun-header {
+    background: #041562;
+    color: #fff;
+    font-weight: 600;
+    font-size: 16px;
+    padding: 10px 15px;
+}
+
+/* Body form */
+.penyusun-body {
+    display: flex;
+    gap: 20px;
+    padding: 15px;
+}
+
+/* Kolom kiri (input) */
+.penyusun-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.penyusun-left label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #041562;
+}
+
+.penyusun-left .form-input {
+    padding: 10px;
+    border: 1px solid #a2a3a4;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* Kolom kanan (ttd) */
+.penyusun-right {
+    width: 420px;   /* biar cukup buat canvas 400px */
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+
+.penyusun-right label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #041562;
+}
+
+.ttd-box {
+    flex: 1;
+    min-height: 100px;
+    border: 2px dashed #0284C7;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+.btn-wrapper {
+    text-align: right;
+    margin-top: 10px;
+}
+
+.btn-primary {
+    background: #041562;
+    color: #fff;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.btn-primary:hover {
+    background: #06238a;
+}
+
+/* ==== TOMBOL EDIT & DELETE ==== */
+.edit-btn {
+    background: #F59E0B; /* warna oranye */
+    color: #fff;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.edit-btn:hover {
+    background: #D97706; /* oranye lebih gelap */
+}
+
+.delete-btn {
+    background: #EF4444; /* warna merah */
+    color: #fff;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.delete-btn:hover {
+    background: #B91C1C; /* merah lebih gelap */
+}
+
+.btn-simpan {
+    background: #041562;
+    color: #fff;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.btn-simpan:hover {
+    background: #06238a;
+}
+
+.btn-save {
+    background: #041562;
+    color: #fff;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+
+    display: block;        /* jadi blok penuh */
+    margin-left: auto;     /* otomatis geser ke kanan */
+    margin-top: 15px; 
+}
+
+.btn-save:hover {
+    background: #06238a;
+}
+
+.btn-reset {
+    background: #EF4444; /* merah */
+    color: #fff;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    display: block;
+    margin-left: auto;
+    margin-top: 10px;
+}
+
+.btn-reset:hover {
+    background: #B91C1C;
+}
+
+.btn-icon {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 5px;
+    font-size: 14px;
+}
+.btn-icon:hover {
+    background: #1e40af;
+}

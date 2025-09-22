@@ -1,0 +1,253 @@
+/* === General Styles === */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #F8F9FA;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* ================== HEADER SECTION ================== */
+.form-asesmen-header {
+    text-align: center;
+    margin: 30px auto 40px;
+}
+
+.form-asesmen-header .breadcrumb {
+    font-size: 14px;
+    color: #0D6EFD;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.form-asesmen-header .icon-box {
+    width: 60px;
+    height: 60px;
+    background: #041C5C;
+    margin: 15px auto;
+    border-radius: 8px;
+}
+
+.main-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #2B2B2B;
+}
+
+.sub-title {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 14px;
+}
+
+.skema-box {
+    background: #E6FFED;   /* hijau muda lembut */
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    color: #0F5132;        /* hijau tua buat teks */
+}
+
+/* ================== HEADER STRIP ================== */
+.header {
+    position: relative;
+    width: 100%;
+    background: #E5EEFF;
+    border-radius: 12px;
+    border: 1px solid #EBEBEB;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    padding-left: 28px;
+    margin: 20px 0;
+    box-sizing: border-box;
+}
+
+.header-strip {
+    width: 10px;
+    height: 100%;
+    background: #0284C7;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.header-title {
+    color: #2B2B2B;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* ================== FORM GROUP ================== */
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #333;
+    font-size: 14px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease-in-out;
+    background: #fff;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
+}
+
+/* ================== PERTANYAAN ================== */
+.pertanyaan-box {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    background: #fff;
+}
+
+.pertanyaan-box .nomor {
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 14px;
+    color: #041C5C;
+}
+
+.teks-pertanyaan {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.pilihan-jawaban {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pilihan-jawaban label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fafafa;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.pilihan-jawaban label:hover {
+    background: #f0f0f0;
+}
+
+.pilihan-jawaban input[type="radio"] {
+    accent-color: #0D6EFD; /* warna biru sesuai tema */
+}
+
+/* ==== PERBAIKAN: jawaban terpilih tetap biru meski disabled ==== */
+.pilihan-jawaban input[type="radio"]:checked:disabled + span,
+.pilihan-jawaban input[type="radio"]:checked:disabled {
+    color: #0D6EFD;
+    font-weight: 600;
+}
+
+/* ==== TABEL PENYUSUN ==== */
+.table-wrapper {
+    margin-top: -80px;
+    margin-left: 1px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    
+    background: #fff;
+    border: 1px solid #EBEBEB;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    overflow-x: auto;
+}
+.table-penyusun {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+.table-penyusun th {
+    background: #041562;
+    color: #fff;
+    padding: 12px;
+    text-align: center;
+    font-weight: 600;
+    border: 1px solid #ddd;
+}
+.table-penyusun td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+.table-penyusun tr:nth-child(even) { background: #f9f9f9; }
+
+/* ====== BUTTON SIMPAN (KANAN BAWAH) ====== */
+.btn-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 30px;
+    padding-right: 20px;
+}
+
+.button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-unduh {
+    background: #2E7D32; /* Hijau */
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s ease-in-out;
+}
+
+.btn-unduh:hover {
+    background: #1B5E20; /* Hijau lebih gelap */
+}
+
+.btn-submit {
+    background: #041C5C;
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s ease-in-out;
+}
+
+.btn-submit:hover {
+    background: #06267c;
+}
+
