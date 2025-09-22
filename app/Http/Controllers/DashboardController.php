@@ -33,17 +33,22 @@ class DashboardController extends Controller
 
     public function admin()
     {
-        // Hilangkan dulu total agar tidak error
         return view('admin.dashboard');
     }
 
     public function asesi()
     {
-        return view('asesi.dashboard');
+        $user = auth()->user();
+        $asesi = DB::table('asesi')->where('user_id', $user->id)->first();
+
+        return view('asesi.dashboard', compact('user', 'asesi'));
     }
 
     public function asesor()
     {
+        $user = auth()->user();
+        $asesi = DB::table('asesi')->where('user_id', $user->id)->first();
+
         $totalPeserta = 284;
         $totalSertifikat = 284;
         $dalamProgres = 284;
@@ -53,7 +58,6 @@ class DashboardController extends Controller
         $labels = collect(['AKL', 'MPLB', 'PEMASARAN', 'M-LOG', 'DKV', 'RPL', 'TJKT']);
         $values = collect([45, 65, 30, 15, 40, 50, 10]);
 
-        // Warna dasar sama dengan di chart.js
         $colors = ["#f1c40f", "#3498db", "#e74c3c", "#e67e22", "#9b59b6", "#2ecc71", "#7f8c8d"];
 
         $maxIndex = $values->search($values->max());
@@ -61,6 +65,8 @@ class DashboardController extends Controller
         $topColor = $colors[$maxIndex];
 
         return view('asesor.dashboard', compact(
+            'user',
+            'asesi',
             'totalPeserta',
             'totalSertifikat',
             'dalamProgres',

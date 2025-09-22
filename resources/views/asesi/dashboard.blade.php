@@ -5,12 +5,18 @@
 @section('konten')
 <div class="container py-4">
 
-  {{-- Header --}}
-  <div class="mb-4">
-    <h2 class="fw-bold">Selamat Datang Maura</h2>
-    <p class="text-muted mb-1">Rekayasa Perangkat Lunak</p>
-    <span class="text-secondary">085102432440</span>
-  </div>
+    {{-- Header --}}
+<div class="mb-4">
+  <h2 class="fw-bold">
+    Selamat Datang {{ $asesi->nama_lengkap ?? $user->name }}
+  </h2>
+  <p class="text-muted mb-1">
+    {{ $asesi->jurusan ?? 'Rekayasa Perangkat Lunak' }}
+  </p>
+  <span class="phone">
+    {{ $asesi->telepon ?? 'Nomor HP belum diisi' }}
+  </span>
+</div>
 
   {{-- Status Sertifikasi --}}
   <h5 class="fw-bold mb-3">Status Sertifikasi</h5>
