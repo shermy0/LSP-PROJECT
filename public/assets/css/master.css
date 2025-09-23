@@ -1,10 +1,7 @@
 /* MASTER */
 body {
     margin: 0;
-<<<<<<< HEAD
-=======
     font-family: "Poppins", sans-serif;
->>>>>>> 4d5eaa9f1287169d8c46f6ecf08760c0f5063c7d
     background-color: #f4f4f4;
     font-family: 'Poppins', sans-serif !important;
 }
@@ -23,10 +20,6 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-<<<<<<< HEAD
-    z-index: 1000;
-=======
->>>>>>> 4d5eaa9f1287169d8c46f6ecf08760c0f5063c7d
 }
 
 .sidebar.collapsed {
@@ -36,13 +29,8 @@ body {
 /* Header Toggle */
 .toggle-btn {
     display: flex;
-<<<<<<< HEAD
-    align-items: flex-end;
-    text-align: right;
-=======
     align-items: flex-end; 
     text-align: right; 
->>>>>>> 4d5eaa9f1287169d8c46f6ecf08760c0f5063c7d
     gap: 10px;
     background-color: #041562;
     color: white;
@@ -56,13 +44,8 @@ body {
 .toggle-left {
     display: flex;
     flex-direction: column;
-<<<<<<< HEAD
-    align-items: flex-start;
-    text-align: left;
-=======
     align-items: flex-start; 
     text-align: left;   
->>>>>>> 4d5eaa9f1287169d8c46f6ecf08760c0f5063c7d
 }
 
 .sidebar.collapsed .toggle-left {
@@ -125,15 +108,6 @@ body {
 .sidebar.collapsed .menu ul li span {
     opacity: 0;
     pointer-events: none;
-<<<<<<< HEAD
-}
-
-.menu ul li a {
-    color: white;
-    text-decoration: none;
-    font-size: 14px;
-=======
->>>>>>> 4d5eaa9f1287169d8c46f6ecf08760c0f5063c7d
 }
 
 /* Footer */
@@ -145,11 +119,7 @@ body {
     gap: 10px;
 }
 
-<<<<<<< HEAD
-/* Avatar */
-=======
 /* Avatar Container */
->>>>>>> 4d5eaa9f1287169d8c46f6ecf08760c0f5063c7d
 .avatar {
     display: flex;
     align-items: center;
@@ -213,10 +183,7 @@ body {
     display: none;
 }
 
-<<<<<<< HEAD
-=======
 /* Sidebar collapse: sembunyikan teks, icon tetap di tengah */
->>>>>>> 4d5eaa9f1287169d8c46f6ecf08760c0f5063c7d
 .sidebar.collapsed .logout-btn {
     width: 50px;
     justify-content: center;
@@ -226,460 +193,14 @@ body {
     display: none;
 }
 
-<<<<<<< HEAD
-/* Konten utama */
-#content {
-=======
 
 /* Konten utama menyesuaikan sidebar */
 #main-content {
->>>>>>> 4d5eaa9f1287169d8c46f6ecf08760c0f5063c7d
     margin-left: 240px;
     padding: 20px;
     transition: margin-left 0.3s ease;
 }
 
-<<<<<<< HEAD
-#content.shrink {
-    margin-left: 70px;
-}
-
-.sidebar.collapsed + #content {
-    margin-left: 70px;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .sidebar {
-        width: 70px;
-    }
-
-    .sidebar .menu ul li a {
-        display: none;
-    }
-
-    .sidebar .menu ul li {
-        justify-content: center;
-    }
-}
-
-/* FORM PERENCANAAN */
-h1 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    text-align: center;
-    margin-top: 20px;
-}
-
-h5 {
-    display: block;
-    text-align: center;
-    font-size: 1rem;
-    font-weight: 500;
-    margin-top: 0;
-    color: #4C4C4C;
-}
-
-.center-underline {
-    display: inline-block;
-    position: relative;
-    text-align: center;
-}
-
-.center-underline::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    bottom: -5px;
-    transform: translateX(-50%);
-    width: 60%;
-    height: 3px;
-    background-color: #0284C7;
-    border-radius: 2px;
-}
-
-.container {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 0 15px;
-}
-
-/* Accordion */
-.accordion {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.accordion-item {
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    overflow: hidden;
-    border: none;
-}
-
-.accordion-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 15px 20px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    background-color: #fff;
-    border-radius: 12px;
-    transition: background-color 0.2s ease;
-}
-
-.accordion-header:hover {
-    background-color: #f7f7f7;
-}
-
-.accordion-button::after {
-    display: none;
-}
-
-/* Dropdown */
-.dropdown .btn {
-    background-color: #fff;
-    color: #4C4C4C;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    padding: 15px 20px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    text-align: left;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: background-color 0.2s ease;
-    border: none;
-    position: relative;
-}
-
-.dropdown .btn::after {
-    content: "\f078";
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    color: #4C4C4C;
-}
-
-.dropdown-menu {
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    background-color: #fff;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    font-size: 0.9rem;
-    min-width: 180px;
-    padding: 6px 0;
-    margin-top: 8px;
-}
-
-.dropdown-item {
-    padding: 12px 20px;
-    font-size: 0.85rem;
-    color: #4C4C4C;
-    transition: background-color 0.2s ease;
-    border-radius: 12px;
-    border: none;
-}
-body {
-    margin: 0;
-    font-family: "Poppins", sans-serif;
-    background-color: #f4f4f4;
-}
-
-/* Sidebar */
-.sidebar {
-    height: 100vh;
-    width: 240px;
-    background-color: #041562;
-    color: white;
-    transition: width 0.3s ease;
-    overflow: hidden;
-    position: fixed;
-    top: 0;
-    left: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.sidebar.collapsed {
-    width: 70px;
-}
-
-/* Header Toggle */
-.toggle-btn {
-    display: flex;
-    align-items: flex-end;
-    text-align: right;
-    gap: 10px;
-    background-color: #041562;
-    color: white;
-    border: none;
-    padding: 15px;
-    width: 100%;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.toggle-left {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
-}
-
-.sidebar.collapsed .toggle-left {
-    opacity: 0;
-    transform: translateX(-10px);
-}
-
-.lsp-title {
-    font-weight: bold;
-    font-size: 18px;
-}
-
-.lsp-subtitle {
-    font-size: 12px;
-    color: #ccc;
-}
-
-/* Menu */
-.menu {
-    flex-grow: 1;
-    margin-top: 10px;
-}
-
-.menu ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.menu ul li {
-    padding: 12px 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    white-space: nowrap;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.menu ul li i {
-    width: 24px;
-    height: 24px;
-    font-size: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.menu ul li:hover {
-    background: linear-gradient(90deg, #0284C7, #0369A1);
-    border: 1px solid #0284C7;
-}
-
-.menu ul li:hover i,
-.menu ul li:hover span {
-    color: white;
-}
-
-.sidebar.collapsed .menu ul li span {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.menu ul li a {
-    color: white;
-    text-decoration: none;
-    font-size: 14px;
-}
-
-/* Footer */
-.sidebar-footer {
-    padding: 15px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-/* Avatar */
-.avatar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.avatar-img {
-    position: relative;
-    width: 48px;
-    height: 48px;
-    flex-shrink: 0;
-}
-
-.avatar-img img {
-    width: 100%;
-    height: 100%;
-    border-radius: 12px;
-    object-fit: cover;
-}
-
-.user-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    line-height: 1.2;
-}
-
-.username {
-    font-size: 16px;
-    font-weight: 500;
-    color: white;
-}
-
-.role {
-    font-size: 14px;
-    color: #ccc;
-}
-
-/* Logout Button */
-.logout-btn {
-    background: #f44336;
-    color: #fff;
-    width: 200px;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    transition: background 0.3s ease;
-}
-
-.logout-btn:hover {
-    background: #d32f2f;
-}
-
-.sidebar.collapsed .menu ul li a {
-    display: none;
-}
-
-.sidebar.collapsed .logout-btn {
-    width: 50px;
-    justify-content: center;
-}
-
-.sidebar.collapsed .logout-btn span {
-    display: none;
-}
-
-/* Konten utama */
-#main-content {
-    margin-left: 240px;
-    padding: 20px;
-    transition: margin-left 0.3s ease;
-}
-
-.sidebar.collapsed + #main-content {
-    margin-left: 70px;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .sidebar {
-        width: 70px;
-    }
-
-    .sidebar .menu ul li a {
-        display: none;
-    }
-
-    .sidebar .menu ul li {
-        justify-content: center;
-    }
-}
-
-/* FORM PERENCANAAN */
-h1 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    text-align: center;
-    margin-top: 20px;
-}
-
-h5 {
-    display: block;
-    text-align: center;
-    font-size: 1rem;
-    font-weight: 500;
-    margin-top: 0;
-    color: #4C4C4C;
-}
-
-.center-underline {
-    display: inline-block;
-    position: relative;
-    text-align: center;
-}
-
-.center-underline::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    bottom: -5px;
-    transform: translateX(-50%);
-    width: 60%;
-    height: 3px;
-    background-color: #0284C7;
-    border-radius: 2px;
-}
-
-.container {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 0 15px;
-}
-
-/* Accordion */
-.accordion {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.accordion-item {
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    overflow: hidden;
-    border: none;
-}
-
-.accordion-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 15px 20px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    background-color: #fff;
-    border-radius: 12px;
-=======
 /* Responsive sidebar */
 .sidebar.collapsed + #main-content {
     margin-left: 70px; 
@@ -783,7 +304,6 @@ h5 {
     background-color: #fff;
     border-radius: 12px; 
     border: none;
->>>>>>> 4d5eaa9f1287169d8c46f6ecf08760c0f5063c7d
     transition: background-color 0.2s ease;
 }
 
@@ -791,19 +311,12 @@ h5 {
     background-color: #f7f7f7;
 }
 
-<<<<<<< HEAD
-=======
 /* Hapus panah default */
->>>>>>> 4d5eaa9f1287169d8c46f6ecf08760c0f5063c7d
 .accordion-button::after {
     display: none;
 }
 
-<<<<<<< HEAD
-/* Dropdown */
-=======
 /* Dropdown tampil seperti item accordion */
->>>>>>> 4d5eaa9f1287169d8c46f6ecf08760c0f5063c7d
 .dropdown .btn {
     background-color: #fff;
     color: #4C4C4C;
@@ -818,34 +331,6 @@ h5 {
     gap: 10px;
     transition: background-color 0.2s ease;
     border: none;
-<<<<<<< HEAD
-    position: relative;
-}
-
-.dropdown .btn::after {
-    content: "\f078";
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    color: #4C4C4C;
-}
-
-.dropdown-menu {
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    background-color: #fff;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    font-size: 0.9rem;
-    min-width: 180px;
-    padding: 6px 0;
-    margin-top: 8px;
-}
-
-=======
 }
 
 /* Panah dropdown di kanan */
@@ -874,7 +359,6 @@ h5 {
 }
 
 /* Item dropdown */
->>>>>>> 4d5eaa9f1287169d8c46f6ecf08760c0f5063c7d
 .dropdown-item {
     padding: 12px 20px;
     font-size: 0.85rem;
@@ -883,8 +367,6 @@ h5 {
     border-radius: 12px;
     border: none;
 }
-<<<<<<< HEAD
-=======
 
 .breadcrumb a {
     color: #002D72;
@@ -1155,4 +637,3 @@ thead.table-title th {
     border-radius: 6px;
     margin: 0 auto 16px auto;
 }
->>>>>>> 4d5eaa9f1287169d8c46f6ecf08760c0f5063c7d
