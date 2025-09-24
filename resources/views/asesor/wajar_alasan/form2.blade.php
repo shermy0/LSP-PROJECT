@@ -16,149 +16,219 @@
                 <div class="panduan-item">
                     <div class="panduan-number">1</div>
                     <div class="panduan-text">
-                        Formulir ini digunakan oleh asesor untuk menilai kebutuhan penyesuaian asesmen asesi sesuai kondisi dan karakteristik individu.
+                        Formulir ini dapat digunakan (sebelum pra asesmen, saat pelaksanaan pra asesmen, setelah pra asesmen)*
+                        jika ada asesi yang mempunyai keterbatasan sesuai karakteristik yang dimilikinya sehingga diperlukan penyesuaian yang wajar...
                     </div>
                 </div>
                 <div class="panduan-item">
                     <div class="panduan-number">2</div>
-                    <div class="panduan-text">Asesor harus memastikan pilihan yang dicentang sesuai hasil observasi dan diskusi dengan asesi.</div>
+                    <div class="panduan-text">Coretlah pada tanda * yang tidak sesuai.</div>
                 </div>
                 <div class="panduan-item">
                     <div class="panduan-number">3</div>
-                    <div class="panduan-text">Beri tanda √ pada kolom pilihan yang relevan, baik Ya/Tidak maupun kotak ‘□’ keterangan.</div>
+                    <div class="panduan-text">Berilah tanda √ pada kotak ‘□’ pada kolom potensi asesi.</div>
                 </div>
                 <div class="panduan-item">
                     <div class="panduan-number">4</div>
-                    <div class="panduan-text">Gunakan keterangan tambahan jika diperlukan untuk memperjelas penyesuaian asesmen.</div>
+                    <div class="panduan-text">
+                        Berilah tanda √ Ya atau Tidak pada tanda ** sesuai pilihan, jika jawaban Ya selanjutnya pada kolom keterangan berilah tanda √ di kotak ‘□’.
+                    </div>
                 </div>
             </div>
         </div>
 
- <!-- Potensi Asesi -->
-<div class="asesmen-card">
-    <div class="asesmen-header">
-        <span class="header-line"></span>
-        <h5>Potensi Asesi</h5>
-    </div>
-    <div class="asesmen-body">
+        <!-- Potensi Asesi -->
+        <div class="asesmen-card">
+            <div class="asesmen-header">
+                <span class="header-line"></span>
+                <h5>Potensi Asesi</h5>
+            </div>
+            <div class="asesmen-body">
+                <label class="potensi-item">
+                    <input type="checkbox" name="potensi[]" value="1">
+                    <span class="potensi-text">Hasil pelatihan / pendidikan dengan kurikulum sesuai standar kompetensi.</span>
+                </label>
+                <label class="potensi-item">
+                    <input type="checkbox" name="potensi[]" value="2">
+                    <span class="potensi-text">Hasil pelatihan dengan kurikulum belum berbasis kompetensi.</span>
+                </label>
+                <label class="potensi-item">
+                    <input type="checkbox" name="potensi[]" value="3">
+                    <span class="potensi-text">Pekerja berpengalaman dari industri berbasis standar kompetensi.</span>
+                </label>
+                <label class="potensi-item">
+                    <input type="checkbox" name="potensi[]" value="4">
+                    <span class="potensi-text">Pekerja berpengalaman dari industri belum berbasis kompetensi.</span>
+                </label>
+                <label class="potensi-item">
+                    <input type="checkbox" name="potensi[]" value="5">
+                    <span class="potensi-text">Pelatihan mandiri / otodidak.</span>
+                </label>
+            </div>
+        </div>
 
-        <!-- Tombol Pilih Semua -->
-        <label class="potensi-item">
-            <input type="checkbox" name="potensi[]" value="1" class="potensi-check">
-            <span class="potensi-text">Hasil pelatihan / pendidikan dengan kurikulum sesuai standar kompetensi.</span>
-        </label>
-        <label class="potensi-item">
-            <input type="checkbox" name="potensi[]" value="2" class="potensi-check">
-            <span class="potensi-text">Hasil pelatihan dengan kurikulum belum berbasis kompetensi.</span>
-        </label>
-        <label class="potensi-item">
-            <input type="checkbox" name="potensi[]" value="3" class="potensi-check">
-            <span class="potensi-text">Pekerja berpengalaman dari industri berbasis standar kompetensi.</span>
-        </label>
-        <label class="potensi-item">
-            <input type="checkbox" name="potensi[]" value="4" class="potensi-check">
-            <span class="potensi-text">Pekerja berpengalaman dari industri belum berbasis kompetensi.</span>
-        </label>
-        <label class="potensi-item">
-            <input type="checkbox" name="potensi[]" value="5" class="potensi-check">
-            <span class="potensi-text">Pelatihan mandiri / otodidak.</span>
-        </label>
+
+<!-- Modal -->
+<div class="modal fade" id="warningModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <h5 class="modal-title fw-bold">Peringatan</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Harap memilih salah satu jawaban, "Ya" atau "Tidak".</strong></p>
+        <p>❌ Mohon tidak memilih kedua opsi secara bersamaan.</p>
+        <p>✅ Sistem hanya mengizinkan satu pilihan yang sah.</p>
+        <p>Pastikan jawaban yang Anda pilih sesuai dengan kondisi asesmen.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" data-bs-dismiss="modal">Mengerti</button>
+      </div>
     </div>
+  </div>
 </div>
 
+        <!-- Instrumen Asesmen -->
+        <div class="asesmen-card mb-4">
+            <div class="asesmen-header">
+                <span class="header-line"></span>
+                <h5>Instrumen Asesmen</h5>
+            </div>
+            <div class="asesmen-body p-0">
+                <table class="table table-bordered asesmen-table mb-0">
+                    <thead class="text-center align-middle bg-primary text-white">
+                        <tr>
+                            <th style="width:40px;">No</th>
+                            <th style="width:250px;">Mengidentifikasi Persyaratan Modifikasi Asesmen</th>
+                            <th style="width:160px;">Diperlukan Penyesuaian</th>
+                            <th>Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Baris 1 -->
+                        <tr>
+                            <td class="text-center">1</td>
+                            <td>Keterbatasan akses terhadap persyaratan bahasa, literasi, numerasi.</td>
+                            <td class="text-center align-middle">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="q1" id="q1ya">
+                                    <label class="form-check-label" for="q1ya">Ya</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="q1" id="q1tidak">
+                                    <label class="form-check-label" for="q1tidak">Tidak</label>
+                                </div>
+                            </td>
+                            <td>
+                                <div><input type="checkbox"> Memerlukan dukungan pembaca, penerjemah, penulis, isyarat</div>
+                                <div><input type="checkbox"> Menggunakan hasil produk</div>
+                                <div><input type="checkbox"> Menggunakan ceklis observasi</div>
+                                <div><input type="checkbox"> Menggunakan daftar instruksi lisan</div>
+                            </td>
+                        </tr>
 
-<!-- Instrumen Asesmen -->
-<div class="asesmen-card mb-4">
-    <div class="asesmen-header">
-        <span class="header-line"></span>
-        <h5>Instrumen Asesmen (Asesor)</h5>
+                        <!-- Baris 2 -->
+                        <tr>
+                            <td class="text-center">2</td>
+                            <td>Penyediaan dukungan pembaca, penerjemah, penulis.</td>
+                            <td class="text-center align-middle">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="q2" id="q2ya">
+                                    <label class="form-check-label" for="q2ya">Ya</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="q2" id="q2tidak">
+                                    <label class="form-check-label" for="q2tidak">Tidak</label>
+                                </div>
+                            </td>
+                            <td>
+                                <div><input type="checkbox"> Menggunakan pertanyaan lisan dengan pendamping</div>
+                                <div><input type="checkbox"> Menggunakan gambar untuk memperjelas pertanyaan</div>
+                                <div><input type="checkbox"> Menggunakan bahasa sederhana</div>
+                            </td>
+                        </tr>
+
+                        <!-- Baris 3 -->
+                        <tr>
+                            <td class="text-center">3</td>
+                            <td>Penggunaan teknologi adaptif atau peralatan khusus (tidak dapat menggunakan teknologi adaptif, komputer dan printer, peralatan digital, dll).</td>
+                            <td class="text-center align-middle">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="q3" id="q3ya">
+                                    <label class="form-check-label" for="q3ya">Ya</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="q3" id="q3tidak">
+                                    <label class="form-check-label" for="q3tidak">Tidak</label>
+                                </div>
+                            </td>
+                            <td>
+                                <div><input type="checkbox"> Ceklis observasi/tes tertulis</div>
+                                <div><input type="checkbox"> Pertanyaan lisan</div>
+                                <div><input type="checkbox"> Pertanyaan tertulis</div>
+                                <div><input type="checkbox"> Pertanyaan wawancara</div>
+                                <div><input type="checkbox"> Daftar instruksi lisan/tertulis</div>
+                                <div><input type="checkbox"> Ceklis verifikasi produk</div>
+                                <div><input type="checkbox"> Menggunakan dukungan operator komputer</div>
+                            </td>
+                        </tr>
+
+                        <!-- Baris 4 -->
+                        <tr>
+                            <td class="text-center">4</td>
+                            <td>Pelaksanaan asesmen secara fleksibel karena alasan kesehatan atau kepentingan pengobatan.</td>
+                            <td class="text-center align-middle">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="q4" id="q4ya">
+                                    <label class="form-check-label" for="q4ya">Ya</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="q4" id="q4tidak">
+                                    <label class="form-check-label" for="q4tidak">Tidak</label>
+                                </div>
+                            </td>
+                            <td>
+                                <div><input type="checkbox"> Menggunakan jadwal fleksibel</div>
+                                <div><input type="checkbox"> Menggunakan instrumen asesmen alternatif</div>
+                                <div><input type="checkbox"> Menggunakan waktu tambahan</div>
+                                <div><input type="checkbox"> Menggunakan metode asesmen khusus untuk kebutuhan tertentu</div>
+                            </td>
+                        </tr>
+
+                        <!-- Baris 5 -->
+                        <tr>
+                            <td class="text-center">5</td>
+                            <td>Penyesuaian tempat fisik/lingkungan asesmen.</td>
+                            <td class="text-center align-middle">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="q5" id="q5ya">
+                                    <label class="form-check-label" for="q5ya">Ya</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="q5" id="q5tidak">
+                                    <label class="form-check-label" for="q5tidak">Tidak</label>
+                                </div>
+                            </td>
+                            <td>
+                                <div><input type="checkbox"> Menggunakan pertanyaan lisan</div>
+                                <div><input type="checkbox"> Menggunakan pertanyaan wawancara</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
-    <div class="asesmen-body p-0">
-        <table class="table table-bordered asesmen-table mb-0">
-            <thead class="text-center align-middle bg-primary text-white">
-                <tr>
-                    <th style="width:40px;">No</th>
-                    <th style="width:250px;">Mengidentifikasi Kebutuhan Penyesuaian</th>
-                    <th style="width:160px;">Perlu Penyesuaian?</th>
-                    <th>Keterangan Asesor</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Contoh Baris 1 -->
-                <tr>
-                    <td class="text-center">1</td>
-                    <td>Keterbatasan akses bahasa, literasi, numerasi.</td>
-                    <td class="text-center align-middle">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input pilihan-radio" type="radio" name="q1" id="q1ya" value="ya" data-target="ket1">
-                            <label class="form-check-label fw-bold" for="q1ya">Ya</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input pilihan-radio" type="radio" name="q1" id="q1tidak" value="tidak" data-target="ket1">
-                            <label class="form-check-label fw-bold" for="q1tidak">Tidak</label>
-                        </div>
-                    </td>
-                    <td id="ket1">
-                        <div><input type="checkbox" disabled> Dukungan pembaca/penerjemah/penulis</div>
-                        <div><input type="checkbox" disabled> Instruksi lisan</div>
-                        <div><input type="checkbox" disabled> Observasi langsung</div>
-                    </td>
-                </tr>
-                <!-- Baris 2 -->
-                <tr>
-                    <td class="text-center">2</td>
-                    <td>Kondisi kesehatan yang mempengaruhi asesmen.</td>
-                    <td class="text-center align-middle">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input pilihan-radio" type="radio" name="q2" id="q2ya" value="ya" data-target="ket2">
-                            <label class="form-check-label fw-bold" for="q2ya">Ya</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input pilihan-radio" type="radio" name="q2" id="q2tidak" value="tidak" data-target="ket2">
-                            <label class="form-check-label fw-bold" for="q2tidak">Tidak</label>
-                        </div>
-                    </td>
-                    <td id="ket2">
-                        <div><input type="checkbox" disabled> Waktu tambahan</div>
-                        <div><input type="checkbox" disabled> Jadwal fleksibel</div>
-                        <div><input type="checkbox" disabled> Instrumen alternatif</div>
-                    </td>
-                </tr>
-                <!-- Baris 3 -->
-                <tr>
-                    <td class="text-center">3</td>
-                    <td>Keterbatasan sarana/lingkungan asesmen.</td>
-                    <td class="text-center align-middle">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input pilihan-radio" type="radio" name="q3" id="q3ya" value="ya" data-target="ket3">
-                            <label class="form-check-label fw-bold" for="q3ya">Ya</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input pilihan-radio" type="radio" name="q3" id="q3tidak" value="tidak" data-target="ket3">
-                            <label class="form-check-label fw-bold" for="q3tidak">Tidak</label>
-                        </div>
-                    </td>
-                    <td id="ket3">
-                        <div><input type="checkbox" disabled> Tempat asesmen disesuaikan</div>
-                        <div><input type="checkbox" disabled> Metode wawancara</div>
-                        <div><input type="checkbox" disabled> Pertanyaan lisan</div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+
+<!-- Tombol Selanjutnya -->
+<div class="d-flex justify-content-end mt-3">
+  <a href="{{ route('asesor.wajar_alasan.form3') }}" class="btn btn-primary px-4">
+    Selanjutnya <i class="fas fa-arrow-right ms-2"></i>
+  </a>
 </div>
 
-
-    </div>
-
-    <!-- Tombol Selanjutnya -->
-    <div class="d-flex justify-content-end mt-3">
-        <a href="{{ route('asesor.wajar_alasan.form3') }}" class="btn btn-primary px-4">
-            Selanjutnya <i class="fas fa-arrow-right ms-2"></i>
-        </a>
-    </div>
-</div>
 
 <!-- CSS Khusus -->
 <style>
@@ -207,99 +277,191 @@
     font-size:14px; line-height:1.4;
 }
 .potensi-item:last-child { border-bottom:none; }
-/* Checkbox bulat */
 .potensi-item input[type="checkbox"] {
+    width:18px; height:18px;
+    cursor:pointer; margin-top:2px;
+}
+.potensi-text { flex:1; color:#333; }
+.asesmen-table { font-size:13px; }
+.asesmen-table th { font-weight:600; text-align:center; font-size:13px; }
+
+/* >>> Tambahan CSS baru <<< */
+
+/* Pertebal tombol Ya/Tidak */
+.form-check-input {
+    border: 2px solid #2874c9 !important;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+.form-check-input:checked {
+    background-color: #2874c9 !important;
+    border-color: #2874c9 !important;
+}
+
+/* Checkbox bulat untuk keterangan */
+.asesmen-body input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
+    -moz-appearance: none;
     width: 18px;
     height: 18px;
     border: 2px solid #2874c9;
-    border-radius: 50%; /* bikin bulat */
-    outline: none;
+    border-radius: 50%; /* jadi bulat */
     cursor: pointer;
+    display: inline-block;
     position: relative;
-    margin-top: 2px;
+    margin-right: 8px;
 }
-
-.potensi-item input[type="checkbox"]:checked {
+.asesmen-body input[type="checkbox"]:checked {
     background-color: #2874c9;
-    border-color: #2874c9;
 }
-
-.potensi-item input[type="checkbox"]:checked::after {
-    content: '';
+.asesmen-body input[type="checkbox"]:checked::after {
+    content: "";
     position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 8px;
-    height: 8px;
+    top: 4px;
+    left: 4px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
     background: #fff;
-    border-radius: 50%;
 }
-
-/* Tambahan khusus untuk bagian Instrumen Asesmen */
-
-/* Radio tombol lebih tebal */
-.asesmen-table .form-check-input[type="radio"] {
-    width: 20px;
-    height: 20px;
-    border: 3px solid #2874c9;
-    cursor: pointer;
-}
-
-/* Checkbox bulat di keterangan instrumen */
-.asesmen-table td input[type="checkbox"] {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
-    border: 2px solid #2874c9;
-    border-radius: 50%;
-    outline: none;
-    cursor: pointer;
-    position: relative;
-    margin-right: 6px;
-}
-
-.asesmen-table td input[type="checkbox"]:checked {
-    background-color: #2874c9;
-    border-color: #2874c9;
-}
-
-.asesmen-table td input[type="checkbox"]:checked::after {
-    content: '';
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 8px;
-    height: 8px;
-    background: #fff;
-    border-radius: 50%;
-}
-
-.asesmen-table td input[type="checkbox"]:disabled {
-    opacity: 0.5;
+.asesmen-body input[type="checkbox"]:disabled {
     cursor: not-allowed;
+    opacity: 0.5;
 }
+
+/* Popup Overlay */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* Box */
+.modal-box {
+    background: #fff;
+    border-radius: 10px;
+    width: 420px;
+    max-width: 90%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+/* Header */
+.modal-header {
+    background: #d32f2f;
+    color: white;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+}
+.modal-header h5 {
+    margin: 0;
+    font-weight: 600;
+}
+.icon-box {
+    background: white;
+    color: #d32f2f;
+    font-size: 20px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin-right: 10px;
+}
+
+/* Body */
+.modal-body {
+    padding: 18px;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Footer */
+.modal-footer {
+    padding: 12px 18px;
+    text-align: right;
+}
+.btn-ok {
+    background: #041562;
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-ok:hover {
+    background: #06268f;
+}
+
+/* Tombol Selanjutnya */
+.btn-primary {
+    background-color: #07258a !important;
+    border: none;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #041a5f !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+
 
 </style>
 
+
 <script>
-document.querySelectorAll('.pilihan-radio').forEach(radio => {
-    radio.addEventListener('change', function() {
-        let target = document.getElementById(this.dataset.target);
-        let checkboxes = target.querySelectorAll('input[type="checkbox"]');
-        
-        if (this.value === 'ya') {
-            checkboxes.forEach(cb => cb.disabled = false);
-        } else {
-            checkboxes.forEach(cb => {
-                cb.disabled = true;
-                cb.checked = false; // reset kalau pilih Tidak
-            });
+// JS untuk kontrol Ya/Tidak -> aktifkan/disable checkbox
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll("tbody tr").forEach(function(row) {
+        const yesRadio = row.querySelector('input[type="radio"][id$="ya"]');
+        const noRadio  = row.querySelector('input[type="radio"][id$="tidak"]');
+        const checkboxes = row.querySelectorAll('td:last-child input[type="checkbox"]');
+
+        function updateCheckboxState() {
+            if (yesRadio.checked) {
+                checkboxes.forEach(cb => cb.disabled = false);
+            } else {
+                checkboxes.forEach(cb => {
+                    cb.disabled = true;
+                    cb.checked = false; // reset kalau pilih Tidak
+                });
+            }
         }
+
+        if (yesRadio && noRadio) {
+            yesRadio.addEventListener("change", updateCheckboxState);
+            noRadio.addEventListener("change", updateCheckboxState);
+        }
+
+        // Set default pas load
+        updateCheckboxState();
     });
 });
-</script>
 
+document.addEventListener("DOMContentLoaded", function() {
+    // Flag supaya popup hanya sekali muncul
+    if (!localStorage.getItem("popupShown")) {
+        let warningModal = new bootstrap.Modal(document.getElementById('warningModal'));
+        warningModal.show();
+        localStorage.setItem("popupShown", "true"); // tandai sudah ditampilkan
+    }
+});
+</script>
 @endsection

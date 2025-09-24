@@ -69,76 +69,52 @@
         font-size: 14px;
     }
 
-    /* Container dalam agar ukurannya konsisten dengan form */
-    .inner-form {
-        max-width: 600px; /* sesuaikan dengan ukuran form atas */
-        margin: auto;
+    /* Style khusus tanda tangan */
+    .card { 
+        background: #fff; 
+        border: 1px solid #ddd; 
+        border-radius: 12px; 
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08); 
+        padding: 25px; 
+        max-width: 600px; 
+        margin: 20px auto; 
     }
+    .card-title {
+        font-weight: bold;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+        color: #333;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+    }
+.card canvas { 
+    border: 1px solid #999; 
+    border-radius: 6px; 
+    background-color: #ffffff; 
+    cursor: crosshair; 
+    display: block;
+    max-width: 100%;
+}
 
-    .signature-wrapper {
-        width: 100%;
-        height: 150px; /* tinggi canvas */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .signature-pad {
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        width: 100% !important;
-        height: 100% !important;
-        background: #fff;
-        display: block;
-    }
-
-    .btn-clean {
-        background: #e74c3c;
-        color: #fff;
-        font-size: 13px;
-        padding: 6px 16px;
-        border-radius: 6px;
-        border: none;
-    }
-
-    .btn-download {
-        background: #041562;
-        color: #fff;
-        font-size: 13px;
-        padding: 6px 16px;
-        border-radius: 6px;
-        border: none;
-    }
+    .btns { display: flex; justify-content: flex-start; gap: 10px; margin-top: 10px; }
+    .btns .clear { background: #dc3545; color: white; }
+    .btns .download { background: #0d6efd; color: white; }
+    .btns button:hover { opacity: 0.9; transform: translateY(-2px); transition: all 0.2s; }
 
     /* Tombol utama bawah */
-.btn-main {
-    font-size: 15px;
-    font-weight: 500;
-    padding: 10px 28px;
-    border-radius: 8px;
-    border: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Tombol Simpan */
-.btn-simpan {
-    background: #041562;
-    color: #fff;
-}
-.btn-simpan:hover {
-    background: #06268f;
-}
-
-/* Tombol Unduh */
-.btn-unduh {
-    background: #007a6e;
-    color: #fff;
-}
-.btn-unduh:hover {
-    background: #005f54;
-}
-
+    .btn-main {
+        font-size: 15px;
+        font-weight: 500;
+        padding: 10px 28px;
+        border-radius: 8px;
+        border: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    }
+    .btn-simpan { background: #041562; color: #fff; }
+    .btn-simpan:hover { background: #06268f; }
+    .btn-unduh { background: #007a6e; color: #fff; }
+    .btn-unduh:hover { background: #005f54; }
 </style>
 
 <div class="container mt-4">
@@ -165,42 +141,38 @@
         </div>
     </div>
 
-{{-- Bagian Tanda Tangan Asesor --}}
-<div class="card-custom mt-4">
-    <div class="section-header">
-        Tanda Tangan & Persetujuan
-    </div>
-    <div class="p-3" style="max-width:600px; margin:auto;">
-        <h6 class="fw-bold mb-3">Asesor</h6>
-
-        <div class="mb-3">
-            <label class="form-label">Nama Lengkap</label>
-            <input type="text" class="form-control" value="Reno Suswanto">
+    {{-- Bagian Tanda Tangan Asesor --}}
+    <div class="border rounded-3 p-3 mb-4 bg-white shadow-sm">
+        <div class="bg-light position-relative mb-3 px-3 py-2 fw-semibold text-dark rounded">
+            <span class="position-absolute top-0 start-0 h-100 bg-primary rounded-start" style="width:8px;"></span>
+            &nbsp;&nbsp;Tanda Tangan Asesor
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">No. Registrasi</label>
-            <input type="text" class="form-control" value="081237654">
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Tanggal</label>
-            <input type="date" class="form-control" value="2026-08-23">
-        </div>
-
-        <div class="mb-2">
-            <label class="form-label">Tanda Tangan</label>
-            <div class="signature-wrapper">
-                <canvas id="signatureAsesor" class="signature-pad"></canvas>
+        <div class="card">
+            <div class="card-title">Asesor</div>
+            <div class="mb-2">
+                <label for="nama-asesor">Nama Lengkap</label>
+                <input type="text" id="nama-asesor" class="form-control" value="Reno Suswanto">
+            </div>
+            <div class="mb-2">
+                <label for="no-asesor">No. Registrasi</label>
+                <input type="text" id="no-asesor" class="form-control" value="081237654">
+            </div>
+            <div class="mb-3">
+                <label for="tanggal-asesor">Tanggal</label>
+                <input type="date" id="tanggal-asesor" class="form-control" value="{{ date('Y-m-d') }}">
+            </div>
+            <div class="mb-3">
+                <label for="ttd-asesor">Tanda Tangan</label>
+                <canvas id="ttd-asesor" width="600" height="200"></canvas>
+                <input type="hidden" name="ttd_asesor" id="ttd_asesor_data">
+            </div>
+            <div class="btns">
+                <button type="button" class="btn clear" onclick="clearCanvas('ttd-asesor')">Hapus</button>
+                <button type="button" class="btn download" onclick="downloadTTD('ttd-asesor','nama-asesor','tanggal-asesor','tanda_tangan_asesor')">Unduh</button>
             </div>
         </div>
-
-        <div class="d-flex gap-2">
-            <button class="btn-clean" onclick="clearSignatureAsesor()">Bersihkan</button>
-            <button class="btn-download" onclick="downloadSignatureAsesor()">Unduh</button>
-        </div>
     </div>
-</div>
 
     {{-- Tombol Simpan & Unduh --}}
     <div class="text-end mb-5">
@@ -209,9 +181,10 @@
     </div>
 </div>
 
+{{-- Script tanda tangan umum --}}
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
 <script>
-    let signatureAsesor;
+    const signaturePads = {};
 
     function resizeCanvas(canvas) {
         const ratio = Math.max(window.devicePixelRatio || 1, 1);
@@ -220,37 +193,48 @@
         canvas.getContext("2d").scale(ratio, ratio);
     }
 
-    window.addEventListener("load", () => {
-        const canvas = document.getElementById("signatureAsesor");
-        resizeCanvas(canvas);
-        signatureAsesor = new SignaturePad(canvas, {
+    function initSignaturePad(id) {
+        const canvas = document.getElementById(id);
+        resizeCanvas(canvas); // Atur ukuran agar gambar muncul dengan benar
+        const signaturePad = new SignaturePad(canvas, {
             backgroundColor: 'rgba(255,255,255,1)',
-            penColor: 'black'
+            penColor: 'black',
         });
-    });
-
-    window.addEventListener("resize", () => {
-        const canvas = document.getElementById("signatureAsesor");
-        resizeCanvas(canvas);
-        signatureAsesor.clear();
-    });
-
-    function clearSignatureAsesor() {
-        signatureAsesor.clear();
+        signaturePads[id] = signaturePad;
     }
 
-    function downloadSignatureAsesor() {
-        if (signatureAsesor.isEmpty()) {
+    window.onload = function() {
+        initSignaturePad("signatureAsesi");
+        initSignaturePad("signatureAsesor");
+    };
+
+    window.onresize = function() {
+        // Supaya tanda tangan nggak hilang kalau resize window
+        for (const id in signaturePads) {
+            const canvas = document.getElementById(id);
+            resizeCanvas(canvas);
+        }
+    };
+
+    function clearSignature(id) {
+        signaturePads[id].clear();
+    }
+
+    function downloadSignature(id) {
+        if (signaturePads[id].isEmpty()) {
             alert("Tanda tangan masih kosong!");
             return;
         }
-        const dataURL = signatureAsesor.toDataURL();
+        const dataURL = signaturePads[id].toDataURL();
         const link = document.createElement("a");
         link.href = dataURL;
-        link.download = "signatureAsesor.png";
+        link.download = id + ".png";
         link.click();
     }
+
+ddocument.addEventListener('DOMContentLoaded', function () {
+    initCanvas('ttd-asesor', 'ttd_asesor_data');
+});
+
 </script>
-
-
 @endsection

@@ -88,37 +88,37 @@
     </div>
 
     <!-- Form -->
-    <div class="card-custom">
-        <div class="form-box">
-            <label for="judul">Judul / Skema</label>
-            <input type="text" id="judul" value="Okupasi" readonly>
-        </div>
-        <div class="form-box">
-            <label for="nomor">Nomor</label>
-            <input type="text" id="nomor" value="012876345" readonly>
-        </div>
-        <div class="form-box">
-            <label for="tuk">TUK</label>
-            <input type="text" id="tuk" value="SMKN 11 BANDUNG" readonly>
-        </div>
-        <div class="form-box">
-            <label for="assessor">Nama Assessor</label>
-            <input type="text" id="assessor" value="Reno Suswanto" readonly>
-        </div>
-        <div class="form-box">
-            <label for="asesi">Nama Asesi</label>
-            <input type="text" id="asesi" value="Hafiz Fadhillah" readonly>
-        </div>
-        <div class="form-box">
-            <label for="tanggal">Tanggal Asesmen</label>
-            <input type="date" id="tanggal" value="2026-08-23">
-        </div>
-
-        <form action="{{ route('asesor.wajar_alasan.form2') }}" method="GET">
-            <div class="btn-wrapper">
-                <button type="submit" class="btn-next">Selanjutnya</button>
-            </div>
-        </form>
+<div class="card-custom">
+    <div class="form-box">
+        <label for="judul">Judul / Skema</label>
+        <input type="text" id="judul" value="Okupasi" readonly>
+    </div>
+    <div class="form-box">
+        <label for="nomor">Nomor</label>
+        <input type="text" id="nomor" value="012876345" readonly>
+    </div>
+    <div class="form-box">
+        <label for="tuk">TUK</label>
+        <input type="text" id="tuk" value="SMKN 11 BANDUNG" readonly>
+    </div>
+    <div class="form-box">
+        <label for="assessor">Nama Assessor</label>
+        <input type="text" id="assessor" value="Reno Suswanto" readonly>
+    </div>
+    <div class="form-box">
+        <label for="asesi">Nama Asesi</label>
+        <input type="text" id="asesi" value="Hafiz Fadhillah" readonly>
+    </div>
+    <div class="form-box">
+        <label for="tanggal">Tanggal Asesmen</label>
+        <input type="date" id="tanggal" value="2026-08-23">
     </div>
 </div>
+
+<!-- Tombol di luar kotak -->
+<form action="{{ route('asesor.wajar_alasan.form2') }}" method="GET">
+    <div class="btn-wrapper">
+        <button type="submit" class="btn-next">Selanjutnya</button>
+    </div>
+</form>
 @endsection

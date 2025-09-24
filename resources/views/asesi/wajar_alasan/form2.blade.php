@@ -240,6 +240,16 @@
     margin-bottom: 24px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
+
+/* Header Potensi Asesi */
+.potensi-header {
+    background: #07258a !important; /* biru tua */
+    color: #fff;
+}
+.potensi-header h5 {
+    color: #fff !important;
+}
+
 .asesmen-header {
     background: #eaf1ff;
     padding: 10px 16px;
@@ -249,6 +259,7 @@
     display: flex;
     align-items: center;
 }
+
 .header-line {
     position: absolute;
     left: 0; top: 0; bottom: 0;
@@ -264,13 +275,32 @@
     color: #333;
 }
 .asesmen-body { padding: 16px 20px; }
-.panduan-item { display:flex; align-items:flex-start; margin-bottom:10px; }
-.panduan-number {
-    background:#2874c9; color:#fff; border-radius:50%;
-    width:24px; height:24px; text-align:center; line-height:24px;
-    margin-right:12px; font-size:12px; font-weight:600;
+.panduan-item { 
+    display:flex; 
+    align-items:flex-start; 
+    margin-bottom:10px; 
 }
-.panduan-text { font-size:13px; line-height:1.6; }
+
+.panduan-number {
+    background: linear-gradient(135deg, #2874c9, #1e56a0); /* gradasi biru */
+    color:#fff; 
+    border-radius:50%;
+    width:28px; 
+    height:28px; 
+    text-align:center; 
+    line-height:28px;
+    margin-right:12px; 
+    font-size:13px; 
+    font-weight:600;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* biar mirip timbul */
+}
+
+.panduan-text { 
+    font-size:13px; 
+    line-height:1.6; 
+}
+
+
 .potensi-item {
     display:flex; align-items:flex-start; gap:10px;
     padding:12px 15px; border-bottom:1px solid #ddd;
@@ -282,8 +312,24 @@
     cursor:pointer; margin-top:2px;
 }
 .potensi-text { flex:1; color:#333; }
-.asesmen-table { font-size:13px; }
-.asesmen-table th { font-weight:600; text-align:center; font-size:13px; }
+.asesmen-table thead th {
+    background-color: #0b2c61; /* biru tua */
+    color: #fff;
+    text-align: center;
+    vertical-align: middle;
+    font-weight: 600;
+    font-size: 13px;
+    border: 1px solid #fff; /* garis pemisah putih antar kolom */
+}
+
+/* rounded di ujung kiri-kanan */
+.asesmen-table thead th:first-child {
+    border-top-left-radius: 8px;
+}
+.asesmen-table thead th:last-child {
+    border-top-right-radius: 8px;
+}
+
 
 /* >>> Tambahan CSS baru <<< */
 
@@ -399,6 +445,28 @@
 .btn-ok:hover {
     background: #06268f;
 }
+
+/* Tombol Selanjutnya */
+.btn-primary {
+    background-color: #07258a !important;
+    border: none;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #041a5f !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
 
 </style>
 
