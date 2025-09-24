@@ -72,10 +72,10 @@
                     <table class="table table-bordered align-middle">
                         <thead class="table-light">
                             <tr>
-                                <th>No</th>
-                                <th>Kode Unit</th>
-                                <th>Judul Unit</th>
-                                <th>Standar Kompetensi Kerja</th>
+                                <th style="width:2%;">No</th>
+                                <th style="width:8%; text-align:center;">Kode Unit</th>
+                                <th style="width:15%;">Judul Unit</th>
+                                <th style="width:8%;">Standar Kompetensi Kerja</th>
                             </tr>
                         </thead>
                         <tbody id="unitTable">
@@ -221,7 +221,7 @@ document.getElementById('skemaSelect').addEventListener('change', function () {
                     tbody.innerHTML += `
                         <tr>
                             <td>${i + 1}</td>
-                            <td>${u.kode_unit}</td>
+                            <td style="text-align:center;">${u.kode_unit}</td>
                             <td>${u.judul_unit}</td>
                             <td>${u.standar_kompetensi}</td>
                         </tr>`;

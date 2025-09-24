@@ -1,200 +1,114 @@
-@extends('layouts.master')
+@extends('master')
 
-@section('title', 'Asesmen Mandiri')
+@section('title', 'Tanda Tangan Asesi')
 
-@section('content')
-<body>
-    <div class="container">
-        <!-- Unit Kompetensi 1 -->
-        <div class="unit-header">
-            <h3>Unit Kompetensi 3</h3>
-            <h3>Kode Unit :  J.59MTM00.027.1<br>
-               Judul Unit : Mengumpulkan Asset Multimedia</h3>
-        </div>
+@section('konten')
+<div class="container my-5">
+    <div class="ttd-container">
+        <div class="ttd-header">Tanda Tangan Asesi</div>
+        <div class="ttd-card">
+            <div class="ttd-card-title">Asesi</div>
+            <form>
+                <label for="nama-asesi" class="ttd-label">Nama Lengkap</label>
+                <input type="text" id="nama-asesi" class="ttd-input" placeholder="Masukkan nama lengkap asesi">
 
-        <div class="question-box">
-            <div class="question-title">1. Menyusun teknis pengelolaan konten</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Elemen</th>
-                        <th>K</th>
-                        <th>BK</th>
-                        <th>Bukti</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>
-                            <div class="elemen-list">
-                                <div class="elemen-item">1.1 Personil pengelola asset dikonfirmasi.</div>
-                                <div class="elemen-item">1.2 Sistem penamaan file yang berdasarkan standar konvensi dan protocol.</div>
-                                <div class="elemen-item">1.3 Sumber & review penyimpanan dan sistem backup ditetapkan.</div>
-                            </div>
-                        </td>
-                        <td><input type="radio" name="q5" value="K"></td>
-                        <td><input type="radio" name="q5" value="BK"></td>
-                        <td>
-                            <label class="upload-btn">
-                                Pilih
-                                <input type="file" name="bukti_q5" style="display: none;" onchange="handleFileUpload(event, 'preview_q5')">
+                <label for="tanggal-asesi" class="ttd-label">Tanggal</label>
+                <input type="date" id="tanggal-asesi" class="ttd-input">
 
-                                <script src="{{ asset('assets/js/asesmen.js') }}"></script>
-                            </label>
-                            <div class="preview-box"></div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                <label for="ttd-asesi" class="ttd-label">Tanda Tangan</label>
+                <canvas id="ttd-asesi" class="ttd-canvas" width="400" height="200" style="border:1px solid #ccc;"></canvas>
 
-        <div class="question-box">
-            <div class="question-title">2. Membuat strategi pencarian</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Elemen</th>
-                        <th>K</th>
-                        <th>BK</th>
-                        <th>Bukti</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>2</td>
-                        <td>
-                            <div class="elemen-list">
-                                <div class="elemen-item">2.1 Pencarian dokumen dan asset media diatur.</div>
-                                <div class="elemen-item">2.2 Konvensi untuk mencatat kemajuan dan lokasi asset media ditetapkan.</div>
-                                <div class="elemen-item">2.3 Strategi pencarian dan pencatatan asset media dikembangkan.</div>
-                                <div class="elemen-item">2.4 Sistem pengelolaan asset media disosialisaikan ke anggota tim saat sistem diterapkan.</div>
-                            </div>
-                        </td>
-                        <td><input type="radio" name="q6" value="K"></td>
-                        <td><input type="radio" name="q6" value="BK"></td>
-                        <td>
-                            <label class="upload-btn">
-                                Pilih
-                                <input type="file" name="bukti_q6" style="display: none;" onchange="handleFileUpload(event, 'preview_q6')">
-
-                                <script src="{{ asset('assets/js/asesmen.js') }}"></script>
-                            </label>
-                            <div class="preview-box"></div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                <div class="ttd-btns mt-3">
+                    <button type="button" class="ttd-btn ttd-clear" onclick="clearCanvas('ttd-asesi')">Hapus</button>
+                    <button type="button" class="ttd-btn ttd-download" onclick="downloadTTD('ttd-asesi','nama-asesi','tanggal-asesi')">Unduh</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <div class="container">
-        <!-- Unit Kompetensi 2 -->
-        <div class="unit-header">
-            <h3>Unit Kompetensi 4</h3>
-            <h3>Kode Unit : J.59MTM00.028.1<br>
-               Judul Unit : Membuat Data based Multimedia</h3>
-        </div>
-
-        <div class="question-box">
-            <div class="question-title">1. Membuat basis data perangkat multimedia</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Elemen</th>
-                        <th>K</th>
-                        <th>BK</th>
-                        <th>Bukti</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>
-                            <div class="elemen-list">
-                                <div class="elemen-item">1.1 Sumber asset media sesuai prosedur didokumentasikan.</div>
-                                <div class="elemen-item">1.2 Rincian dari berbagai output didokumentasikan sesuai informasi teknis, hak cipta dan perizinan.</div>
-                                <div class="elemen-item">1.3 Persyaratan pengarsipan ditentukan.</div>
-                            </div>
-                        </td>
-                        <td><input type="radio" name="q7" value="K"></td>
-                        <td><input type="radio" name="q7" value="BK"></td>
-                        <td>
-                            <label class="upload-btn">
-                                Pilih
-                                <input type="file" name="bukti_q7" style="display: none;" onchange="handleFileUpload(event, 'preview_q7')">
-
-                                <script src="{{ asset('assets/js/asesmen.js') }}"></script>
-                            </label>
-                            <div class="preview-box"></div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="question-box">
-            <div class="question-title">2. Menyelesaikan masalah yang dihadapi</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Elemen</th>
-                        <th>K</th>
-                        <th>BK</th>
-                        <th>Bukti</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>2</td>
-                        <td>
-                            <div class="elemen-list">
-                                <div class="elemen-item">2.1 Asset media dan informasi dicatat sesuai dengan sistem yang sudah mapan.</div>
-                                <div class="elemen-item">2.2 Status produk, prototype dan asset media diindentifikasi.</div>
-                                <div class="elemen-item">2.3 Menanggapi dan menyelesaikan permasalahan yang dihadapi saat sistem diimplementasikan.</div>
-                            </div>
-                        </td>
-                        <td><input type="radio" name="q8" value="K"></td>
-                        <td><input type="radio" name="q8" value="BK"></td>
-                        <td>
-                            <label class="upload-btn">
-                                Pilih
-                                <input type="file" name="bukti_q8" style="display: none;" onchange="handleFileUpload(event, 'preview_q8')">
-
-                                <script src="{{ asset('assets/js/asesmen.js') }}"></script>
-                            </label>
-                            <div class="preview-box"></div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+    <!-- Tombol Aksi di bawah form -->
+    <div class="action-buttons mt-4 text-end">
+        <a href="{{ route('asesi.asesmen_mandiri.form2') }}" class="btn-back">Kembali</a>
+        <button type="submit" class="btn-submit">Simpan & Kirim</button>
     </div>
+</div>
 
-    <!-- Tombol Aksi -->
-    <div class="container button-group">
-        <a href="{{ route('asesmen') }}" class="btn-back">Kembali</a>
-        <a href="{{ route('asesmen3') }}" class="btn-next" >Simpan dan Lanjut</a>
-    </div>
+<style>
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
 
-    <div id="imageModal" class="modal">
-        <span class="close" onclick="closeImageModal()">&times;</span>
-        <img class="modal-content" id="modalImage">
-    </div>
+.btn-back, .btn-submit {
+    padding: 10px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
 
-    <script>
-        function toggleSidebar() {
-            document.getElementById("sidebar").classList.toggle("collapsed");
-            document.getElementById("content").style.marginLeft =
-                document.getElementById("sidebar").classList.contains("collapsed") ? "70px" : "240px";
-        }
-    </script>
+.btn-back {
+    background-color: #6c757d; /* abu-abu */
+}
 
-    <script src="{{ asset('assets/js/asesmen.js') }}"></script>
-</body>
-</html>
+.btn-submit {
+    background-color: #007bff; /* biru */
+}
+</style>
+
+<script>
+    // Fungsi gambar di canvas
+    function initSignature(canvasId) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext("2d");
+        let drawing = false;
+
+        canvas.addEventListener("mousedown", (e) => {
+            drawing = true;
+            ctx.beginPath();
+            ctx.moveTo(e.offsetX, e.offsetY);
+        });
+
+        canvas.addEventListener("mousemove", (e) => {
+            if (drawing) {
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.stroke();
+            }
+        });
+
+        canvas.addEventListener("mouseup", () => {
+            drawing = false;
+        });
+
+        canvas.addEventListener("mouseleave", () => {
+            drawing = false;
+        });
+    }
+
+    // Hapus tanda tangan
+    function clearCanvas(canvasId) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Unduh tanda tangan
+    function downloadTTD(canvasId, nameId, dateId) {
+        const canvas = document.getElementById(canvasId);
+        const nama = document.getElementById(nameId).value || "Asesi";
+        const tanggal = document.getElementById(dateId).value || new Date().toISOString().split('T')[0];
+        const link = document.createElement("a");
+        link.download = `TTD_${nama}_${tanggal}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+    }
+
+    // Jalankan saat halaman load
+    window.onload = function () {
+        initSignature("ttd-asesi");
+    };
+</script>
 @endsection

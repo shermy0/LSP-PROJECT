@@ -1,8 +1,8 @@
-@extends('layouts.master')
+@extends('master')
 
 @section('title', 'Asesmen Mandiri')
 
-@section('content')
+@section('konten')
 <div class="container">
 
     <!-- Breadcrumb -->

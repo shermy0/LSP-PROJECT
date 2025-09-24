@@ -1,8 +1,8 @@
-@extends('layouts.master')
+@extends('master')
 
 @section('title', 'Asesmen Mandiri')
 
-@section('content')
+@section('konten')
     <div class="container">
 
         @foreach($units as $unit)
@@ -67,7 +67,7 @@
 
         <!-- Tombol Aksi -->
         <div class="button-group">
-            <a href="{{ route('index-asesi') }}" class="btn-back">Kembali</a>
+            <a href="{{ route('asesi.asesmen_mandiri.form1') }}" class="btn-back">Kembali</a>
             <button type="submit" class="btn-next">Simpan dan Lanjut</button>
         </div>
     </div>
