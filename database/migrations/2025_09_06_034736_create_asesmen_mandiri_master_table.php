@@ -12,12 +12,24 @@ return new class extends Migration
             $table->id('id_asesmen_mandiri');
             $table->unsignedBigInteger('id_permohonan');
             $table->unsignedBigInteger('id_asesi');
-            $table->unsignedBigInteger('id_asesor');
+            $table->unsignedBigInteger('id_asesor')->nullable(); // ✅ sekarang nullable
             $table->enum('rekomendasi', ['Dapat Dilanjutkan', 'Tidak Dapat Dilanjutkan'])->nullable();
+            $table->timestamps();
 
-            $table->foreign('id_permohonan')->references('id_permohonan')->on('permohonan')->onDelete('cascade');
-            $table->foreign('id_asesi')->references('id_asesi')->on('asesi')->onDelete('cascade');
-            $table->foreign('id_asesor')->references('id_asesor')->on('asesor')->onDelete('cascade');
+            $table->foreign('id_permohonan')
+                ->references('id_permohonan')
+                ->on('permohonan')
+                ->onDelete('cascade');
+
+            $table->foreign('id_asesi')
+                ->references('id_asesi')
+                ->on('asesi')
+                ->onDelete('cascade');
+
+            $table->foreign('id_asesor')
+                ->references('id_asesor')
+                ->on('asesor')
+                ->onDelete('cascade');
         });
     }
 
