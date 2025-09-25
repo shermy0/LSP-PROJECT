@@ -69,7 +69,6 @@
                         <label class="fw-bold soal-number">{{ $index+1 }}.</label>
                         <label class="soal-text">{{ $p->isi_pertanyaan }}</label>
 
-
                         {{-- Foto pertanyaan jika ada --}}
                         @if($p->file_path && in_array(strtolower($p->file_type), ['jpg','jpeg','png']))
                             <div class="mt-2">
@@ -80,6 +79,7 @@
                             </div>
                         @endif
                         
+                        {{-- Opsi Jawaban --}}
                         @foreach($p->opsiJawaban as $opsi)
                             <div class="form-check mt-2">
                                 <input type="radio"
@@ -87,12 +87,21 @@
                                     value="{{ $opsi->id_opsi }}"
                                     {{ $jawabanUser == $opsi->id_opsi ? 'checked' : '' }}>
                                 <label class="form-check-label">
-                                    {{ $opsi->kode_opsi }}. {{ $opsi->isi_opsi }}
+                                    {{ $opsi->kode_opsi }}. 
+                                    @if(str_contains($opsi->isi_opsi, 'uploads/opsi_jawaban'))
+                                        <img src="{{ asset('storage/'.$opsi->isi_opsi) }}" 
+                                             alt="Opsi {{ $opsi->kode_opsi }}" 
+                                             class="img-thumbnail" 
+                                             style="max-height:100px;">
+                                    @else
+                                        {{ $opsi->isi_opsi }}
+                                    @endif
                                 </label>
                             </div>
                         @endforeach
                     </div>
 
+                    {{-- Navigasi --}}
                     <div class="mt-4 d-flex justify-content-between navigation-buttons">
                         @if($index > 0)
                             <button type="button" class="btn btn-secondary prev-btn">
@@ -165,7 +174,6 @@ let form = document.getElementById("jawabanForm");
 function updateCountdown() {
     let minutes = Math.floor(totalSeconds / 60);
     let seconds = totalSeconds % 60;
-
     countdownEl.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 
     if (totalSeconds <= 0) {
@@ -189,8 +197,8 @@ let timerInterval = setInterval(updateCountdown, 1000);
 </script>
 @endif
 
-
 <script>
+// Navigasi Soal
 document.addEventListener('DOMContentLoaded', function () {
     const soalItems = document.querySelectorAll('.soal-item');
     const navButtons = document.querySelectorAll('.soal-nav');

@@ -25,22 +25,22 @@
                     @endif
                 @endif
 
-                <!-- Opsi Jawaban -->
+               <!-- Opsi Jawaban -->
                 <h6 class="fw-bold mt-3">Opsi Jawaban:</h6>
                 <div class="row">
                     @foreach($p->opsiJawaban as $opsi)
-                        <div class="col-md-6 mb-2">
-                            <div class="input-group">
-                                <span class="input-group-text {{ $opsi->benar ? 'bg-success text-white' : '' }}">
-                                    {{ $opsi->kode_opsi }}
-                                </span>
-                                <input type="text" class="form-control" value="{{ $opsi->isi_opsi }}" readonly>
-                                @if($opsi->benar)
-                                    <span class="input-group-text bg-success text-white">
-                                        <i class="fas fa-check"></i>
-                                    </span>
-                                @endif
-                            </div>
+                        <div class="mb-2">
+                            <strong>{{ $opsi->kode_opsi }}.</strong>
+                            @if(str_contains($opsi->isi_opsi, 'uploads/opsi_jawaban'))
+                                {{-- Jika opsi adalah gambar --}}
+                                <img src="{{ asset('storage/'.$opsi->isi_opsi) }}" class="img-thumbnail" style="max-height: 100px;">
+                            @else
+                                {{-- Jika opsi adalah teks --}}
+                                {{ $opsi->isi_opsi }}
+                            @endif
+                            @if($opsi->benar)
+                                <span class="badge bg-success">Kunci Jawaban</span>
+                            @endif
                         </div>
                     @endforeach
                 </div>

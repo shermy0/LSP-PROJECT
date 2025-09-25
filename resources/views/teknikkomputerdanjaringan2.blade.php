@@ -5,20 +5,20 @@
     <h1 class="fw-bold">Form Asesmen</h1>
     <div class="text-center mb-3">
         <h5 class="center-underline">
-             PRAMUNIAGA - AsesKom
+             TEKNIK KOMPUTER DAN JARINGAN 2 - AsesKom
         </h5>
     </div>
 
-     <div class="accordion mt-4" id="formAccordion">
+    <div class="accordion mt-4" id="formAccordion">
         <!-- Item 1 -->
         <div class="accordion-item mb-2">
             <h2 class="accordion-header p-3 border rounded">
                 <i class="fa-solid fa-stop me-2"></i> Pertanyaan Pilihan Ganda
             </h2>
         </div>
-        
+
         <!-- Item 2 -->
-       <div class="accordion-item mb-2">
+        <div class="accordion-item mb-2">
     <a href="{{ route('formasesmen.pertanyaanEsai', ['id_skema' => $skema->id_skema]) }}" 
        class="accordion-header d-block p-3 border rounded text-dark text-decoration-none">
         <i class="fa-solid fa-stop me-2"></i> Pertanyaan Esai
@@ -28,12 +28,9 @@
 
 
         <!-- Item 3 -->
-               <div class="accordion-item mb-2">
+        <div class="accordion-item mb-2">
             <h2 class="accordion-header p-3 border rounded">
-                <a href="{{ route('formasesmen.pertanyaanLisan', ['id_skema' => $skema->id_skema]) }}" 
-                class="text-dark text-decoration-none">
-                    <i class="fa-solid fa-stop me-2"></i> Pertanyaan Lisan
-                </a>
+                <i class="fa-solid fa-stop me-2"></i> Pertanyaan Lisan
             </h2>
         </div>
 
