@@ -70,26 +70,54 @@ Route::get('/', function () {
     return view('asesi.index');
 })->name('index');
 
+Route::get('/indexcss', function () {
+    return view('asesi.index_css');
+})->name('indexcss');
+
 Route::get('/asesmen', function () {
     return view('asesi.asesmen');
 })->name('asesmen');
+
+Route::get('/asesmencss', function () {
+    return view('asesi.asesmen_css');
+})->name('asesmencss');
 
 Route::get('/asesmen2', function () {
     return view('asesi.asesmen2');
 })->name('asesmen2');
 
+Route::get('/asesmen2css', function () {
+    return view('asesi.asesmen2_css');
+})->name('asesmen2css');
+
 Route::get('/asesmen3', function () {
     return view('asesi.asesmen3');
 })->name('asesmen3');
+
+Route::get('/asesmen3css', function () {
+    return view('asesi.asesmen3_css');
+})->name('asesmen3css');
 
 Route::get('/index', function () {
     return view('asesor.index');
 })->name('index');
 
+Route::get('/indexasesor', function () {
+    return view('asesor.index_css');
+})->name('indexasesor');
+
 Route::get('/verifasesmen', function () {
     return view('asesor.verifasesmen');
 })->name('verifasesmen');
 
+Route::get('/verifasesmencss', function () {
+    return view('asesor.verifasesmen_css');
+})->name('verifasesmencss');
+
 Route::get('/verifasesmen2', function () {
     return view('asesor.verifasesmen2');
 })->name('verifasesmen2');
+
+Route::get('/verifasesmen2css', function () {
+    return view('asesor.verifasesmen2_css');
+})->name('verifasesmen2css');
