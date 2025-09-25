@@ -49,8 +49,8 @@
             @endif
 
             @if(Auth::user()->role == 'asesi')
-                <li><i class="bi bi-house-door-fill"></i><a href="#">Dashboard</a></li>
-                <li><i class="bi bi-pencil-square"></i><a href="#">Form Asesmen </a></li>
+                <li><i class="bi bi-house-door-fill"></i><a href="{{ route('dashboard.asesi') }}">Dashboard</a></li>
+                <li><i class="bi bi-pencil-square"></i><a href="{{ route('asesi.permohonan.form1') }}">Form Asesmen </a></li>
                 <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
             @endif
         </ul>
