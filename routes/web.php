@@ -16,6 +16,7 @@ use App\Http\Controllers\ModifikasiController;
 use App\Http\Controllers\FormAsesmenController;
 use App\Http\Controllers\Asesi\PermohonanController;
 use App\Http\Controllers\Admin\Form1AdminController;
+use App\Http\Controllers\OpsiJawabanController;
 
 
 Route::get('/pembuatan/{id_pembuatan}', [FormAsesmenController::class, 'showPembuatan'])
@@ -94,6 +95,7 @@ Route::get('/officeadministative', [FormAsesmenController::class, 'officeadminis
 Route::get('/pemogramanjunior', [FormAsesmenController::class, 'pemogramanjunior'])->name('formasesmen.pemogramanjunior');
 
 Route::get('/juniortechnicalsupport', [FormAsesmenController::class, 'juniortechnicalsupport'])->name('formasesmen.juniortechnicalsupport');
+Route::get('/juniortechnicalsupport_asesi', [FormAsesmenController::class, 'juniortechnicalsupport_asesi'])->name('formasesmen.juniortechnicalsupport_asesi');
 
 Route::get('/junioroperatordesigngrafis', [FormAsesmenController::class, 'junioroperatordesigngrafis'])->name('formasesmen.junioroperatordesigngrafis');
 
@@ -125,17 +127,17 @@ Route::get('/pertanyaan/lisan', [PertanyaanController::class, 'createLisan'])->n
 Route::post('/pertanyaan/lisan', [PertanyaanController::class, 'storeLisan'])->name('pertanyaan.lisan.store');
 
 // Pilihan Ganda
-Route::get('/pertanyaan/pg', [PertanyaanController::class, 'createPG'])->name('pertanyaan.pg.create');
-Route::post('/pertanyaan/pg', [PertanyaanController::class, 'storePG'])->name('pertanyaan.pg.store');
 
 /*
 |--------------------------------------------------------------------------|
 | ROUTE JAWABAN                                                            |
 |--------------------------------------------------------------------------|
 */
-
 Route::prefix('jawaban')->group(function () {
-    Route::get('/{id_skema}', [JawabanController::class, 'index'])->name('jawaban.index');
+    // Tampilkan pertanyaan sesuai skema + jenis soal
+    Route::get('/{idSkema}/{jenis}', [JawabanController::class, 'show']);
+
+    // Simpan jawaban
     Route::post('/store', [JawabanController::class, 'store'])->name('jawaban.store');
 });
 
@@ -299,3 +301,31 @@ Route::get('/form-asesmen/{id_skema}/kelompok', [PertanyaanController::class, 'k
 Route::get('/form-asesmen/{id_skema}/kelompok-essai', [PertanyaanController::class, 'kelompokPekerjaan'])
     ->defaults('jenis', 'essai')
     ->name('pertanyaan.essai.kelompok');
+
+
+    Route::get('/form-asesmen/pertanyaan-PG/{id_skema}', [FormAsesmenController::class, 'pertanyaanPG'])
+    ->name('formasesmen.pertanyaanPG');
+
+// Routes untuk Opsi Jawaban
+Route::prefix('opsi-jawaban')->group(function () {
+    Route::post('/store', [OpsiJawabanController::class, 'store'])->name('opsi-jawaban.store');
+    Route::post('/store-multiple', [OpsiJawabanController::class, 'storeMultiple'])->name('opsi-jawaban.store-multiple');
+    Route::get('/pertanyaan/{id}', [OpsiJawabanController::class, 'getByPertanyaan'])->name('opsi-jawaban.by-pertanyaan');
+    Route::put('/update/{id}', [OpsiJawabanController::class, 'update'])->name('opsi-jawaban.update');
+    Route::delete('/delete/{id}', [OpsiJawabanController::class, 'destroy'])->name('opsi-jawaban.destroy');
+    Route::post('/update-kunci', [OpsiJawabanController::class, 'updateKunciJawaban'])->name('opsi-jawaban.update-kunci');
+});
+
+// Routes untuk Pertanyaan Pilihan Ganda
+Route::get('/pertanyaan/{id_skema}/kelompok-pg', [PertanyaanController::class, 'kelompokPekerjaan'])
+->name('pertanyaan.pg.kelompok')
+->defaults('jenis', 'pilihan_ganda');
+
+Route::get('/pertanyaan/pg/create', [PertanyaanController::class, 'createPG'])->name('pertanyaan.pg.create');
+Route::post('/pertanyaan/pg/store', [PertanyaanController::class, 'storePG'])->name('pertanyaan.pg.store');
+Route::get('/pertanyaan/pg/{id_skema}/{id_kelompok}/crud', [PertanyaanController::class, 'crudPG'])->name('pg.crud');
+
+// Tambahan untuk edit/update/destroy
+Route::get('/pertanyaan/pg/{id}/edit', [PertanyaanController::class, 'editPG'])->name('pertanyaan.pg.edit');
+Route::put('/pertanyaan/pg/{id}', [PertanyaanController::class, 'updatePG'])->name('pertanyaan.pg.update');
+Route::delete('/pertanyaan/pg/{id}', [PertanyaanController::class, 'destroyPG'])->name('pertanyaan.pg.destroy');

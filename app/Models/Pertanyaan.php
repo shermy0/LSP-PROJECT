@@ -41,4 +41,9 @@ class Pertanyaan extends Model
     {
         return $this->belongsTo(KelompokPekerjaan::class, 'id_kelompok', 'id_kelompok');
     }
+
+    public function opsiJawaban()
+    {
+        return $this->hasMany(OpsiJawaban::class, 'id_pertanyaan');
+    }
 }
