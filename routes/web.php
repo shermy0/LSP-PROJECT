@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DashboardController;
@@ -13,6 +14,10 @@ use App\Http\Controllers\SkemaController;
 use App\Models\UnitKompetensi;
 use App\Http\Controllers\ModifikasiController;
 use App\Http\Controllers\FormAsesmenController;
+use App\Http\Controllers\Asesi\PermohonanController;
+use App\Http\Controllers\Admin\Form1AdminController;
+use App\Http\Controllers\OpsiJawabanController;
+
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\DataPesertaUjiController;
 use App\Http\Controllers\ProfileAsesorController;
@@ -36,11 +41,12 @@ Route::put('/pertanyaan/esai/{id}', [PertanyaanController::class, 'updateEsai'])
 // Hapus
 Route::delete('/pertanyaan/esai/{id}', [PertanyaanController::class, 'destroyEsai'])->name('pertanyaan.esai.destroy');
 
+
 // CRUD Lisan
 Route::prefix('pertanyaan/lisan')->name('lisan.')->group(function () {
     Route::get('/create', [PertanyaanController::class, 'createLisan'])->name('create');
     Route::post('/store', [PertanyaanController::class, 'storeLisan'])->name('store');
-    Route::get('/{id_skema}/crud', [PertanyaanController::class, 'crudLisan'])->name('crud');
+    Route::get('/{id_skema}/{id_kelompok}/crud', [PertanyaanController::class, 'crudLisan'])->name('crud');
     Route::get('/{id}/edit', [PertanyaanController::class, 'editLisan'])->name('edit');
     Route::put('/{id}', [PertanyaanController::class, 'updateLisan'])->name('update');
     Route::delete('/{id}', [PertanyaanController::class, 'destroyLisan'])->name('destroy');
@@ -59,6 +65,7 @@ Route::get('/form-asesmen/pertanyaan-lisan/{id_skema}', [FormAsesmenController::
     ->name('formasesmen.pertanyaanLisan');
 Route::get('/lisan/{id_skema}/crud', [PertanyaanController::class, 'crudLisan'])
     ->name('lisan.crud');
+
 
     
 // Form input esai via query string (jumlah & id_skema)
@@ -106,6 +113,7 @@ Route::get('/officeadministative', [FormAsesmenController::class, 'officeadminis
 Route::get('/pemogramanjunior', [FormAsesmenController::class, 'pemogramanjunior'])->name('formasesmen.pemogramanjunior');
 
 Route::get('/juniortechnicalsupport', [FormAsesmenController::class, 'juniortechnicalsupport'])->name('formasesmen.juniortechnicalsupport');
+Route::get('/juniortechnicalsupport_asesi', [FormAsesmenController::class, 'juniortechnicalsupport_asesi'])->name('formasesmen.juniortechnicalsupport_asesi');
 
 Route::get('/junioroperatordesigngrafis', [FormAsesmenController::class, 'junioroperatordesigngrafis'])->name('formasesmen.junioroperatordesigngrafis');
 
@@ -137,8 +145,6 @@ Route::get('/pertanyaan/lisan', [PertanyaanController::class, 'createLisan'])->n
 Route::post('/pertanyaan/lisan', [PertanyaanController::class, 'storeLisan'])->name('pertanyaan.lisan.store');
 
 // Pilihan Ganda
-Route::get('/pertanyaan/pg', [PertanyaanController::class, 'createPG'])->name('pertanyaan.pg.create');
-Route::post('/pertanyaan/pg', [PertanyaanController::class, 'storePG'])->name('pertanyaan.pg.store');
 
 
 
@@ -169,9 +175,11 @@ Route::get('/form-asesmen/{id_skema}/kelompok-demonstrasi',
 | ROUTE JAWABAN                                                            |
 |--------------------------------------------------------------------------|
 */
-
 Route::prefix('jawaban')->group(function () {
-    Route::get('/{id_skema}', [JawabanController::class, 'index'])->name('jawaban.index');
+    // Tampilkan pertanyaan sesuai skema + jenis soal
+    Route::get('/{idSkema}/{jenis}', [JawabanController::class, 'show']);
+
+    // Simpan jawaban
     Route::post('/store', [JawabanController::class, 'store'])->name('jawaban.store');
 });
 
@@ -202,6 +210,8 @@ Route::get('/formasesmen', [FormAsesmenController::class, 'index'])->name('forma
 */
 
 // Login
+
+// ================== AUTH ==================
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -272,25 +282,48 @@ Route::middleware(['auth', 'role:asesi'])->group(function () {
 |--------------------------------------------------------------------------|
 */
 //dashboard
+// ================== DASHBOARD ==================
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Admin
-    Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('dashboard.admin');
-
-    // Asesi
-    // Asesi
-Route::get('/asesi/dashboard', [DashboardController::class, 'asesi'])->name('asesi.dashboard');
-
-
-    // Asesor
+    Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
+    Route::get('/asesi/dashboard', [DashboardController::class, 'asesi'])->name('asesi.dashboard');
     Route::get('/asesor/dashboard', [DashboardController::class, 'asesor'])->name('dashboard.asesor');
 });
 
 Route::get('/form-mapa01', [SkemaController::class, 'formMapa01'])->name('form.mapa01');
 
 
-// Logout
+    // ================== FORM ASESMEN (untuk Asesor) ==================
+    Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('formperencanaan');
+    Route::get('/formasesmen', [FormAsesmenController::class, 'index'])->name('formasesmen');
+    Route::get('/pramuniaga', [FormAsesmenController::class, 'pramuniaga'])->name('formasesmen.pramuniaga');
+    Route::get('/officeadministative', [FormAsesmenController::class, 'officeadministative'])->name('formasesmen.officeadministative');
+    Route::get('/pemogramanjunior', [FormAsesmenController::class, 'pemogramanjunior'])->name('formasesmen.pemogramanjunior');
+    Route::get('/juniortechnicalsupport', [FormAsesmenController::class, 'juniortechnicalsupport'])->name('formasesmen.juniortechnicalsupport');
+    Route::get('/junioroperatordesigngrafis', [FormAsesmenController::class, 'junioroperatordesigngrafis'])->name('formasesmen.junioroperatordesigngrafis');
+    Route::get('/akuntansikeuanganII', [FormAsesmenController::class, 'akuntansikeuanganII'])->name('formasesmen.akuntansikeuanganII');
+
+    // ================== FORM PERMOHONAN (untuk Asesi) ==================
+    Route::prefix('asesi/permohonan')->name('asesi.permohonan.')->group(function () {
+        Route::get('/form1', [PermohonanController::class, 'form1'])->name('form1');
+        Route::post('/store', [PermohonanController::class, 'store'])->name('store');
+        Route::get('/form2', [PermohonanController::class, 'form2'])->name('form2');
+        Route::post('/store-dokumen', [PermohonanController::class, 'storeDokumen'])->name('storeDokumen');
+    });
+
+    // API get skema & unit kompetensi (AJAX)
+    Route::get('/get-skema/{id}', [PermohonanController::class, 'getSkema'])->name('get.skema');
+
+    // ================== ADMIN (FR.APL.01 - Form1) ==================
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::prefix('permohonan')->name('permohonan.')->group(function () {
+            Route::get('/', [Form1AdminController::class, 'index'])->name('index');
+            Route::get('/{user_id}', [Form1AdminController::class, 'show'])->name('show');
+        });
+    });
+
+// ================== LOGOUT ==================
 Route::post('/logout', function () {
     Auth::logout();
     request()->session()->invalidate();
@@ -319,3 +352,31 @@ Route::prefix('profileasesor')->group(function () {
 Route::get('/form-asesmen/{id_skema}/kelompok-essai', [PertanyaanController::class, 'kelompokPekerjaan'])
     ->defaults('jenis', 'essai')
     ->name('pertanyaan.essai.kelompok');
+
+
+    Route::get('/form-asesmen/pertanyaan-PG/{id_skema}', [FormAsesmenController::class, 'pertanyaanPG'])
+    ->name('formasesmen.pertanyaanPG');
+
+// Routes untuk Opsi Jawaban
+Route::prefix('opsi-jawaban')->group(function () {
+    Route::post('/store', [OpsiJawabanController::class, 'store'])->name('opsi-jawaban.store');
+    Route::post('/store-multiple', [OpsiJawabanController::class, 'storeMultiple'])->name('opsi-jawaban.store-multiple');
+    Route::get('/pertanyaan/{id}', [OpsiJawabanController::class, 'getByPertanyaan'])->name('opsi-jawaban.by-pertanyaan');
+    Route::put('/update/{id}', [OpsiJawabanController::class, 'update'])->name('opsi-jawaban.update');
+    Route::delete('/delete/{id}', [OpsiJawabanController::class, 'destroy'])->name('opsi-jawaban.destroy');
+    Route::post('/update-kunci', [OpsiJawabanController::class, 'updateKunciJawaban'])->name('opsi-jawaban.update-kunci');
+});
+
+// Routes untuk Pertanyaan Pilihan Ganda
+Route::get('/pertanyaan/{id_skema}/kelompok-pg', [PertanyaanController::class, 'kelompokPekerjaan'])
+->name('pertanyaan.pg.kelompok')
+->defaults('jenis', 'pilihan_ganda');
+
+Route::get('/pertanyaan/pg/create', [PertanyaanController::class, 'createPG'])->name('pertanyaan.pg.create');
+Route::post('/pertanyaan/pg/store', [PertanyaanController::class, 'storePG'])->name('pertanyaan.pg.store');
+Route::get('/pertanyaan/pg/{id_skema}/{id_kelompok}/crud', [PertanyaanController::class, 'crudPG'])->name('pg.crud');
+
+// Tambahan untuk edit/update/destroy
+Route::get('/pertanyaan/pg/{id}/edit', [PertanyaanController::class, 'editPG'])->name('pertanyaan.pg.edit');
+Route::put('/pertanyaan/pg/{id}', [PertanyaanController::class, 'updatePG'])->name('pertanyaan.pg.update');
+Route::delete('/pertanyaan/pg/{id}', [PertanyaanController::class, 'destroyPG'])->name('pertanyaan.pg.destroy');

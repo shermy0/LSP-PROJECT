@@ -47,13 +47,4 @@
             @endforelse
         </div>
     @endisset
-
-{{-- Tombol Kembali --}}
-<div class="text-center mt-4">
-    <a href="{{ route('pertanyaan.lisan.kelompok', $skema->id_skema) }}" 
-       class="btn btn-primary fw-bold px-4">
-        Kembali ke Kelompok Pekerjaan
-    </a>
-</div>
-
 @endsection
