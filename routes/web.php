@@ -47,6 +47,7 @@ Route::post('/meninjau-asesmen/store', [SkemaController::class, 'store'])->name(
 // simpan dan lanjut
 Route::post('/formperencanaan', [PerencanaanController::class, 'simpan'])->name('formperencanaan');
 Route::post('/ninjau-asesmen-asesor', [PerencanaanController::class, 'simpanLanjut'])->name('ninjau_asesmen_asesor');
+Route::get('/ninjau-asesmen-asesor/{asesor_id}', [PerencanaanController::class, 'ninjauAsesmenAsesor'])->name('ninjau_asesmen_asesor.view');
 
 Route::get('/get-asesor/{skema_id}', [SkemaController::class, 'getAsesor']);
 // Logout

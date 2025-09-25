@@ -25,11 +25,13 @@
     <h5 style="text-align: left;">Asesor</h5>
     <div class="col-md-12">
         <label for="namaAsesor" class="form-label fw-semibold">Nama Asesor</label>
-        <input type="text" class="form-control" id="namaAsesor" placeholder="Nama Asesor">
+        <input type="text" class="form-control" value="{{ $asesor->nama_asesor }}" readonly>
+
     </div>
     <div class="col-md-12">
         <label for="nomorregistrasi" class="form-label fw-semibold">Nomor Registrasi</label>
-        <input type="text" class="form-control" id="nomorregistrasi" placeholder="Nomor Registrasi">
+        <input type="text" class="form-control" value="{{ $asesor->no_registrasi }}" readonly>
+
     </div>
     <div class="col-md-12">
         <label for="tanggalAsesmen" class="form-label fw-semibold">Tanggal Asesmen</label>

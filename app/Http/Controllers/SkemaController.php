@@ -27,6 +27,7 @@ class SkemaController extends Controller
     {
         MeninjauAsesmen::create([
             'id_asesmen' => $request->id_asesmen ?? 1,
+            'asesor_id' => $request->asesor_id,
 
             // Rencana Asesmen
             'rencana_valid' => $request->has('rencana_valid'),
@@ -78,8 +79,8 @@ class SkemaController extends Controller
             // Rekomendasi 2
             'rekomendasi2' => $request->rekomendasi2,
         ]);
-
-        return redirect()->route('ninjau_asesmen_asesor.view')
-            ->with('success', 'Data berhasil disimpan!');
+        return redirect()
+        ->route('ninjau_asesmen_asesor.view', ['asesor_id' => $request->asesor_id])
+        ->with('success', 'Data berhasil disimpan!');
     }
 }
