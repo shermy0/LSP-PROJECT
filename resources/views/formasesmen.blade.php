@@ -11,14 +11,12 @@
 
     <div class="accordion mt-4" id="formAccordion">
         @foreach($skema as $s)
-        <div class="accordion-item">
-            <h2 class="accordion-header">
+            <div class="accordion-item mb-2">
                 <a href="{{ route('formasesmen.show', ['id_skema' => $s->id_skema]) }}" 
-                   class="text-dark text-decoration-none d-block">
+                   class="accordion-header d-block p-3 border rounded text-dark text-decoration-none">
                     <i class="fa-solid fa-stop me-2"></i> {{ strtoupper($s->nama_skema) }}
                 </a>
-            </h2>
-        </div>
+            </div>
         @endforeach
     </div>
 </div>

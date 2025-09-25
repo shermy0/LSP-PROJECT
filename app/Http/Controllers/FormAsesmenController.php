@@ -50,6 +50,11 @@ public function showSkema($id_skema)
         'Office Administrative' => 'officeadministative',
         'Pramuniaga' => 'pramuniaga',
         'Akuntansi dan Keuangan Lembaga 2' => 'akuntansikeuanganII',
+        'Akuntansi dan Keuangan Lembaga 1' => 'akuntansidankeuanganlembaga1',
+        'Teknik Komputer dan Jaringan 2' => 'teknikkomputerdanjaringan2',
+        'Teknik Komputer dan Jaringan 3' => 'teknikkomputerdanjaringan3',
+        'Teknik Komputer dan Jaringan 4' => 'teknikkomputerdanjaringan4',
+        
     ];
 
     if (array_key_exists($skema->nama_skema, $viewMap)) {
