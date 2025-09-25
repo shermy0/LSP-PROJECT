@@ -29,7 +29,7 @@ class AuthController extends Controller
             } elseif ($user->role === 'asesor') {
                 return redirect()->route('asesor.dashboard');
             } elseif ($user->role === 'asesi') {
-                return redirect()->route('dashboard.asesi');
+                return redirect()->route('asesi.dashboard');
             } else {
                 Auth::logout();
                 return redirect()->route('login')->withErrors('Role tidak dikenali.');

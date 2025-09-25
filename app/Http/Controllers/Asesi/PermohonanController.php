@@ -178,19 +178,4 @@ class PermohonanController extends Controller
         return redirect()->route('asesi.permohonan.form2')
             ->with('success', 'Dokumen & tanda tangan berhasil disimpan.');
     }
-
-    public function form3()
-    {
-        return view('asesi.permohonan.form3');
-    }
-
-    public function form4()
-    {
-        return view('asesi.permohonan.form4');
-    }
-
-    public function form5()
-    {
-        return view('asesi.permohonan.form5');
-    }
 }
