@@ -97,9 +97,9 @@
                     <div class="mb-3">
                         <label class="form-label">{{ $loop->iteration }}. {{ $jd->nama_jenis }} <span class="text-danger">*</span></label>
                         <div class="input-group">
-                            <input type="file"
-                                   name="dokumen[{{ $jd->id_jenis_dokumen }}]"
-                                   class="form-control dokumen-input"
+                            <input type="file" 
+                                   name="dokumen[{{ $jd->id_jenis_dokumen }}]" 
+                                   class="form-control dokumen-input" 
                                    accept=".jpg,.jpeg,.png,.pdf" required
                                    onchange="showFileActions(this)">
                             <button type="button" class="btn btn-outline-danger" onclick="removeFile(this)">Hapus</button>
@@ -118,7 +118,6 @@
                     &nbsp;&nbsp;Tanda Tangan Asesi
                 </div>
 
-<<<<<<< HEAD
                 <div class="card">
                     <div class="card-title">Asesi</div>
                     <div class="mb-2">
@@ -139,22 +138,6 @@
                     <div class="btns">
                         <button type="button" class="btn clear" onclick="clearCanvas()">Hapus</button>
                         <button type="button" class="btn download" onclick="downloadTTD()">Unduh</button>
-=======
-                <div class="mb-3">
-                    <label class="form-label">Nama Lengkap</label>
-                    <input type="text" class="form-control rounded-3" placeholder="Masukkan nama lengkap asesi">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Tanggal</label>
-                    <input type="date" class="form-control rounded-3">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Tanda Tangan</label>
-                    <canvas id="signature-pad" class="border rounded-3 w-100 bg-white"></canvas>
-                    <div class="mt-2 d-flex gap-2">
-                        <button type="button" class="btn btn-sm btn-secondary" id="clear">Hapus</button>
-                        <button type="button" class="btn btn-sm btn-primary" id="download">Unduh</button>
->>>>>>> 92bd7e4921c6f95538051fbc6df165f147ed5419
                     </div>
                 </div>
             </div>
@@ -284,7 +267,6 @@ document.addEventListener('DOMContentLoaded', function () {
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-<<<<<<< HEAD
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
@@ -331,14 +313,14 @@ function downloadTTD() {
 
 <!-- Style -->
 <style>
-.card {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    padding: 25px;
-    max-width: 500px;
-    margin: 20px auto;
+.card { 
+    background: #fff; 
+    border: 1px solid #ddd; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08); 
+    padding: 25px; 
+    max-width: 500px; 
+    margin: 20px auto; 
 }
 .card-title {
     font-weight: bold;
@@ -348,98 +330,17 @@ function downloadTTD() {
     border-bottom: 1px solid #eee;
     padding-bottom: 10px;
 }
-.card canvas {
-    border: 1px solid #999;
-    border-radius: 6px;
-    width: 100%;
-    height: 150px;
-    background-color: #ffffff;
-    cursor: crosshair;
+.card canvas { 
+    border: 1px solid #999; 
+    border-radius: 6px; 
+    width: 100%; 
+    height: 150px; 
+    background-color: #ffffff; 
+    cursor: crosshair; 
 }
 .btns { display: flex; justify-content: space-between; gap: 10px; }
 .btns .clear { background: #dc3545; color: white; }
 .btns .download { background: #0d6efd; color: white; }
 .btns button:hover { opacity: 0.9; transform: translateY(-2px); transition: all 0.2s; }
 </style>
-=======
-        .upload-hidden {
-            display: none;
-        }
-
-        /* Perbaikan kotak tanda tangan */
-        #signature-pad {
-            height: 250px; /* lebih tinggi dari sebelumnya */
-            max-height: 950px;
-            background: #fff;
-        }
-    </style>
-
-    <script>
-        const canvas = document.getElementById('signature-pad');
-        const ctx = canvas.getContext('2d');
-
-        // Supaya canvas responsif
-        function resizeCanvas() {
-            const ratio = Math.max(window.devicePixelRatio || 1, 1);
-            canvas.width = canvas.offsetWidth * ratio;
-            canvas.height = canvas.offsetHeight * ratio;
-            canvas.getContext("2d").scale(ratio, ratio);
-        }
-        window.onresize = resizeCanvas;
-        resizeCanvas();
-
-        let drawing = false;
-
-        canvas.addEventListener("mousedown", e => {
-            drawing = true;
-            ctx.beginPath();
-            ctx.moveTo(e.offsetX, e.offsetY);
-        });
-
-        canvas.addEventListener("mousemove", e => {
-            if (drawing) {
-                ctx.lineTo(e.offsetX, e.offsetY);
-                ctx.strokeStyle = "#000";
-                ctx.lineWidth = 2;
-                ctx.lineCap = "round";
-                ctx.stroke();
-            }
-        });
-
-        canvas.addEventListener("mouseup", () => {
-            drawing = false;
-        });
-
-        // Support touchscreen
-        canvas.addEventListener("touchstart", e => {
-            e.preventDefault();
-            const rect = canvas.getBoundingClientRect();
-            ctx.beginPath();
-            ctx.moveTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
-        });
-
-        canvas.addEventListener("touchmove", e => {
-            e.preventDefault();
-            const rect = canvas.getBoundingClientRect();
-            ctx.lineTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
-            ctx.strokeStyle = "#000";
-            ctx.lineWidth = 2;
-            ctx.lineCap = "round";
-            ctx.stroke();
-        });
-
-        // Tombol hapus
-        document.getElementById("clear").addEventListener("click", () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        });
-
-        // Tombol download
-        document.getElementById("download").addEventListener("click", () => {
-            const link = document.createElement("a");
-            link.download = "tanda_tangan.png";
-            link.href = canvas.toDataURL();
-            link.click();
-        });
-    </script>
->>>>>>> 92bd7e4921c6f95538051fbc6df165f147ed5419
 @endsection
