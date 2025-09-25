@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Skema;
 use App\Models\MeninjauAsesmen;
+use App\Models\PenyusunPersetujuan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+
 class SkemaController extends Controller
 {
     public function ninjau_asesemen()
@@ -82,5 +85,30 @@ class SkemaController extends Controller
         return redirect()
         ->route('ninjau_asesmen_asesor.view', ['asesor_id' => $request->asesor_id])
         ->with('success', 'Data berhasil disimpan!');
+    }
+    public function simpanPersetujuan(Request $request, $asesor_id)
+    {
+        // Handle tanda tangan
+        if ($request->has('tanda_tangan')) {
+            $ttd = $request->tanda_tangan;
+            $ttd = str_replace('data:image/png;base64,', '', $ttd);
+            $ttd = str_replace(' ', '+', $ttd);
+            $ttdName = 'ttd_' . $asesor_id . '_' . time() . '.png';
+            File::put(storage_path('app/public/ttd/') . $ttdName, base64_decode($ttd));
+
+            $tanda_tangan = 'ttd/' . $ttdName;
+        } else {
+            $tanda_tangan = null;
+        }
+
+        // Simpan ke DB
+        PenyusunPersetujuan::create([
+            'asesor_id'       => $asesor_id,
+            'tanggal_asesmen' => $request->tanggal_asesmen,
+            'tanda_tangan'    => $tanda_tangan,
+            'komentar'        => $request->komentar,
+        ]);
+
+        return redirect()->back()->with('success', 'Persetujuan berhasil disimpan!');
     }
 }

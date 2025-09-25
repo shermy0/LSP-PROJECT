@@ -43,6 +43,7 @@ Route::middleware(['auth', 'role:asesi'])->group(function () {
 Route::get('/ninjau_asesemen', [SkemaController::class, 'ninjau_asesemen'])->name('ninjau_asesemen');
 Route::get('/ninjau-asesmen-asesor', [PerencanaanController::class, 'ninjauAsesmenAsesor'])->name('ninjau_asesmen_asesor.view');
 Route::post('/meninjau-asesmen/store', [SkemaController::class, 'store'])->name('meninjau_asesmen.store');
+Route::post('/ninjau-asesmen-asesor/{asesor_id}/simpan-persetujuan',[PerencanaanController::class, 'simpanPersetujuan'])->name('ninjau_asesmen_asesor.simpan');
 
 // simpan dan lanjut
 Route::post('/formperencanaan', [PerencanaanController::class, 'simpan'])->name('formperencanaan');
