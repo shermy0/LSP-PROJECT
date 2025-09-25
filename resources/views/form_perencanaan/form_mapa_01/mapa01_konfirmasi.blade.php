@@ -28,38 +28,29 @@
                         <th class="text-center align-middle">Tanda Tangan</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @php
-                        $roles = [
-                            'Manajer sertifikasi LSP',
-                            'Master Asesor / Master Trainer / Lead Asesor Kompetensi',
-                            'Manajer pelatihan Lembaga Training terakreditasi / Lembaga Training terdaftar',
-                            'Manajer atau supervisor ditempat kerja'
-                        ];
-                    @endphp
-
-                    @foreach($roles as $role)
-                        <tr>
-                            <td>{{ $role }}</td>
-                            <td>
-                                <select name="asesor[{{ $role }}]" class="form-select">
-                                    <option value="">-- Pilih Nama --</option>
-                                    @foreach($asesors as $asesor)
-                                        <option value="{{ $asesor->id_asesor }}">
-                                            {{ $asesor->nama_asesor }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </td>
-
-                            <td><input type="date" name="tanggal[{{ $role }}]" class="form-control"></td>
-                            <td class="text-center">
-                                <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc; cursor:pointer;"></canvas>
-                                <input type="hidden" name="tanda_tangan[{{ $role }}]" class="tanda_tangan">
-                            </td>
-                        </tr>
+<tbody>
+    @foreach($roles as $role)
+        <tr>
+            <td>{{ $role }}</td>
+            <td>
+                <select name="asesor[{{ $role }}]" class="form-select">
+                    <option value="">-- Pilih Nama --</option>
+                    @foreach($asesors as $asesor)
+                        <option value="{{ $asesor->id_asesor }}">
+                            {{ $asesor->nama_asesor }}
+                        </option>
                     @endforeach
-                </tbody>
+                </select>
+            </td>
+            <td><input type="date" name="tanggal[{{ $role }}]" class="form-control"></td>
+            <td class="text-center">
+                <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc; cursor:pointer;"></canvas>
+                <input type="hidden" name="tanda_tangan[{{ $role }}]" class="tanda_tangan">
+            </td>
+        </tr>
+    @endforeach
+</tbody>
+
             </table>
         </div>
     </div>

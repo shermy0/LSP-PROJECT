@@ -46,6 +46,8 @@ Route::post('/formperencanaan', [PerencanaanController::class, 'simpan'])->name(
 // form perencanaan mapa 01
 Route::prefix('form-perencanaan')->group(function () {
     // MAPA01
+Route::post('/mapa01/orang-relevan', [MapaController::class, 'simpanOrangRelevan'])
+    ->name('form.mapa01.simpanOrangRelevan');
 
     Route::get('/mapa01', [MapaController::class, 'create'])->name('form.mapa01');
 

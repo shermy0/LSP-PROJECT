@@ -26,11 +26,14 @@
         <select name="skema_id" id="skema_id" class="skema-select">
             <option value="">-- Pilih Skema --</option>
             @foreach($skemas as $skema)
-                <option value="{{ $skema->id_skema }}"
-                        data-kode="{{ $skema->kode_skema }}"
-                        data-jenjang="{{ $skema->jenjang }}">
-                    {{ $skema->nama_skema }}
-                </option>
+<option value="{{ $skema->id_skema }}"
+        data-kode="{{ $skema->kode_skema }}"
+        data-jenjang="{{ $skema->jenjang }}"
+        data-standar="{{ $skema->unitKompetensi->pluck('standar_kompetensi')->first() }}">
+    {{ $skema->nama_skema }}
+</option>
+
+
             @endforeach
         </select>
     </div>
@@ -172,39 +175,45 @@
 </div>
 </div>
 
-                <div class="mapa-subsection-header">Konfirmasi dengan Orang Lain yang Relevan</div>
-                <div class="mapa-options">
-                    <div>
-                        <input type="checkbox" id="asesi1" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2">
-                        <label for="asesi1">Manajer sertifikasi LSP P1 SMKN 11 Bandung</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="asesi2" name="asesi[]" value="Pelatihan dengan kurikulum belum berbasis kompetensi" class="form-check-input me-2">
-                        <label for="asesi2">Master Asesor / Master Trainer / Lead Asesor Kompetensi</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="asesi3" name="asesi[]" value="Pekerja berpengalaman kompeten" class="form-check-input me-2">
-                        <label for="asesi3">Manajer Pelatihan Lembaga Training terakreditasi / Lembaga Training Terdaftar</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="asesi4" name="asesi[]" value="Pekerja berpengalaman belum kompeten" class="form-check-input me-2">
-                        <label for="asesi4">Manajer atau supervisor ditempat kerja</label>
-                    </div>
-            </div>
+<div class="mapa-subsection-header">Konfirmasi dengan Orang Lain yang Relevan</div>
+<div class="mapa-options">
+    <div>
+        <input type="checkbox" id="relevan1" name="orang_relevan[]" value="Manajer sertifikasi LSP P1 SMKN 11 Bandung" class="form-check-input me-2">
+        <label for="relevan1">Manajer sertifikasi LSP P1 SMKN 11 Bandung</label>
+    </div>
+    <div>
+        <input type="checkbox" id="relevan2" name="orang_relevan[]" value="Master Asesor / Master Trainer / Lead Asesor Kompetensi" class="form-check-input me-2">
+        <label for="relevan2">Master Asesor / Master Trainer / Lead Asesor Kompetensi</label>
+    </div>
+    <div>
+        <input type="checkbox" id="relevan3" name="orang_relevan[]" value="Manajer Pelatihan Lembaga Training terakreditasi / Lembaga Training Terdaftar" class="form-check-input me-2">
+        <label for="relevan3">Manajer Pelatihan Lembaga Training terakreditasi / Lembaga Training Terdaftar</label>
+    </div>
+    <div>
+        <input type="checkbox" id="relevan4" name="orang_relevan[]" value="Manajer atau supervisor di tempat kerja" class="form-check-input me-2">
+        <label for="relevan4">Manajer atau supervisor di tempat kerja</label>
+    </div>
+</div>
+
 
             
 <div class="mapa-subsection-header">Standar Industri atau Tempat Kerja</div>
 <div class="mapa-options">
-    {{-- Standar Kompetensi --}}
-    <div>
-        <input type="checkbox" id="129" name="asesi[]" 
-               value="Standar Kompetensi" class="form-check-input me-2 toggle-input"
-               data-target="input-asesi1">
-        <label for="asesi1">Standar Kompetensi:</label>
-        <input type="text" id="input-asesi1" name="standar_kompetensi" 
-               class="form-control mt-2" placeholder="Isi standar kompetensi"
-               disabled style="display:none;">
-    </div>
+{{-- Standar Kompetensi --}}
+<div>
+    <input type="checkbox" id="129" name="asesi[]" 
+           value="Standar Kompetensi" 
+           class="form-check-input me-2"
+           checked disabled>
+    <label for="asesi1">Standar Kompetensi:</label>
+
+<input type="text" id="input-asesi1" name="standar_kompetensi" 
+       class="form-control mt-2" 
+value=""
+       readonly>
+
+</div>
+
 
     {{-- Kriteria asesmen dari kurikulum pelatihan --}}
     <div>
@@ -265,33 +274,43 @@ document.addEventListener("DOMContentLoaded", function() {
     // =========================
     // Inisialisasi data dari localStorage
     // =========================
-    function loadDariLocal() {
-        let data = localStorage.getItem("mapa01Data");
-        if (!data) return;
-        data = JSON.parse(data);
+function loadDariLocal() {
+    let data = localStorage.getItem("mapa01Data");
+    if (!data) return;
+    data = JSON.parse(data);
 
-        // select skema
-        if (data.skema_id) document.getElementById('skema_id').value = data.skema_id;
-        if (data.nomorSkema) document.getElementById('nomorSkema').value = data.nomorSkema;
-        if (data.skema) {
-            let radio = document.getElementById(data.skema);
-            if (radio) radio.checked = true;
-        }
-
-        // checkbox asesi
-        if (data.asesi) {
-            document.querySelectorAll('input[name="asesi[]"]').forEach(cb => {
-                if (data.asesi.includes(cb.value)) cb.checked = true;
-            });
-        }
-
-        // checkbox tujuan
-        if (data.tujuan) {
-            document.querySelectorAll('input[name="tujuan[]"]').forEach(cb => {
-                if (data.tujuan.includes(cb.value)) cb.checked = true;
-            });
-        }
+    if (data.skema_id) {
+        document.getElementById('skema_id').value = data.skema_id;
     }
+
+    if (data.nomorSkema) document.getElementById('nomorSkema').value = data.nomorSkema;
+
+    if (data.skema) {
+        let radio = document.getElementById(data.skema);
+        if (radio) radio.checked = true;
+    }
+
+    // checkbox asesi
+    if (data.asesi) {
+        document.querySelectorAll('input[name="asesi[]"]').forEach(cb => {
+            if (data.asesi.includes(cb.value)) cb.checked = true;
+        });
+    }
+
+    // checkbox tujuan
+    if (data.tujuan) {
+        document.querySelectorAll('input[name="tujuan[]"]').forEach(cb => {
+            if (data.tujuan.includes(cb.value)) cb.checked = true;
+        });
+    }
+
+    // 🔥 trigger ulang supaya standar_kompetensi otomatis muncul
+    if (data.skema_id) {
+        document.getElementById('skema_id').dispatchEvent(new Event('change'));
+    }
+}
+
+
 
     loadDariLocal();
 
@@ -325,6 +344,8 @@ document.addEventListener("DOMContentLoaded", function() {
         let selected = this.options[this.selectedIndex];
         let kode = selected.getAttribute('data-kode');
         let jenjang = selected.getAttribute('data-jenjang');
+        let standar = selected.getAttribute('data-standar');
+document.getElementById('input-asesi1').value = standar || '';
 
         document.getElementById('nomorSkema').value = kode || '';
 

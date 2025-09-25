@@ -16,8 +16,14 @@ class Skema extends Model
         'jenjang',
         'bidang_keahlian',
         'deskripsi',
-        'status_skema'
+        'status_skema',
+        'standar_kompetensi'
     ];
+
+        public function unitKompetensi()
+    {
+        return $this->hasMany(UnitKompetensi::class, 'id_skema', 'id_skema');
+    }
 
     public function units()
     {
@@ -40,6 +46,26 @@ class Skema extends Model
             'skema_id',       // foreign key di pivot untuk skema
             'tujuan_id'       // foreign key di pivot untuk tujuan
         );
+    }
+
+      public function laporan()
+    {
+        return $this->hasMany(LaporanAsesmen::class, 'skema_id');
+    }
+
+    public function validasi()
+    {
+        return $this->hasMany(ValidasiAsesmen::class, 'skema_id');
+    }
+
+    public function konfirmasi()
+    {
+        return $this->hasMany(KonfirmasiOrangRelevan::class, 'skema_id');
+    }
+
+    public function asesor()
+    {
+        return $this->belongsToMany(Asesor::class, 'skema_asesor', 'id_skema', 'id_asesor');
     }
 
 }

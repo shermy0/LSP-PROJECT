@@ -13,11 +13,72 @@ use App\Models\HasilAsesmenPerangkat;
 use App\Models\MasterJenisBukti;
 use App\Models\PerangkatAsesmen;
 use App\Models\KelompokPekerjaan;
+use App\Models\KonfirmasiOrangRelevan;
+use App\Models\KonfirmasiOrangRelevanPersetujuan;
+use App\Models\LaporanAsesmen;
+use App\Models\ValidasiAsesmen;
 use Illuminate\Http\Request;
 
 
 class MapaController extends Controller
 {
+
+public function konfirmasi($idSkema)
+{
+    $skema = Skema::findOrFail($idSkema);
+
+    // Ambil role/jabatan yang sudah di-checklist di MAPA01
+    $roles = Mapa01OrangRelevan::where('skema_id', $skema->id_skema)->pluck('jabatan');
+
+    // Ambil asesor per skema
+    $asesors = DB::table('asesor')
+        ->join('asesor_skema', 'asesor.id_asesor', '=', 'asesor_skema.asesor_id')
+        ->where('asesor_skema.skema_id', $skema->id_skema)
+        ->select('asesor.id_asesor', 'asesor.nama_asesor', 'asesor.jabatan')
+        ->get();
+
+    return view('form_perencanaan.form_mapa_01.mapa01_konfirmasi', compact('skema', 'roles', 'asesors'));
+}
+
+
+public function simpanKonfirmasi(Request $request, $skema_id)
+{
+    foreach ($request->asesor as $role => $asesor_id) {
+        $konfirmasi = KonfirmasiOrangRelevan::create([
+            'id_validasi' => null, // kalau mau dikaitkan ke validasi
+            'nama' => $role,
+            'jabatan' => $role,
+            'tgl_konfirmasi' => $request->tanggal[$role],
+            'skema_id' => $skema_id,
+        ]);
+
+        KonfirmasiOrangRelevanPersetujuan::create([
+            'id_konfirmasi' => $konfirmasi->id_konfirmasi,
+            'ttd_pemberi_konfirmasi' => $request->tanda_tangan[$role] ?? null,
+            'tgl_ttd_pemberi_konfirmasi' => $request->tanggal[$role],
+        ]);
+    }
+
+    return redirect()->route('form.mapa01.konfirmasi', $skema_id)
+        ->with('success','Data konfirmasi berhasil disimpan.');
+}
+public function simpanOrangRelevan(Request $request, $skema_id)
+{
+    $request->validate([
+        'jabatan' => 'required|array|min:1',
+        'jabatan.*' => 'required|string|max:255'
+    ]);
+
+    foreach ($request->jabatan as $jabatan) {
+        Mapa01OrangRelevan::firstOrCreate([
+            'skema_id' => $skema_id,
+            'jabatan'  => $jabatan,
+        ]);
+    }
+
+      return redirect()->back()->with('success', 'Orang relevan berhasil disimpan.');
+}
+
 public function simpanTujuan(Request $request)
 {
     $request->validate([
@@ -46,11 +107,14 @@ public function simpanTujuan(Request $request)
 
 
 
-    public function create()
-    {
-        $skemas = Skema::where('status_skema', 'Aktif')->get();
-        return view('form_perencanaan.form_mapa_01.mapa01', compact('skemas'));
-    }
+public function create()
+{
+    $skemas = Skema::with('unitKompetensi')
+        ->where('status_skema', 'Aktif')
+        ->get();
+
+    return view('form_perencanaan.form_mapa_01.mapa01', compact('skemas'));
+}
 
     public function getSkema($id)
     {
@@ -281,34 +345,8 @@ public function search(Request $request)
 
     return response()->json($asesors);
 }
-public function konfirmasi($idSkema)
-{
-    $skema = Skema::findOrFail($idSkema);
 
-    // Ambil semua asesor yg terkait dengan skema ini
-    $asesors = DB::table('asesor')
-        ->join('asesor_skema', 'asesor.id_asesor', '=', 'asesor_skema.asesor_id')
-        ->where('asesor_skema.skema_id', $skema->id_skema)
-        ->select('asesor.id_asesor', 'asesor.nama_asesor')
-        ->get();
 
-return view('form_perencanaan.form_mapa_01.mapa01_konfirmasi', compact('skema', 'asesors'));
-}
-
-public function simpanKonfirmasi(Request $request, $skema_id)
-{
-    // Simpan data ke database
-    // Contoh umum:
-    // ModelKonfirmasi::create([
-    //     'skema_id' => $skema_id,
-    //     'field1' => $request->input('field1'),
-    //     'field2' => $request->input('field2'),
-    // ]);
-
-    // Setelah simpan, redirect ke view formperencanaan.blade.php
-    return redirect()->route('formperencanaan')
-                     ->with('success', 'Data berhasil disimpan!');
-}
 
 public function getKelompokBySkema($skemaId)
 {

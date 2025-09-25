@@ -16,5 +16,18 @@ class LaporanAsesmen extends Model
         'penolakan',
         'saran_perbaikan',
         'tgl_laporan',
+        'skema_id',
     ];
+
+    // Relasi ke ValidasiAsesmen
+    public function validasi()
+    {
+        return $this->hasMany(ValidasiAsesmen::class, 'id_laporan');
+    }
+
+    // Relasi ke Skema
+    public function skema()
+    {
+        return $this->belongsTo(Skema::class, 'skema_id');
+    }
 }
