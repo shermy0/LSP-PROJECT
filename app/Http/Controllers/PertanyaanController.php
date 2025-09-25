@@ -24,43 +24,95 @@ class PertanyaanController extends Controller
         return view('pertanyaan.index', compact('pertanyaan'));
     }
 
-    // ================================
-    // FORM LISAN
+// ================================
+    // CRUD LISAN
     // ================================
     public function createLisan(Request $request)
     {
-        $jumlah   = $request->query('jumlah', 5); 
+        $jumlah = $request->query('jumlah', 5);
         $id_skema = $request->query('id_skema');
 
         $skema = Skema::findOrFail($id_skema);
-        return view('input_lisan', compact('skema', 'jumlah'));
-    }
 
-        public function storeLisan(Request $request)
-    {
-        $request->validate([
-            'id_skema'           => 'required|integer',
-            'id_asesor'          => 'required|integer',
-            'isi_pertanyaan.*'   => 'required|string',
-            'kunci_jawaban.*'    => 'nullable|string',
+        // Buat record pembuatan pertanyaan
+        $pembuatan = PembuatanPertanyaan::create([
+            'id_skema' => $id_skema,
+            'timer' => $request->query('timer', 0),
+            'timescap' => now(),
         ]);
 
-        $id_skema  = $request->id_skema;
-        $id_asesor = $request->id_asesor;
+        $idKelompok = KelompokPekerjaan::where('id_skema', $id_skema)->value('id_kelompok') ?? null;
+
+        return view('input_lisan', [
+            'skema' => $skema,
+            'jumlah' => $jumlah,
+            'idPembuatanPertanyaan' => $pembuatan->id_pembuatan_pertanyaan,
+            'idKelompok' => $idKelompok
+        ]);
+    }
+
+    public function storeLisan(Request $request)
+    {
+        $request->validate([
+            'id_skema' => 'required|exists:skema_sertifikasi,id_skema',
+            'id_asesor' => 'required|exists:asesor,id_asesor',
+            'id_kelompok' => 'nullable|exists:kelompok_pekerjaan,id_kelompok',
+            'id_pembuatan_pertanyaan' => 'nullable|exists:pembuatan_pertanyaan,id_pembuatan_pertanyaan',
+            'isi_pertanyaan.*' => 'required|string',
+            'kunci_jawaban.*' => 'nullable|string',
+        ]);
 
         foreach ($request->isi_pertanyaan as $key => $isi) {
-        $pertanyaan = new Pertanyaan();
-        $pertanyaan->id_skema         = $id_skema;
-        $pertanyaan->id_asesor        = $id_asesor; // ambil dari form request
-        $pertanyaan->jenis_pertanyaan = 'lisan';
-        $pertanyaan->isi_pertanyaan   = $isi;
-        $pertanyaan->kunci_jawaban    = $request->kunci_jawaban[$key] ?? null;
-        $pertanyaan->save();
+            Pertanyaan::create([
+                'id_skema' => $request->id_skema,
+                'id_asesor' => $request->id_asesor,
+                'id_kelompok' => $request->id_kelompok,
+                'id_pembuatan_pertanyaan' => $request->id_pembuatan_pertanyaan,
+                'jenis_pertanyaan' => 'lisan',
+                'isi_pertanyaan' => $isi,
+                'kunci_jawaban' => $request->kunci_jawaban[$key] ?? null,
+            ]);
         }
 
-        return redirect()->route('pertanyaan.index')
-                         ->with('success', 'Pertanyaan lisan berhasil ditambahkan!');
+        return redirect()->route('lisan.crud', $request->id_skema)
+            ->with('success', 'Pertanyaan lisan berhasil ditambahkan!');
     }
+
+    public function editLisan($id)
+    {
+        $pertanyaan = Pertanyaan::findOrFail($id);
+        return view('input_lisan_edit', compact('pertanyaan'));
+    }
+
+    public function updateLisan(Request $request, $id)
+    {
+        $request->validate([
+            'isi_pertanyaan' => 'required|string',
+            'kunci_jawaban' => 'nullable|string',
+        ]);
+
+        $pertanyaan = Pertanyaan::findOrFail($id);
+        $pertanyaan->update([
+            'isi_pertanyaan' => $request->isi_pertanyaan,
+            'kunci_jawaban' => $request->kunci_jawaban
+        ]);
+
+        return redirect()->route('lisan.crud', $pertanyaan->id_skema)
+            ->with('success', 'Pertanyaan lisan berhasil diperbarui');
+    }
+
+    public function crudLisan($id_skema)
+    {
+        $skema = Skema::findOrFail($id_skema);
+
+        $kelompok = KelompokPekerjaan::with(['pertanyaan' => function($q) {
+            $q->where('jenis_pertanyaan', 'lisan');
+        }])->where('id_skema', $id_skema)->first(); // <── pakai first()
+
+        return view('lisan_crud', compact('skema', 'kelompok'));
+    }
+    
+     
 
     // ================================
     // FORM ESAI

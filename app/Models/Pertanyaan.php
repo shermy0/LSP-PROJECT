@@ -24,6 +24,7 @@ class Pertanyaan extends Model
         'file_type',
         'deskripsi_pertanyaan',
         'kunci_jawaban',
+        'id_kelompok'
     ];
 
     // 🔹 Relasi ke tabel pembuatan_pertanyaan

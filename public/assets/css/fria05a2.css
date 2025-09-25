@@ -1,0 +1,308 @@
+/* ==== GLOBAL STYLES ==== */
+body {
+    font-family: Poppins, sans-serif;
+    color: #2B2B2B;
+    margin: 20px;
+    width: 100%;
+}
+
+/* ==== HEADER SECTION ==== */
+.form-asesmen-header {
+    text-align: center;
+    margin: 30px auto;
+}
+
+.form-asesmen-header .breadcrumb {
+    font-size: 14px;
+    color: #0D6EFD;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.form-asesmen-header .form-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+.form-asesmen-header .icon-box {
+    width: 60px;
+    height: 60px;
+    background: #041C5C;
+    margin: 15px auto;
+    border-radius: 8px;
+}
+
+/* ==== TITLE ==== */
+.main-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 20px 0 10px;
+}
+
+.sub-title {
+    color: #484343;
+    font-size: 18px;
+    font-weight: 400;
+    margin-bottom: 15px;
+}
+
+/* ==== FORM CONTAINER ==== */
+.form-container {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.label {
+    display: block;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 15px;
+}
+
+.input-box {
+    background: white;
+    border: 1px solid #989494;
+    border-radius: 8px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    padding-left: 14px;
+    color: #989494;
+    font-size: 14px;
+    margin-top: 6px;
+}
+
+/* ==== TUK SECTION ==== */
+.tuk-title {
+    font-size: 16px;
+    margin: 20px 0 10px;
+}
+
+.radio-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 6px;
+}
+
+.radio-group label {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.content-card .Daftar h2 {
+    font-size: 18px; /* kecilkan dari default 5px */
+    background: #E6F0FF;
+    padding: 6px 1px; /* padding dikurangi biar lebih ramping */
+    border-radius: 6px;
+    color: #041C5C;
+    margin-bottom: 15px;
+    display: inline-block; /* supaya kotaknya menyesuaikan text */
+    max-width: 250px; /* atur lebar maksimal */
+    text-align: center;
+}
+
+/* Panduan Box */
+.daftar h2 {
+    font-size: 18px;
+    background: #E6F0FF;
+    padding: 10px;
+    border-radius: 6px;
+    color: #041C5C;
+    margin-bottom: 10px;
+}
+
+/* ==== BUTTON TAMBAH ASESOR ==== */
+.btn-tambah-asesor {
+    background: #169569;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 8px 20px;
+    border-radius: 10px;
+    margin: 15px 0;
+    cursor: pointer;
+    transition: background 0.3s;
+    display: inline-block;
+    margin-left: -125px; /* geser kiri */
+}
+.btn-tambah-asesor:hover { background: #128056; }
+
+/* ==== HEADER STRIP ==== */
+.header {
+    position: relative;
+    width: 100%;
+    background: #E5EEFF;
+    border-radius: 15px;
+    border: 1px solid #EBEBEB;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding-left: 30px;
+    margin: 15px 0 20px;
+    box-sizing: border-box;
+}
+.header-strip {
+    width: 10px;
+    height: 100%;
+    background: #0284C7;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+.header-title {
+    color: #2B2B2B;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* ==== CONTAINER ==== */
+.container {
+    max-width: 700px;
+    margin: 20px auto 100px;
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+
+/* ==== TABEL PENYUSUN ==== */
+.table-wrapper {
+    margin-top: -80px;     /* lebih naik lagi */
+    margin-left: 1px;     /* agak geser ke kiri */
+    margin-right: 20px;   /* biar kanan masih ada ruang */
+    margin-bottom: 20px;  /* jarak bawah tetap */
+    
+    background: #fff;
+    border: 1px solid #EBEBEB;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    overflow-x: auto;
+}
+.table-penyusun {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+.table-penyusun th {
+    background: #041562;
+    color: #fff;
+    padding: 12px;
+    text-align: center;
+    font-weight: 600;
+    border: 1px solid #ddd;
+}
+.table-penyusun td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+.table-penyusun tr:nth-child(even) { background: #f9f9f9; }
+
+.btn-save {
+    background: #041562;
+    color: #fff;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+
+    display: block;        /* jadi blok penuh */
+    margin-left: auto;     /* otomatis geser ke kanan */
+    margin-top: 15px; 
+}
+
+.btn-save:hover {
+    background: #06238a;
+}
+
+/* ==== HEADER STRIP ==== */
+.header {
+    position: relative;
+    width: 100%;
+    background: #E5EEFF;
+    border-radius: 15px;
+    border: 1px solid #EBEBEB;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding-left: 30px;
+    margin: 15px 0 20px;
+    box-sizing: border-box;
+}
+.header-strip {
+    width: 10px;
+    height: 100%;
+    background: #0284C7;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+.header-title {
+    color: #2B2B2B;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* ==== CONTAINER ==== */
+.container {
+    max-width: 700px;
+    margin: 20px auto 100px;
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+
+.rekap-soal {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.card-rekap {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.card-rekap .rekap-nomor {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e0e7ff; /* biru muda */
+    color: #1e3a8a; /* biru tua */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.card-rekap .rekap-pertanyaan {
+    font-size: 14px;
+    margin-bottom: 12px;
+    color: #222;
+}
+
+.card-rekap .rekap-kunci {
+    background: #f1f7ff; /* biru muda */
+    border-left: 4px solid #3b82f6; /* biru border */
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.card-rekap .rekap-kunci span {
+    color: #2563eb; /* biru teks */
+    font-weight: 600;
+}
