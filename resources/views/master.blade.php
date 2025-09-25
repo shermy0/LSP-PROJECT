@@ -36,11 +36,15 @@
     <div class="menu">
         <ul>
             @if(Auth::user()->role == 'admin')
-                <li><i class="bi bi-house-door-fill"></i><a href="#">Dashboard</a></li>
+                <li><i class="bi bi-house-door-fill"></i><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                <li><i class="bi bi-person-lines-fill"></i><a href="{{ route('admin.permohonan.index') }}">Daftar Permohonan</a></li>
+                <li><i class="bi bi-people-fill"></i><a href="#">Data Peserta Uji</a></li>
+                <li><i class="bi bi-people-fill"></i><a href="#">Data Asesor</a></li>
+
             @endif
 
             @if(Auth::user()->role == 'asesor')
-                <li><i class="bi bi-house-door-fill"></i><a href="{{ route('dashboard.asesor') }}">Dashboard</a></li>
+                <li><i class="bi bi-house-door-fill"></i><a href="{{ route('asesor.dashboard') }}">Dashboard</a></li>
                 <li><i class="bi bi-journal-album"></i><a href="{{ route('formasesmen') }}">Form Asesmen</a></li>
                 <li><i class="bi bi-people-fill"></i><a href="#">Data Peserta Uji</a></li>
                 <li><i class="bi bi-pencil-square"></i><a href="{{ route('formperencanaan') }}">Form Perencanaan</a></li>

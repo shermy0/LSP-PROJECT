@@ -96,11 +96,14 @@
                 @foreach($jenisDokumen as $jd)
                     <div class="mb-3">
                         <label class="form-label">{{ $loop->iteration }}. {{ $jd->nama_jenis }} <span class="text-danger">*</span></label>
-                        <input type="file" 
-                               name="dokumen[{{ $jd->id_jenis_dokumen }}]" 
-                               class="form-control dokumen-input" 
-                               accept=".jpg,.jpeg,.png,.pdf" required
-                               onchange="showFileButton(this)">
+                        <div class="input-group">
+                            <input type="file" 
+                                   name="dokumen[{{ $jd->id_jenis_dokumen }}]" 
+                                   class="form-control dokumen-input" 
+                                   accept=".jpg,.jpeg,.png,.pdf" required
+                                   onchange="showFileActions(this)">
+                            <button type="button" class="btn btn-outline-danger" onclick="removeFile(this)">Hapus</button>
+                        </div>
                         <div class="invalid-feedback">Silakan unggah dokumen ini.</div>
                         <!-- Tempat tombol lihat -->
                         <div class="file-preview mt-2"></div>
@@ -148,9 +151,24 @@
     </div>
 </div>
 
-<!-- Script Preview File (klik tombol lihat) -->
+<!-- Modal Preview Dokumen -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="previewModalLabel">Preview Dokumen</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+      </div>
+      <div class="modal-body text-center" id="previewContent">
+        <!-- konten preview file -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Script Preview File & Hapus -->
 <script>
-function showFileButton(input) {
+function showFileActions(input) {
     const file = input.files[0];
     const previewContainer = input.closest('.mb-3').querySelector('.file-preview');
     previewContainer.innerHTML = '';
@@ -166,18 +184,28 @@ function showFileButton(input) {
 }
 
 function openPreview(url, type) {
-    let newWindow = window.open("", "_blank", "width=800,height=600");
+    let content = '';
     if (type.startsWith("image/")) {
-        newWindow.document.write(`<img src="${url}" style="max-width:100%">`);
+        content = `<img src="${url}" class="img-fluid" style="max-height:70vh;">`;
     } else if (type === "application/pdf") {
-        newWindow.document.write(`<embed src="${url}" type="application/pdf" width="100%" height="100%">`);
+        content = `<embed src="${url}" type="application/pdf" width="100%" height="600px">`;
     } else {
-        newWindow.document.write(`<a href="${url}" target="_blank">Download File</a>`);
+        content = `<a href="${url}" target="_blank">Download File</a>`;
     }
+    document.getElementById('previewContent').innerHTML = content;
+    let modal = new bootstrap.Modal(document.getElementById('previewModal'));
+    modal.show();
+}
+
+function removeFile(btn) {
+    const input = btn.closest('.input-group').querySelector('input[type="file"]');
+    input.value = ''; // reset file
+    const previewContainer = btn.closest('.mb-3').querySelector('.file-preview');
+    previewContainer.innerHTML = ''; // hapus tombol lihat
 }
 </script>
 
-<!-- Script Skema + Validasi sama seperti sebelumnya -->
+<!-- Script Skema + Validasi -->
 <script>
 document.getElementById('skemaSelect').addEventListener('change', function () {
     let skemaId = this.value;

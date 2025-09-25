@@ -12,6 +12,10 @@ use App\Http\Controllers\Asesi\PermohonanController;
 use App\Http\Controllers\Admin\Form1AdminController;
 use App\Http\Controllers\BandingAsesmenController;
 
+// Tambahan controller Asesmen Mandiri
+use App\Http\Controllers\Asesi\AsesmenMandiriController as AsesiAsesmenMandiriController;
+use App\Http\Controllers\Asesor\AsesmenMandiriController as AsesorAsesmenMandiriController;
+
 // ================== AUTH ==================
 // login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -43,7 +47,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Admin
-    Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('dashboard.admin');
+    Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
 
     // Asesi
     Route::get('/asesi/dashboard', [DashboardController::class, 'asesi'])->name('asesi.dashboard');
@@ -55,8 +59,8 @@ Route::middleware(['auth'])->group(function () {
     });
     Route::get('/get-skema/{id}', [PermohonanController::class, 'getSkema'])->name('get.skema');
 
-    // Asesor
-    Route::get('/asesor/dashboard', [DashboardController::class, 'asesor'])->name('dashboard.asesor');
+    // ================== ASESOR ==================
+    Route::get('/asesor/dashboard', [DashboardController::class, 'asesor'])->name('asesor.dashboard');
 
     // ================== FORM ASESMEN ==================
     Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('formperencanaan');
@@ -83,7 +87,24 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{user_id}', [Form1AdminController::class, 'show'])->name('show');
         });
     });
+
+    // ================== ASESMEN MANDIRI ==================
+    Route::prefix('asesi/asesmen-mandiri')->name('asesi.asesmen_mandiri.')->group(function () {
+        Route::get('/form1', [AsesiAsesmenMandiriController::class, 'form1'])->name('form1');
+        Route::get('/form2', [AsesiAsesmenMandiriController::class, 'form2'])->name('form2');
+        Route::get('/form3', [AsesiAsesmenMandiriController::class, 'form3'])->name('form3');
+        Route::get('/form4', [AsesiAsesmenMandiriController::class, 'form4'])->name('form4');
+    });
+
+    Route::prefix('asesor/asesmen-mandiri')->name('asesor.asesmen_mandiri.')->group(function () {
+        Route::get('/form1', [AsesorAsesmenMandiriController::class, 'form1'])->name('form1');
+        Route::get('/form2', [AsesorAsesmenMandiriController::class, 'form2'])->name('form2');
+        Route::get('/form3', [AsesorAsesmenMandiriController::class, 'form3'])->name('form3');
+    });
 });
+
+Route::post('/admin/permohonan/{id_permohonan}/update', 
+    [Form1AdminController::class, 'update'])->name('admin.permohonan.update');
 
 // ================== LOGOUT ==================
 Route::post('/logout', function () {

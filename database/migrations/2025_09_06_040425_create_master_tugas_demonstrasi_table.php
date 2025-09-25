@@ -11,16 +11,15 @@ return new class extends Migration
         Schema::create('master_tugas_demonstrasi', function (Blueprint $table) {
             $table->id('id_tugas');
             $table->unsignedBigInteger('id_skema');
-            $table->unsignedBigInteger('id_unit');
-            $table->unsignedBigInteger('id_kuk');
+            $table->unsignedBigInteger('id_demonstrasi');
+            $table->unsignedBigInteger('id_kelompok');
             $table->string('nama_tugas')->nullable();
             $table->text('deskripsi_pertanyaan')->nullable();
-            $table->text('instruksi')->nullable();
-            $table->string('durasi')->nullable();
+            $table->timestamp('timescap')->useCurrent()->comment('Waktu soal dibuat');
 
             $table->foreign('id_skema')->references('id_skema')->on('skema_sertifikasi')->onDelete('cascade');
-            $table->foreign('id_unit')->references('id_unit')->on('unit_kompetensi')->onDelete('cascade');
-            $table->foreign('id_kuk')->references('id_kuk')->on('kuk')->onDelete('cascade');
+            $table->foreign('id_kelompok')->references('id_kelompok')->on('kelompok_pekerjaan')->onDelete('cascade');
+            $table->foreign('id_demonstrasi')->references('id_demonstrasi')->on('demonstrasi')->onDelete('cascade');
         });
     }
 

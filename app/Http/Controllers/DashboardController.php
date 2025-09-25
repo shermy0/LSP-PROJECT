@@ -14,16 +14,18 @@ class DashboardController extends Controller
         $menus = [];
         if ($user->role == 'admin') {
             $menus = [
-                ['name' => 'Dashboard', 'route' => route('dashboard.admin'), 'icon' => 'fas fa-home'],
+                ['name' => 'Dashboard', 'route' => route('admin.dashboard'), 'icon' => 'fas fa-home'],
                 ['name' => 'Data Peserta Uji', 'route' => '#', 'icon' => 'fas fa-users'],
             ];
         } elseif ($user->role == 'asesor') {
             $menus = [
+                ['name' => 'Dashboard', 'route' => route('asesor.dashboard'), 'icon' => 'fas fa-home'],
                 ['name' => 'Form Perencanaan', 'route' => route('formperencanaan'), 'icon' => 'fas fa-file-alt'],
+
             ];
         } elseif ($user->role == 'asesi') {
             $menus = [
-                ['name' => 'Dashboard', 'route' => route('dashboard.asesi'), 'icon' => 'fas fa-home'],
+                ['name' => 'Dashboard', 'route' => route('asesi.dashboard'), 'icon' => 'fas fa-home'],
                 ['name' => 'Form Perencanaan', 'route' => route('formperencanaan'), 'icon' => 'fas fa-edit'],
             ];
         }
