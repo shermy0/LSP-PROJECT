@@ -5,7 +5,7 @@
     <h1 class="fw-bold">Form Asesmen</h1>
     <div class="text-center mb-3">
         <h5 class="center-underline">
-            Sistem Manajemen Asesmen Siswa TJKT - AsesKom
+            JUNIOR TECHNICAL SUPPORT - AsesKom
         </h5>
     </div>
 
@@ -18,14 +18,14 @@
         </div>
         
         <!-- Item 2 -->
-        <div class="accordion-item mb-2">
-            <h2 class="accordion-header p-3 border rounded">
-                <a href="{{ route('formasesmen.pertanyaanEsai', ['id_skema' => $skema->id_skema]) }}" 
-                   class="text-dark text-decoration-none">
-                    <i class="fa-solid fa-stop me-2"></i> Pertanyaan Esai
-                </a>
-            </h2>
-        </div>
+       <div class="accordion-item mb-2">
+    <a href="{{ route('formasesmen.pertanyaanEsai', ['id_skema' => $skema->id_skema]) }}" 
+       class="accordion-header d-block p-3 border rounded text-dark text-decoration-none">
+        <i class="fa-solid fa-stop me-2"></i> Pertanyaan Esai
+    </a>
+</div>
+
+
 
         <!-- Item 3 -->
         <div class="accordion-item mb-2">

@@ -5,7 +5,7 @@
     <h1 class="fw-bold">Form Asesmen</h1>
     <div class="text-center mb-3">
         <h5 class="center-underline">
-             PEMROGRAM JUNIOR (JUNIOR CODER) - AsesKom
+            AKUNTANSI DAN KEUANGAN LEMBAGA 2 - AsesKom
         </h5>
     </div>
 
@@ -25,15 +25,14 @@
     </a>
 </div>
 
-        <!-- Item 3 -->
-<div class="accordion-item mb-2" 
-     onclick="window.location='{{ route('formasesmen.pertanyaanLisan', ['id_skema' => $skema->id_skema]) }}';"
-     style="cursor: pointer;">
-    <h2 class="accordion-header p-3 border rounded">
-        <i class="fa-solid fa-stop me-2"></i> Pertanyaan Esai
-    </h2>
-</div>
 
+
+        <!-- Item 3 -->
+        <div class="accordion-item mb-2">
+            <h2 class="accordion-header p-3 border rounded">
+                <i class="fa-solid fa-stop me-2"></i> Pertanyaan Lisan
+            </h2>
+        </div>
 
         <!-- Item 4 -->
         <div class="accordion-item mb-3">
