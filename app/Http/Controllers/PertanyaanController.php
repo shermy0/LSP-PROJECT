@@ -305,7 +305,6 @@ public function createPG(Request $request)
     ]);
 }
 
-
 public function storePG(Request $request)
 {
     \Log::info('=== StorePG masuk ===');
@@ -319,9 +318,15 @@ public function storePG(Request $request)
             'timer' => 'required|integer|min:1',
             'isi_pertanyaan' => 'required|array|min:1',
             'isi_pertanyaan.*' => 'required|string|min:5',
-            'opsi' => 'required|array',
-            'opsi.*' => 'required|array|min:5', 
-            'opsi.*.*' => 'required|string|min:1',
+            'jenis_opsi' => 'required|array',
+            'jenis_opsi.*' => 'required|array|min:5',
+            'jenis_opsi.*.*' => 'required|string|in:text,gambar',
+            'opsi_text' => 'required|array',
+            'opsi_text.*' => 'required|array',
+            'opsi_text.*.*' => 'nullable|string',
+            'opsi_gambar' => 'required|array',
+            'opsi_gambar.*' => 'required|array',
+            'opsi_gambar.*.*' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
             'kunci_jawaban' => 'required|array',
             'kunci_jawaban.*' => 'required|string|in:A,B,C,D,E',
             'file.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
@@ -381,18 +386,40 @@ public function storePG(Request $request)
 
             \Log::info("Pertanyaan tersimpan id={$pertanyaan->id_pertanyaan}");
 
-            if (isset($request->opsi[$i])) {
-                foreach ($request->opsi[$i] as $j => $opsiText) {
-                    if (empty(trim($opsiText))) continue;
+            // Simpan opsi jawaban
+            if (isset($request->jenis_opsi[$i])) {
+                foreach ($request->jenis_opsi[$i] as $j => $jenis) {
                     $kode = chr(65 + $j);
+                    $isiOpsi = null;
 
-                    OpsiJawaban::create([
-                        'id_pertanyaan' => $pertanyaan->id_pertanyaan,
-                        'kode_opsi' => $kode,
-                        'isi_opsi' => $opsiText,
-                        'benar' => ($request->kunci_jawaban[$i] === $kode) ? 1 : 0,
-                    ]);
-                    \Log::info("Opsi $kode disimpan untuk pertanyaan {$pertanyaan->id_pertanyaan}");
+                    if ($jenis === 'text') {
+                        // Simpan teks langsung
+                        $isiOpsi = $request->opsi_text[$i][$j] ?? '';
+                    } elseif ($jenis === 'gambar') {
+                        // Simpan gambar sebagai file dan simpan path-nya
+                        if ($request->hasFile("opsi_gambar.$i.$j") && $request->file("opsi_gambar.$i.$j")->isValid()) {
+                            $fileOpsi = $request->file("opsi_gambar.$i.$j");
+                            
+                            // Generate nama file yang singkat
+                            $timestamp = now()->format('YmdHis');
+                            $fileName = "opsi_{$pertanyaan->id_pertanyaan}_{$kode}_{$timestamp}.{$fileOpsi->getClientOriginalExtension()}";
+                            
+                            $filePath = $fileOpsi->storeAs("uploads/opsi_jawaban", $fileName, "public");
+                            $isiOpsi = $filePath; // Simpan path file saja
+                            
+                            \Log::info("Gambar opsi disimpan: $filePath");
+                        }
+                    }
+
+                    if (!empty($isiOpsi)) {
+                        OpsiJawaban::create([
+                            'id_pertanyaan' => $pertanyaan->id_pertanyaan,
+                            'kode_opsi' => $kode,
+                            'isi_opsi' => $isiOpsi,
+                            'benar' => ($request->kunci_jawaban[$i] === $kode) ? 1 : 0,
+                        ]);
+                        \Log::info("Opsi $kode ($jenis) disimpan untuk pertanyaan {$pertanyaan->id_pertanyaan}");
+                    }
                 }
             }
         }
@@ -411,8 +438,6 @@ public function storePG(Request $request)
         return back()->with('error', 'Gagal menyimpan pertanyaan: ' . $e->getMessage())->withInput();
     }
 }
-
-
 
 public function crudPG($id_skema, $id_kelompok)
 {
@@ -461,7 +486,10 @@ public function crudPG($id_skema, $id_kelompok)
 
 public function editPG($id)
 {
-    $pertanyaan = Pertanyaan::with('opsiJawaban')->findOrFail($id);
+    $pertanyaan = Pertanyaan::with(['opsiJawaban' => function($query) {
+        $query->orderBy('kode_opsi'); // Urutkan berdasarkan kode A, B, C, D, E
+    }])->findOrFail($id);
+    
     $skema = Skema::find($pertanyaan->id_skema);
 
     return view('pertanyaan.input_pg_edit', compact('pertanyaan', 'skema'));
@@ -469,44 +497,79 @@ public function editPG($id)
 
 public function updatePG(Request $request, $id)
 {
+    \Log::info('=== UpdatePG Dimulai ===');
+    \Log::info('Request Data:', $request->all());
+    \Log::info('Files:', $request->file() ?: []);
+
     $pertanyaan = Pertanyaan::findOrFail($id);
 
     $request->validate([
         'isi_pertanyaan' => 'required|string',
         'kunci_jawaban' => 'required|string|in:A,B,C,D,E',
-        'opsi' => 'required|array|min:2',
-        'opsi.*' => 'required|string',
+        'jenis_opsi' => 'required|array|min:2',
+        'jenis_opsi.*' => 'required|string|in:text,gambar',
+        'opsi_text' => 'required|array',
+        'opsi_text.*' => 'nullable|string',
+        'opsi_gambar.*' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+        'opsi_gambar_lama.*' => 'nullable|string',
         'file' => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
+        'hapus_file' => 'nullable',
     ]);
 
     DB::beginTransaction();
     try {
-        // handle file
+        // File pertanyaan
         if ($request->hasFile('file')) {
             if ($pertanyaan->file_path && \Storage::disk('public')->exists($pertanyaan->file_path)) {
                 \Storage::disk('public')->delete($pertanyaan->file_path);
             }
             $file = $request->file('file');
-            $filePath = $file->store('uploads/pertanyaan', 'public');
-            $pertanyaan->file_path = $filePath;
+            $pertanyaan->file_path = $file->store('uploads/pertanyaan', 'public');
             $pertanyaan->file_type = $file->getClientOriginalExtension();
+        } elseif ($request->has('hapus_file')) {
+            if ($pertanyaan->file_path && \Storage::disk('public')->exists($pertanyaan->file_path)) {
+                \Storage::disk('public')->delete($pertanyaan->file_path);
+            }
+            $pertanyaan->file_path = null;
+            $pertanyaan->file_type = null;
         }
 
-        // update pertanyaan
+        // Update pertanyaan
         $pertanyaan->isi_pertanyaan = $request->isi_pertanyaan;
         $pertanyaan->kunci_jawaban = $request->kunci_jawaban;
         $pertanyaan->save();
 
-        // hapus opsi lama
+        // Hapus opsi lama
+        $opsiLama = OpsiJawaban::where('id_pertanyaan', $id)->get();
+        foreach ($opsiLama as $opsi) {
+            if ($opsi->isi_opsi && str_contains($opsi->isi_opsi, 'uploads/opsi_jawaban') && 
+                \Storage::disk('public')->exists($opsi->isi_opsi)) {
+                \Storage::disk('public')->delete($opsi->isi_opsi);
+            }
+        }
         OpsiJawaban::where('id_pertanyaan', $id)->delete();
 
-        // simpan opsi baru
-        foreach ($request->opsi as $j => $opsi) {
+        // Simpan opsi baru
+        foreach ($request->jenis_opsi as $j => $jenis) {
             $kode = chr(65 + $j);
+            $isiOpsi = null;
+
+            if ($jenis === 'text') {
+                $isiOpsi = $request->opsi_text[$j] ?? '';
+            } elseif ($jenis === 'gambar') {
+                if ($request->hasFile("opsi_gambar.$j") && $request->file("opsi_gambar.$j")->isValid()) {
+                    $fileOpsi = $request->file("opsi_gambar.$j");
+                    $fileName = "opsi_{$id}_{$kode}_" . now()->format('YmdHis') . "." . $fileOpsi->getClientOriginalExtension();
+                    $isiOpsi = $fileOpsi->storeAs("uploads/opsi_jawaban", $fileName, "public");
+                } elseif (!empty($request->opsi_gambar_lama[$j])) {
+                    $isiOpsi = $request->opsi_gambar_lama[$j];
+                }
+            }
+
             OpsiJawaban::create([
                 'id_pertanyaan' => $id,
                 'kode_opsi' => $kode,
-                'isi_opsi' => $opsi,
+                'isi_opsi' => $isiOpsi ?? '',
                 'benar' => ($request->kunci_jawaban == $kode) ? 1 : 0,
             ]);
         }
@@ -518,9 +581,10 @@ public function updatePG(Request $request, $id)
         ])->with('success', 'Pertanyaan PG berhasil diupdate!');
     } catch (\Exception $e) {
         DB::rollBack();
-        return back()->with('error', 'Gagal update: '.$e->getMessage());
+        return back()->with('error', 'Gagal update: '.$e->getMessage())->withInput();
     }
 }
+
 
 public function destroyPG($id)
 {
