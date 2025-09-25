@@ -50,8 +50,9 @@ Route::prefix('form-perencanaan')->group(function () {
     Route::get('/mapa01', [MapaController::class, 'create'])->name('form.mapa01');
 
     // Tujuan Asesmen
-  Route::post('/mapa01/simpan-tujuan', [MapaController::class, 'simpanTujuan'])->name('mapa01.simpanTujuan');
-    // Unit per skema & kelompok
+    Route::post('/mapa01/simpan-tujuan', [MapaController::class, 'simpanTujuan'])
+        ->name('mapa01.simpanTujuan');
+            // Unit per skema & kelompok
     Route::get('/mapa01/kode-unit/{skema_id}', [MapaController::class, 'kodeUnit'])->name('form.mapa01.kodeunit');
     Route::get('/mapa01/{skema_id}/kelompok/{kelompok_id}/tambah-unit', [MapaController::class, 'tambahUnit'])->name('form.mapa01.tambahunit');
     Route::post('/mapa01/{skema_id}/kelompok/{kelompok_id}/simpan-unit', [MapaController::class, 'simpanUnit'])->name('form.mapa01.simpanunit');

@@ -18,7 +18,7 @@ use Illuminate\Http\Request;
 
 class MapaController extends Controller
 {
-    public function simpanTujuan(Request $request)
+public function simpanTujuan(Request $request)
 {
     $request->validate([
         'skema_id' => 'required|exists:skema_sertifikasi,id_skema',
@@ -29,15 +29,22 @@ class MapaController extends Controller
 
     $tujuanIds = [];
     foreach ($request->tujuan as $tujuanNama) {
+        // cek atau buat tujuan baru
         $tujuan = TujuanAsesmen::firstOrCreate(['nama_tujuan' => $tujuanNama]);
         $tujuanIds[] = $tujuan->id_tujuan;
     }
 
-    // Sync pivot table tanpa menghapus tujuan lama
+    // simpan ke pivot tanpa menghapus yang lama
     $skema->tujuans()->syncWithoutDetaching($tujuanIds);
 
-    return response()->json(['status' => 'success', 'message' => 'Tujuan berhasil disimpan']);
+    return response()->json([
+        'status'  => 'success',
+        'message' => 'Tujuan berhasil disimpan',
+        'tujuan'  => $request->tujuan
+    ]);
 }
+
+
 
     public function create()
     {

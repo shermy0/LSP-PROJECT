@@ -154,9 +154,9 @@
     <div class="form-group">
         <label class="form-label">Hubungan antara standarkompetensi dan:</label>
         <div class="mapa-options-konteks">
-            <label><input type="checkbox" id="asesi1" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Bukti untuk mendukung asesmen</label>
-            <label><input type="checkbox" id="asesi1" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Aktivitas kerja di tempat kerja Asesi</label>
-            <label><input type="checkbox" id="asesi1" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Kegiatan Pembelajaran</label>
+            <label><input type="checkbox" id="123" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Bukti untuk mendukung asesmen</label>
+            <label><input type="checkbox" id="124" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Aktivitas kerja di tempat kerja Asesi</label>
+            <label><input type="checkbox" id="125" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Kegiatan Pembelajaran</label>
         </div>
     </div>
 
@@ -164,9 +164,9 @@
     <div class="form-group">
         <label class="form-label">Siapa yang melakukan asesmen / RPL</label>
         <div class="mapa-options-konteks">
-            <label><input type="checkbox" id="asesi1" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Lembaga Sertifikasi</label>
-            <label><input type="checkbox" id="asesi1" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Organisasi Pelatihan</label>
-            <label><input type="checkbox" id="asesi1" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Asesor Perusahaan</label>
+            <label><input type="checkbox" id="126" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Lembaga Sertifikasi</label>
+            <label><input type="checkbox" id="127" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Organisasi Pelatihan</label>
+            <label><input type="checkbox" id="128" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Asesor Perusahaan</label>
         </div>
     </div>
 </div>
@@ -197,7 +197,7 @@
 <div class="mapa-options">
     {{-- Standar Kompetensi --}}
     <div>
-        <input type="checkbox" id="asesi1" name="asesi[]" 
+        <input type="checkbox" id="129" name="asesi[]" 
                value="Standar Kompetensi" class="form-check-input me-2 toggle-input"
                data-target="input-asesi1">
         <label for="asesi1">Standar Kompetensi:</label>
@@ -208,21 +208,21 @@
 
     {{-- Kriteria asesmen dari kurikulum pelatihan --}}
     <div>
-        <input type="checkbox" id="asesi2" name="asesi[]" 
+        <input type="checkbox" id="130" name="asesi[]" 
                value="Kriteria asesmen" class="form-check-input me-2">
         <label for="asesi2">Kriteria asesmen dari kurikulum pelatihan</label>
     </div>
 
     {{-- Spesifikasi Kinerja Perusahaan --}}
     <div>
-        <input type="checkbox" id="asesi3" name="asesi[]" 
+        <input type="checkbox" id="131" name="asesi[]" 
                value="Spesifikasi Kinerja" class="form-check-input me-2">
         <label for="asesi3">Spesifikasi kinerja suatu perusahaan atau industri</label>
     </div>
 
     {{-- Spesifikasi Produk --}}
     <div>
-        <input type="checkbox" id="asesi4" name="asesi[]" 
+        <input type="checkbox" id="132" name="asesi[]" 
                value="Spesifikasi Produk" class="form-check-input me-2 toggle-input"
                data-target="input-asesi4">
         <label for="asesi4">Spesifikasi Produk:</label>
@@ -233,7 +233,7 @@
 
     {{-- Pedoman Khusus --}}
     <div>
-        <input type="checkbox" id="asesi5" name="asesi[]" 
+        <input type="checkbox" id="133" name="asesi[]" 
                value="Pedoman Khusus" class="form-check-input me-2 toggle-input"
                data-target="input-asesi5">
         <label for="asesi5">Pedoman Khusus:</label>
@@ -251,163 +251,147 @@
 
 </div>
 <!-- Simpan dan Lanjut -->
-<form id="simpan-lanjut-form" action="" method="GET" class="simpan-form">
+<form id="simpan-lanjut-form" action="" method="POST" class="simpan-form">
     @csrf
     <button type="submit" class="simpan-btn">
         <span>Simpan dan Lanjut</span>
     </button>
 </form>
 
+
 <script>
-document.getElementById('skema_id').addEventListener('change', function() {
-    let selected = this.options[this.selectedIndex];
-    let kode = selected.getAttribute('data-kode');
-    let jenjang = selected.getAttribute('data-jenjang');
+document.addEventListener("DOMContentLoaded", function() {
 
-    // isi nomor otomatis dari kode_skema
-    document.getElementById('nomorSkema').value = kode || '';
+    // =========================
+    // Inisialisasi data dari localStorage
+    // =========================
+    function loadDariLocal() {
+        let data = localStorage.getItem("mapa01Data");
+        if (!data) return;
+        data = JSON.parse(data);
 
-    // pilih radio otomatis sesuai jenjang
-    if (jenjang) {
-        if (jenjang.toLowerCase().includes("kkni")) {
-            document.getElementById('kkni').checked = true;
-        } else if (jenjang.toLowerCase().includes("okupasi")) {
-            document.getElementById('okupasi').checked = true;
+        // select skema
+        if (data.skema_id) document.getElementById('skema_id').value = data.skema_id;
+        if (data.nomorSkema) document.getElementById('nomorSkema').value = data.nomorSkema;
+        if (data.skema) {
+            let radio = document.getElementById(data.skema);
+            if (radio) radio.checked = true;
+        }
+
+        // checkbox asesi
+        if (data.asesi) {
+            document.querySelectorAll('input[name="asesi[]"]').forEach(cb => {
+                if (data.asesi.includes(cb.value)) cb.checked = true;
+            });
+        }
+
+        // checkbox tujuan
+        if (data.tujuan) {
+            document.querySelectorAll('input[name="tujuan[]"]').forEach(cb => {
+                if (data.tujuan.includes(cb.value)) cb.checked = true;
+            });
         }
     }
-});
 
-// fungsi untuk simpan data ke localStorage
-function simpanKeLocal() {
-    let data = {};
+    loadDariLocal();
 
-    // ambil nilai select skema
-    data.skema_id = document.getElementById('skema_id').value;
-    data.nomorSkema = document.getElementById('nomorSkema').value;
+    // =========================
+    // Simpan data ke localStorage
+    // =========================
+    function simpanKeLocal() {
+        let data = {};
+        data.skema_id = document.getElementById('skema_id').value;
+        data.nomorSkema = document.getElementById('nomorSkema').value;
 
-    // ambil radio skema
-    let skemaRadio = document.querySelector('input[name="skema"]:checked');
-    data.skema = skemaRadio ? skemaRadio.id : null;
+        let skemaRadio = document.querySelector('input[name="skema"]:checked');
+        data.skema = skemaRadio ? skemaRadio.id : null;
 
-    // ambil checkbox asesi
-    data.asesi = [];
-    document.querySelectorAll('input[name="asesi[]"]:checked').forEach(cb => {
-        data.asesi.push(cb.value);
-    });
+        data.asesi = [];
+        document.querySelectorAll('input[name="asesi[]"]:checked').forEach(cb => data.asesi.push(cb.value));
 
-    // ambil tujuan asesmen
-    data.tujuan = [];
-    document.querySelectorAll('input[name="tujuan[]"]:checked').forEach(cb => {
-        data.tujuan.push(cb.value);
-    });
+        data.tujuan = [];
+        document.querySelectorAll('input[name="tujuan[]"]:checked').forEach(cb => data.tujuan.push(cb.value));
 
-    localStorage.setItem("mapa01Data", JSON.stringify(data));
-}
-
-// fungsi untuk load data dari localStorage
-function loadDariLocal() {
-    let data = localStorage.getItem("mapa01Data");
-    if (!data) return;
-    data = JSON.parse(data);
-
-    // isi kembali select
-    if (data.skema_id) {
-        document.getElementById('skema_id').value = data.skema_id;
+        localStorage.setItem("mapa01Data", JSON.stringify(data));
     }
 
-    // isi kembali nomor
-    if (data.nomorSkema) {
-        document.getElementById('nomorSkema').value = data.nomorSkema;
-    }
+    document.addEventListener("input", simpanKeLocal);
+    document.addEventListener("change", simpanKeLocal);
 
-    // radio skema
-    if (data.skema) {
-        let radio = document.getElementById(data.skema);
-        if (radio) radio.checked = true;
-    }
+    // =========================
+    // Pilih skema otomatis
+    // =========================
+    document.getElementById('skema_id').addEventListener('change', function() {
+        let selected = this.options[this.selectedIndex];
+        let kode = selected.getAttribute('data-kode');
+        let jenjang = selected.getAttribute('data-jenjang');
 
-    // checkbox asesi
-    if (data.asesi) {
-        document.querySelectorAll('input[name="asesi[]"]').forEach(cb => {
-            if (data.asesi.includes(cb.value)) {
-                cb.checked = true;
-            }
-        });
-    }
+        document.getElementById('nomorSkema').value = kode || '';
 
-    // tujuan asesmen
-    if (data.tujuan) {
-        document.querySelectorAll('input[name="tujuan[]"]').forEach(cb => {
-            if (data.tujuan.includes(cb.value)) {
-                cb.checked = true;
-            }
-        });
-    }
-}
-
-// simpan otomatis setiap ada perubahan input
-document.addEventListener("input", simpanKeLocal);
-document.addEventListener("change", simpanKeLocal);
-
-// load data ketika halaman dibuka
-document.addEventListener("DOMContentLoaded", loadDariLocal);
-
-document.getElementById('simpan-lanjut-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    const skemaId = document.getElementById('skema_id').value;
-    if (!skemaId) {
-        alert("Silakan pilih skema terlebih dahulu");
-        return;
-    }
-
-    // ambil semua tujuan yang di-checklist
-    let tujuan = [];
-    document.querySelectorAll('input[name="tujuan[]"]:checked').forEach(cb => {
-        tujuan.push(cb.value);
-    });
-
-    if (tujuan.length === 0) {
-        alert("Silakan pilih minimal 1 tujuan asesmen");
-        return;
-    }
-
-    fetch("{{ route('mapa01.simpanTujuan') }}", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-        },
-        body: JSON.stringify({ skema_id: skemaId, tujuan: tujuan })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.status === 'success') {
-            // arahkan ke halaman kode-unit
-            window.location.href = "/form-perencanaan/mapa01/kode-unit/" + skemaId;
-        } else {
-            alert("Gagal menyimpan tujuan");
+        if (jenjang) {
+            if (jenjang.toLowerCase().includes("kkni")) document.getElementById('kkni').checked = true;
+            else if (jenjang.toLowerCase().includes("okupasi")) document.getElementById('okupasi').checked = true;
         }
-    })
-    .catch(err => {
-        console.error(err);
-        alert("Terjadi kesalahan, coba lagi");
+
+        simpanKeLocal();
     });
-});
 
-document.getElementById('simpanTujuan').addEventListener('click', function() {
-    let input = document.getElementById('tujuanBaru');
-    let value = input.value.trim();
+    // =========================
+    // Simpan & lanjut
+    // =========================
+    document.getElementById('simpan-lanjut-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const skemaId = document.getElementById('skema_id').value;
+        if (!skemaId) { alert("Silakan pilih skema terlebih dahulu"); return; }
 
-    if(value !== "") {
-        // Buat ID unik biar gak bentrok
-        let id = 'tujuan-' + Date.now();
+        let tujuan = [];
+        document.querySelectorAll('input[name="tujuan[]"]:checked').forEach(cb => tujuan.push(cb.value));
+        if (tujuan.length === 0) { alert("Silakan pilih minimal 1 tujuan asesmen"); return; }
 
-        // Tambahkan ke list
-        let container = document.getElementById('tujuan-asesmen-list');
-        
-        let div = document.createElement('div');
-        div.classList.add("d-flex", "align-items-center", "mb-2", "tujuan-custom");
+        fetch("{{ route('mapa01.simpanTujuan') }}", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json", 
+                "X-CSRF-TOKEN": "{{ csrf_token() }}" 
+            },
+            body: JSON.stringify({ skema_id: skemaId, tujuan: tujuan })
+        })
+        .then(async res => {
+            if (!res.ok) {
+                const text = await res.text();
+                console.error("Response bukan JSON:", text);
+                throw new Error("HTTP error " + res.status);
+            }
+            return res.json();
+        })
+        .then(data => {
+            if(data.status === 'success') {
+                window.location.href = "/form-perencanaan/mapa01/kode-unit/" + skemaId;
+            } else {
+                alert("Gagal menyimpan tujuan");
+            }
+        })
+        .catch(err => { console.error(err); alert("Terjadi kesalahan, coba lagi"); });
+    });
+
+    // =========================
+    // Tambah opsi tujuan baru
+    // =========================
+    document.getElementById('simpanTujuan').addEventListener('click', function() {
+        const input = document.getElementById('tujuanBaru');
+        const value = input.value.trim();
+        const skemaId = document.getElementById('skema_id').value;
+
+        if(!skemaId) { alert("Silakan pilih skema terlebih dahulu"); return; }
+        if(value === "") return;
+
+        // Buat ID unik
+        const id = 'tujuan-' + Date.now();
+
+        // Tambahkan ke DOM
+        const container = document.getElementById('tujuan-asesmen-list');
+        const div = document.createElement('div');
+        div.classList.add("d-flex","align-items-center","mb-2","tujuan-custom");
         div.innerHTML = `
             <input type="checkbox" id="${id}" name="tujuan[]" value="${value}" class="form-check-input me-2" checked>
             <label for="${id}" class="me-2 flex-grow-1">${value}</label>
@@ -415,36 +399,55 @@ document.getElementById('simpanTujuan').addEventListener('click', function() {
         `;
         container.appendChild(div);
 
-        // Event hapus hanya utk opsi user
-        div.querySelector(".btn-delete").addEventListener("click", function(){
-            div.remove();
-        });
+        // Event hapus
+        div.querySelector(".btn-delete").addEventListener("click", function(){ div.remove(); simpanKeLocal(); });
 
-        // Reset input
+        // Simpan ke database
+        fetch("{{ route('mapa01.simpanTujuan') }}", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json", 
+                "X-CSRF-TOKEN": "{{ csrf_token() }}" 
+            },
+            body: JSON.stringify({ skema_id: skemaId, tujuan: [value] })
+        })
+        .then(async res => {
+            if (!res.ok) {
+                const text = await res.text();
+                console.error("Response bukan JSON:", text);
+                throw new Error("HTTP error " + res.status);
+            }
+            return res.json();
+        })
+        .then(data => { 
+            if(data.status !== 'success') alert("Gagal menyimpan tujuan baru"); 
+        })
+        .catch(err => { console.error(err); alert("Terjadi kesalahan saat menyimpan tujuan baru"); });
+
+        // Simpan ke localStorage
+        simpanKeLocal();
+
+        // Reset input dan tutup modal
         input.value = "";
-
-        // Tutup modal
         var modal = bootstrap.Modal.getInstance(document.getElementById('modalTambahTujuan'));
         modal.hide();
-    }
-});
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll(".toggle-input").forEach(function (checkbox) {
-            checkbox.addEventListener("change", function () {
-                const targetId = this.dataset.target;
-                const targetInput = document.getElementById(targetId);
-                if (this.checked) {
-                    targetInput.style.display = "block";
-                    targetInput.disabled = false;
-                } else {
-                    targetInput.style.display = "none";
-                    targetInput.disabled = true;
-                    targetInput.value = ""; // reset isi kalau di-uncheck
-                }
-            });
+    });
+
+    // =========================
+    // Toggle input tambahan
+    // =========================
+    document.querySelectorAll(".toggle-input").forEach(function(checkbox) {
+        checkbox.addEventListener("change", function() {
+            const targetId = this.dataset.target;
+            const targetInput = document.getElementById(targetId);
+            if(this.checked) { targetInput.style.display="block"; targetInput.disabled=false; }
+            else { targetInput.style.display="none"; targetInput.disabled=true; targetInput.value=""; }
         });
     });
 
+});
 </script>
+
+
 
 @endsection
