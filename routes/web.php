@@ -17,6 +17,7 @@ use App\Http\Controllers\FormPraAsesmenController;
 use App\Http\Controllers\Asesi\AsesmenMandiriController as AsesiAsesmenMandiriController;
 use App\Http\Controllers\Asesor\AsesmenMandiriController as AsesorAsesmenMandiriController;
 
+
 // ================== AUTH ==================
 // login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -127,6 +128,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/asesi/form-pra-asesmen', [FormPraAsesmenController::class, 'index'])
         ->name('asesi.form_pra_asesmen');
 });
+
+Route::post('/admin/permohonan/{id_permohonan}/update', 
+    [Form1AdminController::class, 'update'])->name('admin.permohonan.update');
 
 // ================== LOGOUT ==================
 Route::post('/logout', function () {
