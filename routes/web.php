@@ -42,11 +42,13 @@ Route::middleware(['auth', 'role:asesi'])->group(function () {
 // Meninjau Asesmen
 Route::get('/ninjau_asesemen', [SkemaController::class, 'ninjau_asesemen'])->name('ninjau_asesemen');
 Route::get('/ninjau-asesmen-asesor', [PerencanaanController::class, 'ninjauAsesmenAsesor'])->name('ninjau_asesmen_asesor.view');
+Route::post('/meninjau-asesmen/store', [SkemaController::class, 'store'])->name('meninjau_asesmen.store');
 
 // simpan dan lanjut
 Route::post('/formperencanaan', [PerencanaanController::class, 'simpan'])->name('formperencanaan');
 Route::post('/ninjau-asesmen-asesor', [PerencanaanController::class, 'simpanLanjut'])->name('ninjau_asesmen_asesor');
 
+Route::get('/get-asesor/{skema_id}', [SkemaController::class, 'getAsesor']);
 // Logout
 Route::post('/logout', function () {
     Auth::logout();
