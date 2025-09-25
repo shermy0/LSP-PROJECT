@@ -5,8 +5,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class MasterTugasDemonstrasi extends Model
 {
-    protected $table = 'master_tugas_demonstrasi';   // nama tabel di DB
-    protected $primaryKey = 'id_tugas';              // primary key
+    protected $table = 'master_tugas_demonstrasi';
+    protected $primaryKey = 'id_tugas';
     public $timestamps = false;
 
     protected $fillable = [
@@ -21,17 +21,16 @@ class MasterTugasDemonstrasi extends Model
     // Relasi ke Demonstrasi
     public function demonstrasi()
     {
-        return $this->belongsTo(Demonstrasi::class, 'id_demonstrasi');
+        return $this->belongsTo(Demonstrasi::class, 'id_demonstrasi', 'id_demonstrasi');
     }
 
     // Relasi ke Skema
-     public function skema()
+    public function skema()
     {
         return $this->belongsTo(SkemaSertifikasi::class, 'id_skema', 'id_skema');
     }
 
-    // Relasi ke Kelompok (opsional, kalau tabel kelompok ada)
-    // 🔹 Relasi ke tabel kelompok (kalau ada model Kelompok)
+    // Relasi ke Kelompok
     public function kelompok()
     {
         return $this->belongsTo(KelompokPekerjaan::class, 'id_kelompok', 'id_kelompok');

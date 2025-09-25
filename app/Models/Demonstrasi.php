@@ -19,7 +19,7 @@ class Demonstrasi extends Model
     ];
 
     // Relasi ke Skema
-     public function skema()
+    public function skema()
     {
         return $this->belongsTo(SkemaSertifikasi::class, 'id_skema', 'id_skema');
     }
@@ -27,18 +27,24 @@ class Demonstrasi extends Model
     // Relasi ke Asesor
     public function asesor()
     {
-        return $this->belongsTo(Asesor::class, 'id_asesor');
+        return $this->belongsTo(Asesor::class, 'id_asesor', 'id_asesor');
     }
 
-    // Relasi ke Kelompok (jika ada tabel kelompok)
+    // Relasi ke Kelompok
     public function kelompok()
     {
         return $this->belongsTo(KelompokPekerjaan::class, 'id_kelompok', 'id_kelompok');
     }
 
-    // Relasi ke Asesmen (jika ada tabel asesmen)
+    // Relasi ke Asesmen
     public function asesmen()
     {
-        return $this->belongsTo(Asesmen::class, 'id_asesmen');
+        return $this->belongsTo(Asesmen::class, 'id_asesmen', 'id_asesmen');
+    }
+
+    // 🔹 Demonstrasi punya banyak tugas
+    public function tugas()
+    {
+        return $this->hasMany(MasterTugasDemonstrasi::class, 'id_demonstrasi', 'id_demonstrasi');
     }
 }

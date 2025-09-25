@@ -210,6 +210,7 @@
     </div>   
         <div class="action-btns">
     <!-- Tombol buka modal -->
+<div class="action-btns">
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalPertanyaan">
         Buat Pertanyaan
     </button>
@@ -224,17 +225,16 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <!-- Ubah method jadi GET dan arahkan ke route demonstrasi.create -->
-            <form method="GET" action="{{ route('demonstrasi.create', $skema->id_skema) }}">
+            <!-- 🔹 Ubah ke POST langsung ke demonstrasi.store -->
+            <form method="POST" action="{{ route('demonstrasi.store') }}">
+                @csrf
                 <div class="modal-body pt-2">
-                    <!-- Hidden id_skema -->
+                    <!-- Hidden id_skema & asesor -->
                     <input type="hidden" name="id_skema" value="{{ $skema->id_skema }}">
-                    <!-- Asesor sementara fix 1 -->
                     <input type="hidden" name="id_asesor" value="1">
 
-                    <!-- Jumlah tugas -->
-                    <label for="jumlah" class="fw-bold small mt-3">Jumlah Tugas</label>
-                    <input type="number" name="jumlah" id="jumlah" class="form-control" min="1" max="15" value="1" required>
+                    <!-- Instruksi default -->
+                    <input type="hidden" name="instruksi" value="Tugas demonstrasi untuk skema {{ $skema->nama_skema }}">
 
                     <!-- Timer -->
                     <label for="timer" class="fw-bold small mt-3">Timer (menit)</label>
@@ -243,7 +243,7 @@
 
                 <div class="modal-footer border-0">
                     <button type="submit" class="btn w-100 text-white" style="background-color:#041562; font-weight:bold;">
-                        Lanjut
+                        Simpan
                     </button>
                 </div>
             </form>
