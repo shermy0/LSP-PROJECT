@@ -11,6 +11,7 @@ use App\Http\Controllers\FormAsesmenController;
 use App\Http\Controllers\Asesi\PermohonanController;
 use App\Http\Controllers\Admin\Form1AdminController;
 use App\Http\Controllers\BandingAsesmenController;
+use App\Http\Controllers\FormPraAsesmenController;
 
 // Tambahan controller Asesmen Mandiri
 use App\Http\Controllers\Asesi\AsesmenMandiriController as AsesiAsesmenMandiriController;
@@ -44,6 +45,7 @@ Route::get('/', function () {
 
 // ================== DASHBOARD ==================
 Route::middleware(['auth'])->group(function () {
+
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Admin
@@ -51,16 +53,25 @@ Route::middleware(['auth'])->group(function () {
 
     // Asesi
     Route::get('/asesi/dashboard', [DashboardController::class, 'asesi'])->name('asesi.dashboard');
+
+    // ================== PERMOHONAN (FR.APL.01) ==================
     Route::prefix('asesi/permohonan')->name('asesi.permohonan.')->group(function () {
         Route::get('/form1', [PermohonanController::class, 'form1'])->name('form1');
         Route::post('/store', [PermohonanController::class, 'store'])->name('store');
         Route::get('/form2', [PermohonanController::class, 'form2'])->name('form2');
         Route::post('/store-dokumen', [PermohonanController::class, 'storeDokumen'])->name('storeDokumen');
+
+        // status menunggu (jika sudah diajukan)
+        Route::get('/menunggu', function () {
+            return view('asesi.permohonan.menunggu');
+        })->name('menunggu');
     });
+
+    // ambil data skema via ajax
     Route::get('/get-skema/{id}', [PermohonanController::class, 'getSkema'])->name('get.skema');
 
     // ================== ASESOR ==================
-    Route::get('/asesor/dashboard', [DashboardController::class, 'asesor'])->name('dashboard.asesor');
+    Route::get('/asesor/dashboard', [DashboardController::class, 'asesor'])->name('asesor.dashboard');
 
     // ================== FORM ASESMEN ==================
     Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('formperencanaan');
@@ -80,25 +91,30 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/form-asesmen/pertanyaan-esai/store', [FormAsesmenController::class, 'storeEsai'])->name('pertanyaan.esai.store');
     Route::post('/form-asesmen/pertanyaan-esai/delete', [FormAsesmenController::class, 'deleteEsai'])->name('pertanyaan.esai.delete');
 
-    // ================== ADMIN (FR.APL.01 - Form1) ==================
+    // ================== ADMIN (FR.APL.01 - Permohonan) ==================
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::prefix('permohonan')->name('permohonan.')->group(function () {
             Route::get('/', [Form1AdminController::class, 'index'])->name('index');
             Route::get('/{user_id}', [Form1AdminController::class, 'show'])->name('show');
+            Route::post('/{id_permohonan}/update', [Form1AdminController::class, 'update'])->name('update');
         });
     });
 
-    // ================== ASESMEN MANDIRI (ASESI) ==================
+    // ================== ASESMEN MANDIRI (FR.APL.02 - ASESI) ==================
     Route::prefix('asesi/asesmen-mandiri')->name('asesi.asesmen_mandiri.')->group(function () {
         Route::get('form1', [AsesiAsesmenMandiriController::class, 'form1'])->name('form1');
         Route::get('form2', [AsesiAsesmenMandiriController::class, 'form2'])->name('form2');
-        Route::post('store', [AsesiAsesmenMandiriController::class, 'store'])->name('store');
         Route::get('form3', [AsesiAsesmenMandiriController::class, 'form3'])->name('form3');
         Route::get('form4', [AsesiAsesmenMandiriController::class, 'form4'])->name('form4');
+        Route::post('store', [AsesiAsesmenMandiriController::class, 'store'])->name('store');
 
         // Tambahan: route simpan tanda tangan
         Route::post('ttd', [AsesiAsesmenMandiriController::class, 'storeTTD'])->name('ttd.store');
+
+        // 🔹 Tambahkan route show
+        Route::get('/{id}', [AsesiAsesmenMandiriController::class, 'show'])->name('show');
     });
+
 
     // ================== ASESMEN MANDIRI (ASESOR) ==================
     Route::prefix('asesor/asesmen-mandiri')->name('asesor.asesmen_mandiri.')->group(function () {
@@ -106,13 +122,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/form2', [AsesorAsesmenMandiriController::class, 'form2'])->name('form2');
         Route::get('/form3', [AsesorAsesmenMandiriController::class, 'form3'])->name('form3');
     });
-});
 
-// ================== ADMIN PERMOHONAN UPDATE ==================
-Route::post(
-    '/admin/permohonan/{id_permohonan}/update',
-    [Form1AdminController::class, 'update']
-)->name('admin.permohonan.update');
+    // ================== PRA ASESMEN ==================
+    Route::get('/asesi/form-pra-asesmen', [FormPraAsesmenController::class, 'index'])
+        ->name('asesi.form_pra_asesmen');
+});
 
 // ================== LOGOUT ==================
 Route::post('/logout', function () {

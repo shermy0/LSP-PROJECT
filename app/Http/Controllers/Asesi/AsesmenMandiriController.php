@@ -141,11 +141,6 @@ class AsesmenMandiriController extends Controller
         return view('asesi.asesmen_mandiri.form3');
     }
 
-    public function form4()
-    {
-        return view('asesi.asesmen_mandiri.form4');
-    }
-
     public function storeTTD(Request $request)
     {
         $user = Auth::user();
