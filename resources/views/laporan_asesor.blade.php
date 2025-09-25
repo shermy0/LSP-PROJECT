@@ -1,5 +1,4 @@
 @extends('master')
-
 @section('konten')
 <div class="card-box">
     <!-- Breadcrumb -->
@@ -20,70 +19,71 @@
 
 <!-- Komentar dan TTD -->
 <div class="card-box">
-    <div class="judul-box">
-        <div class="judul-header">Catatan Asesor & Tanda Tangan</div>
+    <div class="komen_ttd-box">
+        <div class="komen_ttd-header">Catatan Asesor & Tanda Tangan</div>
+    </div>
 
-        <h5 class="mb-3">Asesor</h5>
+    <form id="simpan-form" action="{{ route('formperencanaan') }}" method="POST" class="simpan-form">
+        @csrf
+
+        <h5 style="text-align: left;">Asesor</h5>
 
         <!-- Catatan -->
-        <div class="form-group mb-3">
-            <label for="catatan" class="form-label fw-semibold">Catatan</label>
-            <textarea id="catatan" class="form-control mt-2" rows="3" placeholder="Masukkan Catatan Anda"></textarea>
+        <div class="col-md-12 mb-3">
+            <label for="aspek_positif_negatif" class="form-label fw-semibold">Catatan</label>
+            <textarea name="aspek_positif_negatif" id="aspek_positif_negatif" class="form-control mt-2" rows="3" placeholder="Masukkan Catatan Anda"></textarea>
         </div>
 
-        @if(isset($asesor))
-            <!-- Nama Asesor -->
-            <div class="form-group mb-3">
-                <label class="form-label fw-semibold">Nama Asesor</label>
-                <input type="text" class="form-control" value="{{ $asesor->nama_asesor }}" readonly>
-            </div>
+        @foreach($laporans as $laporan)
+        @endforeach
+        <!-- Nama Asesor -->
+        <div class="col-md-12 mb-3">
+            <label for="namaasesor" class="form-label fw-semibold">Nama Asesor</label>
+            <input type="text" class="form-control" id="namaasesor" 
+                value="{{ $laporan->asesor->nama_asesor ?? '-' }}" readonly>
+            <input type="hidden" name="asesor_id" value="{{ $asesor->id ?? '' }}">
+        </div>
 
-            <!-- Nomor Registrasi -->
-            <div class="form-group mb-3">
-                <label class="form-label fw-semibold">Nomor Registrasi</label>
-                <input type="text" class="form-control" value="{{ $no_registrasi }}" readonly>
-            </div>
-        @else
-            <div class="alert alert-info">
-                Data asesor belum dipilih. Kembali ke halaman 
-                <a href="{{ route('laporan') }}">Pilih Asesor</a>.
-            </div>
-        @endif
+        <!-- Nomor Registrasi -->
+        <div class="col-md-12 mb-3">
+            <label for="nomorregistrasi" class="form-label fw-semibold">Nomor Registrasi</label>
+            <input type="text" class="form-control" id="nomorregistrasi" 
+                value="{{ $laporan->asesor->no_registrasi ?? '-' }}" readonly>
+            <input type="hidden" name="no_registrasi" value="{{ $asesor->no_registrasi ?? '' }}">
+        </div>
+        
+
+        <!-- Skema (hidden aja kalau sudah pasti) -->
+        <input type="hidden" name="skema_id" value="{{ $skema->id ?? '' }}">
 
         <!-- Tanggal Asesmen -->
-        <div class="form-group mb-3">
+        <div class="col-md-12 mb-3">
             <label for="tanggalAsesmen" class="form-label fw-semibold">Tanggal Asesmen</label>
-            <input type="date" class="form-control" id="tanggalAsesmen">
+            <input type="date" class="form-control" id="tanggalAsesmen" name="tgl_laporan" value="{{ now()->toDateString() }}">
         </div>
 
-        <!-- Tanda Tangan -->
-        <div class="col-md-6">
+        <!-- Signature -->
+        <div class="col-md-6 mb-3">
             <div class="card-field">
-                <label class="form-label fw-semibold">Tanda Tangan</label>
-                <div class="signature-container">
+                <label class="form-label">Tanda Tangan</label>
+                <div class="signature-container border rounded">
                     <canvas id="signature-pad" class="signature-pad"></canvas>
                 </div>
-
                 <div class="mt-2 d-flex gap-2">
                     <button type="button" id="clear" class="btn btn-sm btn-outline-danger">Hapus</button>
                 </div>
-
                 <!-- Hidden input untuk simpan tanda tangan -->
                 <input type="hidden" name="tanda_tangan" id="tanda_tangan">
             </div>
         </div>
-    </div>
+
+        <!-- Tombol Simpan -->
+        <button type="submit" class="simpan-btn">
+            <span>Simpan</span>
+        </button>
+    </form>
 </div>
 
-<!-- Tombol Simpan -->
-<form id="simpan-form" action="{{ route('formperencanaan') }}" method="POST" class="simpan-form mt-3">
-    @csrf
-    <button type="submit" class="simpan-btn">
-        <span>Simpan</span>
-    </button>
-</form>
-
-<!-- Signature Pad -->
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
 <script>
     const canvas = document.getElementById("signature-pad");
@@ -91,13 +91,12 @@
 
     // Resize biar canvas sesuai container
     function resizeCanvas() {
-        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        const ratio =  Math.max(window.devicePixelRatio || 1, 1);
         canvas.width = canvas.offsetWidth * ratio;
         canvas.height = canvas.offsetHeight * ratio;
         canvas.getContext("2d").scale(ratio, ratio);
         signaturePad.clear();
     }
-
     window.onresize = resizeCanvas;
     resizeCanvas();
 
@@ -107,7 +106,7 @@
     });
 
     // Saat submit form simpan ke input hidden
-    document.getElementById("simpan-form").addEventListener("submit", function () {
+    document.getElementById("simpan-form").addEventListener("submit", function (e) {
         if (!signaturePad.isEmpty()) {
             document.getElementById("tanda_tangan").value = signaturePad.toDataURL();
         }

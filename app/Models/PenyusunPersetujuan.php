@@ -16,5 +16,6 @@ class PenyusunPersetujuan extends Model
         'no_met',
         'tanggal',
         'tanda_tangan',
+        'catatan'
     ];
 }

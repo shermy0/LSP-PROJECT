@@ -16,14 +16,30 @@
     <div class="text-center mb-4">
         <div class="mapa-logo"></div>
         <h3 class="fw-bold">FR.VA – MEMBERIKAN KONTRIBUSI DALAM VALIDASI ASESMEN</h3>
-        <small class="text-muted">Pemberian Kontribusi dalam Validasi Asesmen</small>
+    </div>
+
+    <!-- Skema -->
+    <div class="skema-container">
+        <div class="skema-group">
+            <span class="skema-label">SKEMA:</span>
+            <select name="skema_id" id="skema_id" class="skema-select">
+                <option value="">-- Pilih Skema --</option>
+                @foreach($skemas as $skema)
+                    <option value="{{ $skema->id_skema }}"
+                            data-kode="{{ $skema->kode_skema }}"
+                            data-jenjang="{{ $skema->jenjang }}">
+                        {{ $skema->nama_skema }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
     </div>
 
     <!-- Periode -->
     <div class="skema-container mb-4">
         <div class="skema-group">
-            <span class="skema-label">PERIODE:</span>
-            <span class="skema-select text-primary fw-bold">{{ $periodeText }}</span>
+            <span class="skema-label fw-bold">PERIODE:</span>
+            <span class="text-primary fw-bold">{{ $periodeText }}</span>
         </div>
     </div>
 

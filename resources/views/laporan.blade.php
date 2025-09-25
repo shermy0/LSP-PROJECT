@@ -22,16 +22,16 @@
     <div class="skema-container">
         <div class="skema-group">
             <span class="skema-label">SKEMA:</span>
-            <select name="skema_id" id="skema_id" class="skema-select">
-                <option value="">-- Pilih Skema --</option>
-                @foreach($skemas as $skema)
-                    <option value="{{ $skema->id_skema }}"
-                            data-kode="{{ $skema->kode_skema }}"
-                            data-jenjang="{{ $skema->jenjang }}">
-                        {{ $skema->nama_skema }}
-                    </option>
-                @endforeach
-            </select>
+                <select name="skema_id" id="skema_id" class="skema-select" required>
+                    <option value="">-- Pilih Skema --</option>
+                    @foreach($skemas as $skema)
+                        <option value="{{ $skema->id_skema }}"
+                                data-kode="{{ $skema->kode_skema }}"
+                                data-jenjang="{{ $skema->jenjang }}">
+                            {{ $skema->nama_skema }}
+                        </option>
+                    @endforeach
+                </select>
         </div>
     </div>
 
@@ -132,32 +132,39 @@
     </div>
 </div>
 
-<form id="simpan-lanjut-form" action="{{ route('laporan_asesor') }}" method="POST" class="simpan-form">
+<!-- Catatan Asesmen -->
+<form id="simpan-lanjut-form" action="{{ route('laporan_asesor.store') }}" method="POST" class="simpan-form">
     @csrf
-    <input type="hidden" name="asesor_id" id="asesor_id_hidden" value="{{ $asesor->id ?? '' }}">
-    <input type="hidden" name="skema_id" id="skema_id_hidden" value="{{ $skema->id ?? '' }}">
-    <input type="hidden" name="no_registrasi" id="no_registrasi_hidden" value="{{ $no_registrasi ?? '' }}">
+    <!-- hidden input supaya data ikut terkirim -->
+    <input type="hidden" name="asesor_id" id="asesor_id_hidden">
+    <input type="hidden" name="skema_id" id="skema_id_hidden">
+    <input type="hidden" name="no_registrasi" id="no_registrasi_hidden">
 
-    <div class="box">
-        <div class="box-header">Aspek Negatif dan Positif dalam Asesmen</div>
-        <textarea name="aspek_positif_negatif" class="box-input" rows="3"></textarea>
-    </div>
+    <div class="card-box">
+        <div class="judul-box">
+            <div class="judul-header">Catatan Asesmen</div>
 
-    <div class="box">
-        <div class="box-header">Pencatatan Penolakan Hasil Asesmen</div>
-        <textarea name="penolakan" class="box-input" rows="3"></textarea>
-    </div>
+            <div class="box">
+                <div class="box-header">Aspek Negatif dan Positif dalam Asesmen</div>
+                <textarea name="aspek_positif_negatif" class="box-input" rows="3" placeholder="Masukkan teks" required></textarea>
+            </div>
 
-    <div class="box">
-        <div class="box-header">Saran Perbaikan : (Asesor/Personil Terkait)</div>
-        <textarea name="saran_perbaikan" class="box-input" rows="3"></textarea>
+            <div class="box">
+                <div class="box-header">Pencatatan Penolakan Hasil Asesmen</div>
+                <textarea name="penolakan" class="box-input" rows="3" placeholder="Masukkan teks" required></textarea>
+            </div>
+
+            <div class="box">
+                <div class="box-header">Saran Perbaikan : (Asesor/Personil Terkait)</div>
+                <textarea name="saran_perbaikan" class="box-input" rows="3" placeholder="Masukkan teks" required></textarea>
+            </div>
+        </div>
     </div>
 
     <button type="submit" class="simpan-btn">
         <span>Simpan dan Lanjut</span>
     </button>
 </form>
-
 
 <script>
     // Saat ganti skema

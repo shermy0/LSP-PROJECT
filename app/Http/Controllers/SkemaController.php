@@ -50,7 +50,7 @@ class SkemaController extends Controller
         $skemas = Skema::all(); 
         return view('mapa02', compact('skemas'));
     }
-    
+
     public function show($id)
     {
         // ambil data dari mapa02
@@ -119,7 +119,9 @@ class SkemaController extends Controller
     }
 
     public function getUnits($skemaId) {
-        $units = UnitKompetensi::where('skema_id', $skemaId)->get();
+        $units = UnitKompetensi::where('id_skema', $skemaId)
+            ->select('kode_unit', 'judul_unit')
+            ->get();
         return response()->json($units);
     }    
 }
