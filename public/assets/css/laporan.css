@@ -1,0 +1,44 @@
+.button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.btn-submit {
+    background: #041C5C;
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s ease-in-out;
+}
+.btn-submit:hover {
+    background: #06267c;
+}
+
+.btn-unduh {
+    background: #2E7D32; /* Hijau */
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s ease-in-out;
+}
+.btn-unduh:hover {
+    background: #1B5E20;
+}
+
+.signature-container {
+    margin-top: 20px;
+}
+.signature-pad {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 400px;
+    height: 200px;
+}

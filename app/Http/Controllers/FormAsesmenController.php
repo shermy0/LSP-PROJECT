@@ -30,6 +30,14 @@ public function pertanyaanLisan($id_skema)
     return view('lisan', compact('skema'));
 }
 
+public function pertanyaanPG($id_skema)
+{
+    // cari skema berdasarkan ID
+    $skema = Skema::findOrFail($id_skema);
+
+    return view('pg', compact('skema')); // pastikan view pg.blade.php ada
+}
+
 public function showSkema($id_skema)
 {
     $skema = Skema::findOrFail($id_skema);
@@ -80,6 +88,34 @@ public function createEsai(Request $request)
     $pembuatan = PembuatanPertanyaan::with('pertanyaan')->findOrFail($id_pembuatan);
 
 }
+public function kelompokPekerjaanPG($id_skema)
+{
+    $skema = Skema::findOrFail($id_skema);
+    
+    // Redirect ke controller PertanyaanController untuk menangani kelompok pekerjaan
+    return redirect()->route('pertanyaan.pg.kelompok', [
+        'id_skema' => $id_skema,
+        'jenis' => 'pilihan_ganda'
+    ]);
+}
+
+public function createPG(Request $request)
+{
+    $jumlah   = $request->query('jumlah', 5); 
+    $id_skema = $request->query('id_skema');
+
+    $skema = Skema::findOrFail($id_skema);
+
+    // Buat record baru di pembuatan_pertanyaan
+    $pembuatan = PembuatanPertanyaan::create([
+        'id_skema' => $id_skema,
+        'timer'    => 0, // default, nanti bisa diatur user
+        'timescap' => now(),
+    ]);
+
+    return view('input_pg', compact('skema', 'jumlah', 'pembuatan'));
+}
+
 
 
 }

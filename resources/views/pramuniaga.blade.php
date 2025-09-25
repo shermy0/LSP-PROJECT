@@ -9,14 +9,14 @@
         </h5>
     </div>
 
-    <div class="accordion mt-4" id="formAccordion">
+     <div class="accordion mt-4" id="formAccordion">
         <!-- Item 1 -->
         <div class="accordion-item mb-2">
             <h2 class="accordion-header p-3 border rounded">
                 <i class="fa-solid fa-stop me-2"></i> Pertanyaan Pilihan Ganda
             </h2>
         </div>
-
+        
         <!-- Item 2 -->
        <div class="accordion-item mb-2">
     <a href="{{ route('formasesmen.pertanyaanEsai', ['id_skema' => $skema->id_skema]) }}" 
@@ -28,9 +28,12 @@
 
 
         <!-- Item 3 -->
-        <div class="accordion-item mb-2">
+               <div class="accordion-item mb-2">
             <h2 class="accordion-header p-3 border rounded">
-                <i class="fa-solid fa-stop me-2"></i> Pertanyaan Lisan
+                <a href="{{ route('formasesmen.pertanyaanLisan', ['id_skema' => $skema->id_skema]) }}" 
+                class="text-dark text-decoration-none">
+                    <i class="fa-solid fa-stop me-2"></i> Pertanyaan Lisan
+                </a>
             </h2>
         </div>
 

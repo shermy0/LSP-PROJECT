@@ -10,12 +10,14 @@
     </div>
 
     <div class="accordion mt-4" id="formAccordion">
-        <!-- Item 1 -->
-        <div class="accordion-item mb-2">
-            <h2 class="accordion-header p-3 border rounded">
-                <i class="fa-solid fa-stop me-2"></i> Pertanyaan Pilihan Ganda
-            </h2>
-        </div>
+    <!-- Item 1 - Pertanyaan Pilihan Ganda -->
+    <div class="accordion-item mb-2" 
+         onclick="window.location='{{ route('pertanyaan.pg.kelompok', ['id_skema' => $skema->id_skema, 'jenis' => 'pilihan_ganda']) }}';"
+         style="cursor: pointer;">
+        <h2 class="accordion-header p-3 border rounded">
+            <i class="fa-solid fa-stop me-2"></i> Pertanyaan Pilihan Ganda
+        </h2>
+    </div>
 
         <!-- Item 2 -->
        <div class="accordion-item mb-2">
@@ -40,7 +42,18 @@
         <!-- Item 3 -->
         <div class="accordion-item mb-2">
             <h2 class="accordion-header p-3 border rounded">
-                <i class="fa-solid fa-stop me-2"></i> Pertanyaan Lisan
+                <i class="fa-solid fa-stop me-2"></i> Pertanyaan Esai
+            </h2>
+            </div>
+
+ 
+        <!-- Item 3 -->
+               <div class="accordion-item mb-2">
+            <h2 class="accordion-header p-3 border rounded">
+                <a href="{{ route('formasesmen.pertanyaanLisan', ['id_skema' => $skema->id_skema]) }}" 
+                class="text-dark text-decoration-none">
+                    <i class="fa-solid fa-stop me-2"></i> Pertanyaan Lisan
+                </a>
             </h2>
         </div>
 
