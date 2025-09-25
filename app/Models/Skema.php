@@ -18,4 +18,12 @@ class Skema extends Model
         'deskripsi',
         'status_skema',
     ];
+
+    // ================================
+    // Relasi: Skema punya banyak KelompokPekerjaan
+    // ================================
+    public function kelompokPekerjaan()
+    {
+        return $this->hasMany(KelompokPekerjaan::class, 'id_skema', 'id_skema');
+    }
 }

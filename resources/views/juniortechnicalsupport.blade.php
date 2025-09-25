@@ -19,6 +19,7 @@
 
         
         <!-- Item 2 -->
+<<<<<<< HEAD
 <div class="accordion-item mb-2">
     <h2 class="accordion-header p-3 border rounded">
         <a href="{{ route('formasesmen.pertanyaanEsai', ['id_skema' => $skema->id_skema]) }}" 
@@ -31,6 +32,24 @@
         <div class="accordion-item mb-2">
             <h2 class="accordion-header p-3 border rounded">
                 <i class="fa-solid fa-stop me-2"></i> Pertanyaan Lisan
+=======
+       <div class="accordion-item mb-2" 
+     onclick="window.location='{{ route('formasesmen.pertanyaanEsai', ['id_skema' => $skema->id_skema]) }}';"
+     style="cursor: pointer;">
+    <h2 class="accordion-header p-3 border rounded">
+        <i class="fa-solid fa-stop me-2"></i> Pertanyaan Esai
+    </h2>
+</div>
+
+ 
+        <!-- Item 3 -->
+               <div class="accordion-item mb-2">
+            <h2 class="accordion-header p-3 border rounded">
+                <a href="{{ route('formasesmen.pertanyaanLisan', ['id_skema' => $skema->id_skema]) }}" 
+                class="text-dark text-decoration-none">
+                    <i class="fa-solid fa-stop me-2"></i> Pertanyaan Lisan
+                </a>
+>>>>>>> 0e80fa31c0b84637a83ad3d0fe51047f7aedede1
             </h2>
         </div>
 

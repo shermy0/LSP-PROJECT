@@ -33,7 +33,7 @@ class Demonstrasi extends Model
     // Relasi ke Kelompok (jika ada tabel kelompok)
     public function kelompok()
     {
-        return $this->belongsTo(Kelompok::class, 'id_kelompok');
+        return $this->belongsTo(KelompokPekerjaan::class, 'id_kelompok', 'id_kelompok');
     }
 
     // Relasi ke Asesmen (jika ada tabel asesmen)

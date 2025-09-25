@@ -6,8 +6,8 @@
     <div class="text-center mb-4">
         <h4 class="fw-bold text-dark">Kelompok Pekerjaan & Unit Kompetensi</h4>
         <p class="text-muted">
-            Skema ID: <span class="fw-bold">{{ $id_skema }}</span> | 
-            Timer: <span class="fw-bold">{{ $timer }} menit</span>
+            Skema ID: <span class="fw-bold">{{ $skema->id_skema ?? '—' }}</span> |
+            Timer: <span class="fw-bold">{{ $timer ?? '—' }} menit</span>
         </p>
     </div>
 
@@ -18,7 +18,7 @@
                     <span>Kelompok {{ $index+1 }}: {{ $k->nama_kelompok }}</span>
                     <button 
                         class="btn btn-light btn-sm"
-                        onclick="popupJumlahPertanyaan({{ $id_skema }}, '{{ $timer }}', {{ $k->id_kelompok }})">
+                        onclick="popupJumlahPertanyaan({{ $skema->id_skema }}, '{{ $timer ?? '' }}', {{ $k->id_kelompok }})">
                         <i class="bi bi-plus-circle"></i> Tambahkan Pertanyaan
                     </button>
                 </div>
@@ -85,13 +85,10 @@ function popupJumlahPertanyaan(id_skema, timer, kelompok_id) {
             cancelButton: 'swal2-cancel btn fw-bold px-4'
         },
         didRender: () => {
-            // Style tombol Lanjutkan (biru tua)
             const confirmBtn = document.querySelector('.swal2-confirm');
             confirmBtn.style.backgroundColor = '#041562';
             confirmBtn.style.color = '#fff';
             confirmBtn.style.borderRadius = '8px';
-
-            // Style tombol Batal (abu-abu)
             const cancelBtn = document.querySelector('.swal2-cancel');
             cancelBtn.style.backgroundColor = '#6c757d';
             cancelBtn.style.color = '#fff';
@@ -115,6 +112,5 @@ function popupJumlahPertanyaan(id_skema, timer, kelompok_id) {
         }
     });
 }
-
 </script>
 @endsection

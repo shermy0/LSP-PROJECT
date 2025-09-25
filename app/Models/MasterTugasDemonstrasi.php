@@ -31,8 +31,9 @@ class MasterTugasDemonstrasi extends Model
     }
 
     // Relasi ke Kelompok (opsional, kalau tabel kelompok ada)
+    // 🔹 Relasi ke tabel kelompok (kalau ada model Kelompok)
     public function kelompok()
     {
-        return $this->belongsTo(Kelompok::class, 'id_kelompok');
+        return $this->belongsTo(KelompokPekerjaan::class, 'id_kelompok', 'id_kelompok');
     }
 }

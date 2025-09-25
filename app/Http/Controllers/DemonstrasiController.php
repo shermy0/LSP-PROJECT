@@ -17,7 +17,7 @@ class DemonstrasiController extends Controller
     {
         $skema = Skema::findOrFail($id_skema);
 
-        $demonstrasi = Demonstrasi::with(['Asesor', 'kuk'])
+        $demonstrasi = Demonstrasi::with(['Asesor'])
             ->where('id_skema', $id_skema)
             ->get();
 

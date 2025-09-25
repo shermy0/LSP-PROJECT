@@ -1,0 +1,114 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #F8F9FA;
+    margin: 0;
+    color: #333;
+}
+
+.page-title {
+    font-size: 24px; /* lebih kecil dari 30px */
+    font-weight: 500;
+    margin-bottom: 10px;
+    text-align: center; /* supaya lebih rapi */
+}
+
+.blue-line {
+    width: 120px; /* lebih kecil dari 166px */
+    height: 3px; /* lebih tipis */
+    background: #0284C7;
+    border: none;
+    margin: 0 auto 15px auto; /* center */
+}
+
+.container {
+    max-width: 700px; /* batasi lebar konten */
+    margin: 20px auto;
+    padding: 10px;
+}
+
+.card {
+    background: white;
+    border-radius: 8px; /* lebih kecil */
+    border: 1px solid #EBEBEB;
+    box-shadow: 0px 3px 3px rgba(0,0,0,0.15);
+    padding: 15px; /* lebih kecil dari 20px */
+    margin-bottom: 15px;
+}
+
+.section-title {
+    font-size: 18px; /* lebih kecil dari 23px */
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.info-list .info-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px; /* lebih kecil dari 18px */
+    color: #676767;
+    margin-bottom: 6px;
+}
+
+.file-details p {
+    font-size: 14px; /* lebih kecil dari 16px */
+    color: #676767;
+    margin: 4px 0;
+}
+
+.btn {
+    display: inline-block;
+    padding: 6px 12px; /* lebih kecil dari 8px 16px */
+    border-radius: 8px;
+    text-align: center;
+    color: white;
+    font-size: 14px; /* lebih kecil */
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+}
+
+.btn-download {
+    background: #026111;
+    margin-top: 8px;
+}
+
+.btn-download:hover {
+    background: #034d10; 
+}
+
+.btn-download:active {
+    background: #034d10; 
+    color: black; 
+}
+
+.btn-back {
+    background: #D0CBCB;
+    color: black;
+}
+
+.back-btn {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.btn-back:hover {
+    background: #b8b4b4; 
+}
+
+.btn-back:active {
+    background: #b8b4b4; 
+    color: black; 
+}
+
+.status {
+    padding: 3px 8px; /* lebih kecil */
+    border-radius: 12px;
+    font-size: 13px;
+    display: inline-block;
+}
+
+.status.success {
+    background: rgba(211,248,214,0.8);
+    color: #2F764B;
+}

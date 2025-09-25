@@ -13,8 +13,6 @@ use App\Http\Controllers\SkemaController;
 use App\Models\UnitKompetensi;
 use App\Http\Controllers\ModifikasiController;
 use App\Http\Controllers\FormAsesmenController;
-use App\Http\Controllers\DemonstrasiController;
-
 
 
 Route::get('/pembuatan/{id_pembuatan}', [FormAsesmenController::class, 'showPembuatan'])
@@ -35,12 +33,23 @@ Route::put('/pertanyaan/esai/{id}', [PertanyaanController::class, 'updateEsai'])
 Route::delete('/pertanyaan/esai/{id}', [PertanyaanController::class, 'destroyEsai'])->name('pertanyaan.esai.destroy');
 
 // CRUD Lisan
-Route::get('/pertanyaan/lisan/create', [PertanyaanController::class, 'createLisan'])->name('lisan.create');
-Route::post('/pertanyaan/lisan/store', [PertanyaanController::class, 'storeLisan'])->name('lisan.store');
-Route::get('/pertanyaan/lisan/{id_skema}/crud', [PertanyaanController::class, 'crudLisan'])->name('lisan.crud');
-Route::get('/pertanyaan/lisan/{id}/edit', [PertanyaanController::class, 'editLisan'])->name('lisan.edit');
-Route::put('/pertanyaan/lisan/{id}/update', [PertanyaanController::class, 'updateLisan'])->name('lisan.update');
-Route::delete('/pertanyaan/lisan/{id}/delete', [PertanyaanController::class, 'destroyLisan'])->name('lisan.destroy');
+Route::prefix('pertanyaan/lisan')->name('lisan.')->group(function () {
+    Route::get('/create', [PertanyaanController::class, 'createLisan'])->name('create');
+    Route::post('/store', [PertanyaanController::class, 'storeLisan'])->name('store');
+    Route::get('/{id_skema}/crud', [PertanyaanController::class, 'crudLisan'])->name('crud');
+    Route::get('/{id}/edit', [PertanyaanController::class, 'editLisan'])->name('edit');
+    Route::put('/{id}', [PertanyaanController::class, 'updateLisan'])->name('update');
+    Route::delete('/{id}', [PertanyaanController::class, 'destroyLisan'])->name('destroy');
+});
+Route::get('/form-asesmen/lisan/create', [PertanyaanController::class, 'createLisan'])
+    ->name('pertanyaan.lisan.create');
+Route::get('/kelompok-lisan/{id_skema}', [PertanyaanController::class, 'kelompokPekerjaan'])
+    ->defaults('jenis', 'lisan');
+Route::put('/pertanyaan/lisan/{id}', [PertanyaanController::class, 'updateLisan'])
+    ->name('pertanyaan.lisan.update');
+    // Kelompok Pekerjaan Lisan
+Route::get('/lisan/kelompok/{id_skema}', [PertanyaanController::class, 'kelompokPekerjaan'])
+    ->name('pertanyaan.lisan.kelompok');
 // Route untuk pertanyaan Lisan per skema
 Route::get('/form-asesmen/pertanyaan-lisan/{id_skema}', [FormAsesmenController::class, 'pertanyaanLisan'])
     ->name('formasesmen.pertanyaanLisan');
@@ -56,6 +65,14 @@ Route::get('/pertanyaan/esai/create', [PertanyaanController::class, 'createEsai'
 Route::get('/form-asesmen/pertanyaan-esai/{id_skema}', [FormAsesmenController::class, 'pertanyaanEsai'])
     ->name('formasesmen.pertanyaanEsai');
 
+// tanda tangan asesor untuk pembuatan soal
+Route::get('/tanda_tangan_asesmen/{id_skema}/{id_pembuatan_pertanyaan}',  
+    [PertanyaanController::class, 'formTTDAsesor']
+)->name('tanda.tangan.asesmen');
+
+Route::post('/tanda_tangan_asesmen/{id_skema}/{id_pembuatan_pertanyaan}/simpan',  
+    [PertanyaanController::class, 'simpanTTDAsesor']
+)->name('tanda.tangan.asesmen.simpan');
 
 
 // login
@@ -100,7 +117,9 @@ Route::get('/formasesmen', [FormAsesmenController::class, 'index'])->name('forma
 */
 
 
-Route::get('/esai/{id_skema}', [PertanyaanController::class, 'crudEsai'])->name('esai.crud');
+Route::get('/esai/{id_skema}/{id_kelompok}', [PertanyaanController::class, 'crudEsai'])
+    ->name('esai.crud');
+
 
 
 // PertanyaanController → simpan esai
@@ -225,9 +244,6 @@ Route::get('/mapa01/{skema_id}/kelompok/{kelompok_id}/tambah-unit', [MapaControl
     Route::put('/mapa01/update-unit/{skema_id}/{id}', [MapaController::class, 'updateUnit'])->name('form.mapa01.updateunit');
 });
 
-
-
-
 Route::get('/get-unit/{id}', [MapaController::class, 'getUnit'])->name('form.mapa01.getunit');
 Route::get('/search-unit', [MapaController::class, 'searchUnit'])->name('form.mapa01.searchunit');
 
@@ -280,4 +296,6 @@ Route::get('/form-asesmen/{id_skema}/kelompok', [PertanyaanController::class, 'k
     ->defaults('jenis', 'lisan')
     ->name('pertanyaan.lisan.kelompok');
 
-    
+Route::get('/form-asesmen/{id_skema}/kelompok-essai', [PertanyaanController::class, 'kelompokPekerjaan'])
+    ->defaults('jenis', 'essai')
+    ->name('pertanyaan.essai.kelompok');

@@ -1,0 +1,250 @@
+/* === General Styles === */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #F8F9FA;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* Header Section */
+.form-asesmen-header {
+    text-align: center;
+    margin: 30px auto;
+}
+
+.form-asesmen-header .breadcrumb {
+    font-size: 14px;
+    color: #0D6EFD;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.form-asesmen-header .form-title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.form-asesmen-header .icon-box {
+    width: 60px;
+    height: 60px;
+    background: #041C5C;
+    margin: 15px auto;
+    border-radius: 8px;
+}
+
+.main-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.sub-title {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 12px;
+}
+
+.skema-box {
+    background: #E6F0FF;
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #041C5C;
+}
+
+.kode-asesor {
+    font-size: 14px;
+    color: #333;
+}
+
+/* Content Card */
+.content-card {
+    width: 90%;
+    max-width: 850px;
+    background: #fff;
+    border-radius: 12px;
+    margin: 20px auto;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Header full width, menyesuaikan layar */
+.header {
+    position: relative;   /* bisa juga fixed/absolute kalau mau menempel di atas */
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: #E5EEFF;
+    border-radius: 15px;
+    border: 1px solid #EBEBEB;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding-left: 30px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    margin-top: 15px;
+}
+
+/* Strip biru */
+.header-strip {
+    width: 10px;
+    height: 100%;
+    background: #0284C7;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+/* Judul */
+.header-title {
+    color: #2B2B2B;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Container compact tetap seperti biasa */
+.container {
+    max-width: 700px;
+    margin: 20px auto 100px auto;
+    font-family: Poppins, sans-serif;
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+
+/* Panduan item sejajar angka dan teks */
+.panduan-item {
+    display: flex;
+    align-items: flex-start; /* rata atas */
+    margin-bottom: 12px;
+}
+
+/* Lingkaran angka */
+.panduan-item .circle {
+    width: 24px;
+    height: 24px;
+    background: #0284C7;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 12px; /* jarak antara angka dan teks */
+    flex-shrink: 0; /* jangan mengecil */
+}
+
+/* Teks isi panduan */
+.panduan-item p {
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+    color: #333;
+}
+
+/* Modal */
+.modal {
+    display: none; /* hidden default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    width: 300px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.modal-content h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.note {
+    font-size: 12px;
+    color: red;
+    margin-bottom: 15px;
+}
+
+.modal-content input {
+    width: 60px;
+    font-size: 16px;
+    padding: 5px;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.card-pertanyaan {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.nomor {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.opsi-jawaban div {
+    margin: 5px 0;
+}
+
+.kunci-jawaban {
+    margin-top: 10px;
+    background: #eef4ff;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+/* Button */
+.btn-container {
+    text-align: right;
+    margin: 30px;
+}
+
+.btn-primary {
+    background: #041C5C;
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.3s ease;
+    margin-right: 100px;
+}
+
+.btn-primary:hover {
+    background: #0A2C8C;
+}
+
+
