@@ -1,9 +1,11 @@
-@extends('master')
+@extends('layouts.master')
 
 @section('title', 'Asesmen Mandiri')
 
-@section('konten')
-    <div class="container">
+@section('content')
+<div class="container">
+    <form action="{{ route('asesi.asesmen_mandiri.store') }}" method="POST">
+        @csrf
 
         @foreach($units as $unit)
             <!-- Header Unit -->
@@ -48,7 +50,7 @@
                                     </td>
                                     <td>
                                         <select name="bukti[{{ $k->id_kuk }}]" class="form-select">
-                                            <option value="">-- Pilih Dokumen --</option>
+                                            <option value="">Pilih Dokumen</option>
                                             @foreach($dokumen as $d)
                                                 <option value="{{ $d->id_dokumen }}">
                                                     {{ $d->nama_jenis }} ({{ basename($d->file_path) }})
@@ -56,7 +58,6 @@
                                             @endforeach
                                         </select>
                                     </td>
-
                                 </tr>
                             @endforeach
                         </tbody>
@@ -66,9 +67,10 @@
         @endforeach
 
         <!-- Tombol Aksi -->
-        <div class="button-group">
+        <div class="button-group mt-4">
             <a href="{{ route('asesi.asesmen_mandiri.form1') }}" class="btn-back">Kembali</a>
             <button type="submit" class="btn-next">Simpan dan Lanjut</button>
         </div>
-    </div>
+    </form>
+</div>
 @endsection

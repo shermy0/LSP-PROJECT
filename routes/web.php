@@ -88,14 +88,19 @@ Route::middleware(['auth'])->group(function () {
         });
     });
 
-    // ================== ASESMEN MANDIRI ==================
+    // ================== ASESMEN MANDIRI (ASESI) ==================
     Route::prefix('asesi/asesmen-mandiri')->name('asesi.asesmen_mandiri.')->group(function () {
-        Route::get('/form1', [AsesiAsesmenMandiriController::class, 'form1'])->name('form1');
-        Route::get('/form2', [AsesiAsesmenMandiriController::class, 'form2'])->name('form2');
-        Route::get('/form3', [AsesiAsesmenMandiriController::class, 'form3'])->name('form3');
-        Route::get('/form4', [AsesiAsesmenMandiriController::class, 'form4'])->name('form4');
+        Route::get('form1', [AsesiAsesmenMandiriController::class, 'form1'])->name('form1');
+        Route::get('form2', [AsesiAsesmenMandiriController::class, 'form2'])->name('form2');
+        Route::post('store', [AsesiAsesmenMandiriController::class, 'store'])->name('store');
+        Route::get('form3', [AsesiAsesmenMandiriController::class, 'form3'])->name('form3');
+        Route::get('form4', [AsesiAsesmenMandiriController::class, 'form4'])->name('form4');
+
+        // Tambahan: route simpan tanda tangan
+        Route::post('ttd', [AsesiAsesmenMandiriController::class, 'storeTTD'])->name('ttd.store');
     });
 
+    // ================== ASESMEN MANDIRI (ASESOR) ==================
     Route::prefix('asesor/asesmen-mandiri')->name('asesor.asesmen_mandiri.')->group(function () {
         Route::get('/form1', [AsesorAsesmenMandiriController::class, 'form1'])->name('form1');
         Route::get('/form2', [AsesorAsesmenMandiriController::class, 'form2'])->name('form2');
@@ -103,8 +108,11 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
-Route::post('/admin/permohonan/{id_permohonan}/update', 
-    [Form1AdminController::class, 'update'])->name('admin.permohonan.update');
+// ================== ADMIN PERMOHONAN UPDATE ==================
+Route::post(
+    '/admin/permohonan/{id_permohonan}/update',
+    [Form1AdminController::class, 'update']
+)->name('admin.permohonan.update');
 
 // ================== LOGOUT ==================
 Route::post('/logout', function () {
