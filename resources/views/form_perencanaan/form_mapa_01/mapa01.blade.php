@@ -216,42 +216,42 @@ value=""
 
 
     {{-- Kriteria asesmen dari kurikulum pelatihan --}}
+<form action="{{ route('form.mapa01.simpanDasarAsesmen', $skema->id_skema) }}" method="POST">
+    @csrf
+    <input type="hidden" name="skema_id" id="form_skema_id" value="{{ $skema->id_skema }}">
+
     <div>
-        <input type="checkbox" id="130" name="asesi[]" 
-               value="Kriteria asesmen" class="form-check-input me-2">
-        <label for="asesi2">Kriteria asesmen dari kurikulum pelatihan</label>
+        <input type="checkbox" name="kriteria_asesmen" value="1" 
+            {{ $skema->dasarAsesmen && $skema->dasarAsesmen->kriteria_asesmen ? 'checked' : '' }}>
+        <label>Kriteria asesmen dari kurikulum pelatihan</label>
     </div>
 
-    {{-- Spesifikasi Kinerja Perusahaan --}}
     <div>
-        <input type="checkbox" id="131" name="asesi[]" 
-               value="Spesifikasi Kinerja" class="form-check-input me-2">
-        <label for="asesi3">Spesifikasi kinerja suatu perusahaan atau industri</label>
+        <input type="checkbox" name="spesifikasi_kinerja" value="1" 
+            {{ $skema->dasarAsesmen && $skema->dasarAsesmen->spesifikasi_kinerja ? 'checked' : '' }}>
+        <label>Spesifikasi kinerja suatu perusahaan atau industri</label>
     </div>
 
-    {{-- Spesifikasi Produk --}}
     <div>
-        <input type="checkbox" id="132" name="asesi[]" 
-               value="Spesifikasi Produk" class="form-check-input me-2 toggle-input"
-               data-target="input-asesi4">
-        <label for="asesi4">Spesifikasi Produk:</label>
+        <input type="checkbox" name="spesifikasi_produk_toggle" class="toggle-input" data-target="input-asesi4">
+        <label>Spesifikasi Produk:</label>
         <input type="text" id="input-asesi4" name="spesifikasi_produk" 
-               class="form-control mt-2" placeholder="Isi spesifikasi produk"
-               disabled style="display:none;">
+               class="form-control mt-2" 
+               value="{{ $skema->dasarAsesmen->spesifikasi_produk ?? '' }}" 
+               style="{{ $skema->dasarAsesmen && $skema->dasarAsesmen->spesifikasi_produk ? '' : 'display:none;' }}">
     </div>
 
-    {{-- Pedoman Khusus --}}
     <div>
-        <input type="checkbox" id="133" name="asesi[]" 
-               value="Pedoman Khusus" class="form-check-input me-2 toggle-input"
-               data-target="input-asesi5">
-        <label for="asesi5">Pedoman Khusus:</label>
+        <input type="checkbox" name="pedoman_khusus_toggle" class="toggle-input" data-target="input-asesi5">
+        <label>Pedoman Khusus:</label>
         <input type="text" id="input-asesi5" name="pedoman_khusus" 
-               class="form-control mt-2" placeholder="Isi pedoman khusus"
-               disabled style="display:none;">
+               class="form-control mt-2" 
+               value="{{ $skema->dasarAsesmen->pedoman_khusus ?? '' }}" 
+               style="{{ $skema->dasarAsesmen && $skema->dasarAsesmen->pedoman_khusus ? '' : 'display:none;' }}">
     </div>
-</div>
 
+    <button type="submit" class="btn btn-primary mt-3">Simpan</button>
+</form>
 
         
     </div>
@@ -340,22 +340,28 @@ function loadDariLocal() {
     // =========================
     // Pilih skema otomatis
     // =========================
-    document.getElementById('skema_id').addEventListener('change', function() {
-        let selected = this.options[this.selectedIndex];
-        let kode = selected.getAttribute('data-kode');
-        let jenjang = selected.getAttribute('data-jenjang');
-        let standar = selected.getAttribute('data-standar');
-document.getElementById('input-asesi1').value = standar || '';
+document.getElementById('skema_id').addEventListener('change', function() {
+    let selectedSkemaId = this.value;
+    
+    // update hidden input di form dasar asesmen
+    document.getElementById('form_skema_id').value = selectedSkemaId;
 
-        document.getElementById('nomorSkema').value = kode || '';
+    let selected = this.options[this.selectedIndex];
+    let kode = selected.getAttribute('data-kode');
+    let jenjang = selected.getAttribute('data-jenjang');
+    let standar = selected.getAttribute('data-standar');
 
-        if (jenjang) {
-            if (jenjang.toLowerCase().includes("kkni")) document.getElementById('kkni').checked = true;
-            else if (jenjang.toLowerCase().includes("okupasi")) document.getElementById('okupasi').checked = true;
-        }
+    document.getElementById('input-asesi1').value = standar || '';
+    document.getElementById('nomorSkema').value = kode || '';
 
-        simpanKeLocal();
-    });
+    if (jenjang) {
+        if (jenjang.toLowerCase().includes("kkni")) document.getElementById('kkni').checked = true;
+        else if (jenjang.toLowerCase().includes("okupasi")) document.getElementById('okupasi').checked = true;
+    }
+
+    simpanKeLocal();
+});
+
 
     // =========================
     // Simpan & lanjut

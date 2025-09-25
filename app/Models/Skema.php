@@ -68,4 +68,9 @@ class Skema extends Model
         return $this->belongsToMany(Asesor::class, 'skema_asesor', 'id_skema', 'id_asesor');
     }
 
+    public function dasarAsesmen()
+{
+    return $this->hasOne(DasarAsesmen::class, 'skema_id', 'id_skema');
+}
+
 }

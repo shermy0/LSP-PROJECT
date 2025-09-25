@@ -17,11 +17,38 @@ use App\Models\KonfirmasiOrangRelevan;
 use App\Models\KonfirmasiOrangRelevanPersetujuan;
 use App\Models\LaporanAsesmen;
 use App\Models\ValidasiAsesmen;
+use App\Models\DasarAsesmen;
 use Illuminate\Http\Request;
 
 
 class MapaController extends Controller
 {
+
+public function simpanDasarAsesmen(Request $request)
+{
+    $request->validate([
+        'skema_id' => 'required|exists:skema_sertifikasi,id_skema',
+        'kriteria_asesmen' => 'nullable|boolean',
+        'spesifikasi_kinerja' => 'nullable|boolean',
+        'spesifikasi_produk' => 'nullable|string',
+        'pedoman_khusus' => 'nullable|string',
+    ]);
+
+    $data = [
+        'kriteria_asesmen' => $request->has('kriteria_asesmen'),
+        'spesifikasi_kinerja' => $request->has('spesifikasi_kinerja'),
+        'spesifikasi_produk' => $request->spesifikasi_produk,
+        'pedoman_khusus' => $request->pedoman_khusus,
+    ];
+
+    DasarAsesmen::updateOrCreate(
+        ['skema_id' => $request->skema_id],
+        $data
+    );
+
+    return redirect()->back()->with('success', 'Dasar asesmen berhasil disimpan.');
+}
+
 
 public function konfirmasi($idSkema)
 {
