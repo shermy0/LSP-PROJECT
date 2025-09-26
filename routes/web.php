@@ -21,6 +21,8 @@ use App\Http\Controllers\OpsiJawabanController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\DataPesertaUjiController;
 use App\Http\Controllers\ProfileAsesorController;
+use App\Http\Controllers\DemonstrasiController;
+
 
 Route::get('/pembuatan/{id_pembuatan}', [FormAsesmenController::class, 'showPembuatan'])
     ->name('pembuatan.show');
@@ -143,6 +145,30 @@ Route::get('/pertanyaan/lisan', [PertanyaanController::class, 'createLisan'])->n
 Route::post('/pertanyaan/lisan', [PertanyaanController::class, 'storeLisan'])->name('pertanyaan.lisan.store');
 
 // Pilihan Ganda
+
+
+
+// CRUD Demonstrasi
+Route::get('/demonstrasi/create', [DemonstrasiController::class, 'create'])->name('demonstrasi.create');
+Route::post('/demonstrasi/store', [DemonstrasiController::class, 'store'])->name('demonstrasi.store');
+Route::get('/demonstrasi/{id_skema}/crud', [DemonstrasiController::class, 'crud'])->name('demonstrasi.crud');
+Route::get('/demonstrasi/{id}/edit', [DemonstrasiController::class, 'edit'])->name('demonstrasi.edit');
+Route::put('/demonstrasi/{id}/update', [DemonstrasiController::class, 'update'])->name('demonstrasi.update');
+Route::delete('/demonstrasi/{id}/delete', [DemonstrasiController::class, 'destroy'])->name('demonstrasi.destroy');
+
+// Form Asesmen → per skema → masuk ke pertanyaan demonstrasi
+Route::get('/form-asesmen/pertanyaan-demonstrasi/{id_skema}', 
+    [DemonstrasiController::class, 'index']
+)->name('formasesmen.pertanyaanDemonstrasi');
+
+// Kelompok Pekerjaan Demonstrasi
+Route::get('/form-asesmen/{id_skema}/kelompok-demonstrasi', 
+    [DemonstrasiController::class, 'kelompokPekerjaanDemo']
+)->name('pertanyaan.demonstrasi.kelompok');
+
+
+
+
 
 /*
 |--------------------------------------------------------------------------|

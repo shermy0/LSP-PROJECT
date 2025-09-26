@@ -132,7 +132,7 @@ class PertanyaanController extends Controller
     $request->validate([
         'id_skema'         => 'required|integer',
         'id_asesor'        => 'required|integer',
-        'id_kelompok'      => 'required|integer', // 🔹
+        'id_kelompok'      => 'required|integer',
         'isi_pertanyaan.*' => 'required|string',
         'kunci_jawaban.*'  => 'nullable|string',
         'file.*'           => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
@@ -141,12 +141,22 @@ class PertanyaanController extends Controller
 
     $id_skema    = $request->id_skema;
     $id_asesor   = $request->id_asesor;
-    $id_kelompok = $request->id_kelompok; // 🔹
+    $id_kelompok = $request->id_kelompok;
     $timer       = $request->timer;
 
-    // Simpan ke tabel pembuatan_pertanyaan
-    $pembuatan = PembuatanPertanyaan::create([
-        'id_skema' => $id_skema,
+    // 🔹 Cari atau buat baru kalau belum ada
+    $pembuatan = PembuatanPertanyaan::firstOrCreate(
+        [
+            'id_skema' => $id_skema,
+        ],
+        [
+            'timer'    => $timer,
+            'timescap' => now(),
+        ]
+    );
+
+    // 🔹 Kalau sudah ada, update timer-nya saja
+    $pembuatan->update([
         'timer'    => $timer,
         'timescap' => now(),
     ]);
@@ -155,7 +165,7 @@ class PertanyaanController extends Controller
     foreach ($request->isi_pertanyaan as $key => $isi) {
         $pertanyaan = new Pertanyaan();
         $pertanyaan->id_skema = $id_skema;
-        $pertanyaan->id_kelompok = $id_kelompok; // 🔹 masuk sini
+        $pertanyaan->id_kelompok = $id_kelompok;
         $pertanyaan->id_asesor = $id_asesor;
         $pertanyaan->id_pembuatan_pertanyaan = $pembuatan->id_pembuatan_pertanyaan;
         $pertanyaan->jenis_pertanyaan = 'esai';
@@ -172,12 +182,12 @@ class PertanyaanController extends Controller
         $pertanyaan->save();
     }
 
-   return redirect()->route('esai.crud', [
-    'id_skema'   => $id_skema,
-    'id_kelompok'=> $id_kelompok
-])->with('success', 'Semua pertanyaan esai berhasil disimpan dengan timer!');
-
+    return redirect()->route('esai.crud', [
+        'id_skema'    => $id_skema,
+        'id_kelompok' => $id_kelompok
+    ])->with('success', 'Semua pertanyaan esai berhasil disimpan dengan timer!');
 }
+
 
 
     public function crudEsai($id_skema, $id_kelompok)
@@ -286,7 +296,7 @@ public function createPG(Request $request)
     $timer = $request->query('timer', 30);
 
     $skema = Skema::findOrFail($id_skema);
-    $kelompok = \App\Models\KelompokPekerjaan::findOrFail($id_kelompok);
+    $kelompok = KelompokPekerjaan::findOrFail($id_kelompok);
 
     // Log untuk debugging
     \Log::info('CreatePG called', [
@@ -608,7 +618,7 @@ public function destroyPG($id)
     {
         $timer = $request->query('timer');
     
-        $kelompok = \App\Models\KelompokPekerjaan::with(['unitKompetensi' => function ($q) use ($id_skema) {
+        $kelompok = KelompokPekerjaan::with(['unitKompetensi' => function ($q) use ($id_skema) {
             $q->where('unit_kompetensi.id_skema', $id_skema);
         }])->where('id_skema', $id_skema)->get();
     

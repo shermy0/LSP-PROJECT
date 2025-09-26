@@ -40,12 +40,18 @@
         </div>
 
         <!-- Item 4 -->
-        <div class="accordion-item mb-3">
-            <h2 class="accordion-header p-3 border rounded">
-                <i class="fa-solid fa-stop me-2"></i> Tugas Praktik Demonstrasi
-            </h2>
-        </div>
-    </div>
+<div class="accordion-item mb-3">
+    <h2 class="accordion-header p-3 border rounded">
+        <a href="{{ route('formasesmen.pertanyaanDemonstrasi', ['id_skema' => $skema->id_skema]) }}" 
+   class="text-dark text-decoration-none">
+   <i class="fa-solid fa-stop me-2"></i> Tugas Praktik Demonstrasi
+</a>
+
+</a>
+
+    </h2>
+</div>
+
 
     <!-- Dropdown sejajar & rapi -->
     <div class="dropdown w-100 mt-2">
