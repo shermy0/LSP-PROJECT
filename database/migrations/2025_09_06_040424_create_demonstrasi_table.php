@@ -11,11 +11,10 @@ return new class extends Migration
         Schema::create('demonstrasi', function (Blueprint $table) {
             $table->id('id_demonstrasi');
             $table->unsignedBigInteger('id_skema');
-            $table->unsignedBigInteger('id_asesor');
             $table->integer('timer');
-
+            $table->timestamp('timescap')->useCurrent()->comment('Waktu soal dibuat');
+            
             $table->foreign('id_skema')->references('id_skema')->on('skema_sertifikasi')->onDelete('cascade');
-            $table->foreign('id_asesor')->references('id_asesor')->on('asesor')->onDelete('cascade');
         });
     }
   
