@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Skema;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SkemaController extends Controller
 {
@@ -41,7 +42,14 @@ class SkemaController extends Controller
         $skemas = Skema::all();
         return view('form_perencanaan.form_mapa_01.mapa01', compact('skemas'));
     }
+    public function getAsesor($skema_id)
+    {
+        $asesors = DB::table('asesor_skema')
+            ->join('asesor', 'asesor_skema.asesor_id', '=', 'asesor.id_asesor')
+            ->where('asesor_skema.skema_id', $skema_id)
+            ->select('asesor.id_asesor', 'asesor.nama_asesor')
+            ->get();
+
+        return response()->json($asesors);
+    }
 }
-    
-
-

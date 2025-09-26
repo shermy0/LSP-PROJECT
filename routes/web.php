@@ -119,6 +119,9 @@ Route::get('/fr-ak-03', function () {
     return view('fr.fr_ak_03');
 });
 
+//route asesor biar bisa otomatis
+Route::get('/get-asesor/{skema_id}', [SkemaController::class, 'getAsesor']);
+
 /*
 |--------------------------------------------------------------------------
 | Form Asesmen (untuk Asesor)

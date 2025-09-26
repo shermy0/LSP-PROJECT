@@ -62,4 +62,15 @@ class PerencanaanController extends Controller
         // logika simpan ke database
         return redirect()->route('frak3')->with('success', 'FR.AK.03 berhasil disimpan!');
     }
+    public function getAsesor($skema_id)
+    {
+        $asesors = DB::table('asesor_skema')
+            ->join('asesor', 'asesor_skema.asesor_id', '=', 'asesor.id_asesor')
+            ->where('asesor_skema.skema_id', $skema_id)
+            ->select('asesor.id_asesor', 'asesor.nama_asesor')
+            ->get();
+
+        return response()->json($asesors);
+    }
+
 }
