@@ -17,10 +17,11 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <span>Kelompok {{ $index+1 }}: {{ $k->nama_kelompok }}</span>
                     <button 
-                        class="btn btn-light btn-sm"
-                        onclick="popupJumlahPertanyaan({{ $skema->id_skema }}, '{{ $timer ?? '' }}', {{ $k->id_kelompok }})">
-                        <i class="bi bi-plus-circle"></i> Tambahkan Tugas Demonstrasi
-                    </button>
+    class="btn btn-light btn-sm"
+    onclick="popupJumlahPertanyaan({{ $asesmen->id_asesmen }}, '{{ $timer ?? '' }}', {{ $k->id_kelompok }})">
+    <i class="bi bi-plus-circle"></i> Tambahkan Tugas Demonstrasi
+</button>
+
                 </div>
             </div>
             <div class="card-body p-0">
@@ -66,7 +67,7 @@
 
 {{-- Script SweetAlert --}}
 <script>
-function popupJumlahPertanyaan(id_skema, timer, kelompok_id) {
+function popupJumlahPertanyaan(id_asesmen, timer, kelompok_id) {
     Swal.fire({
         title: '<h6 class="fw-bold mb-3">Masukkan Jumlah Tugas Demonstrasi</h6>',
         html: `
@@ -106,11 +107,12 @@ function popupJumlahPertanyaan(id_skema, timer, kelompok_id) {
                 return;
             }
 
-            // Redirect ke form create demonstrasi
-            let url = `{{ route('demonstrasi.create') }}?id_skema=${id_skema}&timer=${timer}&kelompok_id=${kelompok_id}&jumlah=${jumlah}`;
+            // ✅ Redirect pakai id_asesmen
+            let url = `{{ url('/demonstrasi/create') }}/${id_asesmen}?timer=${timer}&kelompok_id=${kelompok_id}&jumlah=${jumlah}`;
             window.location.href = url;
         }
     });
 }
+
 </script>
 @endsection

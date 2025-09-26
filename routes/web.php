@@ -148,23 +148,26 @@ Route::post('/pertanyaan/lisan', [PertanyaanController::class, 'storeLisan'])->n
 
 
 
-// CRUD Demonstrasi
-Route::get('/demonstrasi/create', [DemonstrasiController::class, 'create'])->name('demonstrasi.create');
+// CRUD Demonstrasi (berdasarkan id_asesmen)
+Route::get('/demonstrasi/create/{id_asesmen}', [DemonstrasiController::class, 'create'])->name('demonstrasi.create');
 Route::post('/demonstrasi/store', [DemonstrasiController::class, 'store'])->name('demonstrasi.store');
-Route::get('/demonstrasi/{id_skema}/crud', [DemonstrasiController::class, 'crud'])->name('demonstrasi.crud');
+Route::get('/demonstrasi/{id_asesmen}/crud', [DemonstrasiController::class, 'crud'])->name('demonstrasi.crud');
+
+// Edit/Update/Delete
 Route::get('/demonstrasi/{id}/edit', [DemonstrasiController::class, 'edit'])->name('demonstrasi.edit');
 Route::put('/demonstrasi/{id}/update', [DemonstrasiController::class, 'update'])->name('demonstrasi.update');
 Route::delete('/demonstrasi/{id}/delete', [DemonstrasiController::class, 'destroy'])->name('demonstrasi.destroy');
 
-// Form Asesmen → per skema → masuk ke pertanyaan demonstrasi
-Route::get('/form-asesmen/pertanyaan-demonstrasi/{id_skema}', 
+Route::get('/form-asesmen/pertanyaan-demonstrasi/{id_asesmen}', 
     [DemonstrasiController::class, 'index']
 )->name('formasesmen.pertanyaanDemonstrasi');
 
+
 // Kelompok Pekerjaan Demonstrasi
-Route::get('/form-asesmen/{id_skema}/kelompok-demonstrasi', 
+Route::get('/form-asesmen/{id_asesmen}/kelompok-demonstrasi', 
     [DemonstrasiController::class, 'kelompokPekerjaanDemo']
 )->name('pertanyaan.demonstrasi.kelompok');
+
 
 
 
