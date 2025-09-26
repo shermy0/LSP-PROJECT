@@ -4,15 +4,15 @@
     @push('scripts')
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    let now = new Date();
-    let hours = String(now.getHours()).padStart(2, '0');
-    let minutes = String(now.getMinutes()).padStart(2, '0');
-    document.getElementById("timepicker").value = `${hours}:${minutes}`;
+    document.getElementById("setNow").addEventListener("click", function() {
+        let now = new Date();
+        let hours = String(now.getHours()).padStart(2, '0');
+        let minutes = String(now.getMinutes()).padStart(2, '0');
+        document.getElementById("timepicker").value = `${hours}:${minutes}`;
+    });
 });
 </script>
 @endpush
-
-
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">

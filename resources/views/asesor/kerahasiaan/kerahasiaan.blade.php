@@ -59,10 +59,12 @@
                         <label class="form-label">Nama Asesi</label>
                         <select name="asesi" class="form-control">
                             @forelse($asesi ?? [] as $item)
-                                <option value="{{ $item->id_asesi }}"
-                                    {{ (string) ($currentAsesiId ?? ($persetujuan->id_asesi ?? '')) === (string) $item->id_asesi ? 'selected' : '' }}>
-                                    {{ $item->nama_lengkap }}
-                                </option>
+                                @if(is_object($item))
+                                    <option value="{{ $item->id_asesi }}"
+                                        {{ (string) ($currentAsesiId ?? ($persetujuan->id_asesi ?? '')) === (string) $item->id_asesi ? 'selected' : '' }}>
+                                        {{ $item->nama_lengkap }}
+                                    </option>
+                                @endif
                             @empty
                                 <option value="">-- Tidak ada data Asesi --</option>
                             @endforelse
@@ -115,10 +117,12 @@
     </div>
 
     <div class="col-md-4">
-        <label class="form-label">Waktu</label>
-        <input type="text" id="timepicker" name="waktu" class="form-control" required>
+    <label class="form-label">Waktu</label>
+    <div class="input-group">
+        <input type="time" id="timepicker" name="waktu" class="form-control" required>
+        <button type="button" class="btn btn-outline-secondary" id="setNow">Sekarang</button>
     </div>
-
+</div>
     <div class="col-md-4">
         <label class="form-label">TUK</label>
         <select name="tuk" class="form-control">
