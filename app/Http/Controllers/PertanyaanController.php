@@ -12,6 +12,11 @@ use App\Models\kelompokPekerjaan;
 use App\Models\PembuatanPertanyaan;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB; 
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Auth;
+
 
 class PertanyaanController extends Controller
 {
@@ -127,22 +132,22 @@ class PertanyaanController extends Controller
         return view('input_esai', compact('skema', 'jumlah'));
     }
 
-    public function storeEsai(Request $request)
-{
-    $request->validate([
-        'id_skema'         => 'required|integer',
-        'id_asesor'        => 'required|integer',
-        'id_kelompok'      => 'required|integer',
-        'isi_pertanyaan.*' => 'required|string',
-        'kunci_jawaban.*'  => 'nullable|string',
-        'file.*'           => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
-        'timer'            => 'required|integer',
-    ]);
+   public function storeEsai(Request $request)
+    {
+        $request->validate([
+            'id_skema'         => 'required|integer',
+            'id_asesor'        => 'required|integer',
+            'id_kelompok'      => 'required|integer',
+            'isi_pertanyaan.*' => 'required|string',
+            'kunci_jawaban.*'  => 'nullable|string',
+            'file.*'           => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
+            'timer'            => 'required|integer',
+        ]);
 
-    $id_skema    = $request->id_skema;
-    $id_asesor   = $request->id_asesor;
-    $id_kelompok = $request->id_kelompok;
-    $timer       = $request->timer;
+        $id_skema    = $request->id_skema;
+        $id_asesor   = $request->id_asesor;
+        $id_kelompok = $request->id_kelompok;
+        $timer       = $request->timer;
 
     // 🔹 Cek apakah ini mode Lanjutkan (edit) atau Selanjutnya (baru)
     if ($request->filled('id_pembuatan')) {
@@ -176,14 +181,22 @@ class PertanyaanController extends Controller
 
         if ($request->hasFile("file.$key")) {
             $file = $request->file("file.$key");
-            $filePath = $file->store('uploads/pertanyaan', 'public');
-            $pertanyaan->file_path = $filePath;
-            $pertanyaan->file_type = $file->getClientOriginalExtension();
+            if ($file) {
+                $filePath = $file->store('uploads/pertanyaan', 'public');
+                $pertanyaan->file_path = $filePath;
+                $pertanyaan->file_type = $file->getClientOriginalExtension();
+            }
+
+            $pertanyaan->save();
         }
 
-        $pertanyaan->save();
+        return redirect()->route('esai.crud', [
+            'id_skema'    => $id_skema,
+            'id_kelompok' => $id_kelompok
+        ])->with('success', 'Semua pertanyaan esai berhasil disimpan dengan timer!');
     }
 
+<<<<<<< HEAD
     return redirect()->route('esai.crud', [
         'id_skema'    => $id_skema,
         'id_kelompok' => $id_kelompok
@@ -191,6 +204,8 @@ class PertanyaanController extends Controller
 }
 
 
+=======
+>>>>>>> 0327bc2 (commit perubahan)
     public function crudEsai($id_skema, $id_kelompok)
 {
     $skema = Skema::findOrFail($id_skema);

@@ -4,10 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\PembuatanPertanyaan;
-use App\Models\KelompokPekerjaan;
-use App\Models\OpsiJawaban;
-use App\Models\PertanyaanAsesmenPersetujuan;
 
 class Pertanyaan extends Model
 {
@@ -19,7 +15,7 @@ class Pertanyaan extends Model
 
     protected $fillable = [
         'id_skema',
-        'id_kelompok',              
+        'id_kelompok',              // 🔹 Tambahin ini
         'id_pembuatan_pertanyaan',
         'id_asesor',
         'jenis_pertanyaan',
@@ -28,9 +24,10 @@ class Pertanyaan extends Model
         'file_type',
         'deskripsi_pertanyaan',
         'kunci_jawaban',
+        'id_kelompok'
     ];
 
-    // Relasi ke tabel pembuatan_pertanyaan
+    // 🔹 Relasi ke tabel pembuatan_pertanyaan
     public function pembuatan()
     {
         return $this->belongsTo(
@@ -40,25 +37,9 @@ class Pertanyaan extends Model
         );
     }
 
-    // Relasi ke tabel kelompok
+    // 🔹 Relasi ke tabel kelompok (kalau ada model Kelompok)
     public function kelompok()
     {
         return $this->belongsTo(KelompokPekerjaan::class, 'id_kelompok', 'id_kelompok');
-    }
-
-    // Relasi ke opsi jawaban
-    public function opsiJawaban()
-    {
-        return $this->hasMany(OpsiJawaban::class, 'id_pertanyaan');
-    }
-
-    // 🔹 Relasi ke persetujuan asesor (tidak menghapus relasi lain)
-    public function persetujuan()
-    {
-        return $this->hasMany(
-            PertanyaanAsesmenPersetujuan::class,
-            'id_pembuatan_pertanyaan', // FK di tabel persetujuan
-            'id_pembuatan_pertanyaan'  // PK di tabel pertanyaan
-        );
     }
 }
