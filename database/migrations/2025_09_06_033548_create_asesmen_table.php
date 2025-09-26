@@ -13,7 +13,6 @@ return new class extends Migration
             $table->unsignedBigInteger('id_permohonan');
             $table->unsignedBigInteger('id_jadwal');
             $table->enum('hasil', ['K', 'BK'])->nullable();
-            $table->text('umpan_balik_asesi')->nullable();
             $table->text('catatan')->nullable();
             $table->date('tgl_asesmen')->nullable();
             $table->enum('status', ['proses', 'lulus'])->default('proses');

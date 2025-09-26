@@ -2,34 +2,32 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class KelompokPekerjaan extends Model
 {
-    use HasFactory;
-
-    // nama tabel
     protected $table = 'kelompok_pekerjaan';
-
-    // primary key
     protected $primaryKey = 'id_kelompok';
-
-    // kalau tidak pakai created_at / updated_at
+    protected $fillable = ['id_skema', 'nama_kelompok'];
     public $timestamps = false;
 
-    // kolom yang bisa diisi
-    protected $fillable = [
-        'id_skema',
-        'nama_kelompok',
-    ];
+    public function hasilAsesmen()
+    {
+        return $this->hasMany(HasilAsesmen::class, 'id_kelompok', 'id_kelompok');
+    }
 
-    /**
-     * Relasi ke Skema Sertifikasi
-     * (many-to-one → satu kelompok milik satu skema)
-     */
     public function skema()
     {
         return $this->belongsTo(SkemaSertifikasi::class, 'id_skema', 'id_skema');
     }
+     public function unitKompetensi()
+    {
+        return $this->belongsToMany(UnitKompetensi::class, 'hasil_asesmen', 'id_kelompok', 'id_unit')
+                    ->withPivot('id_hasil', 'status', 'catatan'); 
+    }
+    public function pertanyaan()
+    {
+        return $this->hasMany(Pertanyaan::class, 'id_kelompok', 'id_kelompok');
+    }
+
 }
