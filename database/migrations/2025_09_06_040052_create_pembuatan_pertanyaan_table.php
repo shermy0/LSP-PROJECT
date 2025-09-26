@@ -1,0 +1,27 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up()
+    {
+        Schema::create('pembuatan_pertanyaan', function (Blueprint $table) {
+            $table->id('id_pembuatan_pertanyaan');
+            $table->unsignedBigInteger('id_skema');
+            $table->enum('jenis_pertanyaan', ['lisan', 'esai', 'pilihan_ganda']);
+            $table->integer('timer');
+            $table->timestamp('timescap')->useCurrent()->comment('Waktu soal dibuat');
+            
+            
+            $table->foreign('id_skema')->references('id_skema')->on('skema_sertifikasi')->onDelete('cascade');
+        });
+    }
+    
+    public function down()
+    {
+        Schema::dropIfExists('pembuatan_pertanyaan');
+    }
+};

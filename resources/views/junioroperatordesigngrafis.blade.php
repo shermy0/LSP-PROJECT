@@ -20,7 +20,13 @@
         <!-- Item 2 -->
         <div class="accordion-item mb-2">
             <h2 class="accordion-header p-3 border rounded">
+<<<<<<< HEAD
                 <i class="fa-solid fa-stop me-2"></i> Pertanyaan Esai
+=======
+                <a href="{{ route('pertanyaan.esai') }}" class="text-dark text-decoration-none">
+                    <i class="fa-solid fa-stop me-2"></i> Pertanyaan Esai
+                </a>
+>>>>>>> fc23860cdc99f1db4e1288cbb020fa4d4abcd33f
             </h2>
         </div>
 

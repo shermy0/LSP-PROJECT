@@ -19,6 +19,10 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+<<<<<<< HEAD
+=======
+    z-index: 1000;
+>>>>>>> fc23860cdc99f1db4e1288cbb020fa4d4abcd33f
 }
 
 .sidebar.collapsed {
@@ -198,13 +202,25 @@ body {
 }
 
 /* Konten utama */
+<<<<<<< HEAD
 #main-content {
+=======
+#content {
+>>>>>>> fc23860cdc99f1db4e1288cbb020fa4d4abcd33f
     margin-left: 240px;
     padding: 20px;
     transition: margin-left 0.3s ease;
 }
 
+<<<<<<< HEAD
 .sidebar.collapsed + #main-content {
+=======
+#content.shrink {
+    margin-left: 70px;
+}
+
+.sidebar.collapsed + #content {
+>>>>>>> fc23860cdc99f1db4e1288cbb020fa4d4abcd33f
     margin-left: 70px;
 }
 
