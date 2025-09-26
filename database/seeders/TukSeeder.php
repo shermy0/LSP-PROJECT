@@ -8,19 +8,16 @@ use Illuminate\Support\Facades\DB;
 
 class TukSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        DB::table('tuk')->insert([
+        DB::table('tuk')->updateOrInsert(
+            ['id_tuk' => 1],
             [
-                'id_tuk' => 1,
-                'nama_tuk' => 'SMK Negri 11 Bandung',
-                'jenis_tuk' => 'Mandiri',
-                'alamat_tuk' => 'Jl. Raya Cilember, RT.01/RW.04, Sukaraja, Kec. Cicendo, Kota Bandung, Jawa Barat 40153',
-                'status_tuk' => 'Aktif'
+                'nama_tuk' => 'TUK SMKN 11 Bandung',
+                'alamat' => 'Jl. Budhi No. 98 Bandung',
+                'created_at' => now(),
+                'updated_at' => now(),
             ]
-        ]);
+        );
     }
 }

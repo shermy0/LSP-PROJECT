@@ -5,13 +5,15 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegisterController;
-
+use App\Http\Controllers\KerahasiaanController;
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
 use App\Http\Controllers\Asesi\PermohonanController;
 
-
+Route::get('/', function () {
+    return view('auth/login');
+});
 // login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -67,7 +69,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('dashboard.admin');
 
     // Asesi
-    Route::get('/asesi/dashboard', [DashboardController::class, 'asesi'])->name('dashboard.asesi');
+    Route::get('/asesi/dashboard', [DashboardController::class, 'asesi'])
+    ->name('asesi.dashboard'); // ganti nama route
+
 
     // Asesor
     Route::get('/asesor/dashboard', [DashboardController::class, 'asesor'])->name('dashboard.asesor');
@@ -78,6 +82,22 @@ Route::prefix('asesi/permohonan')->name('asesi.permohonan.')->group(function () 
     Route::get('/form1', [PermohonanController::class, 'form1'])->name('form1');
     Route::get('/form2', [PermohonanController::class, 'form2'])->name('form2');
 });
+
+// ...
+
+Route::get('/kerahasiaan', [KerahasiaanController::class, 'create'])->name('kerahasiaan');
+Route::get('/kerahasiaan-asesi', [KerahasiaanController::class, 'kerahasiaanAsesi'])
+    ->name('asesi.kerahasiaan')
+    ->middleware('auth');
+Route::post('/asesi/upload-bukti', [KerahasiaanController::class, 'uploadBukti'])
+    ->name('asesi.uploadBukti')
+    ->middleware('auth');
+
+
+
+// simpan form
+Route::post('/kerahasiaan', [KerahasiaanController::class, 'store'])->name('kerahasiaan.store');
+
 
 // Logout
 Route::post('/logout', function () {

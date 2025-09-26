@@ -36,7 +36,8 @@ class User extends Authenticatable
     // Relasi ke tabel biodata sesuai role
     public function asesor()
     {
-        return $this->hasOne(Asesor::class, 'user_id');
+            return $this->hasOne(Asesor::class, 'user_id', 'id');
+
     }
 
     public function asesi()

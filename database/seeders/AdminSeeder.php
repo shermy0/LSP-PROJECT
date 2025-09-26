@@ -13,17 +13,18 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('admin')->insert([
-            [
-                'id_admin' => 1,
-                'user_id' => 23,
-                'nama_admin' => 'Admin LSP',
-                'nip' => null,
-                'email' => 'adminlsp@gmail.com',
-                'no_registrasi' => null,
-                'created_at' => '2025-09-04 04:46:36',
-                'updated_at' => '2025-09-04 04:46:36'
-            ]
-        ]);
+        DB::table('admin')->updateOrInsert(
+    ['id_admin' => 1],
+    [
+        'user_id' => 3, // harus cocok dengan tabel users
+        'nama_admin' => 'Admin LSP',
+        'email' => 'adminlsp@gmail.com',
+        'nip' => '1234567890',
+        'no_registrasi' => 'REG001',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]
+);
+
     }
 }

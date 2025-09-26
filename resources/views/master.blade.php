@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    @push('scripts')
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let now = new Date();
+    let hours = String(now.getHours()).padStart(2, '0');
+    let minutes = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById("timepicker").value = `${hours}:${minutes}`;
+});
+</script>
+@endpush
+
+
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LSP 11</title>
@@ -39,7 +52,9 @@
             <li> <i class="bi bi-house-door-fill"></i><a href="{{ route('dashboard.asesor') }}">Dashboard</a></li>
                 <li><i class="bi bi-journal-album"></i><a href="{{ route('formasesmen') }}">Form Asesmen</a></li>
                 <li><i class="bi bi-people-fill"></i><a href="#">Data Peserta Uji</a></li>
-                <li><i class="bi bi-pencil-square"></i><<a href="{{ route('kerahasiaan') }}">Form Kerahasiaan</a>
+                <li><i class="bi bi-pencil-square"></i><a href="{{ route('formperencanaan') }}">Form Perencanaan</a></li>
+                <li><i class="bi bi-pencil-square"></i><a href="{{ route('kerahasiaan') }}">Form Kerahasiaan</a>
+
 
                 <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
             @endif
@@ -48,6 +63,8 @@
                 <li><i class="bi bi-house-door-fill"></i><a href="#">Dashboard</a></li>
                 <li><i class="bi bi-pencil-square"></i><a href="#">Form Asesmen </a></li>
                 <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
+                <li><i class="bi bi-pencil-square"></i><a href="{{ route('asesi.kerahasiaan') }}">Form Kerahasiaan</a>
+
             @endif
         </ul>
     </div>
@@ -108,5 +125,8 @@
         });
     });
 </script>
+@stack('scripts')
+
+
 </body>
 </html>

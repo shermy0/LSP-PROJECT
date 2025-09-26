@@ -1,6 +1,6 @@
 @extends('master')
 
-@section('content')
+@section('konten')
 <div class="container">
     <form action="{{ route('asesmen.store') }}" method="POST">
         @csrf

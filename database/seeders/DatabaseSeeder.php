@@ -32,5 +32,10 @@ class DatabaseSeeder extends Seeder
             ElemenKompetensiSeeder::class,
             KukSeeder::class,
         ]);
-    }
+        
+        $this->call(PersetujuanAsesmenSeeder::class);
+         $this->call(UserSeeder::class);
+
+    
+}
 }
