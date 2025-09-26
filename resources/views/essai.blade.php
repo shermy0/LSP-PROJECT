@@ -114,10 +114,9 @@
                     <input type="number" name="timer" id="timer" class="form-control" min="1" max="180" value="30" required>
                 </div>
 
-                
                 <!-- Hidden input modal -->
                 <input type="hidden" name="id_pembuatan" value="{{ $pembuatanList->first()->id_pembuatan ?? '' }}">
-
+                <input type="hidden" name="jenis_pertanyaan" value="essai"> <!-- ⬅️ Tambah jenis -->
 
                 <div class="modal-footer border-0">
                     <button type="submit" class="btn w-100 text-white" style="background-color:#003366; font-weight:bold;">
@@ -128,4 +127,5 @@
         </div>
     </div>
 </div>
+
 @endsection
