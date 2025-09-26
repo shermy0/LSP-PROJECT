@@ -71,7 +71,7 @@ Route::post('/mapa01/{skema_id}/dasar-asesmen', [MapaController::class, 'simpanD
     ->name('form.mapa01.simpanDasarAsesmen');
 
 
-    Route::get('/mapa01', [MapaController::class, 'create'])->name('form.mapa01');
+Route::get('/mapa01/{id_skema}', [MapaController::class, 'showSkema'])->name('form.mapa01');
 
     // Tujuan Asesmen
     Route::post('/mapa01/simpan-tujuan', [MapaController::class, 'simpanTujuan'])
@@ -145,7 +145,6 @@ Route::post('/ninjau_asesemen/ninjau-asesmen-asesor', [PerencanaanController::cl
 // Laporan
 // ============================
 
-Route::get('/form-mapa01', [SkemaController::class, 'formMapa01'])->name('form.mapa01');
 
 
 // Halaman utama laporan (FR.AK.05)

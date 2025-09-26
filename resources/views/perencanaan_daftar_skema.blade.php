@@ -2,7 +2,7 @@
 
 @section('konten')
 <div class="container mt-4">
-    <h1 class="fw-bold">Form Perencanaan</h1>
+    <h1 class="fw-bold">Daftar Skema - Form Perencanaan</h1>
     <div class="text-center">
         <h5 class="center-underline">
             Sistem Manajemen Asesmen Siswa - AsesKom

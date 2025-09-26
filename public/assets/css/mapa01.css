@@ -30,6 +30,7 @@
 }
 
 .jenis-skema label {
+    font-weight: 500;
     margin-right: 80px;
     margin-bottom: 12px;
 }

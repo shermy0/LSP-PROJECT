@@ -1,70 +1,48 @@
 @extends('master')
+
 @section('konten')
-<div class="card-box">
+<link rel="stylesheet" href="{{ asset('assets/css/mapa01.css') }}">
+
+        <div class="card mapa-card">
     <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb">
+         <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a href="{{ route('formperencanaan') }}">Form Perencanaan</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">FR.MAPA.02</li>
+            <li class="breadcrumb-item"><a href="{{ route('formperencanaan.index') }}">Form Perencanaan</a></li>
+            <li class="breadcrumb-item active" aria-current="page">FR.MAPA.01</li>
         </ol>
     </nav>
 
+<div class="container mt-4">
     <!-- Header -->
     <div class="text-center mb-4">
         <div class="mapa-logo"></div>
-        <h3 class="fw-bold">
-            FR.MAPA.02 – PETA INSTRUMEN ASESSMEN HASIL PENDEKATAN ASESMEN DAN PERENCANAAN ASESMEN
-        </h3>
+        <h3 class="fw-bold">FR.MAPA 01. Merencanakan Aktivitas dan Proses</h3>
+        <p class="text-muted">Peninjauan Proses Asesmen</p>
     </div>
-
-    <!-- Skema -->
+    <!-- Dropdown skema -->
     <div class="skema-container">
         <div class="skema-group">
             <span class="skema-label">SKEMA:</span>
-            <select name="skema_id" id="skema_id" class="skema-select">
-                <option value="">-- Pilih Skema --</option>
-                @foreach($skemas as $skema)
-                    <option value="{{ $skema->id_skema }}"
-                            data-kode="{{ $skema->kode_skema }}"
-                            data-jenjang="{{ $skema->jenjang }}">
-                        {{ $skema->nama_skema }}
-                    </option>
-                @endforeach
-            </select>
+            <span class="skema-select">{{ $skema->nama_skema }}</span>
         </div>
     </div>
-
-    <!-- Form -->
-    <form>
-        <div class="row g-3 mb-4">
-            <!-- Skema Sertifikasi -->
+    
+        <div class="row g-3">
             <div class="col-md-6">
-                <div class="card-field">
-                    <label class="form-label">Skema Sertifikasi</label>
-                    <div class="d-flex gap-3 mt-1">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="skema" id="skema1" value="KKNI">
-                            <label class="form-check-label" for="skema1">KKNI</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="skema" id="skema2" value="Okupasi">
-                            <label class="form-check-label" for="skema2">Okupasi</label>
-                        </div>
-                    </div>
+                <div class="mapa-box">
+                    <label class="fw-semibold d-block mb-2">Skema Sertifikasi (Jenjang)</label>
+                    <input type="text" class="form-control" value="{{ $skema->jenjang }}" readonly>
                 </div>
             </div>
 
-            <!-- Nomor -->
             <div class="col-md-6">
-                <div class="card-field">
-                    <label for="nomor" class="form-label">Nomor</label>
-                    <input type="text" class="form-control" id="nomor" placeholder="Nomor Skema" readonly>
+                <div class="mapa-box">
+                    <label class="fw-semibold d-block mb-2">Nomor Skema</label>
+                    <input type="text" class="form-control" value="{{ $skema->kode_skema }}" readonly>
                 </div>
             </div>
         </div>
-    </form>
+    </div>
 </div>
 
 <!-- Judul -->
