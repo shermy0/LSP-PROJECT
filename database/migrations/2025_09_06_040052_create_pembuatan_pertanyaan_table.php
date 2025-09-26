@@ -15,7 +15,6 @@ return new class extends Migration
             $table->integer('timer');
             $table->timestamp('timescap')->useCurrent()->comment('Waktu soal dibuat');
             
-            
             $table->foreign('id_skema')->references('id_skema')->on('skema_sertifikasi')->onDelete('cascade');
         });
     }

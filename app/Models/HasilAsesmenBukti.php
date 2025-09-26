@@ -30,4 +30,3 @@ class HasilAsesmenBukti extends Model
     }
 
 }
-

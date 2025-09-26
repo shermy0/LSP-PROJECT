@@ -6,16 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+
     public function up(): void
     {
         Schema::create('kelompok_pekerjaan', function (Blueprint $table) {
-            $table->unsignedBigInteger('id_kelompok')->autoIncrement();
+            $table->id('id_kelompok'); // primary key auto increment
             $table->unsignedBigInteger('id_skema');
             $table->string('nama_kelompok', 255);
 
-            // Index dan foreign key
-            $table->foreign('id_skema')->references('id_skema')->on('skema_sertifikasi')->onDelete('cascade');
-
+            // Foreign key ke skema_sertifikasi
+            $table->foreign('id_skema')
+                  ->references('id_skema')
+                  ->on('skema_sertifikasi')
+                  ->onDelete('cascade');
         });
     }
 

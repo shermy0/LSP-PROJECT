@@ -25,4 +25,3 @@ class PembuatanPertanyaan extends Model
         return $this->belongsTo(SkemaSertifikasi::class, 'id_skema', 'id_skema');
     }
 }
-    
