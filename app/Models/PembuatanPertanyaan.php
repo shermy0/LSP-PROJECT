@@ -15,6 +15,7 @@ class PembuatanPertanyaan extends Model
 
     protected $fillable = [
         'id_skema',
+        'jenis_pertanyaan',
         'timer',
         'timescap'
     ];
