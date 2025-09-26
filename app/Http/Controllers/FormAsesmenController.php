@@ -17,11 +17,16 @@ class FormAsesmenController extends Controller
 
     public function pertanyaanEsai($id_skema)
 {
-    // cari skema berdasarkan ID
     $skema = Skema::findOrFail($id_skema);
 
-    return view('essai', compact('skema'));
+    // ambil semua pembuatan pertanyaan untuk skema ini
+    $pembuatanList = PembuatanPertanyaan::where('id_skema', $id_skema)
+                        ->orderBy('id_pembuatan_pertanyaan', 'desc')
+                        ->get();
+
+    return view('essai', compact('skema', 'pembuatanList'));
 }
+
 
 public function pertanyaanLisan($id_skema)
 {
@@ -67,17 +72,20 @@ public function showSkema($id_skema)
 
 public function createEsai(Request $request)
 {
-    $jumlah   = $request->query('jumlah', 5); 
     $id_skema = $request->query('id_skema');
+    $id_pembuatan = $request->query('id_pembuatan'); 
+    $jumlah = $request->query('jumlah', 5);
 
     $skema = Skema::findOrFail($id_skema);
 
-    // Buat pembuatan pertanyaan baru tapi belum ada pertanyaan
-    $pembuatan = PembuatanPertanyaan::create([
-        'id_skema' => $id_skema,
-        'timer'    => 0, // sementara
-        'timescap' => now(),
-    ]);
+    if ($id_pembuatan) {
+        $pembuatan = PembuatanPertanyaan::with('pertanyaan')->findOrFail($id_pembuatan);
+    } else {
+        $pembuatan = PembuatanPertanyaan::create([
+            'id_skema' => $id_skema,
+            'timer'    => 0,
+        ]);
+    }
 
     return view('input_esai', compact('skema', 'jumlah', 'pembuatan'));
 }
@@ -114,6 +122,19 @@ public function createPG(Request $request)
     ]);
 
     return view('input_pg', compact('skema', 'jumlah', 'pembuatan'));
+}
+
+
+public function listPembuatan($id_skema)
+{
+    $skema = Skema::findOrFail($id_skema);
+
+    // Ambil semua pembuatan pertanyaan untuk skema ini
+    $pembuatanList = PembuatanPertanyaan::where('id_skema', $id_skema)
+                        ->orderBy('created_at', 'desc')
+                        ->get();
+
+    return view('esai_list_pembuatan', compact('skema', 'pembuatanList'));
 }
 
 
