@@ -132,8 +132,6 @@ Route::get('/formasesmen', [FormAsesmenController::class, 'index'])->name('forma
 Route::get('/esai/{id_skema}/{id_kelompok}', [PertanyaanController::class, 'crudEsai'])
     ->name('esai.crud');
 
-
-
 // PertanyaanController → simpan esai
 Route::post('/pertanyaan/esai/store', [PertanyaanController::class, 'storeEsai'])->name('pertanyaan.esai.store');
 
@@ -148,6 +146,13 @@ Route::post('/pertanyaan/lisan', [PertanyaanController::class, 'storeLisan'])->n
 
 
 
+// CRUD Demonstrasi
+Route::get('/demonstrasi/create', [DemonstrasiController::class, 'create'])->name('demonstrasi.create');
+Route::post('/demonstrasi/store', [DemonstrasiController::class, 'store'])->name('demonstrasi.store');
+Route::get('/demonstrasi/{id_skema}/crud', [DemonstrasiController::class, 'crud'])->name('demonstrasi.crud');
+Route::get('/demonstrasi/{id}/edit', [DemonstrasiController::class, 'edit'])->name('demonstrasi.edit');
+Route::put('/demonstrasi/{id}/update', [DemonstrasiController::class, 'update'])->name('demonstrasi.update');
+Route::delete('/demonstrasi/{id}/delete', [DemonstrasiController::class, 'destroy'])->name('demonstrasi.destroy');
 
 
 
@@ -179,8 +184,10 @@ Route::get('/form-asesmen/pertanyaan-demonstrasi/{id_skema}',
     [DemonstrasiController::class, 'index']
 )->name('formasesmen.pertanyaanDemonstrasi');
 
-
-
+// Kelompok Pekerjaan Demonstrasi
+Route::get('/form-asesmen/{id_skema}/kelompok-demonstrasi', 
+    [DemonstrasiController::class, 'kelompokPekerjaanDemo']
+)->name('pertanyaan.demonstrasi.kelompok');
 
 /*
 |--------------------------------------------------------------------------|
