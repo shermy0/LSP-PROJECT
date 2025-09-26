@@ -10,6 +10,8 @@ use App\Http\Controllers\SkemaController;
 use App\Models\UnitKompetensi;
 use App\Http\Controllers\ModifikasiController;
 use App\Http\Controllers\InstrumenController;
+use App\Http\Controllers\FormPerencanaanController;
+
 
 
 // ============================
@@ -40,18 +42,34 @@ Route::post('/register/asesor', [RegisterController::class, 'storeAsesor'])->nam
 // ============================
 // Form Perencanaan (Asesor)
 // ============================
-Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('formperencanaan');
+// Halaman daftar skema
+Route::get('/perencanaan/skema', [FormPerencanaanController::class, 'index'])
+    ->name('formperencanaan.index');
+
+// Halaman form perencanaan sesuai skema
+Route::get('/perencanaan/skema/{id_skema}', [FormPerencanaanController::class, 'show'])
+    ->name('formperencanaan.show');
+
 Route::post('/formperencanaan', [PerencanaanController::class, 'simpan'])->name('formperencanaan.simpan');
+Route::post('/mapa01/{skema}/pendekatan', [MapaController::class, 'simpanPendekatan'])
+    ->name('form.mapa01.simpanPendekatan');
 
 // form perencanaan mapa 01
 Route::prefix('form-perencanaan')->group(function () {
     // MAPA01
+    Route::post('/mapa01/{skema_id}/simpan-semua', [MapaController::class, 'simpanSemua'])->name('form.mapa01.simpanSemua');
+// routes/web.php
+Route::get('/mapa01/get-tujuan/{skemaId}', [MapaController::class, 'getTujuan'])->name('mapa01.getTujuan');
 
-    Route::post('/mapa01/{skema}/dasar-asesmen', [MapaController::class, 'simpanDasarAsesmen'])
+Route::post('/mapa01/{skema_id}/pendekatan', [MapaController::class, 'simpanPendekatan'])
+    ->name('form.mapa01.simpanPendekatan');
+
+Route::post('/mapa01/{skema_id}/konteks', [MapaController::class, 'simpanKonteksAsesmen'])
+    ->name('form.mapa01.simpanKonteks');
+
+Route::post('/mapa01/{skema_id}/dasar-asesmen', [MapaController::class, 'simpanDasarAsesmen'])
     ->name('form.mapa01.simpanDasarAsesmen');
 
-Route::post('/mapa01/orang-relevan', [MapaController::class, 'simpanOrangRelevan'])
-    ->name('form.mapa01.simpanOrangRelevan');
 
     Route::get('/mapa01', [MapaController::class, 'create'])->name('form.mapa01');
 

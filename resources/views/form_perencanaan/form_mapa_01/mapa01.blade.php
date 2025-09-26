@@ -7,7 +7,7 @@
     <!-- Breadcrumb -->
          <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('formperencanaan') }}">Form Perencanaan</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('formperencanaan.index') }}">Form Perencanaan</a></li>
             <li class="breadcrumb-item active" aria-current="page">FR.MAPA.01</li>
         </ol>
     </nav>
@@ -19,25 +19,7 @@
         <p class="text-muted">Peninjauan Proses Asesmen</p>
     </div>
 
-<!-- Dropdown skema -->
-<div class="skema-container">
-    <div class="skema-group">
-        <span class="skema-label">SKEMA:</span>
-        <select name="skema_id" id="skema_id" class="skema-select">
-            <option value="">-- Pilih Skema --</option>
-            @foreach($skemas as $skema)
-<option value="{{ $skema->id_skema }}"
-        data-kode="{{ $skema->kode_skema }}"
-        data-jenjang="{{ $skema->jenjang }}"
-        data-standar="{{ $skema->unitKompetensi->pluck('standar_kompetensi')->first() }}">
-    {{ $skema->nama_skema }}
-</option>
 
-
-            @endforeach
-        </select>
-    </div>
-</div>
 
 <!-- Form input -->
 <div class="row g-3">
@@ -309,11 +291,6 @@ function loadDariLocal() {
         document.getElementById('skema_id').dispatchEvent(new Event('change'));
     }
 }
-
-
-
-    loadDariLocal();
-
     // =========================
     // Simpan data ke localStorage
     // =========================
@@ -358,6 +335,30 @@ document.getElementById('skema_id').addEventListener('change', function() {
         if (jenjang.toLowerCase().includes("kkni")) document.getElementById('kkni').checked = true;
         else if (jenjang.toLowerCase().includes("okupasi")) document.getElementById('okupasi').checked = true;
     }
+    // Ambil tujuan asesmen dari DB per skema
+fetch("/mapa01/get-tujuan/" + selectedSkemaId)
+    .then(res => res.json())
+    .then(data => {
+        const container = document.getElementById('tujuan-asesmen-list');
+        container.innerHTML = ''; // reset isi
+
+data.tujuanMaster.forEach(tujuan => {
+    let isChecked = data.tujuanChecked.includes(tujuan.id_tujuan) ? 'checked' : '';
+    let id = 'tujuan-' + tujuan.id_tujuan;
+
+    container.innerHTML += `
+        <div>
+            <input type="checkbox" id="${id}" name="tujuan[]" 
+                value="${tujuan.nama_tujuan}" 
+                class="form-check-input me-2" ${isChecked}>
+            <label for="${id}">${tujuan.nama_tujuan}</label>
+        </div>
+    `;
+});
+
+
+    })
+    .catch(err => console.error("Gagal load tujuan:", err));
 
     simpanKeLocal();
 });

@@ -24,6 +24,7 @@ use Illuminate\Http\Request;
 class MapaController extends Controller
 {
 
+
 public function simpanDasarAsesmen(Request $request)
 {
     $request->validate([
@@ -47,6 +48,33 @@ public function simpanDasarAsesmen(Request $request)
     );
 
     return redirect()->back()->with('success', 'Dasar asesmen berhasil disimpan.');
+}
+
+public function showSkema($id_skema)
+{
+    $skema = Skema::findOrFail($id_skema);
+
+    // mapping nama skema ke blade langsung di /views/
+    $viewMap = [
+        'Junior Operator Desain Grafis' => 'junioroperatordesigngrafis',
+        'Junior Technical Support' => 'juniortechnicalsupport',
+        'Pemrogram Junior (Junior Coder)' => 'pemogramanjunior',
+        'Office Administrative' => 'officeadministative',
+        'Pramuniaga' => 'pramuniaga',
+        'Akuntansi dan Keuangan Lembaga 2' => 'akuntansikeuanganII',
+        'Akuntansi dan Keuangan Lembaga 1' => 'akuntansidankeuanganlembaga1',
+        'Teknik Komputer dan Jaringan 2' => 'teknikkomputerdanjaringan2',
+        'Teknik Komputer dan Jaringan 3' => 'teknikkomputerdanjaringan3',
+        'Teknik Komputer dan Jaringan 4' => 'teknikkomputerdanjaringan4',
+        
+    ];
+
+    if (array_key_exists($skema->nama_skema, $viewMap)) {
+        return view($viewMap[$skema->nama_skema], compact('skema'));
+    }
+
+    // fallback kalau belum ada blade khusus
+    return view('default', compact('skema'));
 }
 
 
@@ -105,31 +133,36 @@ public function simpanOrangRelevan(Request $request, $skema_id)
 
       return redirect()->back()->with('success', 'Orang relevan berhasil disimpan.');
 }
+public function getTujuan($skemaId)
+{
+    // Semua tujuan yang ada
+    $tujuanMaster = TujuanAsesmen::all(['id_tujuan', 'nama_tujuan']);
+
+    // Tujuan yang sudah dikaitkan dengan skema ini
+    $tujuanChecked = Skema::findOrFail($skemaId)
+                        ->tujuans()
+                        ->pluck('tujuan_asesmen.id_tujuan')
+                        ->toArray();
+
+    return response()->json([
+        'tujuanMaster' => $tujuanMaster,
+        'tujuanChecked' => $tujuanChecked,
+    ]);
+}
 
 public function simpanTujuan(Request $request)
 {
     $request->validate([
         'skema_id' => 'required|exists:skema_sertifikasi,id_skema',
-        'tujuan'   => 'required|array'
+        'tujuan'   => 'required|array',
     ]);
 
     $skema = Skema::findOrFail($request->skema_id);
 
-    $tujuanIds = [];
-    foreach ($request->tujuan as $tujuanNama) {
-        // cek atau buat tujuan baru
-        $tujuan = TujuanAsesmen::firstOrCreate(['nama_tujuan' => $tujuanNama]);
-        $tujuanIds[] = $tujuan->id_tujuan;
-    }
+    // Sync relasi dengan array id tujuan
+    $skema->tujuans()->sync($request->tujuan);
 
-    // simpan ke pivot tanpa menghapus yang lama
-    $skema->tujuans()->syncWithoutDetaching($tujuanIds);
-
-    return response()->json([
-        'status'  => 'success',
-        'message' => 'Tujuan berhasil disimpan',
-        'tujuan'  => $request->tujuan
-    ]);
+    return response()->json(['status' => 'success']);
 }
 
 

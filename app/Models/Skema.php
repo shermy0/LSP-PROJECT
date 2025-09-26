@@ -17,7 +17,6 @@ class Skema extends Model
         'bidang_keahlian',
         'deskripsi',
         'status_skema',
-        'standar_kompetensi'
     ];
 
         public function unitKompetensi()
