@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('laporan_asesmen', function (Blueprint $table) {
-            $table->increments('id_laporan'); // PRIMARY KEY
-            $table->integer('id_instrumen')->unsigned()->nullable();
+            $table->id('id_laporan'); // PRIMARY KEY
+            $table->unsignedBigInteger('id_instrumen')->nullable(); // ganti unsignedBigInteger
             $table->text('aspek_positif_negatif')->nullable();
             $table->text('penolakan')->nullable();
             $table->text('saran_perbaikan')->nullable();
