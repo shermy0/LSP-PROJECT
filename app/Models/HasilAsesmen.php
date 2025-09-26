@@ -11,7 +11,7 @@ class HasilAsesmen extends Model
 
     protected $table = 'hasil_asesmen';
     protected $primaryKey = 'id_hasil';
-    public $timestamps = false; // ⬅️ ini biar nggak cari created_at & updated_at
+    public $timestamps = false; // ⬅ ini biar nggak cari created_at & updated_at
 protected $fillable = [
     'id_asesor',
     'id_asesi',
@@ -56,5 +56,3 @@ protected $fillable = [
 }
 
 }
-
-

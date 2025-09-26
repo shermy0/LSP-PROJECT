@@ -20,4 +20,14 @@ class KelompokPekerjaan extends Model
     {
         return $this->belongsTo(SkemaSertifikasi::class, 'id_skema', 'id_skema');
     }
+     public function unitKompetensi()
+    {
+        return $this->belongsToMany(UnitKompetensi::class, 'hasil_asesmen', 'id_kelompok', 'id_unit')
+                    ->withPivot('id_hasil', 'status', 'catatan'); 
+    }
+    public function pertanyaan()
+    {
+        return $this->hasMany(Pertanyaan::class, 'id_kelompok', 'id_kelompok');
+    }
+
 }

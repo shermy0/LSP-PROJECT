@@ -4,7 +4,7 @@
 
 @section('konten')
 <div class="container mt-4">
-    <h2 class="mb-4">Daftar Formulir FR.APL.01 (Asesi)</h2>
+    <h2 class="mb-4">Daftar Permohonan FR.APL.01 (Asesi)</h2>
 
     <table class="table table-bordered table-striped">
         <thead class="table-dark">
@@ -28,7 +28,7 @@
                     <td>{{ $a->telepon }}</td>
                     <td>{{ $a->updated_at }}</td>
                     <td>
-                        <a href="{{ route('admin.form1.show', $a->id_asesi) }}" 
+                        <a href="{{ route('admin.permohonan.show', $a->id_asesi) }}" 
                            class="btn btn-sm btn-primary">Lihat</a>
                     </td>
                 </tr>

@@ -11,9 +11,9 @@ return new class extends Migration
         Schema::create('pembuatan_pertanyaan', function (Blueprint $table) {
             $table->id('id_pembuatan_pertanyaan');
             $table->unsignedBigInteger('id_skema');
+            $table->enum('jenis_pertanyaan', ['lisan', 'esai', 'pilihan_ganda']);
             $table->integer('timer');
             $table->timestamp('timescap')->useCurrent()->comment('Waktu soal dibuat');
-            
             
             $table->foreign('id_skema')->references('id_skema')->on('skema_sertifikasi')->onDelete('cascade');
         });
