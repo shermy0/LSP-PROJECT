@@ -127,7 +127,7 @@ class PertanyaanController extends Controller
         return view('input_esai', compact('skema', 'jumlah'));
     }
 
-public function storeEsai(Request $request)
+    public function storeEsai(Request $request)
 {
     $request->validate([
         'id_skema'         => 'required|integer',
@@ -137,43 +137,40 @@ public function storeEsai(Request $request)
         'kunci_jawaban.*'  => 'nullable|string',
         'file.*'           => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
         'timer'            => 'required|integer',
-        'jenis_pertanyaan' => 'required|string|in:lisan,essai,pilihan_ganda', // validasi jenis
     ]);
 
     $id_skema    = $request->id_skema;
     $id_asesor   = $request->id_asesor;
     $id_kelompok = $request->id_kelompok;
     $timer       = $request->timer;
-   $jenis = $request->input('jenis_pertanyaan', 'essai');
- // ⬅️ ambil dari form
 
-    // 🔹 Cari atau buat PembuatanPertanyaan sesuai skema + jenis
-    $pembuatan = PembuatanPertanyaan::firstOrCreate(
-        [
+    // 🔹 Cek apakah ini mode Lanjutkan (edit) atau Selanjutnya (baru)
+    if ($request->filled('id_pembuatan')) {
+        // Mode LANJUTKAN → update record yang ada
+        $pembuatan = PembuatanPertanyaan::findOrFail($request->id_pembuatan);
+        $pembuatan->update([
+            'timer'            => $timer,
+            'timescap'         => now(),
+            'jenis_pertanyaan' => 'esai',
+        ]);
+    } else {
+        // Mode SELANJUTNYA → buat record baru
+        $pembuatan = PembuatanPertanyaan::create([
             'id_skema'         => $id_skema,
-            'jenis_pertanyaan' => $jenis,
-        ],
-        [
-            'timer'    => $timer,
-            'timescap' => now(),
-        ]
-    );
+            'timer'            => $timer,
+            'timescap'         => now(),
+            'jenis_pertanyaan' => 'esai',
+        ]);
+    }
 
-    // 🔹 Update timer + jenis
-    $pembuatan->update([
-        'timer'            => $timer,
-        'jenis_pertanyaan' => $jenis,
-        'timescap'         => now(),
-    ]);
-
-    // 🔹 Simpan pertanyaan
+    // 🔹 Simpan pertanyaan esai
     foreach ($request->isi_pertanyaan as $key => $isi) {
         $pertanyaan = new Pertanyaan();
         $pertanyaan->id_skema = $id_skema;
         $pertanyaan->id_kelompok = $id_kelompok;
         $pertanyaan->id_asesor = $id_asesor;
         $pertanyaan->id_pembuatan_pertanyaan = $pembuatan->id_pembuatan_pertanyaan;
-        $pertanyaan->jenis_pertanyaan = $jenis;
+        $pertanyaan->jenis_pertanyaan = 'esai';
         $pertanyaan->isi_pertanyaan = $isi;
         $pertanyaan->kunci_jawaban = $request->kunci_jawaban[$key] ?? null;
 
@@ -190,9 +187,8 @@ public function storeEsai(Request $request)
     return redirect()->route('esai.crud', [
         'id_skema'    => $id_skema,
         'id_kelompok' => $id_kelompok
-    ])->with('success', 'Semua pertanyaan berhasil disimpan!');
+    ])->with('success', 'Semua pertanyaan esai berhasil disimpan dengan timer!');
 }
-
 
 
 
@@ -621,40 +617,24 @@ public function destroyPG($id)
 
 
     public function kelompokPekerjaan(Request $request, $id_skema, $jenis = null)
-{
-    $timer = $request->query('timer');
-
-    // Ambil kelompok pekerjaan + unit kompetensi
-    $kelompok = KelompokPekerjaan::with(['unitKompetensi' => function ($q) use ($id_skema) {
-        $q->where('unit_kompetensi.id_skema', $id_skema);
-    }])->where('id_skema', $id_skema)->get();
-
-    // Ambil skema
-    $skema = Skema::find($id_skema);
-
-    // Ambil daftar pembuatan pertanyaan berdasarkan skema + jenis
-    $pembuatanList = PembuatanPertanyaan::where('id_skema', $id_skema)
-        ->when($jenis, function ($q) use ($jenis) {
-            $q->where('jenis_pertanyaan', $jenis);
-        })
-        ->orderBy('timescap', 'desc')
-        ->get();
-
-    // Tentukan view berdasarkan jenis
-    if ($jenis === 'essai') {
-        return view('kelompok_pekerjaan_essai', compact(
-            'kelompok', 'timer', 'id_skema', 'jenis', 'skema', 'pembuatanList'
-        ));
-    } elseif ($jenis === 'pilihan_ganda') {
-        return view('kelompok_pekerjaan_pg', compact(
-            'kelompok', 'timer', 'id_skema', 'jenis', 'skema', 'pembuatanList'
-        ));
-    } else {
-        return view('kelompok_pekerjaan_lisan', compact(
-            'kelompok', 'timer', 'id_skema', 'jenis', 'skema', 'pembuatanList'
-        ));
+    {
+        $timer = $request->query('timer');
+    
+        $kelompok = KelompokPekerjaan::with(['unitKompetensi' => function ($q) use ($id_skema) {
+            $q->where('unit_kompetensi.id_skema', $id_skema);
+        }])->where('id_skema', $id_skema)->get();
+    
+        $skema = Skema::find($id_skema);
+    
+        // Tentukan view berdasarkan jenis
+        if ($jenis === 'esai') {
+            return view('kelompok_pekerjaan_essai', compact('kelompok', 'timer', 'id_skema', 'jenis', 'skema'));
+        } elseif ($jenis === 'pilihan_ganda') {
+            return view('kelompok_pekerjaan_pg', compact('kelompok', 'timer', 'id_skema', 'jenis', 'skema'));
+        } else {
+            return view('kelompok_pekerjaan_lisan', compact('kelompok', 'timer', 'id_skema', 'jenis', 'skema'));
+        }
     }
-}
 
     // ================================
     // FORM TANDA TANGAN ASESOR

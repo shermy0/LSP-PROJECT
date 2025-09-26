@@ -350,8 +350,8 @@ Route::prefix('profileasesor')->group(function () {
     Route::put('/update', [ProfileAsesorController::class, 'update'])->name('profile.update');
 });
 Route::get('/form-asesmen/{id_skema}/kelompok-essai', [PertanyaanController::class, 'kelompokPekerjaan'])
-    ->defaults('jenis', 'essai')
-    ->name('pertanyaan.essai.kelompok');
+    ->defaults('jenis', 'esai')
+    ->name('pertanyaan.esai.kelompok');
 
 
     Route::get('/form-asesmen/pertanyaan-PG/{id_skema}', [FormAsesmenController::class, 'pertanyaanPG'])
