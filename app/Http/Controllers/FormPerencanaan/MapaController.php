@@ -147,18 +147,20 @@ public function storeMapa01(Request $request, $id_skema)
     }
 }
 
-public function updateTujuan(Request $request, $id_skema, $id_tujuan)
+public function updateTujuan(Request $request, $skema_id, $tujuan_id)
 {
     $request->validate([
         'nama_tujuan' => 'required|string|max:255',
     ]);
 
-    DB::table('tujuan_asesmen')
-        ->where('id_tujuan', $id_tujuan)
-        ->update(['nama_tujuan' => $request->nama_tujuan]);
+    DB::table('tujuan_asesmen')->where('id_tujuan', $tujuan_id)->update([
+        'nama_tujuan' => $request->nama_tujuan,
+    ]);
 
-    return back()->with('success', 'Tujuan berhasil diupdate!');
+    return response()->json(['success' => true]);
 }
+
+
 public function deleteTujuan($id_skema, $id_tujuan)
 {
     // Hapus relasi di skema_tujuan dulu

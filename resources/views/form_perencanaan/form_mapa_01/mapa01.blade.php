@@ -154,24 +154,22 @@
     </div>
   </div>
 </div>
-<!-- Modal edit Opsi -->
+=<!-- Modal edit Opsi -->
 <div class="modal fade" id="modalEditTujuan" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
-    <form method="POST" id="formEditTujuan">
-        @csrf
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Edit Tujuan Asesmen</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <input type="text" name="nama_tujuan" id="editNamaTujuan" class="form-control">
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Simpan</button>
-          </div>
-        </div>
-    </form>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Tujuan Asesmen</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editIdTujuan">
+        <input type="text" id="editNamaTujuan" class="form-control">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="btnUpdateTujuan">Simpan</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -364,8 +362,9 @@ Manajer atau supervisor di tempat kerja
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const tujuanList = document.getElementById("tujuan-asesmen-list");
+    let currentEditId = null; // simpan id tujuan yang lagi di-edit
 
-    // Tambah tujuan baru lewat modal (client-side only)
+    // Tambah tujuan baru lewat modal
     document.getElementById("simpanTujuan").addEventListener("click", function () {
         const nama = document.getElementById("tujuanBaru").value.trim();
         if (!nama) return;
@@ -375,8 +374,8 @@ document.addEventListener("DOMContentLoaded", function () {
         wrapper.classList.add("tujuan-item");
         wrapper.innerHTML = `
             <input type="checkbox" name="tujuan[]" value="${nama}" id="${id}" checked class="form-check-input me-2">
-            <label for="${id}">${nama}</label>
-            <button type="button" class="btn btn-sm btn-warning edit-tujuan">Edit</button>
+            <label for="${id}" class="tujuan-label">${nama}</label>
+            <button type="button" class="btn btn-sm btn-warning edit-tujuan" data-id="${id}" data-nama="${nama}">Edit</button>
             <button type="button" class="btn btn-sm btn-danger delete-tujuan">Hapus</button>
         `;
         tujuanList.appendChild(wrapper);
@@ -390,24 +389,26 @@ document.addEventListener("DOMContentLoaded", function () {
         const item = e.target.closest(".tujuan-item");
         if (!item) return;
 
-        // Edit tujuan
+        // === Edit tujuan ===
         if (e.target.classList.contains("edit-tujuan")) {
-            const label = item.querySelector("label");
-            const inputBox = prompt("Edit tujuan:", label.textContent);
-            if (inputBox && inputBox.trim() !== "") {
-                label.textContent = inputBox.trim();
-                item.querySelector("input[type=checkbox]").value = inputBox.trim();
-            }
+            currentEditId = e.target.getAttribute("data-id"); // simpan id tujuan yg diedit
+            const nama = e.target.getAttribute("data-nama");
+
+            document.getElementById("editNamaTujuan").value = nama;
+
+            // Tampilkan modal edit
+            const modal = new bootstrap.Modal(document.getElementById("modalEditTujuan"));
+            modal.show();
         }
 
-        // Delete tujuan
+        // === Delete tujuan ===
         if (e.target.classList.contains("delete-tujuan")) {
             if (!confirm("Yakin ingin menghapus tujuan ini?")) return;
 
             const url = e.target.getAttribute("data-url");
 
-            // Kalau ada URL → berarti tujuan dari DB
             if (url) {
+                // tujuan dari DB → hapus pakai fetch
                 fetch(url, {
                     method: "DELETE",
                     headers: {
@@ -425,11 +426,52 @@ document.addEventListener("DOMContentLoaded", function () {
                 })
                 .catch(() => alert("Terjadi error koneksi"));
             } else {
-                // Tujuan baru (JS-only)
+                // tujuan baru (JS-only)
                 item.remove();
             }
         }
     });
+
+// Simpan perubahan edit tujuan
+document.getElementById("btnUpdateTujuan").addEventListener("click", function () {
+    const newName = document.getElementById("editNamaTujuan").value.trim();
+    if (!newName || !currentEditId) return;
+
+    // Kirim ke backend pakai fetch
+    fetch(`/form-perencanaan/mapa01/{{ $skema->id_skema }}/tujuan/${currentEditId}/update`, {
+        method: "POST",
+        headers: {
+            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify({ nama_tujuan: newName })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            // Update label & value checkbox di DOM
+            const checkbox = document.querySelector(`.edit-tujuan[data-id="${currentEditId}"]`)
+                .closest(".tujuan-item").querySelector("input[type=checkbox]");
+            
+            if (checkbox) checkbox.value = newName;
+
+            const label = checkbox.closest(".tujuan-item").querySelector("label");
+            if (label) label.textContent = newName;
+
+            const editBtn = checkbox.closest(".tujuan-item").querySelector(".edit-tujuan");
+            if (editBtn) editBtn.setAttribute("data-nama", newName);
+
+            // Tutup modal
+            bootstrap.Modal.getInstance(document.getElementById("modalEditTujuan")).hide();
+            currentEditId = null;
+        } else {
+            alert("Gagal update tujuan: " + (data.message ?? 'Unknown error'));
+        }
+    })
+    .catch(() => alert("Terjadi error koneksi"));
+});
+
 });
 </script>
 @endsection

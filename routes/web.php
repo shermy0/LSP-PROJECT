@@ -59,7 +59,8 @@ Route::prefix('form-perencanaan')->group(function () {
 Route::get('/mapa01/{id_skema}', [MapaController::class, 'showMapa01'])->name('form.mapa01');
 Route::post('mapa01/{id_skema}/store', [MapaController::class, 'storeMapa01'])
     ->name('form.mapa01.store');
-Route::post('/mapa01/{id_skema}/tujuan/{id_tujuan}/update', [MapaController::class, 'updateTujuan'])->name('form.mapa01.tujuan.update');
+Route::post('/mapa01/{skema}/tujuan/{tujuan}/update', [MapaController::class, 'updateTujuan'])->name('mapa01.tujuan.update');
+
 Route::delete(
     '/form-perencanaan/mapa01/{skema}/tujuan/{tujuan}',
     [MapaController::class, 'deleteTujuan']
