@@ -14,10 +14,10 @@ return new class extends Migration
             $table->unsignedBigInteger('id_demonstrasi')->nullable();
             $table->unsignedBigInteger('id_asesor');
             $table->unsignedBigInteger('id_kelompok')->nullable();
-            $table->string('nama_tugas');
+            $table->string('isi_pertanyaan_demonstrasi');
             $table->string('file_path')->nullable();
             $table->string('file_type', 50)->nullable();
-            $table->text('deskripsi_tugas')->nullable();
+            $table->text('deskripsi_pertanyaan')->nullable();
             $table->string('kunci_jawaban')->nullable();
 
             $table->foreign('id_skema')->references('id_skema')->on('skema_sertifikasi')->onDelete('cascade');

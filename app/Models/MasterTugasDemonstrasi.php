@@ -13,8 +13,8 @@ class MasterTugasDemonstrasi extends Model
         'id_skema',
         'id_demonstrasi',
         'id_kelompok',
-        'nama_tugas',
-        'deskripsi_tugas',
+        'isi_pertanyaan_demonstrasi',
+        'deskripsi_pertanyaan',
         'timescap',
     ];
 
