@@ -151,10 +151,12 @@ public function storeMapa01(Request $request, $id_skema)
             ]
         );
 
-
         DB::commit();
-        return redirect()->route('formperencanaan.index')->with('success', 'FR.MAPA.01 berhasil disimpan!');
-    } catch (\Exception $e) {
+return redirect()->route('form.mapa01.kodeunit', ['skema_id' => $id_skema])
+                 ->with('success', 'FR.MAPA.01 berhasil disimpan!');
+
+
+        } catch (\Exception $e) {
         DB::rollBack();
         return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
     }

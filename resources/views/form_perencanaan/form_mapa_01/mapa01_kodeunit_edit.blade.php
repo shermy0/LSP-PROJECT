@@ -6,8 +6,11 @@
 <div class="card-box">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('formperencanaan') }}">Form Perencanaan</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('form.mapa01') }}">FR.MAPA.01</a></li>
+            <li class="breadcrumb-item">
+                <a href="{{ route('formperencanaan.index') }}">Daftar Skema</a>
+            </li>
+            <li class="breadcrumb-item"><a href="{{ route('formperencanaan.index') }}">Form Perencanaan</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('form.mapa01', ['id_skema' => $skema->id_skema]) }}">FR.MAPA.01</a></li>
             <li class="breadcrumb-item"><a href="{{ route('form.mapa01.kodeunit', $skema->id_skema) }}">Rencana Asesmen</a></li>
             <li class="breadcrumb-item active" aria-current="page">Edit Unit</li>
         </ol>

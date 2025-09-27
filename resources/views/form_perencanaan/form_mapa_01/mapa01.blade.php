@@ -159,7 +159,7 @@
     </div>
   </div>
 </div>
-=<!-- Modal edit Opsi -->
+<!-- Modal edit Opsi -->
 <div class="modal fade" id="modalEditTujuan" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">

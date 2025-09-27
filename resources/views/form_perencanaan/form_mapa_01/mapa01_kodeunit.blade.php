@@ -6,8 +6,11 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ route('formperencanaan.index') }}">Daftar Skema</a>
+            </li>
             <li class="breadcrumb-item"><a href="{{ route('formperencanaan.index') }}">Form Perencanaan</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('form.mapa01') }}">FR.MAPA.01</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('form.mapa01', ['id_skema' => $skema->id_skema]) }}">FR.MAPA.01</a></li>
             <li class="breadcrumb-item active" aria-current="page">Rencana Asesmen</li>
         </ol>
     </nav>
@@ -96,7 +99,7 @@
 
 
 <div class="d-flex justify-content-between mt-3">
-    <a href="{{ route('form.mapa01') }}" class="btn btn-secondary">Kembali</a>
-    <a href="{{ route('form.mapa01.modifikasi', ['skema_id' => $skema->id_skema]) }}" class="btn btn-primary">Simpan dan Lanjut</a>
+<a href="{{ route('form.mapa01', ['id_skema' => $skema->id_skema]) }}" class="btn btn-secondary">Kembali</a>
+<a href="{{ route('form.mapa01.modifikasi', ['skema_id' => $skema->id_skema]) }}" class="btn btn-primary">Simpan dan Lanjut</a>
 </div>
 @endsection

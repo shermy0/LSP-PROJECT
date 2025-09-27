@@ -7,9 +7,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
 use App\Http\Controllers\FormPerencanaan\Mapa01Controller;
 use App\Http\Controllers\FormPerencanaan\Mapa02Controller;
+use App\Http\Controllers\FormPerencanaan\ModifikasiController;
 use App\Http\Controllers\SkemaController;
 use App\Models\UnitKompetensi;
-use App\Http\Controllers\ModifikasiController;
 use App\Http\Controllers\InstrumenController;
 use App\Http\Controllers\FormPerencanaanController;
 
@@ -63,9 +63,13 @@ Route::prefix('form-perencanaan')->group(function () {
 Route::get('/mapa01/{id_skema}', [Mapa01Controller::class, 'showMapa01'])->name('form.mapa01');
    // MAPA02
     Route::get('/mapa02/{id_skema}', [Mapa02Controller::class, 'showMapa02'])->name('form.mapa02');
+    //MODIFIKASI
+    Route::get('/mapa01/modifikasi/{skema_id}', [ModifikasiController::class, 'index'])->name('form.mapa01.modifikasi');
 // ============================
 // END NAVIGASI PERFORM
 // ============================
+Route::post('/mapa01/modifikasi/{skema_id}', [ModifikasiController::class, 'store'])
+     ->name('form.mapa01.modifikasi.store');
 
 Route::post('mapa01/{id_skema}/store', [Mapa01Controller::class, 'storeMapa01'])
     ->name('form.mapa01.store');
@@ -77,7 +81,7 @@ Route::delete(
 )->name('mapa01.tujuan.delete');
 
             // Unit per skema & kelompok
-    Route::get('/mapa01/kode-unit/{skema_id}', [Mapa01Controller::class, 'kodeUnit'])->name('form.mapa01.kodeunit');
+Route::get('/mapa01/kode-unit/{skema_id}', [Mapa01Controller::class, 'kodeUnit'])->name('form.mapa01.kodeunit');
     Route::get('/mapa01/{skema_id}/kelompok/{kelompok_id}/tambah-unit', [Mapa01Controller::class, 'tambahUnit'])->name('form.mapa01.tambahunit');
     Route::post('/mapa01/{skema_id}/kelompok/{kelompok_id}/simpan-unit', [Mapa01Controller::class, 'simpanUnit'])->name('form.mapa01.simpanunit');
     Route::delete('/mapa01/{skema_id}/hapus-unit/{id}', [Mapa01Controller::class, 'hapusUnit'])->name('form.mapa01.hapusunit');
@@ -89,8 +93,6 @@ Route::delete(
     // Get skema
     Route::get('/mapa01/get-skema/{id}', [Mapa01Controller::class, 'getSkema'])->name('form.mapa01.getskema');
 
-    // Modifikasi & konfirmasi
-    Route::get('/mapa01/modifikasi/{skema_id}', [ModifikasiController::class, 'index'])->name('form.mapa01.modifikasi');
 // Konfirmasi
 Route::get('/mapa01/konfirmasi/{skema_id}', [Mapa01Controller::class, 'konfirmasi'])
     ->name('form.mapa01.konfirmasi');
