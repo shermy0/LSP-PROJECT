@@ -8,6 +8,7 @@ use App\Http\Controllers\PerencanaanController;
 use App\Http\Controllers\FormPerencanaan\Mapa01Controller;
 use App\Http\Controllers\FormPerencanaan\Mapa02Controller;
 use App\Http\Controllers\FormPerencanaan\ModifikasiController;
+use App\Http\Controllers\FormPerencanaan\KonfirmasiController;
 use App\Http\Controllers\SkemaController;
 use App\Models\UnitKompetensi;
 use App\Http\Controllers\InstrumenController;
@@ -94,11 +95,17 @@ Route::get('/mapa01/kode-unit/{skema_id}', [Mapa01Controller::class, 'kodeUnit']
     Route::get('/mapa01/get-skema/{id}', [Mapa01Controller::class, 'getSkema'])->name('form.mapa01.getskema');
 
 // Konfirmasi
-Route::get('/mapa01/konfirmasi/{skema_id}', [Mapa01Controller::class, 'konfirmasi'])
-    ->name('form.mapa01.konfirmasi');
+    Route::get('/mapa01/konfirmasi/{skema_id}', [KonfirmasiController::class, 'konfirmasi'])
+        ->name('form.mapa01.konfirmasi');
 
-Route::post('/mapa01/konfirmasi/{skema_id}/simpan', [Mapa01Controller::class, 'simpanKonfirmasi'])
-    ->name('form.mapa01.konfirmasi.simpan');
+    Route::post('/mapa01/konfirmasi/{skema_id}', [KonfirmasiController::class, 'store'])
+        ->name('form.mapa01.konfirmasi.simpan');
+
+Route::get('mapa01/konfirmasi/ttd/{id}/download', [KonfirmasiController::class, 'downloadTtd'])->name('form.mapa01.konfirmasi.ttd.download');
+Route::delete('mapa01/konfirmasi/ttd/{id}/delete', [KonfirmasiController::class, 'deleteTtd'])->name('form.mapa01.konfirmasi.ttd.delete');
+
+// Route::post('/mapa01/konfirmasi/{skema_id}/simpan', [KonfirmasiController::class, 'simpanKonfirmasi'])
+//     ->name('form.mapa01.konfirmasi.simpan');
 
     // Edit & update unit
     Route::get('/mapa01/edit-unit/{skema_id}/{id}', [Mapa01Controller::class, 'editUnit'])->name('form.mapa01.editunit');

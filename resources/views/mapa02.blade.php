@@ -67,111 +67,147 @@
 <!-- Instrumen Asesmen -->
 <form action="{{ route('mapa02.simpanInstrumen') }}" method="POST">
     @csrf
-    <div class="card-box mt-4">
-        <div class="judul-header">Instrumen Asesmen</div>
-        <div class="table-responsive mt-3">
-            <table class="table table-bordered custom-table">
-                <thead class="table-title">
+{{-- Looping kelompok pekerjaan --}}
+@forelse ($kelompokPekerjaan as $index => $kelompok)
+    <div class="mapa-card">
+            <div class="judul-header">Kelompok Pekerjaan {{ $index + 1 }}</div>
+ <div class="table-responsive mt-4">
+        <table class="table table-bordered custom-table">
+            <thead class="table-title">
+                <tr>
+                    <th>Kode Unit</th>
+                    <th>Unit Kompetensi</th>
+                    {{-- <th>Bukti-Bukti</th>
+                    <th>Jenis Bukti</th>
+                    <th>Metode dan Perangkat Asesmen</th> --}}
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($kelompok->hasilAsesmen as $hasil)
                     <tr>
-                        <th rowspan="2" class="text-center align-middle">No</th>
-                        <th rowspan="2" class="text-center align-middle">Instrumen Asesi</th>
-                        <th colspan="5" class="text-center">Potensi Asesi</th>
+                        <td>{{ $hasil->unit->kode_unit ?? '-' }}</td>
+                        <td>{{ $hasil->unit->judul_unit ?? '-' }}</td>
+                        {{-- <td>{{ $hasil->catatan }}</td>
+                        <td>
+                            @foreach ($hasil->bukti as $bukti)
+                                {{ $bukti->jenisBukti->nama_bukti ?? '-' }}<br>
+                            @endforeach
+                        </td>
+                        <td>
+                            @foreach ($hasil->perangkat as $perangkat)
+                                {{ $perangkat->perangkat->catatan_penerapan ?? '-' }}<br>
+                            @endforeach
+                        </td> --}}
                     </tr>
-                    <tr>
-                        @for($p=1; $p<=5; $p++)
-                        <th class="text-center">{{ $p }}</th>
-                        @endfor
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($instrumen as $i => $item)
+                @empty
+                    <tr><td colspan="6" class="text-center">Belum ada unit ditambahkan</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+    </div>
+@empty
+    <div class="alert alert-warning text-center">
+        Belum ada <strong>Kelompok Pekerjaan</strong> ditambahkan pada skema ini.
+    </div>
+@endforelse
+
+
+
+<!-- Instrumen Asesmen -->
+<div class="mapa-card">
+    <div class="judul-header">Instrumen Asesmen</div>
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered custom-table">
+            <thead class="table-title">
+                <tr>
+                    <th rowspan="2" class="text-center align-middle">No</th>
+                    <th rowspan="2" class="text-center align-middle">Instrumen Asesi</th>
+                    <th colspan="5" class="text-center">Potensi Asesi</th>
+                </tr>
+                <tr>
+                    <th class="text-center">1</th>
+                    <th class="text-center">2</th>
+                    <th class="text-center">3</th>
+                    <th class="text-center">4</th>
+                    <th class="text-center">5</th>
+                </tr>
+            </thead>
+            <tbody>
+                @php
+                    $instrumen = [
+                        'FR.IA.01. CL - Ceklis Observasi Aktivitas Di Tempat Kerja atau Tempat Kerja Simulasi',
+                        'FR.IA.02. TPD - Tugas Praktik Demonstrasi',
+                        'FR.IA.03. PMO – Pertanyaan Untuk Mendukung Observasi',
+                        'FR.IA.04. DIT - Daftar Instruksi Tertulis (Pengerjaan Singkat Proyek/Teknik/Pekerjaan/ Kegiatan Terstruktur Lainnya)',
+                        'FR.IA.05. DPT – Daftar Pertanyaan Tertulis Pilihan Ganda',
+                        'FR.IA.06. DPT – Daftar Pertanyaan Tertulis Pilihan Esai',
+                        'FR.IA.07. DPT – Daftar Pertanyaan Uraian',
+                        'FR.IA.08. CVP – Ceklis Verifikasi Portofolio',
+                        'FR.IA.09. PW – Pertanyaan Wawancara',
+                        'FR.IA.10. VPK – Verifikasi Pihak Ketiga',
+                        'FR.IA.11. CRP – Ceklis Reviu Produk',
+                    ];
+                @endphp
+
+                @foreach($instrumen as $i => $judul)
                     <tr>
                         <td class="text-center">{{ $i+1 }}</td>
-                        <td>
-                            <strong>{{ $item->kode_instrumen ?? '-' }}</strong>
-                            - {{ $item->nama_instrumen ?? 'Nama instrumen belum ada' }}
-                        </td>
+                        <td>{{ $judul }}</td>
                         @for($j=1; $j<=5; $j++)
-                        <td class="text-center">
-                            <input type="radio" name="potensi[{{ $item->id_instrumen }}]" value="{{ $j }}">
-                        </td>
+                            <td class="text-center">
+                                <input type="radio" name="potensi{{ $i+1 }}" value="{{ $j }}">
+                            </td>
                         @endfor
                     </tr>
-                    @empty
-                    <tr>
-                        <td colspan="7" class="text-center">Belum ada instrumen untuk skema ini.</td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                @endforeach
+            </tbody>
+        </table>
+
+        <div class="text-danger mt-2">
+            *diisi berdasarkan hasil penentuan pendekatan asesmen dan perencanaan asesmen
         </div>
     </div>
-
-    <div class="mt-3">
-        <button type="submit" class="btn btn-primary">Simpan</button>
-    </div>
-</form>
+</div>
 
 <!-- Penjelasan -->
-<div class="card-box mt-4">
-    <div class="judul-header">Penjelasan</div>
-    <ol class="judul-list">
-        <li>Hasil pelatihan dan/atau pendidikan yang telusur terhadap standar kompetensi.</li>
-        <li>Kurikulum belum berbasis kompetensi.</li>
-        <li>Pekerja berpengalaman yang sesuai standar kompetensi.</li>
-        <li>Pekerja berpengalaman yang belum berbasis kompetensi.</li>
-        <li>Pelatihan / belajar mandiri atau otodidak.</li>
-    </ol>
+<div class="card-box">
+    <div class="judul-box">
+        <div class="judul-header">Penjelasan</div>
+        <ol class="judul-list">
+            <li>Hasil pelatihan dan / atau pendidikan, dimana Kurikulum dan fasilitas praktek mampu telusur terhadap standar kompetensi.</li>
+            <li>Hasil pelatihan dan / atau pendidikan, dimana kurikulum belum berbasis kompetensi.</li>
+            <li>Pekerja berpengalaman, dimana berasal dari industri/tempat kerja yang dalam operasionalnya mampu telusur dengan standar kompetensi.</li>
+            <li>Pekerja berpengalaman, dimana berasal dari industri/tempat kerja yang dalam operasionalnya belum berbasis kompetensi.</li>
+            <li>Pelatihan / belajar mandiri atau otodidak</li>
+        </ol>
+    </div>
 </div>
 
 <!-- Simpan dan Lanjut -->
-<form id="simpan-lanjut-form" action="#" method="POST" class="mt-3">
-    @csrf
-    <button type="submit" class="btn btn-success">
-        Simpan dan Lanjut
+
+    <button type="submit" class="simpan-btn">
+        <span>Simpan dan Lanjut</span>
     </button>
 </form>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const skemaId = {{ $skema->id_skema ?? 'null' }};
-    if (!skemaId) return;
+    document.getElementById('skema_id').addEventListener('change', function() {
+        let selected = this.options[this.selectedIndex];
+        let kode = selected.getAttribute('data-kode');
+        let jenjang = selected.getAttribute('data-jenjang');
 
-    // Ambil kelompok pekerjaan (AJAX)
-    fetch(`/mapa02/skema/${skemaId}/units`)
-        .then(res => res.json())
-        .then(data => {
-            const container = document.getElementById('kelompok-container');
-            container.innerHTML = '';
-            if (data.length) {
-                let html = `
-                    <div class="card-box mt-4">
-                        <div class="judul-header">Unit Kompetensi</div>
-                        <div class="table-responsive mt-2">
-                            <table class="table table-bordered custom-table">
-                                <thead>
-                                    <tr>
-                                        <th class="text-center">No</th>
-                                        <th class="text-center">Kode Unit</th>
-                                        <th class="text-center">Judul Unit</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                `;
-                data.forEach((unit, i) => {
-                    html += `
-                        <tr>
-                            <td class="text-center">${i+1}</td>
-                            <td>${unit.kode_unit}</td>
-                            <td>${unit.judul_unit}</td>
-                        </tr>`;
-                });
-                html += `</tbody></table></div></div>`;
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = `<div class="card-box mt-4"><div class="judul-header">Belum ada unit kompetensi</div></div>`;
+        // biar bisa isi nomor otomatis
+        document.getElementById('nomor').value = kode || '';
+
+        // pilih radio otomatis sesuai skemanya
+        if (jenjang) {
+            if (jenjang.toLowerCase().includes("kkni")) {
+                document.getElementById('skema1').checked = true;
+            } else if (jenjang.toLowerCase().includes("okupasi")) {
+                document.getElementById('skema2').checked = true;
             }
-        });
-});
+        }
+    });
 </script>
 @endsection

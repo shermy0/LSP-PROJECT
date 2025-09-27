@@ -9,7 +9,7 @@
             <li class="breadcrumb-item">
                 <a href="{{ route('formperencanaan.index') }}">Daftar Skema</a>
             </li>
-            <li class="breadcrumb-item"><a href="{{ route('formperencanaan.index') }}">Form Perencanaan</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('formperencanaan.show', ['id_skema' => $skema->id_skema]) }}">Form Perencanaan</a></li>
             <li class="breadcrumb-item"><a href="{{ route('form.mapa01', ['id_skema' => $skema->id_skema]) }}">FR.MAPA.01</a></li>
             <li class="breadcrumb-item active" aria-current="page">Rencana Asesmen</li>
         </ol>

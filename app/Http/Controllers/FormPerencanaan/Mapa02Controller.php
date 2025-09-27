@@ -5,8 +5,14 @@ namespace App\Http\Controllers\FormPerencanaan;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Skema;
-use App\Models\InstrumenAsesmen;
 use App\Models\UnitKompetensi;
+use App\Models\HasilAsesmen;
+use App\Models\HasilAsesmenBukti;
+use App\Models\HasilAsesmenPerangkat;
+use App\Models\MasterJenisBukti;
+use App\Models\PerangkatAsesmen;
+use App\Models\KelompokPekerjaan;
+use App\Models\InstrumenAsesmen;
 use Illuminate\Support\Facades\DB;
 
 class Mapa02Controller extends Controller
@@ -19,21 +25,21 @@ class Mapa02Controller extends Controller
     }
 
     // Halaman MAPA02 berdasarkan skema
-    public function showMapa02($id_skema)
-    {
-        $skema = Skema::findOrFail($id_skema);
+public function showMapa02($skema_id)
+{
+    $skema = Skema::findOrFail($skema_id);
 
-        // Ambil instrumen yang terkait dengan skema ini
-        $instrumen = InstrumenAsesmen::where('skema_id', $id_skema)->get();
+    $kelompokPekerjaan = KelompokPekerjaan::with([
+            'hasilAsesmen.unit',
+            // 'hasilAsesmen.bukti.jenisBukti',
+            // 'hasilAsesmen.perangkat.perangkat'
+        ])
+        ->where('id_skema', $skema_id)
+        ->get();
 
-        // Ambil unit per skema
-        // $units = UnitKompetensi::where('skema_id', $id_skema)->get();
+    return view('mapa02', compact('skema', 'kelompokPekerjaan'));
+}
 
-        // Placeholder untuk kelompok pekerjaan (kalau nanti dipakai)
-        $kelompokPekerjaan = collect();
-
-        return view('mapa02', compact('skema', 'instrumen', 'kelompokPekerjaan'));
-    }
 
     // Ambil data asesor berdasarkan skema (AJAX)
     public function getAsesor($skemaId)
