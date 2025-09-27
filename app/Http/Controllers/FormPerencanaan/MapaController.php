@@ -27,41 +27,54 @@ public function showMapa01($id_skema)
 {
     $skema = DB::table('skema_sertifikasi')->where('id_skema', $id_skema)->first();
 
-  // Tujuan default (hardcode sesuai insert awal)
+    // Tujuan default
     $defaultTujuan = ['Sertifikasi', 'Pengakuan Kompetensi Terkini (PKT)', 'Rekognisi Pembelajaran Lampau (RPL)'];
 
-    // Ambil semua tujuan asesmen dari master
     $allTujuan = DB::table('tujuan_asesmen')->pluck('nama_tujuan')->toArray();
-
-    // Bagi dua: default vs custom
     $customTujuan = array_diff($allTujuan, $defaultTujuan);
 
-    // Ambil tujuan yang sudah dipilih
     $tujuanDipilih = DB::table('skema_tujuan')
         ->join('tujuan_asesmen', 'skema_tujuan.tujuan_id', '=', 'tujuan_asesmen.id_tujuan')
         ->where('skema_tujuan.skema_id', $id_skema)
         ->pluck('tujuan_asesmen.nama_tujuan')
         ->toArray();
-    
-    // Pendekatan
+
     $pendekatan = DB::table('mapa01_pendekatan')->where('id_skema', $id_skema)->first();
+$konteksRow = DB::table('mapa01_konteks')->where('id_skema', $id_skema)->first();
 
-    // KONTEKS
-    $konteksRow = DB::table('mapa01_konteks')->where('id_skema', $id_skema)->first();
+// Jadikan $konteks sebagai objek lengkap
+$konteks = (object)[
+    'lingkungan' => $konteksRow->lingkungan ?? '',
+    'peluang'    => $konteksRow->peluang ?? '',
+    'hubungan'   => $konteksRow && $konteksRow->hubungan ? json_decode($konteksRow->hubungan, true) : [],
+    'pelaksana'  => $konteksRow && $konteksRow->pelaksana ? json_decode($konteksRow->pelaksana, true) : [],
+];
 
-    $lingkungan = $konteksRow->lingkungan ?? '';
-    $peluang    = $konteksRow->peluang ?? '';
-    $hubungan   = $konteksRow && $konteksRow->hubungan ? json_decode($konteksRow->hubungan, true) : [];
-    $pelaksana  = $konteksRow && $konteksRow->pelaksana ? json_decode($konteksRow->pelaksana, true) : [];
-
-    // Konfirmasi & Standar
     $konfirmasi = DB::table('mapa01_konfirmasi')->where('id_skema', $id_skema)->first();
-    $standar    = DB::table('mapa01_standar_industri')->where('id_skema', $id_skema)->first();
+$standarRow = DB::table('mapa01_standar_industri')
+    ->where('id_skema', $id_skema)
+    ->first();
+
+$standar = (object)[
+    'standar_kriteria_asesmen' => $standarRow->standar_kriteria_asesmen ?? 0,
+    'standar_kinerja_perusahaan' => $standarRow->standar_kinerja_perusahaan ?? null,
+    'standar_spesifikasi_produk' => $standarRow->standar_spesifikasi_produk ?? null,
+    'standar_pedoman_khusus' => $standarRow->standar_pedoman_khusus ?? null,
+];
+
+
+    // 👉 Ambil standar_kompetensi pertama sesuai id_skema
+    $standarKompetensi = DB::table('unit_kompetensi')
+        ->where('id_skema', $id_skema)
+        ->pluck('standar_kompetensi')
+        ->unique()
+        ->toArray();
+
 
     return view('form_perencanaan.form_mapa_01.mapa01', compact(
         'skema','defaultTujuan','customTujuan','tujuanDipilih','pendekatan',
-        'lingkungan','peluang','hubungan','pelaksana',
-        'konfirmasi','standar'
+    
+        'konfirmasi','standar','standarKompetensi', 'konteks'
     ));
 }
 
@@ -131,13 +144,13 @@ public function storeMapa01(Request $request, $id_skema)
         DB::table('mapa01_standar_industri')->updateOrInsert(
             ['id_skema' => $id_skema],
             [
-                'standar_skkni' => $request->has('standar_kompetensi') ? 1 : 0,
-                'standar_kriteria_asesmen' => $request->has('kriteria_asesmen') ? 1 : 0,
-                'standar_kinerja_perusahaan' => $request->input('standar_kinerja_perusahaan'),
-                'standar_spesifikasi_produk' => $request->input('spesifikasi_produk'),
-                'standar_pedoman_khusus' => $request->input('pedoman_khusus'),
+                'standar_kriteria_asesmen'   => $request->has('kriteria_asesmen') ? 1 : 0,
+                'standar_kinerja_perusahaan' => $request->input('standar_kinerja_perusahaan') ?: null,
+                'standar_spesifikasi_produk' => $request->input('spesifikasi_produk') ?: null,
+                'standar_pedoman_khusus'     => $request->input('pedoman_khusus') ?: null,
             ]
         );
+
 
         DB::commit();
         return redirect()->route('formperencanaan.index')->with('success', 'FR.MAPA.01 berhasil disimpan!');

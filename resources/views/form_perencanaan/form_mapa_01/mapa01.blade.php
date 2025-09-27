@@ -179,93 +179,66 @@
     <div class="mapa-subsection-header">Konteks Asesmen</div>
     <div class="konteks-section">
 
-        <!-- LINGKUNGAN (radio, pilih salah satu) -->
+        <!-- LINGKUNGAN -->
         <div class="form-group mb-3">
             <label class="form-label d-block">Lingkungan</label>
             <label class="me-3">
                 <input type="radio" name="lingkungan" value="Tempat kerja nyata" class="form-check-input me-1"
-                       {{ ($konteks->lingkungan ?? '') == 'Tempat kerja nyata' ? 'checked' : '' }}>
+                       {{ $konteks->lingkungan == 'Tempat kerja nyata' ? 'checked' : '' }}>
                 Tempat kerja nyata
             </label>
             <label>
                 <input type="radio" name="lingkungan" value="Tempat kerja simulasi" class="form-check-input me-1"
-                       {{ ($konteks->lingkungan ?? '') == 'Tempat kerja simulasi' ? 'checked' : '' }}>
+                       {{ $konteks->lingkungan == 'Tempat kerja simulasi' ? 'checked' : '' }}>
                 Tempat kerja simulasi
             </label>
         </div>
 
-        <!-- PELUANG (radio, pilih salah satu) -->
+        <!-- PELUANG -->
         <div class="form-group mb-3">
             <label class="form-label d-block">Peluang untuk mengumpulkan bukti dalam sejumlah situasi</label>
             <label class="me-3">
                 <input type="radio" name="peluang" value="Tersedia" class="form-check-input me-1"
-                       {{ ($konteks->peluang ?? '') == 'Tersedia' ? 'checked' : '' }}>
+                       {{ $konteks->peluang == 'Tersedia' ? 'checked' : '' }}>
                 Tersedia
             </label>
             <label>
                 <input type="radio" name="peluang" value="Terbatas" class="form-check-input me-1"
-                       {{ ($konteks->peluang ?? '') == 'Terbatas' ? 'checked' : '' }}>
+                       {{ $konteks->peluang == 'Terbatas' ? 'checked' : '' }}>
                 Terbatas
             </label>
         </div>
 
-        <!-- HUBUNGAN (checkbox list, boleh lebih dari 1) -->
+        <!-- HUBUNGAN -->
         <div class="form-group mb-3">
             <label class="form-label d-block">Hubungan antara standar kompetensi dan:</label>
+            @foreach(['Bukti untuk mendukung asesmen','Aktivitas kerja di tempat kerja Asesi','Kegiatan Pembelajaran'] as $h)
             <div>
                 <label>
-                    <input type="checkbox" name="hubungan[]" value="Bukti untuk mendukung asesmen"
+                    <input type="checkbox" name="hubungan[]" value="{{ $h }}"
                            class="form-check-input me-1"
-                           {{ in_array('Bukti untuk mendukung asesmen', $hubungan ?? []) ? 'checked' : '' }}>
-                    Bukti untuk mendukung asesmen
+                           {{ in_array($h, $konteks->hubungan) ? 'checked' : '' }}>
+                    {{ $h }}
                 </label>
             </div>
-            <div>
-                <label>
-                    <input type="checkbox" name="hubungan[]" value="Aktivitas kerja di tempat kerja Asesi"
-                           class="form-check-input me-1"
-                           {{ in_array('Aktivitas kerja di tempat kerja Asesi', $hubungan ?? []) ? 'checked' : '' }}>
-                    Aktivitas kerja di tempat kerja Asesi
-                </label>
-            </div>
-            <div>
-                <label>
-                    <input type="checkbox" name="hubungan[]" value="Kegiatan Pembelajaran"
-                           class="form-check-input me-1"
-                           {{ in_array('Kegiatan Pembelajaran', $hubungan ?? []) ? 'checked' : '' }}>
-                    Kegiatan Pembelajaran
-                </label>
-            </div>
+            @endforeach
         </div>
 
-        <!-- PELAKSANA (checkbox list, boleh lebih dari 1) -->
+        <!-- PELAKSANA -->
         <div class="form-group mb-3">
             <label class="form-label d-block">Siapa yang melakukan asesmen / RPL</label>
+            @foreach(['Lembaga Sertifikasi','Organisasi Pelatihan','Asesor Perusahaan'] as $p)
             <div>
                 <label>
-                    <input type="checkbox" name="pelaksana[]" value="Lembaga Sertifikasi"
+                    <input type="checkbox" name="pelaksana[]" value="{{ $p }}"
                            class="form-check-input me-1"
-                           {{ in_array('Lembaga Sertifikasi', $pelaksana ?? []) ? 'checked' : '' }}>
-                    Lembaga Sertifikasi
+                           {{ in_array($p, $konteks->pelaksana) ? 'checked' : '' }}>
+                    {{ $p }}
                 </label>
             </div>
-            <div>
-                <label>
-                    <input type="checkbox" name="pelaksana[]" value="Organisasi Pelatihan"
-                           class="form-check-input me-1"
-                           {{ in_array('Organisasi Pelatihan', $pelaksana ?? []) ? 'checked' : '' }}>
-                    Organisasi Pelatihan
-                </label>
-            </div>
-            <div>
-                <label>
-                    <input type="checkbox" name="pelaksana[]" value="Asesor Perusahaan"
-                           class="form-check-input me-1"
-                           {{ in_array('Asesor Perusahaan', $pelaksana ?? []) ? 'checked' : '' }}>
-                    Asesor Perusahaan
-                </label>
-            </div>
+            @endforeach
         </div>
+
     </div>
 </div>
 
@@ -273,22 +246,22 @@
 <div class="mapa-subsection-header">Konfirmasi dengan Orang Lain yang Relevan</div>
 <div class="mapa-options">
     <div>
-        <input type="checkbox" name="orang_relevan[]" value="Manajer sertifikasi LSP P1 SMKN 11 Bandung"
+        <input type="checkbox" class="form-check-input me-2"  name="orang_relevan[]" value="Manajer sertifikasi LSP P1 SMKN 11 Bandung"
     @if($konfirmasi && $konfirmasi->konfirmasi_manajer_lsp) checked @endif>
 Manajer sertifikasi LSP P1 SMKN 11 Bandung
     </div>
     <div>
-        <input type="checkbox" name="orang_relevan[]" value="Master Asesor / Master Trainer / Lead Asesor Kompetensi"
+        <input type="checkbox" class="form-check-input me-2" name="orang_relevan[]" value="Master Asesor / Master Trainer / Lead Asesor Kompetensi"
     @if($konfirmasi && $konfirmasi->konfirmasi_master_asesor) checked @endif>
 Master Asesor / Master Trainer / Lead Asesor Kompetensi
     </div>
     <div>
-       <input type="checkbox" name="orang_relevan[]" value="Manajer Pelatihan Lembaga Training terakreditasi / Lembaga Training Terdaftar"
+       <input type="checkbox" class="form-check-input me-2" name="orang_relevan[]" value="Manajer Pelatihan Lembaga Training terakreditasi / Lembaga Training Terdaftar"
     @if($konfirmasi && $konfirmasi->konfirmasi_manajer_pelatihan) checked @endif>
 Manajer Pelatihan Lembaga Training
     </div>
     <div>
-       <input type="checkbox" name="orang_relevan[]" value="Manajer atau supervisor di tempat kerja"
+       <input type="checkbox" class="form-check-input me-2" name="orang_relevan[]" value="Manajer atau supervisor di tempat kerja"
     @if($konfirmasi && $konfirmasi->konfirmasi_supervisor) checked @endif>
 Manajer atau supervisor di tempat kerja
     </div>
@@ -297,55 +270,61 @@ Manajer atau supervisor di tempat kerja
 
 
 
-    {{-- Kriteria asesmen dari kurikulum pelatihan --}}
 <div class="mapa-subsection-header">Standar Industri atau Tempat Kerja</div>
 <div class="mapa-options">
-    {{-- Standar Kompetensi --}}
-    <div>
-        <input type="checkbox" id="asesi1" name="asesi[]" 
-               value="Standar Kompetensi" class="form-check-input me-2 toggle-input"
-               data-target="input-asesi1">
-        <label for="asesi1">Standar Kompetensi:</label>
-        <input type="text" id="input-asesi1" name="standar_kompetensi" 
-               class="form-control mt-2" placeholder="Isi standar kompetensi"
-               disabled style="display:none;">
-    </div>
+{{-- Standar Kompetensi --}}
+<div>
+    @foreach($standarKompetensi as $sk)
+        <input type="checkbox" class="form-check-input me-2" checked disabled>
+        <label>Standar Kompetensi: {{ $sk }}</label>
+    @endforeach
+</div>
 
-    {{-- Kriteria asesmen dari kurikulum pelatihan --}}
-    <div>
-        <input type="checkbox" id="asesi2" name="asesi[]" 
-               value="Kriteria asesmen" class="form-check-input me-2">
-        <label for="asesi2">Kriteria asesmen dari kurikulum pelatihan</label>
-    </div>
 
-    {{-- Spesifikasi Kinerja Perusahaan --}}
-    <div>
-        <input type="checkbox" id="asesi3" name="asesi[]" 
-               value="Spesifikasi Kinerja" class="form-check-input me-2">
-        <label for="asesi3">Spesifikasi kinerja suatu perusahaan atau industri</label>
-    </div>
+{{-- Kriteria Asesmen dari Kurikulum Pelatihan --}}
+<div>
+    <input type="checkbox" id="asesi2" name="kriteria_asesmen"
+           value="1" class="form-check-input me-2"
+           {{ isset($standar) && $standar->standar_kriteria_asesmen ? 'checked' : '' }}>
+    <label for="asesi2">Kriteria asesmen dari kurikulum pelatihan</label>
+</div>
 
-    {{-- Spesifikasi Produk --}}
-    <div>
-        <input type="checkbox" id="asesi4" name="asesi[]" 
-               value="Spesifikasi Produk" class="form-check-input me-2 toggle-input"
-               data-target="input-asesi4">
-        <label for="asesi4">Spesifikasi Produk:</label>
-        <input type="text" id="input-asesi4" name="spesifikasi_produk" 
-               class="form-control mt-2" placeholder="Isi spesifikasi produk"
-               disabled style="display:none;">
-    </div>
+{{-- Spesifikasi Kinerja Perusahaan --}}
+<div>
+    <input type="checkbox" id="asesi3" class="form-check-input me-2 toggle-input"
+           data-target="input-asesi3"
+           {{ isset($standar) && $standar->standar_kinerja_perusahaan ? 'checked' : '' }}>
+    <label for="asesi3">Spesifikasi kinerja suatu perusahaan atau industri</label>
+    <input type="text" id="input-asesi3" name="standar_kinerja_perusahaan"
+           class="form-control mt-2"
+           value="{{ $standar->standar_kinerja_perusahaan ?? '' }}"
+           {{ isset($standar) && $standar->standar_kinerja_perusahaan ? '' : 'disabled style=display:none;' }}>
+</div>
 
-    {{-- Pedoman Khusus --}}
-    <div>
-        <input type="checkbox" id="asesi5" name="asesi[]" 
-               value="Pedoman Khusus" class="form-check-input me-2 toggle-input"
-               data-target="input-asesi5">
-        <label for="asesi5">Pedoman Khusus:</label>
-        <input type="text" id="input-asesi5" name="pedoman_khusus" 
-               class="form-control mt-2" placeholder="Isi pedoman khusus"
-               disabled style="display:none;">
-    </div>
+{{-- Spesifikasi Produk --}}
+<div>
+    <input type="checkbox" id="asesi4" class="form-check-input me-2 toggle-input"
+           data-target="input-asesi4"
+           {{ isset($standar) && $standar->standar_spesifikasi_produk ? 'checked' : '' }}>
+    <label for="asesi4">Spesifikasi Produk:</label>
+    <input type="text" id="input-asesi4" name="spesifikasi_produk"
+           class="form-control mt-2" placeholder="Isi spesifikasi produk"
+           value="{{ $standar->standar_spesifikasi_produk ?? '' }}"
+           {{ isset($standar) && $standar->standar_spesifikasi_produk ? '' : 'disabled style=display:none;' }}>
+</div>
+
+{{-- Pedoman Khusus --}}
+<div>
+    <input type="checkbox" id="asesi5" class="form-check-input me-2 toggle-input"
+           data-target="input-asesi5"
+           {{ isset($standar) && $standar->standar_pedoman_khusus ? 'checked' : '' }}>
+    <label for="asesi5">Pedoman Khusus:</label>
+    <input type="text" id="input-asesi5" name="pedoman_khusus"
+           class="form-control mt-2" placeholder="Isi pedoman khusus"
+           value="{{ $standar->standar_pedoman_khusus ?? '' }}"
+           {{ isset($standar) && $standar->standar_pedoman_khusus ? '' : 'disabled style=display:none;' }}>
+</div>
+
 </div>
 
 
@@ -360,6 +339,21 @@ Manajer atau supervisor di tempat kerja
 </form>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".toggle-input").forEach(cb => {
+        cb.addEventListener("change", function () {
+            const target = document.getElementById(this.dataset.target);
+            if (this.checked) {
+                target.style.display = "block";
+                target.disabled = false;
+            } else {
+                target.style.display = "none";
+                target.disabled = true;
+                target.value = ""; // biar ga ikut ke DB
+            }
+        });
+    });
+});
 document.addEventListener("DOMContentLoaded", function () {
     const tujuanList = document.getElementById("tujuan-asesmen-list");
     let currentEditId = null; // simpan id tujuan yang lagi di-edit
