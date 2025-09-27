@@ -39,7 +39,7 @@
                 <li><i class="bi bi-house-door-fill"></i><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                 <li><i class="bi bi-person-lines-fill"></i><a href="{{ route('admin.permohonan.index') }}">Daftar Permohonan</a></li>
                 <li><i class="bi bi-people-fill"></i><a href="#">Data Peserta Uji</a></li>
-                <li><i class="bi bi-people-fill"></i><a href="#">Data Asesor</a></li>
+                <li><i class="bi bi-people-fill"></i><a href="{{route('admin.dataasesor')}}">Data Asesor</a></li>
 
             @endif
 

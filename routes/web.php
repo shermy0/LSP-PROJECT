@@ -11,6 +11,7 @@ use App\Http\Controllers\FormAsesmenController;
 use App\Http\Controllers\Asesi\PermohonanController;
 use App\Http\Controllers\Admin\Form1AdminController;
 use App\Http\Controllers\BandingAsesmenController;
+use App\Http\Controllers\DataAsesorController;
 
 // Tambahan controller Asesmen Mandiri
 use App\Http\Controllers\Asesi\AsesmenMandiriController as AsesiAsesmenMandiriController;
@@ -48,6 +49,8 @@ Route::middleware(['auth'])->group(function () {
 
     // Admin
     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
+    Route::get('/admin/dataasesor', [DataAsesorController::class, 'admin'])->name('admin.dataasesor');
+
 
     // Asesi
     Route::get('/asesi/dashboard', [DashboardController::class, 'asesi'])->name('asesi.dashboard');
