@@ -53,6 +53,9 @@
         </div>
     </div>
 </div>
+
+<form action="{{ route('form.mapa01.store', $skema->id_skema) }}" method="POST">
+    @csrf
     <!-- Menentukan Pendekatan Asesmen -->
 <div class="mapa-section">
     <div class="card mapa-card">
@@ -62,47 +65,75 @@
                 <div class="mapa-subsection-header">Asesi</div>
                 <div class="mapa-options">
                     <div>
-                        <input type="checkbox" id="asesi1" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2">
+                        <input class="form-check-input" type="checkbox" name="pelatihan_standar" id="pelatihan_standar"
+            {{ $pendekatan && $pendekatan->pelatihan_standar ? 'checked' : '' }}>
                         <label for="asesi1">Hasil pelatihan dan / atau pendidikan, dimana Kurikulum dan fasilitas praktek mampu telusur terhadap standar kompetensi</label>
                     </div>
                     <div>
-                        <input type="checkbox" id="asesi2" name="asesi[]" value="Pelatihan dengan kurikulum belum berbasis kompetensi" class="form-check-input me-2">
+                         <input class="form-check-input" type="checkbox" name="pelatihan_nonstandar" id="pelatihan_nonstandar"
+            {{ $pendekatan && $pendekatan->pelatihan_nonstandar ? 'checked' : '' }}>
                         <label for="asesi2">Hasil pelatihan dan / atau pendidikan, dimana kurikulum belum berbasis kompetensi</label>
                     </div>
                     <div>
-                        <input type="checkbox" id="asesi3" name="asesi[]" value="Pekerja berpengalaman kompeten" class="form-check-input me-2">
+                        <input class="form-check-input" type="checkbox" name="pengalaman_standar" id="pengalaman_standar"
+            {{ $pendekatan && $pendekatan->pengalaman_standar ? 'checked' : '' }}>
                         <label for="asesi3">Pekerja berpengalaman, dimana berasal dari industri/tempat kerja yang dalam operasionalnya mampu telusur dengan standar kompetensi</label>
                     </div>
                     <div>
-                        <input type="checkbox" id="asesi4" name="asesi[]" value="Pekerja berpengalaman belum kompeten" class="form-check-input me-2">
+                       <input class="form-check-input" type="checkbox" name="pengalaman_nonstandar" id="pengalaman_nonstandar"
+            {{ $pendekatan && $pendekatan->pengalaman_nonstandar ? 'checked' : '' }}>
                         <label for="asesi4">Pekerja berpengalaman, dimana berasal dari industri/tempat kerja yang dalam operasionalnya belum berbasis kompetensi</label>
                     </div>
                     <div>
-                        <input type="checkbox" id="asesi5" name="asesi[]" value="Belajar mandiri/otodidak" class="form-check-input me-2">
+                        <input class="form-check-input" type="checkbox" name="otodidak" id="otodidak"
+            {{ $pendekatan && $pendekatan->otodidak ? 'checked' : '' }}>
                         <label for="asesi5">Pelatihan / belajar mandiri atau otodidak.</label>
                     </div>
             </div>
-        <!-- Tujuan Asesmen -->
+<!-- Tujuan Asesmen -->
 <div class="mapa-section">
     <div class="mapa-subsection-header">Tujuan Asesmen</div>
     <div class="mapa-options" id="tujuan-asesmen-list">
-        <div>
-            <input type="checkbox" id="sertifikasi" name="tujuan[]" value="Sertifikasi" class="form-check-input me-2">
-            <label for="sertifikasi">Sertifikasi</label>
-        </div>
-        <div>
-            <input type="checkbox" id="pkt" name="tujuan[]" value="Pengakuan Kompetensi Terkini (PKT)" class="form-check-input me-2">
-            <label for="pkt">Pengakuan Kompetensi Terkini (PKT)</label>
-        </div>
-        <div>
-            <input type="checkbox" id="rpl" name="tujuan[]" value="Rekognisi Pembelajaran Lampau (RPL)" class="form-check-input me-2">
-            <label for="rpl">Rekognisi Pembelajaran Lampau (RPL)</label>
-        </div>
+        {{-- Default tujuan (tidak bisa dihapus/diubah) --}}
+        @foreach($defaultTujuan as $nama)
+            <div class="tujuan-item">
+                <input type="checkbox" name="tujuan[]" value="{{ $nama }}"
+                       class="form-check-input me-2"
+                       @if(in_array($nama, $tujuanDipilih ?? [])) checked @endif>
+                <label>{{ $nama }}</label>
+            </div>
+        @endforeach
+
+        {{-- Custom tujuan (bisa edit & hapus) --}}
+        @foreach($customTujuan as $nama)
+            @php
+                $tujuan = DB::table('tujuan_asesmen')->where('nama_tujuan', $nama)->first();
+            @endphp
+            <div class="tujuan-item">
+                <input type="checkbox" name="tujuan[]" value="{{ $nama }}"
+                       class="form-check-input me-2"
+                       @if(in_array($nama, $tujuanDipilih ?? [])) checked @endif>
+                <label>{{ $nama }}</label>
+
+                <button type="button" class="btn btn-sm btn-warning edit-tujuan"
+                        data-id="{{ $tujuan->id_tujuan }}"
+                        data-nama="{{ $nama }}">Edit</button>
+
+                <button type="button" 
+                        class="btn btn-sm btn-danger delete-tujuan"
+                        data-url="{{ route('mapa01.tujuan.delete', ['skema' => $skema->id_skema, 'tujuan' => $tujuan->id_tujuan]) }}">
+                    Hapus
+                </button>
+            </div>
+        @endforeach
     </div>
+
     <button type="button" class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#modalTambahTujuan">
         + Tambah opsi tujuan lainnya
     </button>
 </div>
+
+
 
 <!-- Modal Tambah Opsi -->
 <div class="modal fade" id="modalTambahTujuan" tabindex="-1" aria-labelledby="modalTambahTujuanLabel" aria-hidden="true">
@@ -123,68 +154,145 @@
     </div>
   </div>
 </div>
+<!-- Modal edit Opsi -->
+<div class="modal fade" id="modalEditTujuan" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" id="formEditTujuan">
+        @csrf
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Tujuan Asesmen</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <input type="text" name="nama_tujuan" id="editNamaTujuan" class="form-control">
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Simpan</button>
+          </div>
+        </div>
+    </form>
+  </div>
+</div>
 
 
+<!-- KONTEKS ASESMEN -->
 <div class="mapa-section">
     <div class="mapa-subsection-header">Konteks Asesmen</div>
-        <div class="konteks-section">
-    <!-- Lingkungan -->
-    <div class="form-group">
-        <label class="form-label">Lingkungan</label>
-        <div class="mapa-options-konteks radio">
-            <label> <input type="radio" id="aa" name="aa" class="form-check-input"> Tempat kerja nyata</label>
-            <label> <input type="radio" id="dd" name="aa" class="form-check-input"> Tempat kerja simulasi</label>
-        </div>
-    </div>
+    <div class="konteks-section">
 
-    <!-- Peluang -->
-    <div class="form-group radio">
-        <label class="form-label">Peluang untuk mengumpulkan bukti dalam sejumlah situasi</label>
-        <div class="mapa-options-konteks">
-            <label><input type="radio" id="bb" name="bb" class="form-check-input">  Tersedia</label>
-            <label><input type="radio" id="cc" name="bb" class="form-check-input"> Terbatas</label>
+        <!-- LINGKUNGAN (radio, pilih salah satu) -->
+        <div class="form-group mb-3">
+            <label class="form-label d-block">Lingkungan</label>
+            <label class="me-3">
+                <input type="radio" name="lingkungan" value="Tempat kerja nyata" class="form-check-input me-1"
+                       {{ ($konteks->lingkungan ?? '') == 'Tempat kerja nyata' ? 'checked' : '' }}>
+                Tempat kerja nyata
+            </label>
+            <label>
+                <input type="radio" name="lingkungan" value="Tempat kerja simulasi" class="form-check-input me-1"
+                       {{ ($konteks->lingkungan ?? '') == 'Tempat kerja simulasi' ? 'checked' : '' }}>
+                Tempat kerja simulasi
+            </label>
         </div>
-    </div>
 
-    <!-- Hubungan -->
-    <div class="form-group">
-        <label class="form-label">Hubungan antara standarkompetensi dan:</label>
-        <div class="mapa-options-konteks">
-            <label><input type="checkbox" id="123" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Bukti untuk mendukung asesmen</label>
-            <label><input type="checkbox" id="124" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Aktivitas kerja di tempat kerja Asesi</label>
-            <label><input type="checkbox" id="125" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Kegiatan Pembelajaran</label>
+        <!-- PELUANG (radio, pilih salah satu) -->
+        <div class="form-group mb-3">
+            <label class="form-label d-block">Peluang untuk mengumpulkan bukti dalam sejumlah situasi</label>
+            <label class="me-3">
+                <input type="radio" name="peluang" value="Tersedia" class="form-check-input me-1"
+                       {{ ($konteks->peluang ?? '') == 'Tersedia' ? 'checked' : '' }}>
+                Tersedia
+            </label>
+            <label>
+                <input type="radio" name="peluang" value="Terbatas" class="form-check-input me-1"
+                       {{ ($konteks->peluang ?? '') == 'Terbatas' ? 'checked' : '' }}>
+                Terbatas
+            </label>
         </div>
-    </div>
 
-    <!-- Pelaksana -->
-    <div class="form-group">
-        <label class="form-label">Siapa yang melakukan asesmen / RPL</label>
-        <div class="mapa-options-konteks">
-            <label><input type="checkbox" id="126" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Lembaga Sertifikasi</label>
-            <label><input type="checkbox" id="127" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Organisasi Pelatihan</label>
-            <label><input type="checkbox" id="128" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Asesor Perusahaan</label>
+        <!-- HUBUNGAN (checkbox list, boleh lebih dari 1) -->
+        <div class="form-group mb-3">
+            <label class="form-label d-block">Hubungan antara standar kompetensi dan:</label>
+            <div>
+                <label>
+                    <input type="checkbox" name="hubungan[]" value="Bukti untuk mendukung asesmen"
+                           class="form-check-input me-1"
+                           {{ in_array('Bukti untuk mendukung asesmen', $hubungan ?? []) ? 'checked' : '' }}>
+                    Bukti untuk mendukung asesmen
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="checkbox" name="hubungan[]" value="Aktivitas kerja di tempat kerja Asesi"
+                           class="form-check-input me-1"
+                           {{ in_array('Aktivitas kerja di tempat kerja Asesi', $hubungan ?? []) ? 'checked' : '' }}>
+                    Aktivitas kerja di tempat kerja Asesi
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="checkbox" name="hubungan[]" value="Kegiatan Pembelajaran"
+                           class="form-check-input me-1"
+                           {{ in_array('Kegiatan Pembelajaran', $hubungan ?? []) ? 'checked' : '' }}>
+                    Kegiatan Pembelajaran
+                </label>
+            </div>
+        </div>
+
+        <!-- PELAKSANA (checkbox list, boleh lebih dari 1) -->
+        <div class="form-group mb-3">
+            <label class="form-label d-block">Siapa yang melakukan asesmen / RPL</label>
+            <div>
+                <label>
+                    <input type="checkbox" name="pelaksana[]" value="Lembaga Sertifikasi"
+                           class="form-check-input me-1"
+                           {{ in_array('Lembaga Sertifikasi', $pelaksana ?? []) ? 'checked' : '' }}>
+                    Lembaga Sertifikasi
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="checkbox" name="pelaksana[]" value="Organisasi Pelatihan"
+                           class="form-check-input me-1"
+                           {{ in_array('Organisasi Pelatihan', $pelaksana ?? []) ? 'checked' : '' }}>
+                    Organisasi Pelatihan
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="checkbox" name="pelaksana[]" value="Asesor Perusahaan"
+                           class="form-check-input me-1"
+                           {{ in_array('Asesor Perusahaan', $pelaksana ?? []) ? 'checked' : '' }}>
+                    Asesor Perusahaan
+                </label>
+            </div>
         </div>
     </div>
 </div>
-</div>
+
 
 <div class="mapa-subsection-header">Konfirmasi dengan Orang Lain yang Relevan</div>
 <div class="mapa-options">
     <div>
-        <input type="checkbox" id="relevan1" name="orang_relevan[]" value="Manajer sertifikasi LSP P1 SMKN 11 Bandung" class="form-check-input me-2">
-        <label for="relevan1">Manajer sertifikasi LSP P1 SMKN 11 Bandung</label>
+        <input type="checkbox" name="orang_relevan[]" value="Manajer sertifikasi LSP P1 SMKN 11 Bandung"
+    @if($konfirmasi && $konfirmasi->konfirmasi_manajer_lsp) checked @endif>
+Manajer sertifikasi LSP P1 SMKN 11 Bandung
     </div>
     <div>
-        <input type="checkbox" id="relevan2" name="orang_relevan[]" value="Master Asesor / Master Trainer / Lead Asesor Kompetensi" class="form-check-input me-2">
-        <label for="relevan2">Master Asesor / Master Trainer / Lead Asesor Kompetensi</label>
+        <input type="checkbox" name="orang_relevan[]" value="Master Asesor / Master Trainer / Lead Asesor Kompetensi"
+    @if($konfirmasi && $konfirmasi->konfirmasi_master_asesor) checked @endif>
+Master Asesor / Master Trainer / Lead Asesor Kompetensi
     </div>
     <div>
-        <input type="checkbox" id="relevan3" name="orang_relevan[]" value="Manajer Pelatihan Lembaga Training terakreditasi / Lembaga Training Terdaftar" class="form-check-input me-2">
-        <label for="relevan3">Manajer Pelatihan Lembaga Training terakreditasi / Lembaga Training Terdaftar</label>
+       <input type="checkbox" name="orang_relevan[]" value="Manajer Pelatihan Lembaga Training terakreditasi / Lembaga Training Terdaftar"
+    @if($konfirmasi && $konfirmasi->konfirmasi_manajer_pelatihan) checked @endif>
+Manajer Pelatihan Lembaga Training
     </div>
     <div>
-        <input type="checkbox" id="relevan4" name="orang_relevan[]" value="Manajer atau supervisor di tempat kerja" class="form-check-input me-2">
-        <label for="relevan4">Manajer atau supervisor di tempat kerja</label>
+       <input type="checkbox" name="orang_relevan[]" value="Manajer atau supervisor di tempat kerja"
+    @if($konfirmasi && $konfirmasi->konfirmasi_supervisor) checked @endif>
+Manajer atau supervisor di tempat kerja
     </div>
 </div>
 
@@ -247,14 +355,81 @@
     </div>
 </div>
 <!-- Simpan dan Lanjut -->
-<form id="simpan-lanjut-form" action="" method="POST" class="simpan-form">
     @csrf
     <button type="submit" class="simpan-btn">
         <span>Simpan dan Lanjut</span>
     </button>
 </form>
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const tujuanList = document.getElementById("tujuan-asesmen-list");
 
+    // Tambah tujuan baru lewat modal (client-side only)
+    document.getElementById("simpanTujuan").addEventListener("click", function () {
+        const nama = document.getElementById("tujuanBaru").value.trim();
+        if (!nama) return;
 
+        const id = "tujuan_" + Date.now();
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("tujuan-item");
+        wrapper.innerHTML = `
+            <input type="checkbox" name="tujuan[]" value="${nama}" id="${id}" checked class="form-check-input me-2">
+            <label for="${id}">${nama}</label>
+            <button type="button" class="btn btn-sm btn-warning edit-tujuan">Edit</button>
+            <button type="button" class="btn btn-sm btn-danger delete-tujuan">Hapus</button>
+        `;
+        tujuanList.appendChild(wrapper);
 
+        document.getElementById("tujuanBaru").value = "";
+        bootstrap.Modal.getInstance(document.getElementById("modalTambahTujuan")).hide();
+    });
+
+    // Delegasi event untuk Edit & Delete
+    tujuanList.addEventListener("click", function (e) {
+        const item = e.target.closest(".tujuan-item");
+        if (!item) return;
+
+        // Edit tujuan
+        if (e.target.classList.contains("edit-tujuan")) {
+            const label = item.querySelector("label");
+            const inputBox = prompt("Edit tujuan:", label.textContent);
+            if (inputBox && inputBox.trim() !== "") {
+                label.textContent = inputBox.trim();
+                item.querySelector("input[type=checkbox]").value = inputBox.trim();
+            }
+        }
+
+        // Delete tujuan
+        if (e.target.classList.contains("delete-tujuan")) {
+            if (!confirm("Yakin ingin menghapus tujuan ini?")) return;
+
+            const url = e.target.getAttribute("data-url");
+
+            // Kalau ada URL → berarti tujuan dari DB
+            if (url) {
+                fetch(url, {
+                    method: "DELETE",
+                    headers: {
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "Accept": "application/json"
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        item.remove();
+                    } else {
+                        alert("Gagal menghapus tujuan: " + data.message);
+                    }
+                })
+                .catch(() => alert("Terjadi error koneksi"));
+            } else {
+                // Tujuan baru (JS-only)
+                item.remove();
+            }
+        }
+    });
+});
+</script>
 @endsection

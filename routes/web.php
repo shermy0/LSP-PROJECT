@@ -51,31 +51,20 @@ Route::get('/perencanaan/skema/{id_skema}', [FormPerencanaanController::class, '
     ->name('formperencanaan.show');
 
 Route::post('/formperencanaan', [PerencanaanController::class, 'simpan'])->name('formperencanaan.simpan');
-Route::post('/mapa01/{skema}/pendekatan', [MapaController::class, 'simpanPendekatan'])
-    ->name('form.mapa01.simpanPendekatan');
+
 
 // form perencanaan mapa 01
 Route::prefix('form-perencanaan')->group(function () {
     // MAPA01
-    Route::post('/mapa01/{skema_id}/simpan-semua', [MapaController::class, 'simpanSemua'])->name('form.mapa01.simpanSemua');
-// routes/web.php
-Route::get('/mapa01/get-tujuan/{skemaId}', [MapaController::class, 'getTujuan'])->name('mapa01.getTujuan');
+Route::get('/mapa01/{id_skema}', [MapaController::class, 'showMapa01'])->name('form.mapa01');
+Route::post('mapa01/{id_skema}/store', [MapaController::class, 'storeMapa01'])
+    ->name('form.mapa01.store');
+Route::post('/mapa01/{id_skema}/tujuan/{id_tujuan}/update', [MapaController::class, 'updateTujuan'])->name('form.mapa01.tujuan.update');
+Route::delete(
+    '/form-perencanaan/mapa01/{skema}/tujuan/{tujuan}',
+    [MapaController::class, 'deleteTujuan']
+)->name('mapa01.tujuan.delete');
 
-Route::post('/mapa01/{skema_id}/pendekatan', [MapaController::class, 'simpanPendekatan'])
-    ->name('form.mapa01.simpanPendekatan');
-
-Route::post('/mapa01/{skema_id}/konteks', [MapaController::class, 'simpanKonteksAsesmen'])
-    ->name('form.mapa01.simpanKonteks');
-
-Route::post('/mapa01/{skema_id}/dasar-asesmen', [MapaController::class, 'simpanDasarAsesmen'])
-    ->name('form.mapa01.simpanDasarAsesmen');
-
-
-Route::get('/mapa01/{id_skema}', [MapaController::class, 'showSkema'])->name('form.mapa01');
-
-    // Tujuan Asesmen
-    Route::post('/mapa01/simpan-tujuan', [MapaController::class, 'simpanTujuan'])
-        ->name('mapa01.simpanTujuan');
             // Unit per skema & kelompok
     Route::get('/mapa01/kode-unit/{skema_id}', [MapaController::class, 'kodeUnit'])->name('form.mapa01.kodeunit');
     Route::get('/mapa01/{skema_id}/kelompok/{kelompok_id}/tambah-unit', [MapaController::class, 'tambahUnit'])->name('form.mapa01.tambahunit');

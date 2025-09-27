@@ -23,31 +23,157 @@ use Illuminate\Http\Request;
 
 class MapaController extends Controller
 {
+public function showMapa01($id_skema)
+{
+    $skema = DB::table('skema_sertifikasi')->where('id_skema', $id_skema)->first();
 
+  // Tujuan default (hardcode sesuai insert awal)
+    $defaultTujuan = ['Sertifikasi', 'Pengakuan Kompetensi Terkini (PKT)', 'Rekognisi Pembelajaran Lampau (RPL)'];
 
-public function simpanDasarAsesmen(Request $request)
+    // Ambil semua tujuan asesmen dari master
+    $allTujuan = DB::table('tujuan_asesmen')->pluck('nama_tujuan')->toArray();
+
+    // Bagi dua: default vs custom
+    $customTujuan = array_diff($allTujuan, $defaultTujuan);
+
+    // Ambil tujuan yang sudah dipilih
+    $tujuanDipilih = DB::table('skema_tujuan')
+        ->join('tujuan_asesmen', 'skema_tujuan.tujuan_id', '=', 'tujuan_asesmen.id_tujuan')
+        ->where('skema_tujuan.skema_id', $id_skema)
+        ->pluck('tujuan_asesmen.nama_tujuan')
+        ->toArray();
+    
+    // Pendekatan
+    $pendekatan = DB::table('mapa01_pendekatan')->where('id_skema', $id_skema)->first();
+
+    // KONTEKS
+    $konteksRow = DB::table('mapa01_konteks')->where('id_skema', $id_skema)->first();
+
+    $lingkungan = $konteksRow->lingkungan ?? '';
+    $peluang    = $konteksRow->peluang ?? '';
+    $hubungan   = $konteksRow && $konteksRow->hubungan ? json_decode($konteksRow->hubungan, true) : [];
+    $pelaksana  = $konteksRow && $konteksRow->pelaksana ? json_decode($konteksRow->pelaksana, true) : [];
+
+    // Konfirmasi & Standar
+    $konfirmasi = DB::table('mapa01_konfirmasi')->where('id_skema', $id_skema)->first();
+    $standar    = DB::table('mapa01_standar_industri')->where('id_skema', $id_skema)->first();
+
+    return view('form_perencanaan.form_mapa_01.mapa01', compact(
+        'skema','defaultTujuan','customTujuan','tujuanDipilih','pendekatan',
+        'lingkungan','peluang','hubungan','pelaksana',
+        'konfirmasi','standar'
+    ));
+}
+
+public function storeMapa01(Request $request, $id_skema)
+{
+    DB::beginTransaction();
+    try {
+        // === Tujuan Asesmen (sama seperti sebelumnya) ===
+        if ($request->has('tujuan')) {
+            // bersih-bersih: hapus dulu relasi lama supaya tidak duplikat
+            DB::table('skema_tujuan')->where('skema_id', $id_skema)->delete();
+            foreach ($request->tujuan as $namaTujuan) {
+                $tujuan = DB::table('tujuan_asesmen')->where('nama_tujuan', $namaTujuan)->first();
+                $tujuanId = $tujuan ? $tujuan->id_tujuan : DB::table('tujuan_asesmen')->insertGetId(['nama_tujuan' => $namaTujuan]);
+                DB::table('skema_tujuan')->insert([
+                    'skema_id' => $id_skema,
+                    'tujuan_id' => $tujuanId,
+                ]);
+            }
+        } else {
+            // kalau tidak ada pilihan, hapus relasi lama (opsional)
+            DB::table('skema_tujuan')->where('skema_id', $id_skema)->delete();
+        }
+
+        // === Pendekatan (sesuaikan nama field yang kamu pakai di blade) ===
+        DB::table('mapa01_pendekatan')->updateOrInsert(
+            ['id_skema' => $id_skema],
+            [
+                'pelatihan_standar'     => $request->has('pelatihan_standar') ? 1 : 0,
+                'pelatihan_nonstandar'  => $request->has('pelatihan_nonstandar') ? 1 : 0,
+                'pengalaman_standar'    => $request->has('pengalaman_standar') ? 1 : 0,
+                'pengalaman_nonstandar' => $request->has('pengalaman_nonstandar') ? 1 : 0,
+                'otodidak'              => $request->has('otodidak') ? 1 : 0,
+            ]
+        );
+
+        // === KONTEKS: Lingkungan & Peluang radio, Hubungan & Pelaksana checkbox ===
+        $lingkungan = $request->input('lingkungan', '');  // string
+        $peluang    = $request->input('peluang', '');     // string
+        $hubungan   = $request->input('hubungan', []);    // array
+        $pelaksana  = $request->input('pelaksana', []);   // array
+
+        DB::table('mapa01_konteks')->updateOrInsert(
+            ['id_skema' => $id_skema],
+            [
+                'lingkungan' => $lingkungan,
+                'peluang'    => $peluang,
+                'hubungan'   => json_encode(array_values($hubungan)),
+                'pelaksana'  => json_encode(array_values($pelaksana)),
+                'updated_at' => now(),
+                'created_at' => now(),
+            ]
+        );
+
+        // === Konfirmasi (sama seperti sebelumnya) ===
+        DB::table('mapa01_konfirmasi')->updateOrInsert(
+            ['id_skema' => $id_skema],
+            [
+                'konfirmasi_manajer_lsp'    => in_array('Manajer sertifikasi LSP P1 SMKN 11 Bandung', $request->orang_relevan ?? []) ? 1 : 0,
+                'konfirmasi_master_asesor'  => in_array('Master Asesor / Master Trainer / Lead Asesor Kompetensi', $request->orang_relevan ?? []) ? 1 : 0,
+                'konfirmasi_manajer_pelatihan' => in_array('Manajer Pelatihan Lembaga Training terakreditasi / Lembaga Training Terdaftar', $request->orang_relevan ?? []) ? 1 : 0,
+                'konfirmasi_supervisor'     => in_array('Manajer atau supervisor di tempat kerja', $request->orang_relevan ?? []) ? 1 : 0,
+            ]
+        );
+
+        // === Standar Industri ===
+        DB::table('mapa01_standar_industri')->updateOrInsert(
+            ['id_skema' => $id_skema],
+            [
+                'standar_skkni' => $request->has('standar_kompetensi') ? 1 : 0,
+                'standar_kriteria_asesmen' => $request->has('kriteria_asesmen') ? 1 : 0,
+                'standar_kinerja_perusahaan' => $request->input('standar_kinerja_perusahaan'),
+                'standar_spesifikasi_produk' => $request->input('spesifikasi_produk'),
+                'standar_pedoman_khusus' => $request->input('pedoman_khusus'),
+            ]
+        );
+
+        DB::commit();
+        return redirect()->route('formperencanaan.index')->with('success', 'FR.MAPA.01 berhasil disimpan!');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
+    }
+}
+
+public function updateTujuan(Request $request, $id_skema, $id_tujuan)
 {
     $request->validate([
-        'skema_id' => 'required|exists:skema_sertifikasi,id_skema',
-        'kriteria_asesmen' => 'nullable|boolean',
-        'spesifikasi_kinerja' => 'nullable|boolean',
-        'spesifikasi_produk' => 'nullable|string',
-        'pedoman_khusus' => 'nullable|string',
+        'nama_tujuan' => 'required|string|max:255',
     ]);
 
-    $data = [
-        'kriteria_asesmen' => $request->has('kriteria_asesmen'),
-        'spesifikasi_kinerja' => $request->has('spesifikasi_kinerja'),
-        'spesifikasi_produk' => $request->spesifikasi_produk,
-        'pedoman_khusus' => $request->pedoman_khusus,
-    ];
+    DB::table('tujuan_asesmen')
+        ->where('id_tujuan', $id_tujuan)
+        ->update(['nama_tujuan' => $request->nama_tujuan]);
 
-    DasarAsesmen::updateOrCreate(
-        ['skema_id' => $request->skema_id],
-        $data
-    );
+    return back()->with('success', 'Tujuan berhasil diupdate!');
+}
+public function deleteTujuan($id_skema, $id_tujuan)
+{
+    // Hapus relasi di skema_tujuan dulu
+    DB::table('skema_tujuan')->where('tujuan_id', $id_tujuan)->delete();
 
-    return redirect()->back()->with('success', 'Dasar asesmen berhasil disimpan.');
+    // Baru hapus tujuannya
+    DB::table('tujuan_asesmen')->where('id_tujuan', $id_tujuan)->delete();
+
+    // Kalau request AJAX, balikin JSON
+    if (request()->wantsJson()) {
+        return response()->json(['success' => true, 'message' => 'Tujuan berhasil dihapus']);
+    }
+
+    // Kalau request biasa (submit form), redirect
+    return back()->with('success', 'Tujuan berhasil dihapus!');
 }
 
 
@@ -68,75 +194,6 @@ public function konfirmasi($idSkema)
     return view('form_perencanaan.form_mapa_01.mapa01_konfirmasi', compact('skema', 'roles', 'asesors'));
 }
 
-
-public function simpanKonfirmasi(Request $request, $skema_id)
-{
-    foreach ($request->asesor as $role => $asesor_id) {
-        $konfirmasi = KonfirmasiOrangRelevan::create([
-            'id_validasi' => null, // kalau mau dikaitkan ke validasi
-            'nama' => $role,
-            'jabatan' => $role,
-            'tgl_konfirmasi' => $request->tanggal[$role],
-            'skema_id' => $skema_id,
-        ]);
-
-        KonfirmasiOrangRelevanPersetujuan::create([
-            'id_konfirmasi' => $konfirmasi->id_konfirmasi,
-            'ttd_pemberi_konfirmasi' => $request->tanda_tangan[$role] ?? null,
-            'tgl_ttd_pemberi_konfirmasi' => $request->tanggal[$role],
-        ]);
-    }
-
-    return redirect()->route('form.mapa01.konfirmasi', $skema_id)
-        ->with('success','Data konfirmasi berhasil disimpan.');
-}
-public function simpanOrangRelevan(Request $request, $skema_id)
-{
-    $request->validate([
-        'jabatan' => 'required|array|min:1',
-        'jabatan.*' => 'required|string|max:255'
-    ]);
-
-    foreach ($request->jabatan as $jabatan) {
-        Mapa01OrangRelevan::firstOrCreate([
-            'skema_id' => $skema_id,
-            'jabatan'  => $jabatan,
-        ]);
-    }
-
-      return redirect()->back()->with('success', 'Orang relevan berhasil disimpan.');
-}
-public function getTujuan($skemaId)
-{
-    // Semua tujuan yang ada
-    $tujuanMaster = TujuanAsesmen::all(['id_tujuan', 'nama_tujuan']);
-
-    // Tujuan yang sudah dikaitkan dengan skema ini
-    $tujuanChecked = Skema::findOrFail($skemaId)
-                        ->tujuans()
-                        ->pluck('tujuan_asesmen.id_tujuan')
-                        ->toArray();
-
-    return response()->json([
-        'tujuanMaster' => $tujuanMaster,
-        'tujuanChecked' => $tujuanChecked,
-    ]);
-}
-
-public function simpanTujuan(Request $request)
-{
-    $request->validate([
-        'skema_id' => 'required|exists:skema_sertifikasi,id_skema',
-        'tujuan'   => 'required|array',
-    ]);
-
-    $skema = Skema::findOrFail($request->skema_id);
-
-    // Sync relasi dengan array id tujuan
-    $skema->tujuans()->sync($request->tujuan);
-
-    return response()->json(['status' => 'success']);
-}
 
 
 
@@ -220,12 +277,6 @@ public function searchUnit(Request $request)
     return response()->json($units);
 }
 
-// public function index($skema_id)
-// {
-    
-//     $skema = Skema::findOrFail($skema_id);
-//     return view('form_perencanaan.form_mapa_01.mapa01_konfirmasi', compact('skema'));
-// }
 
 public function simpanUnit(Request $request, $skema_id, $kelompok_id)
 {
