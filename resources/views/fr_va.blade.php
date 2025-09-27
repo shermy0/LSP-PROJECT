@@ -6,9 +6,12 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
-                <a href="{{ route('formperencanaan') }}">Form Perencanaan</a>
+                <a href="{{ route('formperencanaan.index') }}">Daftar Skema</a>
             </li>
-            <li class="breadcrumb-item active" aria-current="page">FR.VA {{ $periode }}</li>
+            <li class="breadcrumb-item">
+                <a href="{{ route('formperencanaan.show', $skema->id_skema) }}">Form Perencanaan</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">FR VS {{ $periode }}</li>
         </ol>
     </nav>
 

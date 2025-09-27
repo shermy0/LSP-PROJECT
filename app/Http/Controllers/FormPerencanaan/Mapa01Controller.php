@@ -21,7 +21,7 @@ use App\Models\DasarAsesmen;
 use Illuminate\Http\Request;
 
 
-class MapaController extends Controller
+class Mapa01Controller extends Controller
 {
 public function showMapa01($id_skema)
 {

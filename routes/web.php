@@ -5,7 +5,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
-use App\Http\Controllers\FormPerencanaan\MapaController;
+use App\Http\Controllers\FormPerencanaan\Mapa01Controller;
+use App\Http\Controllers\FormPerencanaan\Mapa02Controller;
 use App\Http\Controllers\SkemaController;
 use App\Models\UnitKompetensi;
 use App\Http\Controllers\ModifikasiController;
@@ -55,69 +56,92 @@ Route::post('/formperencanaan', [PerencanaanController::class, 'simpan'])->name(
 
 // form perencanaan mapa 01
 Route::prefix('form-perencanaan')->group(function () {
+// ============================
+// BUAT NAVIGASI PERFORM, JANGAN OTAK-ATIK!!!
+// ============================
     // MAPA01
-Route::get('/mapa01/{id_skema}', [MapaController::class, 'showMapa01'])->name('form.mapa01');
-Route::post('mapa01/{id_skema}/store', [MapaController::class, 'storeMapa01'])
+Route::get('/mapa01/{id_skema}', [Mapa01Controller::class, 'showMapa01'])->name('form.mapa01');
+   // MAPA02
+    Route::get('/mapa02/{id_skema}', [Mapa02Controller::class, 'showMapa02'])->name('form.mapa02');
+// ============================
+// END NAVIGASI PERFORM
+// ============================
+
+Route::post('mapa01/{id_skema}/store', [Mapa01Controller::class, 'storeMapa01'])
     ->name('form.mapa01.store');
-Route::post('/mapa01/{skema}/tujuan/{tujuan}/update', [MapaController::class, 'updateTujuan'])->name('mapa01.tujuan.update');
+Route::post('/mapa01/{skema}/tujuan/{tujuan}/update', [Mapa01Controller::class, 'updateTujuan'])->name('mapa01.tujuan.update');
 
 Route::delete(
     '/form-perencanaan/mapa01/{skema}/tujuan/{tujuan}',
-    [MapaController::class, 'deleteTujuan']
+    [Mapa01Controller::class, 'deleteTujuan']
 )->name('mapa01.tujuan.delete');
 
             // Unit per skema & kelompok
-    Route::get('/mapa01/kode-unit/{skema_id}', [MapaController::class, 'kodeUnit'])->name('form.mapa01.kodeunit');
-    Route::get('/mapa01/{skema_id}/kelompok/{kelompok_id}/tambah-unit', [MapaController::class, 'tambahUnit'])->name('form.mapa01.tambahunit');
-    Route::post('/mapa01/{skema_id}/kelompok/{kelompok_id}/simpan-unit', [MapaController::class, 'simpanUnit'])->name('form.mapa01.simpanunit');
-    Route::delete('/mapa01/{skema_id}/hapus-unit/{id}', [MapaController::class, 'hapusUnit'])->name('form.mapa01.hapusunit');
+    Route::get('/mapa01/kode-unit/{skema_id}', [Mapa01Controller::class, 'kodeUnit'])->name('form.mapa01.kodeunit');
+    Route::get('/mapa01/{skema_id}/kelompok/{kelompok_id}/tambah-unit', [Mapa01Controller::class, 'tambahUnit'])->name('form.mapa01.tambahunit');
+    Route::post('/mapa01/{skema_id}/kelompok/{kelompok_id}/simpan-unit', [Mapa01Controller::class, 'simpanUnit'])->name('form.mapa01.simpanunit');
+    Route::delete('/mapa01/{skema_id}/hapus-unit/{id}', [Mapa01Controller::class, 'hapusUnit'])->name('form.mapa01.hapusunit');
 
     // Kelompok pekerjaan
-    Route::post('/mapa01/{skema_id}/tambah-kelompok', [MapaController::class, 'tambahKelompok'])->name('form.mapa01.tambahKelompok');
-    Route::delete('/mapa01/{skema_id}/hapus-kelompok/{kelompok_id}', [MapaController::class, 'hapusKelompok'])->name('form.mapa01.hapusKelompok');
+    Route::post('/mapa01/{skema_id}/tambah-kelompok', [Mapa01Controller::class, 'tambahKelompok'])->name('form.mapa01.tambahKelompok');
+    Route::delete('/mapa01/{skema_id}/hapus-kelompok/{kelompok_id}', [Mapa01Controller::class, 'hapusKelompok'])->name('form.mapa01.hapusKelompok');
 
     // Get skema
-    Route::get('/mapa01/get-skema/{id}', [MapaController::class, 'getSkema'])->name('form.mapa01.getskema');
+    Route::get('/mapa01/get-skema/{id}', [Mapa01Controller::class, 'getSkema'])->name('form.mapa01.getskema');
 
     // Modifikasi & konfirmasi
     Route::get('/mapa01/modifikasi/{skema_id}', [ModifikasiController::class, 'index'])->name('form.mapa01.modifikasi');
 // Konfirmasi
-Route::get('/mapa01/konfirmasi/{skema_id}', [MapaController::class, 'konfirmasi'])
+Route::get('/mapa01/konfirmasi/{skema_id}', [Mapa01Controller::class, 'konfirmasi'])
     ->name('form.mapa01.konfirmasi');
 
-Route::post('/mapa01/konfirmasi/{skema_id}/simpan', [MapaController::class, 'simpanKonfirmasi'])
+Route::post('/mapa01/konfirmasi/{skema_id}/simpan', [Mapa01Controller::class, 'simpanKonfirmasi'])
     ->name('form.mapa01.konfirmasi.simpan');
 
     // Edit & update unit
-    Route::get('/mapa01/edit-unit/{skema_id}/{id}', [MapaController::class, 'editUnit'])->name('form.mapa01.editunit');
-    Route::put('/mapa01/update-unit/{skema_id}/{id}', [MapaController::class, 'updateUnit'])->name('form.mapa01.updateunit');
+    Route::get('/mapa01/edit-unit/{skema_id}/{id}', [Mapa01Controller::class, 'editUnit'])->name('form.mapa01.editunit');
+    Route::put('/mapa01/update-unit/{skema_id}/{id}', [Mapa01Controller::class, 'updateUnit'])->name('form.mapa01.updateunit');
     // ============================
 // MAPA 01 & MAPA 02
 // ============================
-Route::get('/mapa02', [PerencanaanController::class, 'mapa02'])->name('form.mapa02');
+// Route::get('/mapa02', [PerencanaanController::class, 'mapa02'])->name('form.mapa02');
 
 
 });
 // ============================
-// MAPA 02
+// MAPA 02 (lama, sementara dikomentari)
 // ============================
-Route::get('/mapa02', [SkemaController::class, 'showForm'])->name('mapa02.show');
-Route::get('/mapa02/skema/{skemaId}/kelompok', [MapaController::class, 'getKelompokBySkema']);
-Route::get('mapa02/mapa02-asesor', [PerencanaanController::class, 'mapa02'])->name('mapa02_asesor.show');
-Route::post('mapa02/mapa02-asesor', [PerencanaanController::class, 'simpanLanjutmapa02'])->name('mapa02_asesor');
-Route::get('/mapa02/skema/{skemaId}/instrumen', [SkemaController::class, 'getInstrumenBySkema']);
-// AMBIL ASESOR
-Route::get('/mapa02/skema/{skemaId}/asesor', [SkemaController::class, 'getAsesor']);
-Route::post('/instrumen/simpan-potensi', [InstrumenController::class, 'simpanPotensi'])->name('instrumen.simpanPotensi');
-Route::get('/mapa02/skema/{skemaId}/units', [SkemaController::class, 'getUnits']);
-Route::get('/asesor/search', [AsesorController::class, 'search'])->name('asesor.search');
+// Route::get('/mapa02', [PerencanaanController::class, 'mapa02'])->name('form.mapa02');
+// Route::get('/mapa02', [SkemaController::class, 'showForm'])->name('mapa02.show');
+// Route::get('/mapa02/skema/{skemaId}/kelompok', [Mapa01Controller::class, 'getKelompokBySkema']);
+// Route::get('mapa02/mapa02-asesor', [PerencanaanController::class, 'mapa02'])->name('mapa02_asesor.show');
+// Route::post('mapa02/mapa02-asesor', [PerencanaanController::class, 'simpanLanjutmapa02'])->name('mapa02_asesor');
+// Route::get('/mapa02/skema/{skemaId}/instrumen', [SkemaController::class, 'getInstrumenBySkema']);
+// Route::get('/mapa02/skema/{skemaId}/asesor', [SkemaController::class, 'getAsesor']);
+// Route::post('/instrumen/simpan-potensi', [InstrumenController::class, 'simpanPotensi'])->name('instrumen.simpanPotensi');
+// Route::get('/mapa02/skema/{skemaId}/units', [SkemaController::class, 'getUnits']);
+// Route::get('/asesor/search', [AsesorController::class, 'search'])->name('asesor.search');
+
+// Halaman MAPA02 default (tampilkan semua skema)
+Route::get('/mapa02', [Mapa02Controller::class, 'index'])->name('mapa02.index');
+
+// Halaman MAPA02 per skema
+Route::get('/mapa02/{id_skema}', [Mapa02Controller::class, 'showMapa02'])->name('form.mapa02');
+
+// AJAX
+Route::get('/mapa02/skema/{skemaId}/asesor', [Mapa02Controller::class, 'getAsesor'])->name('mapa02.getAsesor');
+Route::get('/mapa02/skema/{skemaId}/asesi/{asesorId}', [Mapa02Controller::class, 'getAsesi'])->name('mapa02.getAsesi');
+Route::get('/mapa02/skema/{skemaId}/units', [Mapa02Controller::class, 'getUnits'])->name('mapa02.getUnits');
+
+// Simpan jawaban instrumen
+Route::post('/mapa02/instrumen/simpan-potensi', [Mapa02Controller::class, 'simpanInstrumen'])
+    ->name('mapa02.simpanInstrumen');
+
+Route::get('/get-unit/{skema_id}', [Mapa01Controller::class, 'getUnitsBySkema']);
 
 
-Route::get('/get-unit/{skema_id}', [MapaController::class, 'getUnitsBySkema']);
-
-
-Route::get('/get-unit/{id}', [MapaController::class, 'getUnit'])->name('form.mapa01.getunit');
-Route::get('/search-unit', [MapaController::class, 'searchUnit'])->name('form.mapa01.searchunit');
+Route::get('/get-unit/{id}', [Mapa01Controller::class, 'getUnit'])->name('form.mapa01.getunit');
+Route::get('/search-unit', [Mapa01Controller::class, 'searchUnit'])->name('form.mapa01.searchunit');
 
 
 // Dashboard Admin

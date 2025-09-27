@@ -2,15 +2,20 @@
 
 @section('konten')
 <link rel="stylesheet" href="{{ asset('assets/css/mapa01.css') }}">
-
-        <div class="card mapa-card">
+    <div class="card mapa-card">
     <!-- Breadcrumb -->
-         <nav aria-label="breadcrumb">
+    <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('formperencanaan.index') }}">Daftar Skema</a></li>
+            <li class="breadcrumb-item">
+                <a href="{{ route('formperencanaan.index') }}">Daftar Skema</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ route('formperencanaan.show', $skema->id_skema) }}">Form Perencanaan</a>
+            </li>
             <li class="breadcrumb-item active" aria-current="page">FR.MAPA.01</li>
         </ol>
     </nav>
+
 
 <div class="container mt-4">
     <!-- Header -->
@@ -19,7 +24,7 @@
         <h3 class="fw-bold">FR.MAPA 01. Merencanakan Aktivitas dan Proses</h3>
         <p class="text-muted">Peninjauan Proses Asesmen</p>
     </div>
-    <!-- Dropdown skema -->
+    <!-- skema -->
     <div class="skema-container">
         <div class="skema-group">
             <span class="skema-label">SKEMA:</span>

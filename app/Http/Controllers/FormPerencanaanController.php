@@ -10,11 +10,11 @@ class FormPerencanaanController extends Controller
     // Halaman daftar skema
     public function index()
     {
-        $skema = Skema::all(); // Model Skema untuk tabel skema_sertifikasi
+        $skema = Skema::all();
         return view('perencanaan_daftar_skema', compact('skema'));
     }
 
-    // Halaman daftar form sesuai skema yang dipilih
+    // Halaman form perencanaan sesuai skema
     public function show($id_skema)
     {
         $skema = Skema::findOrFail($id_skema);
