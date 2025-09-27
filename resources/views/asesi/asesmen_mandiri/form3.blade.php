@@ -1,15 +1,14 @@
-@extends('layouts.master')
+@extends('master')
 
 @section('title', 'Tanda Tangan Asesi')
 
-@section('content')
+@section('konten')
 <div class="container my-5">
     <div class="ttd-container">
         <div class="ttd-header">Tanda Tangan Asesi</div>
         <div class="ttd-card">
             <div class="ttd-card-title">Asesi</div>
 
-            <!-- Tambahkan id untuk form -->
             <form id="ttd-form" method="POST" action="{{ route('asesi.asesmen_mandiri.ttd.store') }}">
                 @csrf
 
@@ -18,55 +17,123 @@
                        value="{{ Auth::user()->name }}" readonly>
 
                 <label for="tanggal-asesi" class="ttd-label">Tanggal</label>
+                <!-- tanggal dibuat readonly -->
                 <input type="date" name="tgl_ttd_asesi" id="tanggal-asesi" class="ttd-input"
-                       value="{{ date('Y-m-d') }}">
+                       value="{{ date('Y-m-d') }}" readonly>
 
                 <label for="ttd-asesi" class="ttd-label">Tanda Tangan</label>
                 <canvas id="ttd-asesi" class="ttd-canvas"
-                        width="400" height="200" style="border:1px solid #ccc;"></canvas>
+                        width="400" height="200"></canvas>
 
                 <!-- Hidden input untuk simpan base64 -->
                 <input type="hidden" name="ttd_asesi" id="ttd-asesi-input">
 
                 <div class="ttd-btns mt-3">
-                    <button type="button" class="ttd-btn ttd-clear"
+                    <button type="button" class="btn-clear"
                             onclick="clearCanvas('ttd-asesi')">Hapus</button>
-
-                    <!-- Tombol unduh di dalam form -->
-                    <button type="button" class="ttd-btn ttd-download"
+                    <button type="button" class="btn-download"
                             onclick="downloadTTD()">Unduh</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Tombol Aksi di bawah form -->
-    <div class="action-buttons mt-4 text-end">
+    <div class="action-buttons mt-4">
         <a href="{{ route('asesi.asesmen_mandiri.form2') }}" class="btn-back">Kembali</a>
-        <!-- Submit ke form dengan id ttd-form -->
         <button type="submit" class="btn-submit" form="ttd-form" onclick="saveTTD()">Simpan & Kirim</button>
     </div>
 </div>
 
 <style>
-.action-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
-.btn-back, .ttd-btn, .btn-submit {
-    padding: 10px 18px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: bold;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-}
-.btn-back { background-color: #6c757d; }
-.ttd-clear { background-color: #dc3545; }
-.ttd-download { background-color: #17a2b8; } /* biru muda */
-.btn-submit { background-color: #007bff; }   /* biru utama */
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: #f9f9fb;
+    }
+    .container {
+        max-width: 850px;
+    }
+
+    .ttd-container {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        padding: 25px;
+    }
+    .ttd-header {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #041562;
+    }
+    .ttd-card-title {
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 15px;
+        color: #333;
+    }
+
+    /* Label & Input */
+    .ttd-label {
+        font-weight: 500;
+        font-size: 14px;
+        margin-top: 10px;
+        display: block;
+        color: #333;
+    }
+    .ttd-input {
+        width: 100%;
+        padding: 10px 12px;
+        margin-top: 5px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        background: #f9f9f9;
+    }
+    .ttd-input:focus {
+        outline: none;
+        border-color: #041562;
+        background: #fff;
+    }
+
+    /* Canvas */
+    .ttd-canvas {
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        background: #fff;
+        cursor: crosshair;
+        display: block;
+        margin-top: 8px;
+    }
+
+    /* Buttons */
+    .ttd-btns {
+        display: flex;
+        gap: 10px;
+    }
+    .btn-clear, .btn-download, .btn-back, .btn-submit {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+        color: #fff;
+    }
+    .btn-clear { background: #d9534f; }
+    .btn-clear:hover { background: #c9302c; }
+    .btn-download { background: #17a2b8; }
+    .btn-download:hover { background: #117a8b; }
+    .btn-back { background: #6c757d; text-decoration: none; line-height: 36px; }
+    .btn-back:hover { background: #5a6268; }
+    .btn-submit { background: #041562; }
+    .btn-submit:hover { background: #06208a; }
+
+    .action-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
 </style>
 
 <script>
@@ -84,6 +151,8 @@ function initSignature(canvasId) {
     canvas.addEventListener("mousemove", (e) => {
         if (drawing) {
             ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.strokeStyle = "#000000"; // warna hitam
+            ctx.lineWidth = 2;
             ctx.stroke();
         }
     });

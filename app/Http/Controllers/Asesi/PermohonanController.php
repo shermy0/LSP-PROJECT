@@ -187,7 +187,7 @@ class PermohonanController extends Controller
             ]
         );
 
-        return redirect()->route('asesi.form_pra_asesmen')
+        return redirect()->route('form_pra_assesmen')
             ->with('success', 'Dokumen & tanda tangan berhasil disimpan.');
     }
 }
