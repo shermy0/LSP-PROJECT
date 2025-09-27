@@ -120,7 +120,7 @@
     <label class="form-label">Waktu</label>
     <div class="input-group">
         <input type="time" id="timepicker" name="waktu" class="form-control" required>
-        <button type="button" class="btn btn-outline-secondary" id="setNow">Sekarang</button>
+        <button type="button" class="btn btn-outline-secondary" id="setNow">saat ini</button>
     </div>
 </div>
     <div class="col-md-4">

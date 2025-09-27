@@ -3,8 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Database\Seeders\PersetujuanAsesmenSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -31,11 +32,14 @@ class DatabaseSeeder extends Seeder
             UnitKompetensiSeeder::class,
             ElemenKompetensiSeeder::class,
             KukSeeder::class,
+            JenisDokumenSeeder::class,
+            KelompokPekerjaanSeeder::class,
+            TujuanAsesmenSeeder::class,
         ]);
         
+        // Ensure PersetujuanAsesmenSeeder exists in database/seeders
         $this->call(PersetujuanAsesmenSeeder::class);
-         $this->call(UserSeeder::class);
+        $this->call(UserSeeder::class);
 
-    
-}
+    }
 }

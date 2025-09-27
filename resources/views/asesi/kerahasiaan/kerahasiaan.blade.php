@@ -58,6 +58,26 @@
 </tbody>
 
 </table>
+<div class="row mb-3">
+    <div class="col-md-4">
+        <label class="form-label">Tanggal</label>
+        <input type="text" class="form-control readonly-input"
+               value="{{ $persetujuan?->tanggal ?? '-' }}" readonly>
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">Waktu</label>
+        <input type="text" class="form-control readonly-input"
+               value="{{ $persetujuan?->waktu ?? '-' }}" readonly>
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">Tempat Uji Kompetensi (TUK)</label>
+        <input type="text" class="form-control readonly-input"
+               value="{{ $persetujuan?->tuk?->nama_tuk ?? '-' }}" readonly>
+    </div>
+</div>
+
 
             <div class="text-end">
                 <button type="submit" class="btn btn-primary">Kirim Bukti</button>

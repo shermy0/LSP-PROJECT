@@ -1,0 +1,230 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Poppins:wght@400;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #fff;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+/* Container */
+.container {
+    max-width: 600px;
+    margin: auto;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+/* Logo */
+.logo-box {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo {
+    width: 50px;
+    height: 50px;
+    background: #1d4ed8;
+    border-radius: 8px;
+    margin: auto;
+}
+
+.logo-box h2 {
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* Form */
+.form-wrapper {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.form-box {
+    margin-bottom: 20px;
+}
+
+h1, h2, .judul, .nomorSkema {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: #1e293b; /* abu tua biar elegan */
+    margin-bottom: 10px;
+}
+
+/* Label form */
+.form-box label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #334155; /* abu gelap */
+}
+
+.form-box input, .form-box select { width: 100%; /* biar sejajar */ max-width: 100%; /* cegah kepanjangan */ padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; /* penting biar padding nggak bikin beda ukuran */ }
+
+/* Panduan */
+.guide-header {
+    background: #e6f0ff; /* biru muda */
+    border-radius: 8px;
+    padding: 10px 16px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Garis aksen gradasi kiri */
+.guide-header::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 6px;
+    border-radius: 8px 0 0 8px;
+    background: linear-gradient(180deg, #00b4ff, #001f73);
+}
+
+/* Teks judul */
+.guide-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+
+.guide-box {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    background: #f9f9f9;
+    margin-bottom: 20px;
+}
+
+.guide-box h3 {
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #333;
+}
+
+.guide-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.guide-box ul li {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.guide-box ul li span {
+    background: linear-gradient(135deg, #00b4ff, #001f73);
+    color: #fff;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    font-size: 16px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+.step {
+  display: flex;
+  align-items: center;     /* teks sejajar vertikal dengan lingkaran */
+  margin-bottom: 16px;
+}
+
+.step-number {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #00b4ff, #004080);
+  color: #fff;
+  font-family: 'Poppins', sans-serif;  /* font modern */
+  font-weight: 700;                    /* lebih tebal */
+  font-size: 18px;                     /* lebih proporsional */
+  display: flex;
+  align-items: center;     /* angka di tengah vertikal */
+  justify-content: center; /* angka di tengah horizontal */
+  margin-right: 12px;
+  flex-shrink: 0;          /* biar ukuran tetap, ga ketarik */
+  font-size: 14px;
+}
+
+.step-text {
+  flex: 1;
+  font-size: 14px;
+  color: #222;
+}
+
+
+
+/* Tombol */
+.button-box {
+    text-align: right;
+}
+
+.btn-next {
+    background: #0a1f55;
+    color: #fff;
+    padding: 12px 25px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+
+
+/*Error State */
+.input-error {
+    border: 2px solid #e74c3c !important;
+    background-color: #fdecea;
+    animation: shake 0.3s ease-in-out;
+}
+
+/* Success State */
+.input-success {
+    border: 2px solid #2ecc71 !important;
+    background-color: #e9f9f0;
+}
+
+/* Animasi Shake */
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+}
+
+/* Pesan Error */
+.error-message {
+    font-size: 0.9rem;
+    color: #e74c3c;
+    margin-top: 5px;
+    display: none;
+}
+.error-message.show {
+    display: block;
+}
+
+
