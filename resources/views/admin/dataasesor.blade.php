@@ -17,64 +17,33 @@
   </div>
 
  {{-- Statistik --}}
-  <div class="row g-4 mb-4">
-    <div class="col-md-4">
-      <div class="card shadow-sm border-0 rounded-3 p-3">
-        <div class="d-flex align-items-center">
-          <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-            <i class="fas fa-user-tie"></i>
-          </div>
-          <div>
-            <h4 class="mb-0 text-primary">15</h4>
-            <small class="text-muted">Total Asesor</small>
-          </div>
-        </div>
+ <div class="col-md-4">
+  <div class="card shadow-sm border-0 rounded-3 p-3">
+    <div class="d-flex align-items-center">
+      <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+        <i class="fas fa-user-tie"></i>
       </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card shadow-sm border-0 rounded-3 p-3">
-        <div class="d-flex align-items-center">
-          <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-            <i class="fas fa-check-circle"></i>
-          </div>
-          <div>
-            <h4 class="mb-0 text-success">12</h4>
-            <small class="text-muted">Aktif</small>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card shadow-sm border-0 rounded-3 p-3">
-        <div class="d-flex align-items-center">
-          <div class="rounded-circle bg-warning text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-            <i class="fas fa-pause-circle"></i>
-          </div>
-          <div>
-            <h4 class="mb-0 text-warning">3</h4>
-            <small class="text-muted">Nonaktif</small>
-          </div>
-        </div>
+      <div>
+        <h4 class="mb-0 text-primary">{{ $total }}</h4>
+        <small class="text-muted">Total Asesor</small>
       </div>
     </div>
   </div>
+</div>
 
-  {{-- Filter Section --}}
-  <div class="filter-section d-flex align-items-center mb-3">
-    <input type="text" class="form-control search-input me-2" placeholder="Cari...">
-    <select class="form-select me-2" style="max-width: 180px;">
-      <option>Semua Status</option>
-      <option>Aktif</option>
-      <option>Nonaktif</option>
-    </select>
-    <select class="form-select me-2" style="max-width: 180px;">
-      <option>Semua Bidang</option>
-      <option>Teknik Informatika</option>
-      <option>Teknik Mesin</option>
-    </select>
+ <form action="{{ route('admin.dataasesor') }}" method="GET" class="d-flex mb-3">
+    <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cari...">
+    <select name="bidang" class="form-select me-2" style="max-width: 280px;">
+    <option value="Semua">Semua Bidang</option>
+    @foreach($listBidang as $b)
+        <option value="{{ $b }}" {{ request('bidang') == $b ? 'selected' : '' }}>
+            {{ $b }}
+        </option>
+    @endforeach
+</select>
     <button class="btn btn-primary me-2">Filter</button>
-    <button class="btn btn-secondary"><i class="fas fa-sync-alt"></i></button>
-  </div>
+    <a href="{{ route('admin.dataasesor') }}" class="btn btn-secondary"><i class="fas fa-sync-alt"></i></a>
+</form>
 
   {{-- Tabel Data Asesor --}}
 <div class="table-responsive mt-3">
@@ -83,7 +52,6 @@
       <tr>
         <th>No</th>
         <th>Nama Asesor</th>
-        <th>NIP</th>
         <th>Bidang Keahlian</th>
         <th>Sertifikasi</th>
         <th>Status</th>
@@ -95,7 +63,6 @@
         <tr>
           <td>{{ $key+1 }}</td>
           <td class="text-start fw-bold">{{ $a->nama_asesor }}</td>
-          <td>{{ $a->nip }}</td>
           <td><span class="badge bg-info text-dark">{{ $a->bidang_keahlian }}</span></td>
           <td>
             @if($a->sertifikasi == 'Lengkap')
