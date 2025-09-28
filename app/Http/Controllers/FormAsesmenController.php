@@ -21,8 +21,9 @@ class FormAsesmenController extends Controller
 
     // ambil semua pembuatan pertanyaan untuk skema ini
     $pembuatanList = PembuatanPertanyaan::where('id_skema', $id_skema)
-                        ->orderBy('id_pembuatan_pertanyaan', 'desc')
-                        ->get();
+    ->where('jenis_pertanyaan', 'esai') // ⬅️ ini yang bikin cuma esai
+    ->get();
+
 
     return view('essai', compact('skema', 'pembuatanList'));
 }

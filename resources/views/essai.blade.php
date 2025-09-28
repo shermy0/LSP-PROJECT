@@ -96,6 +96,7 @@
         </button>
     </div>
 </div>
+
 <!-- Modal -->
 <div class="modal fade" id="modalPertanyaan" tabindex="-1" aria-labelledby="modalPertanyaanLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 350px;">
@@ -105,21 +106,20 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            {{-- Arahkan ke form pertanyaan esai --}}
             <form method="GET" action="{{ route('pertanyaan.esai.kelompok', ['id_skema' => $skema->id_skema]) }}">
                 <div class="modal-body pt-2">
-                    <!-- Timer -->
                     <label for="timer" class="fw-bold small mt-3">Timer (menit)</label>
-                    <input type="number" name="timer" id="timer" class="form-control" 
-                           min="1" max="180" value="30" required>
+                    <input type="number" name="timer" id="timer" class="form-control" min="1" max="180" value="30" required>
                 </div>
 
-                <!-- ❌ HAPUS input id_pembuatan disini -->
                 <input type="hidden" name="jenis_pertanyaan" value="esai">
 
+                @if(isset($pembuatan_aktif))
+                    <input type="hidden" name="id_pembuatan" value="{{ $pembuatan_aktif->id_pembuatan }}">
+                @endif
+
                 <div class="modal-footer border-0">
-                    <button type="submit" class="btn w-100 text-white" 
-                            style="background-color:#003366; font-weight:bold;">
+                    <button type="submit" class="btn w-100 text-white" style="background-color:#003366; font-weight:bold;">
                         Simpan
                     </button>
                 </div>
@@ -127,5 +127,4 @@
         </div>
     </div>
 </div>
-
 @endsection
