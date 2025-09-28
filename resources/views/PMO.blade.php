@@ -34,59 +34,122 @@
         </div>
         <div class="card-body">
             <ol class="list-group list-group-numbered">
-                <li class="list-group-item border-0 ps-0">
-                    Formulir ini diisi sebelum, saat, atau setelah asesmen observasi.
-                </li>
-                <li class="list-group-item border-0 ps-0">
-                    Pertanyaan harus relevan dengan dimensi kompetensi dan tugas praktik.
-                </li>
-                <li class="list-group-item border-0 ps-0">
-                    Saat pre-demo, pertanyaan bisa terkait K3, SOP, atau persiapan alat.
-                </li>
-                <li class="list-group-item border-0 ps-0">
-                    Jika KUK sudah diamati, tidak perlu ditanyakan ulang, cukup beri catatan.
-                </li>
-                <li class="list-group-item border-0 ps-0">
-                    Jika perlu konfirmasi, boleh tambahkan pertanyaan baru yang relevan.
-                </li>
-                <li class="list-group-item border-0 ps-0">
-                    Tanggapan asesi wajib ditulis di kolom tanggapan.
-                </li>
+                <li class="list-group-item border-0 ps-0">Formulir ini diisi sebelum, saat, atau setelah asesmen observasi.</li>
+                <li class="list-group-item border-0 ps-0">Pertanyaan harus relevan dengan dimensi kompetensi dan tugas praktik.</li>
+                <li class="list-group-item border-0 ps-0">Saat pra-demonstrasi, pertanyaan bisa terkait K3, SOP, atau catatan.</li>
             </ol>
         </div>
     </div>
 
-    <!-- Tombol Masukkan Pertanyaan -->
+    <!-- Daftar pembuatan pertanyaan -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header" style="background-color:#f9fbff; font-weight:bold;">
+            Pembuatan Pertanyaan yang Sudah Ada
+        </div>
+        <div class="card-body">
+            @if($pembuatanList->isEmpty())
+                <p class="text-muted">Belum ada pembuatan pertanyaan untuk skema ini.</p>
+            @else
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID Pembuatan</th>
+                            <th>Timer</th>
+                            <th>Tanggal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($pembuatanList as $pembuatan)
+                            <tr>
+                                <td>{{ $pembuatan->id_pembuatan_pertanyaan }}</td>
+                                <td>{{ $pembuatan->timer }} menit</td>
+                                <td>{{ $pembuatan->timescap ? \Carbon\Carbon::parse($pembuatan->timescap)->format('d-m-Y H:i') : '-' }}</td>
+                                <td>
+                                    <a href="{{ route('pertanyaan.pmo.kelompok', [
+                                        'id_skema' => $skema->id_skema,
+                                        'id_pembuatan' => $pembuatan->id_pembuatan_pertanyaan
+                                    ]) }}" class="btn btn-sm btn-primary">
+                                        Lanjutkan
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
+        </div>
+    </div>
+
+    <!-- Tombol Selanjutnya -->
     <div class="text-end">
-        <button class="btn text-white px-4 py-2" style="background-color:#041562;" data-bs-toggle="modal" data-bs-target="#modalPMO">
+        <button class="btn text-white px-4 py-2" style="background-color:#041562;" 
+                data-bs-toggle="modal" data-bs-target="#modalPilihan">
             Selanjutnya
         </button>
     </div>
+
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="modalPMO" tabindex="-1" aria-labelledby="modalPMOLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+<!-- Modal Pilihan -->
+<div class="modal fade" id="modalPilihan" tabindex="-1" aria-labelledby="modalPilihanLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 350px;">
         <div class="modal-content" style="border-radius: 10px; border: none;">
             <div class="modal-header border-0 pb-0">
-                <h6 class="modal-title fw-bold" id="modalPMOLabel">Atur Pertanyaan</h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h6 class="modal-title fw-bold" id="modalPilihanLabel">Pilih Aksi</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
-            {{-- Arahkan ke CRUD PMO --}}
-            <form method="GET" action="{{ route('pmo.create') }}">
-                <div class="modal-body pt-2">
-                    <!-- Input Jumlah Pertanyaan -->
-                    <label for="jumlah" class="fw-bold small mt-2">Jumlah Pertanyaan</label>
-                    <input type="number" name="jumlah" id="jumlah" class="form-control" min="1" max="20" value="5" required>
+            <div class="modal-body text-center">
+                <!-- Input Soal -->
+                <a href="{{ route('pertanyaan.pmo.kelompok', ['id_skema' => $skema->id_skema]) }}" 
+                   class="btn w-100 mb-2 text-white fw-bold" style="background-color:#041562;">
+                    Input Soal
+                </a>
 
-                    <!-- Timer -->
+                <!-- Jawaban Asesi PMO -->
+                @php
+                    $pembuatanPMO = $pembuatanList->firstWhere('jenis_pertanyaan', 'pmo');
+                @endphp
+
+                @if($pembuatanPMO)
+                    <a href="{{ route('jawaban.pmo', [
+                        'id_skema' => $skema->id_skema,
+                        'id_pembuatan' => $pembuatanPMO->id_pembuatan_pertanyaan
+                    ]) }}" 
+                    class="btn w-100 fw-bold" 
+                    style="background-color:#f1f1f1; color:#333;">
+                        Input Jawaban
+                    </a>
+                @else
+                    <button class="btn w-100 fw-bold" style="background-color:#f1f1f1; color:#333;" disabled>
+                        Belum ada pertanyaan PMO
+                    </button>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Timer -->
+<div class="modal fade" id="modalTimer" tabindex="-1" aria-labelledby="modalTimerLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 350px;">
+        <div class="modal-content" style="border-radius: 10px; border: none;">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title fw-bold" id="modalTimerLabel">Atur Timer</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+          <form method="GET" action="{{ route('pertanyaan.pmo.kelompok', ['id_skema' => $skema->id_skema]) }}">
+                <div class="modal-body pt-2">
                     <label for="timer" class="fw-bold small mt-3">Timer (menit)</label>
-                    <input type="number" name="timer" id="timer" class="form-control" min="1" max="180" value="60" required>
+                    <input type="number" name="timer" id="timer" class="form-control" min="1" max="180" value="30" required>
                 </div>
 
+                <input type="hidden" name="id_pembuatan" value="{{ $pembuatanList->first()->id_pembuatan_pertanyaan ?? '' }}">
+
                 <div class="modal-footer border-0">
-                    <button type="submit" class="btn w-100 text-white" style="background-color:#041562; font-weight:bold;">
+                    <button type="submit" class="btn w-100 text-white fw-bold" style="background-color:#041562;">
                         Simpan
                     </button>
                 </div>
@@ -94,23 +157,4 @@
         </div>
     </div>
 </div>
-
-<script>
-function redirectToPMO() {
-    let jumlah = document.getElementById('jumlah').value;
-    let timer = document.getElementById('timer').value;
-    let id_skema = "{{ $skema->id_skema }}";
-
-    if(jumlah < 1 || jumlah > 20) {
-        alert("Jumlah pertanyaan harus antara 1-20");
-        return;
-    }
-    if(timer < 1 || timer > 180) {
-        alert("Timer harus antara 1 - 180 menit");
-        return;
-    }
-
-    window.location.href = "{{ route('pmo.create') }}?jumlah=" + jumlah + "&id_skema=" + id_skema + "&timer=" + timer;
-}
-</script>
 @endsection

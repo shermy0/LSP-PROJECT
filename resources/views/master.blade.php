@@ -34,7 +34,7 @@
     </button>
 
     <div class="menu">
-        <ul>git 
+        <ul>
             @if(Auth::user()->role == 'admin')
                 <li><i class="bi bi-house-door-fill"></i><a href="#">Dashboard</a></li>
             @endif
