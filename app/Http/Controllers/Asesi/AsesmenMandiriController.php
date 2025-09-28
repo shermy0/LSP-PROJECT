@@ -83,8 +83,25 @@ class AsesmenMandiriController extends Controller
             )
             ->get();
 
-        return view('asesi.asesmen_mandiri.form2', compact('permohonan', 'units', 'elemen', 'kuk', 'dokumen'));
+        // 🔑 Ambil jawaban sebelumnya
+        $asesmen = DB::table('asesmen_mandiri_master')
+            ->where('id_permohonan', $permohonan->id_permohonan)
+            ->first();
+
+        $jawaban = [];
+        if ($asesmen) {
+            $jawaban = DB::table('asesmen_mandiri_jawaban')
+                ->where('id_asesmen_mandiri', $asesmen->id_asesmen_mandiri)
+                ->get()
+                ->keyBy('id_kuk'); // index berdasarkan id_kuk
+        }
+
+        return view(
+            'asesi.asesmen_mandiri.form2',
+            compact('permohonan', 'units', 'elemen', 'kuk', 'dokumen', 'jawaban')
+        );
     }
+
 
     public function store(Request $request)
     {
@@ -108,9 +125,9 @@ class AsesmenMandiriController extends Controller
         if (!$asesmen) {
             $idAsesmen = DB::table('asesmen_mandiri_master')->insertGetId([
                 'id_permohonan' => $permohonan->id_permohonan,
-                'id_asesi'      => $asesi->id_asesi,
-                'id_asesor'     => null,
-                'rekomendasi'   => null,
+                'id_asesi' => $asesi->id_asesi,
+                'id_asesor' => null,
+                'rekomendasi' => null,
             ]);
         } else {
             $idAsesmen = $asesmen->id_asesmen_mandiri;
@@ -123,10 +140,10 @@ class AsesmenMandiriController extends Controller
             DB::table('asesmen_mandiri_jawaban')->updateOrInsert(
                 [
                     'id_asesmen_mandiri' => $idAsesmen,
-                    'id_kuk'             => $id_kuk,
+                    'id_kuk' => $id_kuk,
                 ],
                 [
-                    'status'     => $status,
+                    'status' => $status,
                     'id_dokumen' => $dokumenKuk[$id_kuk] ?? null,
                 ]
             );
@@ -166,11 +183,11 @@ class AsesmenMandiriController extends Controller
             ['id_asesmen_mandiri' => $asesmen->id_asesmen_mandiri],
             [
                 'tgl_ttd_asesi' => $request->tgl_ttd_asesi,
-                'ttd_asesi'     => 'ttd/' . $imageName,
+                'ttd_asesi' => 'ttd/' . $imageName,
             ]
         );
 
-        return redirect()->route('asesi.asesmen_mandiri.form4')
+        return redirect()->route('form_pra_assesmen')
             ->with('success', 'Tanda tangan berhasil disimpan.');
     }
 }

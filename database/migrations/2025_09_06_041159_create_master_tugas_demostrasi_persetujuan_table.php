@@ -10,12 +10,12 @@ return new class extends Migration
     {
         Schema::create('master_tugas_demostrasi_persetujuan', function (Blueprint $table) {
             $table->id('id_tugas_demonstrasi_persetujuan');
-            $table->unsignedBigInteger('id_tugas');
+            $table->unsignedBigInteger('id_demonstrasi');
             $table->unsignedBigInteger('id_asesor');
             $table->date('tgl_ttd_asesor')->nullable();
             $table->string('ttd_asesor')->nullable();
 
-            $table->foreign('id_tugas')->references('id_tugas')->on('master_tugas_demonstrasi')->onDelete('cascade');
+            $table->foreign('id_demonstrasi')->references('id_demonstrasi')->on('demonstrasi')->onDelete('cascade');
             $table->foreign('id_asesor')->references('id_asesor')->on('asesor')->onDelete('cascade');
         });
     }

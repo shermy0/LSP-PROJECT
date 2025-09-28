@@ -19,7 +19,7 @@
     </p>
 
     <!-- Tombol -->
-    <a href="{{ route('asesi.form_pra_asesmen') }}" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">
+    <a href="{{ route('form_pra_assesmen') }}" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">
         ← Kembali
     </a>
 </div>

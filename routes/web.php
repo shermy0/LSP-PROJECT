@@ -19,6 +19,7 @@ use App\Http\Controllers\FormPraAsesmenController;
 use App\Http\Controllers\Asesi\AsesmenMandiriController as AsesiAsesmenMandiriController;
 use App\Http\Controllers\Asesor\AsesmenMandiriController as AsesorAsesmenMandiriController;
 
+
 // ================== AUTH ==================
 Route::get('/', function () {
     return view('auth/login');
@@ -146,19 +147,28 @@ Route::post('/kerahasiaan', [KerahasiaanController::class, 'store'])->name('kera
         // Tambahan: route simpan tanda tangan
         Route::post('ttd', [AsesiAsesmenMandiriController::class, 'storeTTD'])->name('ttd.store');
 
-        // 🔹 Tambahkan route show
+        // 🔹 route show jawaban asesi (hanya untuk asesi sendiri)
         Route::get('/{id}', [AsesiAsesmenMandiriController::class, 'show'])->name('show');
     });
 
-
-    // ================== ASESMEN MANDIRI (ASESOR) ==================
+    // ASESMEN MANDIRI (ASESOR)
     Route::prefix('asesor/asesmen-mandiri')->name('asesor.asesmen_mandiri.')->group(function () {
-        Route::get('/form1', [AsesorAsesmenMandiriController::class, 'form1'])->name('form1');
-        Route::get('/form2', [AsesorAsesmenMandiriController::class, 'form2'])->name('form2');
-        Route::get('/form3', [AsesorAsesmenMandiriController::class, 'form3'])->name('form3');
+        Route::get('/', [AsesorAsesmenMandiriController::class, 'index'])->name('index');
+        Route::get('/{asesi}', [AsesorAsesmenMandiriController::class, 'show'])->name('show');
+        Route::post('/{asesi}/verifikasi', [AsesorAsesmenMandiriController::class, 'verifikasiStore'])->name('verifikasi.store');
     });
 
+
+
+
     // ================== PRA ASESMEN ==================
+    Route::get('form-pra-assesmen', [FormPraAsesmenController::class, 'index'])
+        ->name('form_pra_assesmen');
+
+Route::post(
+    '/admin/permohonan/{id_permohonan}/update',
+    [Form1AdminController::class, 'update']
+)->name('admin.permohonan.update');
     Route::get('/asesi/form-pra-asesmen', [FormPraAsesmenController::class, 'index'])
         ->name('asesi.form_pra_asesmen');
 

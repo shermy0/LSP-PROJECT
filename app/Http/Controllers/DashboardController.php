@@ -14,16 +14,18 @@ class DashboardController extends Controller
         $menus = [];
         if ($user->role == 'admin') {
             $menus = [
-                ['name' => 'Dashboard', 'route' => route('dashboard.admin'), 'icon' => 'fas fa-home'],
+                ['name' => 'Dashboard', 'route' => route('admin.dashboard'), 'icon' => 'fas fa-home'],
                 ['name' => 'Data Peserta Uji', 'route' => '#', 'icon' => 'fas fa-users'],
             ];
         } elseif ($user->role == 'asesor') {
             $menus = [
+                ['name' => 'Dashboard', 'route' => route('asesor.dashboard'), 'icon' => 'fas fa-home'],
                 ['name' => 'Form Perencanaan', 'route' => route('formperencanaan'), 'icon' => 'fas fa-file-alt'],
+
             ];
         } elseif ($user->role == 'asesi') {
             $menus = [
-                ['name' => 'Dashboard', 'route' => route('dashboard.asesi'), 'icon' => 'fas fa-home'],
+                ['name' => 'Dashboard', 'route' => route('asesi.dashboard'), 'icon' => 'fas fa-home'],
                 ['name' => 'Form Perencanaan', 'route' => route('formperencanaan'), 'icon' => 'fas fa-edit'],
             ];
         }
@@ -44,21 +46,26 @@ class DashboardController extends Controller
 
     public function asesor()
     {
-        $totalPeserta = 284;
-        $totalSertifikat = 284;
-        $dalamProgres = 284;
-        $penghargaan = 284;
+        // --- REAL DATA ---
+        $totalPeserta    = DB::table('asesi')->count();
+        $totalSertifikat = DB::table('sertifikat')->count();
+        $dalamProgres    = DB::table('asesmen')->where('status', 'proses')->count();
 
-        // Data chart
+        $kompeten        = DB::table('hasil_asesmen')->where('status', 'kompeten')->count();
+        $belumKompeten   = DB::table('hasil_asesmen')->where('status', 'belum kompeten')->count();
+
+        // --- DUMMY DATA (sementara) ---
+        $penghargaan     = 0;
+
+        // Grafik sertifikasi per jurusan (sementara dummy karena di tabel asesi belum ada field jurusan)
         $labels = collect(['AKL', 'MPLB', 'PEMASARAN', 'M-LOG', 'DKV', 'RPL', 'TJKT']);
         $values = collect([45, 65, 30, 15, 40, 50, 10]);
 
-        // Warna dasar sama dengan di chart.js
-        $colors = ["#f1c40f", "#3498db", "#e74c3c", "#e67e22", "#9b59b6", "#2ecc71", "#7f8c8d"];
+        $colors = ["#f1c40f","#3498db","#e74c3c","#e67e22","#9b59b6","#2ecc71","#7f8c8d"];
 
-        $maxIndex = $values->search($values->max());
+        $maxIndex   = $values->search($values->max());
         $topJurusan = $labels[$maxIndex];
-        $topColor = $colors[$maxIndex];
+        $topColor   = $colors[$maxIndex];
 
         return view('asesor.dashboard', compact(
             'totalPeserta',
@@ -68,7 +75,9 @@ class DashboardController extends Controller
             'labels',
             'values',
             'topJurusan',
-            'topColor'
+            'topColor',
+            'kompeten',
+            'belumKompeten'
         ));
     }
 }
