@@ -16,6 +16,63 @@
     <p class="text-muted">Sistem Manajemen Asesor - AsesKom</p>
   </div>
 
+
+{{-- Modal Tambah Asesor --}}
+<div class="modal fade" id="modalTambah" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="{{ route('admin.asesor.store') }}" method="POST">
+      @csrf
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Tambah Asesor</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          
+          <div class="mb-3">
+            <label class="form-label">Nama Asesor</label>
+            <input type="text" name="nama_asesor" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">NIP</label>
+            <input type="text" name="nip" class="form-control">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Bidang Keahlian</label>
+            <select name="bidang_keahlian" class="form-select" required>
+              @foreach($listBidang as $b)
+                <option value="{{ $b }}">{{ $b }}</option>
+              @endforeach
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">No Registrasi</label>
+            <input type="text" name="no_registrasi" class="form-control">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" name="password" class="form-control" required>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Simpan</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
  {{-- Statistik --}}
  <div class="col-md-4">
   <div class="card shadow-sm border-0 rounded-3 p-3">
@@ -30,6 +87,14 @@
     </div>
   </div>
 </div>
+
+ {{-- Tombol Tambah --}}
+<div class="mb-3">
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalTambah">
+        + Tambah Asesor
+    </button>
+</div>
+
 
  <form action="{{ route('admin.dataasesor') }}" method="GET" class="d-flex mb-3">
     <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cari...">

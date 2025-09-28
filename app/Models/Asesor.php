@@ -13,11 +13,17 @@ class Asesor extends Model
     protected $primaryKey = 'id_asesor';
     public $timestamps = false;
     protected $fillable = [
-        'user_id','nama_asesor','nip','email','keahlian','jabatan','no_registrasi'
+        'user_id','nama_asesor','nip','email','bidang_keahlian','jabatan','no_registrasi'
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
+    public function asesis()
+    {
+        return $this->hasMany(Asesi::class);
+    }
+
 }

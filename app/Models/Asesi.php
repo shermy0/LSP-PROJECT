@@ -24,6 +24,6 @@ class Asesi extends Model
 
     public function asesor()
     {
-        return $this->belongsTo(Asesor::class, 'id_asesor');
+        return $this->belongsTo(Asesor::class, 'asesor_id', 'id_asesor');
     }
 }
