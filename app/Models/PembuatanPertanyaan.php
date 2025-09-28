@@ -15,6 +15,7 @@ class PembuatanPertanyaan extends Model
 
     protected $fillable = [
         'id_skema',
+        'jenis_pertanyaan',
         'timer',
         'timescap'
     ];
@@ -24,4 +25,3 @@ class PembuatanPertanyaan extends Model
         return $this->belongsTo(SkemaSertifikasi::class, 'id_skema', 'id_skema');
     }
 }
-    

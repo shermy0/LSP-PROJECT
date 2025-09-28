@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -31,8 +31,9 @@ class DatabaseSeeder extends Seeder
             UnitKompetensiSeeder::class,
             ElemenKompetensiSeeder::class,
             KukSeeder::class,
-            KelompokPekerjaanSeeder::class,
             JenisDokumenSeeder::class,
+            KelompokPekerjaanSeeder::class,
+            TujuanAsesmenSeeder::class,
         ]);
     }
 }

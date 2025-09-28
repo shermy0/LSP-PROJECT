@@ -31,4 +31,3 @@ class KelompokPekerjaan extends Model
     }
 
 }
- 

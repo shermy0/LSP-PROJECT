@@ -1,41 +1,35 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Demonstrasi extends Model
 {
+    use HasFactory;
+
+    // Nama tabel (opsional kalau sama dengan plural nama model)
     protected $table = 'demonstrasi';
+
+    // Primary key
     protected $primaryKey = 'id_demonstrasi';
+
+    // Kalau tidak pakai created_at & updated_at
     public $timestamps = false;
 
+    // Kolom yang boleh diisi (mass assignment)
     protected $fillable = [
-        'id_asesmen',
-        'id_asesor',
+        'id_skema',
         'timer',
+        'timescap',
     ];
 
-    // Relasi ke Asesmen
-    public function asesmen()
+    /**
+     * Relasi ke Skema Sertifikasi
+     */
+    public function skema()
     {
         return $this->belongsTo(Asesmen::class, 'id_asesmen', 'id_asesmen');
     }
-
-    // Relasi ke Asesor
-    public function asesor()
-    {
-        return $this->belongsTo(Asesor::class, 'id_asesor', 'id_asesor');
-    }
-
-    // 🔹 Demonstrasi punya banyak tugas
-    public function tugas()
-    {
-        return $this->hasMany(MasterTugasDemonstrasi::class, 'id_demonstrasi', 'id_demonstrasi');
-    }
-    // Demonstrasi.php
-public function skema()
-{
-    return $this->asesmen->skema(); // akses lewat asesmen
-}
-
 }

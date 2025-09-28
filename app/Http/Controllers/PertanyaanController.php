@@ -144,24 +144,26 @@ class PertanyaanController extends Controller
     $id_kelompok = $request->id_kelompok;
     $timer       = $request->timer;
 
-    // 🔹 Cari atau buat baru kalau belum ada
-    $pembuatan = PembuatanPertanyaan::firstOrCreate(
-        [
-            'id_skema' => $id_skema,
-        ],
-        [
-            'timer'    => $timer,
-            'timescap' => now(),
-        ]
-    );
+    // 🔹 Cek apakah ini mode Lanjutkan (edit) atau Selanjutnya (baru)
+    if ($request->filled('id_pembuatan')) {
+        // Mode LANJUTKAN → update record yang ada
+        $pembuatan = PembuatanPertanyaan::findOrFail($request->id_pembuatan);
+        $pembuatan->update([
+            'timer'            => $timer,
+            'timescap'         => now(),
+            'jenis_pertanyaan' => 'esai',
+        ]);
+    } else {
+        // Mode SELANJUTNYA → buat record baru
+        $pembuatan = PembuatanPertanyaan::create([
+            'id_skema'         => $id_skema,
+            'timer'            => $timer,
+            'timescap'         => now(),
+            'jenis_pertanyaan' => 'esai',
+        ]);
+    }
 
-    // 🔹 Kalau sudah ada, update timer-nya saja
-    $pembuatan->update([
-        'timer'    => $timer,
-        'timescap' => now(),
-    ]);
-
-    // Simpan pertanyaan esai
+    // 🔹 Simpan pertanyaan esai
     foreach ($request->isi_pertanyaan as $key => $isi) {
         $pertanyaan = new Pertanyaan();
         $pertanyaan->id_skema = $id_skema;
@@ -625,7 +627,7 @@ public function destroyPG($id)
         $skema = Skema::find($id_skema);
     
         // Tentukan view berdasarkan jenis
-        if ($jenis === 'essai') {
+        if ($jenis === 'esai') {
             return view('kelompok_pekerjaan_essai', compact('kelompok', 'timer', 'id_skema', 'jenis', 'skema'));
         } elseif ($jenis === 'pilihan_ganda') {
             return view('kelompok_pekerjaan_pg', compact('kelompok', 'timer', 'id_skema', 'jenis', 'skema'));

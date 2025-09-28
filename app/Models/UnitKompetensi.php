@@ -25,9 +25,4 @@ class UnitKompetensi extends Model
     {
         return $this->belongsTo(SkemaSertifikasi::class, 'id_skema', 'id_skema');
     }
-     public function kelompokPekerjaan()
-    {
-        return $this->belongsToMany(KelompokPekerjaan::class, 'hasil_asesmen', 'id_unit', 'id_kelompok')
-                    ->withPivot('id_hasil', 'status', 'catatan');
-    }
 }
