@@ -51,6 +51,7 @@ Route::prefix('pertanyaan/lisan')->name('lisan.')->group(function () {
     Route::put('/{id}', [PertanyaanController::class, 'updateLisan'])->name('update');
     Route::delete('/{id}', [PertanyaanController::class, 'destroyLisan'])->name('destroy');
 });
+Route::get('/skema/{id}/kelompok-lisan', [PertanyaanController::class, 'kelompokLisan'])->name('kelompok.pekerjaan.lisan');
 Route::get('/form-asesmen/lisan/create', [PertanyaanController::class, 'createLisan'])
     ->name('pertanyaan.lisan.create');
 Route::get('/kelompok-lisan/{id_skema}', [PertanyaanController::class, 'kelompokPekerjaan'])
@@ -65,8 +66,7 @@ Route::get('/form-asesmen/pertanyaan-lisan/{id_skema}', [FormAsesmenController::
     ->name('formasesmen.pertanyaanLisan');
 Route::get('/lisan/{id_skema}/crud', [PertanyaanController::class, 'crudLisan'])
     ->name('lisan.crud');
-
-
+Route::get('/kelompok-lisan/{id_skema}/{jenis?}', [PertanyaanController::class, 'kelompokPekerjaan'])->name('kelompok.pekerjaan');
     
 // Form input esai via query string (jumlah & id_skema)
 Route::get('/pertanyaan/esai/create', [PertanyaanController::class, 'createEsai'])

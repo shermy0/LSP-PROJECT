@@ -48,10 +48,10 @@
 
  
         <!-- Item 3 -->
-               <div class="accordion-item mb-2">
+        <div class="accordion-item mb-2">
             <h2 class="accordion-header p-3 border rounded">
                 <a href="{{ route('formasesmen.pertanyaanLisan', ['id_skema' => $skema->id_skema]) }}" 
-                class="text-dark text-decoration-none">
+                   class="text-dark text-decoration-none">
                     <i class="fa-solid fa-stop me-2"></i> Pertanyaan Lisan
                 </a>
             </h2>
