@@ -35,10 +35,7 @@
             @endif
 
             @if(Auth::user()->role == 'asesor')
-                <li><i class="bi bi-house-door-fill"></i><a href="#">Dashboard</a></li>
-                <li><i class="bi bi-people-fill"></i><a href="#">Data Peserta Uji</a></li>
-                <li><i class="bi bi-pencil-square"></i><a href="{{ route('formperencanaan') }}">Form Perencanaan</a></li>
-                <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
+                <li><i class="bi bi-pencil-square"></i><a href="{{ route('formperencanaan.index') }}">Form Perencanaan</a></li>
             @endif
 
             @if(Auth::user()->role == 'asesi')

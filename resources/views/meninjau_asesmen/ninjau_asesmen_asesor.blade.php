@@ -43,16 +43,31 @@
             <div class="signature-container">
                 <canvas id="signature-pad" class="signature-pad"></canvas>
             </div>
-            <div class="mt-2 d-flex gap-2">
-                <button type="button" id="clear" class="btn btn-sm btn-outline-danger">Hapus</button>
+            <div class="col-md-12">
+                <label for="nomorregistrasi" class="form-label fw-semibold">Nomor Registrasi</label>
+                <input type="text" class="form-control" id="nomorregistrasi" placeholder="Nomor Registrasi">
             </div>
-            <!-- Hidden input untuk simpan tanda tangan -->
-            <input type="hidden" name="tanda_tangan" id="tanda_tangan">
-        </div>
-    </div>
-    <div class="col-md-12">
-        <label for="komentar" class="form-label fw-semibold">Komentar</label>
-        <textarea id="rekomendasi" class="form-control mt-2" rows="3" placeholder="Masukkan Komentar Anda"></textarea>
+            <div class="col-md-12">
+                <label for="tanggalAsesmen" class="form-label fw-semibold">Tanggal Asesmen</label>
+                <input type="date" class="form-control" id="tanggalAsesmen">
+            </div>
+            <div class="col-md-6">
+                <div class="card-field">
+                    <label class="form-label">Tanda Tangan</label>
+                    <div class="signature-container">
+                        <canvas id="signature-pad" class="signature-pad"></canvas>
+                    </div>
+                    <div class="mt-2 d-flex gap-2">
+                        <button type="button" id="clear" class="btn btn-sm btn-outline-danger">Hapus</button>
+                    </div>
+                    <!-- Hidden input untuk simpan tanda tangan -->
+                    <input type="hidden" name="tanda_tangan" id="tanda_tangan">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <label for="komentar" class="form-label fw-semibold">Komentar</label>
+                <textarea id="rekomendasi" class="form-control mt-2" rows="3" placeholder="Masukkan Komentar Anda"></textarea>
+            </div>
     </div>
 </div>
 

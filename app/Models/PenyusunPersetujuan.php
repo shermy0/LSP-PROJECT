@@ -6,14 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class PenyusunPersetujuan extends Model
 {
-    use HasFactory;
-
     protected $table = 'penyusun_persetujuan';
+    protected $primaryKey = 'id';
+    public $timestamps = false;
 
     protected $fillable = [
-        'asesor_id',
-        'tanggal_asesmen',
+        'id_asesor',
+        'id_skema',
+        'no_met',
+        'tanggal',
         'tanda_tangan',
-        'komentar',
+        'catatan',
+
     ];
 }
