@@ -10,6 +10,9 @@ use App\Models\TujuanAsesmen;
 
 class PermohonanController extends Controller
 {
+    /**
+     * Formulir Data Pribadi (FR-APL-01 Bagian 1)
+     */
     public function form1()
     {
         $user = auth()->user();
@@ -19,6 +22,9 @@ class PermohonanController extends Controller
         return view('asesi.permohonan.form1', compact('tuk', 'asesi'));
     }
 
+    /**
+     * Formulir Permohonan Sertifikasi (FR-APL-01 Bagian 2)
+     */
     public function form2()
     {
         $user = auth()->user();
@@ -30,6 +36,9 @@ class PermohonanController extends Controller
         return view('asesi.permohonan.form2', compact('skema', 'asesi', 'jenisDokumen', 'tujuanAsesmen'));
     }
 
+    /**
+     * Simpan Data Asesi (Bagian 1)
+     */
     public function store(Request $request)
     {
         $user = auth()->user();
@@ -60,12 +69,19 @@ class PermohonanController extends Controller
         return redirect()->route('asesi.permohonan.form2')->with('success', 'Data berhasil disimpan');
     }
 
+    /**
+     * API Ambil Skema + Unit Kompetensi
+     */
     public function getSkema($id)
     {
         $skema = DB::table('skema_sertifikasi')
             ->where('id_skema', $id)
             ->select('id_skema', 'nama_skema', 'kode_skema', 'judul_skema', 'deskripsi')
             ->first();
+
+        if (!$skema) {
+            return response()->json(['error' => 'Skema tidak ditemukan'], 404);
+        }
 
         $units = DB::table('unit_kompetensi')
             ->where('id_skema', $id)
@@ -78,14 +94,17 @@ class PermohonanController extends Controller
         ]);
     }
 
+    /**
+     * Simpan Dokumen, Tanda Tangan & Permohonan (Bagian 2)
+     */
     public function storeDokumen(Request $request)
     {
         $request->validate([
-            'id_skema'       => 'required|exists:skema_sertifikasi,id_skema',
-            'id_tujuan'      => 'required|exists:tujuan_asesmen,id_tujuan',
-            'dokumen.*'      => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
-            'tanggal'        => 'required|date',
-            'ttd_asesi'      => 'required|string', // base64 dari canvas
+            'id_skema'  => 'required|exists:skema_sertifikasi,id_skema',
+            'id_tujuan' => 'required|exists:tujuan_asesmen,id_tujuan',
+            'dokumen.*' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
+            'tanggal'   => 'required|date',
+            'ttd_asesi' => 'required|string', // base64 dari canvas
         ]);
 
         $user = auth()->user();
@@ -103,17 +122,17 @@ class PermohonanController extends Controller
             ->first();
 
         if (!$permohonan || $permohonan->status === 'Ditolak') {
-            // buat permohonan baru
+            // buat baru
             $idPermohonan = DB::table('permohonan')->insertGetId([
                 'id_asesi'       => $asesi->id_asesi,
                 'id_skema'       => $request->id_skema,
                 'tgl_permohonan' => now(),
-                'status'         => 'Diajukan', // reset jadi diajukan
+                'status'         => 'Diajukan',
                 'created_at'     => now(),
                 'updated_at'     => now(),
             ]);
         } else {
-            // update permohonan lama (jika statusnya Diajukan atau Diterima)
+            // update permohonan lama
             $idPermohonan = $permohonan->id_permohonan;
             DB::table('permohonan')->where('id_permohonan', $idPermohonan)->update([
                 'id_skema'       => $request->id_skema,
@@ -123,12 +142,9 @@ class PermohonanController extends Controller
             ]);
         }
 
-        // simpan relasi skema - tujuan asesmen
+        // simpan relasi skema - tujuan
         DB::table('skema_tujuan')->updateOrInsert(
-            [
-                'skema_id'  => $request->id_skema,
-                'tujuan_id' => $request->id_tujuan,
-            ],
+            ['skema_id' => $request->id_skema, 'tujuan_id' => $request->id_tujuan],
             []
         );
 
@@ -165,7 +181,7 @@ class PermohonanController extends Controller
             $ttdData   = base64_decode($ttdBase64);
             $fileName  = "ttd/asesi_{$asesi->id_asesi}_" . time() . ".png";
 
-            // hapus ttd lama jika ada
+            // hapus ttd lama
             $oldTTD = DB::table('permohonan_persetujuan')
                 ->where('id_permohonan', $idPermohonan)
                 ->value('ttd_asesi');
@@ -174,7 +190,7 @@ class PermohonanController extends Controller
                 Storage::disk('public')->delete($oldTTD);
             }
 
-            // simpan file baru
+            // simpan baru
             Storage::disk('public')->put($fileName, $ttdData);
             $ttdPath = $fileName;
         }

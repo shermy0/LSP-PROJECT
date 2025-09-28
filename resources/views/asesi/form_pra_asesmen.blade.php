@@ -68,22 +68,59 @@
             {{-- FR.APL.02 Asesmen Mandiri (muncul hanya jika permohonan diterima) --}}
             @if($status == 'Diterima')
                 @php
-                    $asesmenStatus = $asesmenMandiri ? 'Sudah diisi' : 'Belum diisi';
-                    $asesmenBadge = $asesmenMandiri ? 'bg-success' : 'bg-secondary';
-                    $asesmenLink = $asesmenMandiri 
-                        ? route('asesi.asesmen_mandiri.show', $asesmenMandiri->id_asesmen_mandiri)
-                        : route('asesi.asesmen_mandiri.form1');
+                    // $asesmenMandiri diambil oleh controller (boleh null / object)
+                    // bisa berisi fields: id_asesmen_mandiri, rekomendasi, updated_at, id_asesor, dsb.
+                    $asesmenExists = !empty($asesmenMandiri);
+                    $rekom = $asesmenExists ? ($asesmenMandiri->rekomendasi ?? null) : null;
+
+                    if (!$asesmenExists) {
+                        $asesmenLabel = 'Belum diisi';
+                        $asesmenBadge = 'bg-secondary';
+                        $asesmenHref = route('asesi.asesmen_mandiri.form1');
+                        $asesmenData = null;
+                    } else {
+                        // ada asesmen mandiri (sudah diisi oleh asesi)
+                        if (empty($rekom)) {
+                            // belum direkomendasikan -> di periksa
+                            $asesmenLabel = 'Di Periksa';
+                            $asesmenBadge = 'bg-warning text-dark';
+                            // menuju halaman waiting (tunggu verifikasi admin)
+                            $asesmenHref = route('asesi.asesmen_mandiri.waiting'); // pastikan route ini ada
+                        } elseif ($rekom === 'Dapat Dilanjutkan') {
+                            $asesmenLabel = 'Dapat Dilanjutkan';
+                            $asesmenBadge = 'bg-success';
+                            // link kept but we will open modal instead via JS (so keep href="#")
+                            $asesmenHref = 'javascript:void(0)';
+                        } else {
+                            // 'Tidak Dapat Dilanjutkan'
+                            $asesmenLabel = 'Tidak Dapat Dilanjutkan';
+                            $asesmenBadge = 'bg-danger';
+                            $asesmenHref = 'javascript:void(0)';
+                        }
+
+                        // data for modal
+                        $asesmenData = [
+                            'id' => $asesmenMandiri->id_asesmen_mandiri,
+                            'rekomendasi' => $rekom,
+                            'updated_at' => $asesmenMandiri->updated_at ?? $asesmenMandiri->created_at ?? null,
+                            'id_asesor' => $asesmenMandiri->id_asesor ?? null,
+                        ];
+                    }
                 @endphp
 
-                <a href="{{ $asesmenLink }}" 
-                   class="pra-item d-flex justify-content-between align-items-center mb-3 p-3 text-decoration-none">
+                <a href="{{ $asesmenHref }}"
+                   class="pra-item d-flex justify-content-between align-items-center mb-3 p-3 text-decoration-none"
+                   id="link-asesmen-mandiri"
+                   @if($asesmenExists)
+                        data-asesmen='@json($asesmenData)'
+                   @endif>
                     <div class="d-flex align-items-start">
                         <div class="icon-wrap me-3">✅</div>
                         <div>
                             <h6 class="mb-1 fw-semibold text-dark">FR.APL.02 Asesmen Mandiri</h6>
                             <small class="text-muted">
-                                @if($asesmenMandiri)
-                                    Terakhir diisi: {{ $asesmenMandiri->updated_at ?? '-' }}
+                                @if($asesmenExists)
+                                    Terakhir diisi: {{ $asesmenMandiri->updated_at ?? $asesmenMandiri->created_at ?? '-' }}
                                 @else
                                     Silakan lanjutkan mengisi asesmen mandiri setelah permohonan diterima.
                                 @endif
@@ -91,7 +128,7 @@
                         </div>
                     </div>
                     <div class="text-end">
-                        <span class="badge {{ $asesmenBadge }}">{{ $asesmenStatus }}</span>
+                        <span class="badge {{ $asesmenBadge }}">{{ $asesmenLabel }}</span>
                     </div>
                 </a>
             @endif
@@ -99,6 +136,29 @@
         </div>
     </div>
 
+</div>
+
+{{-- Modal untuk menampilkan detail rekomendasi / instruksi --}}
+<div class="modal fade" id="asesmenModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="asesmenModalTitle">Detail Asesmen Mandiri</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+      </div>
+      <div class="modal-body" id="asesmenModalBody">
+        <!-- diisi oleh JS -->
+        <p class="mb-2"><strong>Rekomendasi:</strong> <span id="modalRekom"></span></p>
+        <p class="mb-2"><strong>Terakhir diperbarui:</strong> <span id="modalUpdated"></span></p>
+        <p class="mb-2"><strong>Catatan / Keterangan:</strong></p>
+        <div id="modalCatatan" class="small text-muted">-</div>
+      </div>
+      <div class="modal-footer">
+        <a href="#" id="modalPrimaryBtn" class="btn btn-primary">Lanjutkan</a>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 {{-- Style langsung di blade --}}
@@ -149,4 +209,68 @@
         font-size: 18px;
     }
 </style>
+
+{{-- Script untuk handle klik & modal --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const link = document.getElementById('link-asesmen-mandiri');
+    if (!link) return;
+
+    link.addEventListener('click', function (e) {
+        // ambil data asesmen (jika ada)
+        const dataStr = link.getAttribute('data-asesmen');
+        if (!dataStr) {
+            // tidak ada asesmen -> biarkan link normal mengarahkan ke form
+            return;
+        }
+
+        const data = JSON.parse(dataStr);
+
+        // jika rekomendasi null -> status "Di Periksa" -> arahkan ke waiting page
+        if (!data.rekomendasi) {
+            e.preventDefault();
+            // pastikan route 'asesi.asesmen_mandiri.waiting' ada; jika tidak, ganti dengan route show
+            window.location.href = "{{ route('asesi.asesmen_mandiri.waiting') }}";
+            return;
+        }
+
+        // jika rekomendasi ada -> tampilkan modal dengan detail
+        e.preventDefault();
+        const rekom = data.rekomendasi;
+        const updated = data.updated_at || '-';
+        const id = data.id;
+
+        document.getElementById('modalRekom').textContent = rekom;
+        document.getElementById('modalUpdated').textContent = updated;
+
+        // optional: ambil catatan via AJAX jika Anda menyimpan catatan di tabel persetujuan
+        // untuk sementara tampilkan placeholder / catatan default
+        document.getElementById('modalCatatan').textContent = 'Lihat detail rekomendasi dari asesor.';
+
+        const primaryBtn = document.getElementById('modalPrimaryBtn');
+
+        if (rekom === 'Dapat Dilanjutkan') {
+            primaryBtn.textContent = 'Lanjutkan';
+            // arahkan ke halaman show asesmen (atau halaman selanjutnya)
+            primaryBtn.href = "{{ url('/') }}" + "/asesi/asesmen-mandiri/" + id; // route('asesi.asesmen_mandiri.show', id)
+            primaryBtn.classList.remove('btn-danger');
+            primaryBtn.classList.add('btn-primary');
+            primaryBtn.style.display = 'inline-block';
+        } else {
+            // Tidak Dapat Dilanjutkan
+            primaryBtn.textContent = 'Isi Ulang Asesmen';
+            primaryBtn.href = "{{ route('asesi.asesmen_mandiri.form1') }}";
+            primaryBtn.classList.remove('btn-primary');
+            primaryBtn.classList.add('btn-danger');
+            primaryBtn.style.display = 'inline-block';
+        }
+
+        // tampilkan modal
+        const modalEl = document.getElementById('asesmenModal');
+        const bsModal = new bootstrap.Modal(modalEl);
+        bsModal.show();
+    });
+});
+</script>
+
 @endsection

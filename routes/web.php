@@ -106,7 +106,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('form1', [AsesiAsesmenMandiriController::class, 'form1'])->name('form1');
         Route::get('form2', [AsesiAsesmenMandiriController::class, 'form2'])->name('form2');
         Route::get('form3', [AsesiAsesmenMandiriController::class, 'form3'])->name('form3');
-        Route::get('form4', [AsesiAsesmenMandiriController::class, 'form4'])->name('form4');
+        Route::get('/waiting', function () {
+            return view('asesi.asesmen_mandiri.waiting');
+        })->name('waiting');
         Route::post('store', [AsesiAsesmenMandiriController::class, 'store'])->name('store');
 
         // Tambahan: route simpan tanda tangan
