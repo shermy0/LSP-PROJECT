@@ -2,74 +2,91 @@
 
 namespace App\Http\Controllers\FormPerencanaan;
 
-use Illuminate\Support\Facades\DB;  
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Skema;
 
 class KonfirmasiController extends Controller
 {
-// BUAT NYARI ASESOR SESUAI SKEMA DI FILE KONFIRMASI
-public function search(Request $request)
-{
-    $term = $request->get('q');
-    $skemaId = $request->get('skema_id');
+    // TAMPILKAN FORM KONFIRMASI
+    public function konfirmasi($skema_id)
+    {
+        $skema = Skema::findOrFail($skema_id);
 
-    $asesors = DB::table('asesor')
-        ->join('asesor_skema', 'asesor.id_asesor', '=', 'asesor_skema.asesor_id')
-        ->where('asesor_skema.skema_id', $skemaId)
-        ->where('asesor.nama_asesor', 'LIKE', "%{$term}%")
-        ->select('asesor.id_asesor', 'asesor.nama_asesor')
-        ->limit(10)
-        ->get();
+        // Ambil status konfirmasi (jika ada)
+        $konfirmasi = DB::table('mapa01_konfirmasi')
+            ->where('id_skema', $skema_id)
+            ->first();
 
-    return response()->json($asesors);
-}
+        // Ambil semua asesor yang terkait dengan skema
+        $asesors = DB::table('asesor')
+            ->join('asesor_skema', 'asesor.id_asesor', '=', 'asesor_skema.asesor_id')
+            ->where('asesor_skema.skema_id', $skema_id)
+            ->select('asesor.id_asesor', 'asesor.nama_asesor')
+            ->get();
 
-  // Method untuk menampilkan halaman konfirmasi
-public function konfirmasi($skema_id)
-{
-    $skema = Skema::findOrFail($skema_id);
+        // Ambil data orang relevan (per role) dari tabel penyusun_persetujuan
+        $roles = DB::table('penyusun_persetujuan')
+            ->where('id_skema', $skema_id)
+            ->whereIn('role', ['manajer_lsp', 'master_asesor', 'manajer_pelatihan', 'supervisor'])
+            ->get()
+            ->keyBy('role'); // hasilnya bisa dipanggil $roles['master_asesor']
 
-    // Ambil data konfirmasi sebelumnya
-    $konfirmasi = DB::table('mapa01_konfirmasi')
-        ->where('id_skema', $skema_id)
-        ->first();
+        // Ambil daftar penyusun (role = penyusun)
+        $penyusun = DB::table('penyusun_persetujuan')
+            ->where('id_skema', $skema_id)
+            ->where('role', 'penyusun')
+            ->get();
 
-    // Ambil semua asesor terkait skema
-    $asesors = DB::table('asesor')
-        ->join('asesor_skema', 'asesor.id_asesor', '=', 'asesor_skema.asesor_id')
-        ->where('asesor_skema.skema_id', $skema_id)
-        ->select('asesor.id_asesor', 'asesor.nama_asesor')
-        ->get();
+        return view('form_perencanaan.form_mapa_01.mapa01_konfirmasi', compact(
+            'skema',
+            'asesors',
+            'konfirmasi',
+            'roles',
+            'penyusun'
+        ));
+    }
 
-    return view('form_perencanaan.form_mapa_01.mapa01_konfirmasi', compact('skema', 'asesors', 'konfirmasi'));
-}
-
+    // SIMPAN DATA ORANG RELEVAN + PENYUSUN
     public function store(Request $request, $skema_id)
     {
+        /** SIMPAN ORANG RELEVAN (manajer, asesor, supervisor) */
+        if ($request->has('asesor')) {
+            foreach ($request->asesor as $role => $idAsesor) {
+                if (!$idAsesor) continue;
+
+                $ttdBase64 = $request->tanda_tangan[$role] ?? null;
+
+                DB::table('penyusun_persetujuan')->updateOrInsert(
+                    [
+                        'id_skema'  => $skema_id,
+                        'role'      => $role,
+                    ],
+                    [
+                        'id_asesor'    => $idAsesor,
+                        'tanggal'      => $request->tanggal[$role] ?? null,
+                        'tanda_tangan' => $ttdBase64,
+                    ]
+                );
+            }
+        }
+
+        /** SIMPAN PENYUSUN */
         if ($request->has('nama')) {
-            foreach ($request->nama as $index => $nama) {
-                $ttdBase64 = $request->tanda_tangan[$index] ?? null;
-                $ttdPath = null;
+            foreach ($request->nama as $i => $nama) {
+                if (!$nama) continue;
 
-                if ($ttdBase64) {
-                    // decode base64
-                    $imageData = base64_decode(str_replace('data:image/png;base64,', '', $ttdBase64));
-                    $fileName = 'ttd_' . uniqid() . '.png';
-                    $ttdPath = 'ttd/' . $fileName;
-
-                    // simpan ke storage
-                    Storage::disk('public')->put($ttdPath, $imageData);
-                }
+                $ttdBase64 = $request->tanda_tangan[$i] ?? null;
 
                 DB::table('penyusun_persetujuan')->insert([
                     'id_skema'     => $skema_id,
-                    'id_asesor'    => $request->asesor[$index] ?? null,
-                    'no_met'       => $request->nomet[$index] ?? null,
-                    'tanggal'      => $request->tanggal[$index] ?? null,
+                    'id_asesor'    => null,
+                    'no_met'       => $request->nomet[$i] ?? null,
+                    'tanggal'      => $request->tanggal[$i] ?? null,
                     'tanda_tangan' => $ttdBase64,
-                    'catatan'      => null,
+                    'role'         => 'penyusun',
+                    'catatan'      => null
                 ]);
             }
         }
@@ -78,28 +95,34 @@ public function konfirmasi($skema_id)
             ->with('success', 'Data konfirmasi berhasil disimpan.');
     }
 
-    public function downloadTtd($id)
-    {
-        $penyusun = DB::table('penyusun_persetujuan')->find($id);
-        if (!$penyusun || !$penyusun->tanda_tangan_path) {
-            abort(404);
-        }
-
-        return Storage::disk('public')->download($penyusun->tanda_tangan_path);
-    }
-
+    // Hapus tanda tangan (set kolom tanda_tangan jadi null)
     public function deleteTtd($id)
     {
-        $penyusun = DB::table('penyusun_persetujuan')->find($id);
-        if ($penyusun && $penyusun->tanda_tangan_path) {
-            Storage::disk('public')->delete($penyusun->tanda_tangan_path);
-        }
-
         DB::table('penyusun_persetujuan')
             ->where('id', $id)
-            ->update(['tanda_tangan' => null, 'tanda_tangan_path' => null]);
+            ->update(['tanda_tangan' => null]);
 
         return back()->with('success', 'Tanda tangan berhasil dihapus.');
     }
 
+    // DOWNLOAD TANDA TANGAN (dari base64 jadi PNG)
+    public function downloadTtd($id)
+    {
+        $data = DB::table('penyusun_persetujuan')->where('id', $id)->first();
+
+        if (!$data || !$data->tanda_tangan) {
+            return back()->with('error', 'Tanda tangan tidak ditemukan.');
+        }
+
+        // Decode base64 → binary
+        $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $data->tanda_tangan));
+
+        // Nama file download
+        $fileName = 'tanda_tangan_' . $id . '.png';
+
+        // Return response sebagai file download
+        return response($imageData)
+            ->header('Content-Type', 'image/png')
+            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"');
+    }
 }

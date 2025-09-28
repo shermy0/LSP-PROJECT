@@ -11,7 +11,7 @@
             <li class="breadcrumb-item">
                 <a href="{{ route('formperencanaan.show', $skema->id_skema) }}">Form Perencanaan</a>
             </li>
-            <li class="breadcrumb-item active" aria-current="page">FR.MAPA.01</li>
+            <li class="breadcrumb-item active" aria-current="page">FR.VA.K</li>
         </ol>
     </nav>
 

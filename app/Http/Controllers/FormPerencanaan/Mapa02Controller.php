@@ -25,21 +25,20 @@ class Mapa02Controller extends Controller
     }
 
     // Halaman MAPA02 berdasarkan skema
-public function showMapa02($skema_id)
-{
-    $skema = Skema::findOrFail($skema_id);
+    public function showMapa02($skema_id)
+    {
+        $skema = Skema::findOrFail($skema_id);
 
-    $kelompokPekerjaan = KelompokPekerjaan::with([
-            'hasilAsesmen.unit',
-            // 'hasilAsesmen.bukti.jenisBukti',
-            // 'hasilAsesmen.perangkat.perangkat'
-        ])
-        ->where('id_skema', $skema_id)
-        ->get();
+        $kelompokPekerjaan = KelompokPekerjaan::with([
+                'hasilAsesmen.unit',
+                // 'hasilAsesmen.bukti.jenisBukti',
+                // 'hasilAsesmen.perangkat.perangkat'
+            ])
+            ->where('id_skema', $skema_id)
+            ->get();
 
-    return view('mapa02', compact('skema', 'kelompokPekerjaan'));
-}
-
+        return view('mapa02', compact('skema', 'kelompokPekerjaan'));
+    }
 
     // Ambil data asesor berdasarkan skema (AJAX)
     public function getAsesor($skemaId)
