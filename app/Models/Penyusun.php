@@ -4,10 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PenyusunPersetujuan extends Model
+class Penyusun extends Model
 {
     protected $table = 'penyusun_persetujuan';
-    protected $primaryKey = 'id';
     public $timestamps = false;
 
     protected $fillable = [
@@ -16,6 +15,6 @@ class PenyusunPersetujuan extends Model
         'no_met',
         'tanggal',
         'tanda_tangan',
-        'catatan'
+        'catatan',
     ];
 }

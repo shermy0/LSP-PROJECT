@@ -42,9 +42,6 @@
                             <input type="text" name="rekomendasi[]" class="form-control" placeholder="Isi Rekomendasi">
                         </td>
                         <td class="text-center">
-                            <button type="button" class="btn btn-warning btn-sm">
-                                <i class="fa fa-edit text-white"></i>
-                            </button>
                             <button type="button" class="btn btn-danger btn-sm">
                                 <i class="fa fa-trash"></i>
                             </button>
@@ -84,9 +81,6 @@
                             <input type="hidden" name="tanda_tangan[]" class="tanda_tangan">
                         </td>
                         <td class="text-center">
-                            <button type="button" class="btn btn-warning btn-sm">
-                                <i class="fa fa-edit text-white"></i>
-                            </button>
                             <button type="button" class="btn btn-danger btn-sm">
                                 <i class="fa fa-trash"></i>
                             </button>
@@ -124,9 +118,6 @@
                             <input type="hidden" name="tanda_tangan_validator[]" class="tanda_tangan">
                         </td>
                         <td class="text-center">
-                            <button type="button" class="btn btn-warning btn-sm">
-                                <i class="fa fa-edit text-white"></i>
-                            </button>
                             <button type="button" class="btn btn-danger btn-sm delete-row">
                                 <i class="fa fa-trash"></i>
                             </button>

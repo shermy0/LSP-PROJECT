@@ -7,6 +7,13 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
 use App\Http\Controllers\SkemaController;
 use App\Http\Controllers\InstrumenController;
+use App\Http\Controllers\PenyusunController;
+
+// Tampilkan form laporan_asesor tertentu
+Route::get('/laporan_asesor/{id}/create', [PenyusunController::class, 'create'])->name('laporan_asesor.create');
+
+// Simpan laporan
+Route::post('/laporan_asesor/store', [PenyusunController::class, 'store'])->name('laporan.store');
 
 // ============================
 // Halaman Utama
@@ -85,6 +92,14 @@ Route::get('/mapa02/skema/{skemaId}/units', [SkemaController::class, 'getUnits']
 Route::get('/fr-va/{periode}', [PerencanaanController::class, 'frVa'])->name('fr_va');
 // FR VA Asesor (halaman lanjutan)
 Route::get('/fr-va-asesor', [PerencanaanController::class, 'frVaAsesor'])->name('fr_va_asesor');
+// Simpan dari FR VA ke FR VA Asesor
+Route::post('/fr-va-asesor/simpan', [PerencanaanController::class, 'simpanLanjutfrVa'])->name('fr_va_asesor.simpan');
+// FR VA (halaman awal dengan periode)
+Route::get('/fr-va/{periode}', [PerencanaanController::class, 'frVa'])->name('fr_va');
+
+// FR VA Asesor (halaman lanjutan)
+Route::get('/fr-va-asesor', [PerencanaanController::class, 'frVaAsesor'])->name('fr_va_asesor');
+
 // Simpan dari FR VA ke FR VA Asesor
 Route::post('/fr-va-asesor/simpan', [PerencanaanController::class, 'simpanLanjutfrVa'])->name('fr_va_asesor.simpan');
 

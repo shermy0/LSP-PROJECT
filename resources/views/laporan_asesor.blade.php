@@ -23,38 +23,38 @@
         <div class="komen_ttd-header">Catatan Asesor & Tanda Tangan</div>
     </div>
 
-    <form id="simpan-form" action="{{ route('formperencanaan') }}" method="POST" class="simpan-form">
+    <form id="simpan-form" action="{{ route('laporan.store') }}" method="POST" class="simpan-form">
         @csrf
 
-        <h5 style="text-align: left;">Asesor</h5>
+        <h5 style="text-align: center;">Asesor</h5>
 
         <!-- Catatan -->
         <div class="col-md-12 mb-3">
-            <label for="aspek_positif_negatif" class="form-label fw-semibold">Catatan</label>
-            <textarea name="aspek_positif_negatif" id="aspek_positif_negatif" class="form-control mt-2" rows="3" placeholder="Masukkan Catatan Anda"></textarea>
+            <label for="catatan" class="form-label fw-semibold">Catatan</label>
+            <textarea name="catatan" id="catatan" class="form-control mt-2" rows="3" placeholder="Masukkan Catatan Anda"></textarea>
         </div>
 
         @foreach($laporans as $laporan)
         @endforeach
         <!-- Nama Asesor -->
         <div class="col-md-12 mb-3">
-            <label for="namaasesor" class="form-label fw-semibold">Nama Asesor</label>
-            <input type="text" class="form-control" id="namaasesor" 
+            <label for="nama_asesor" class="form-label fw-semibold">Nama Asesor</label>
+            <input type="text" class="form-control" id="nama_asesor" 
                 value="{{ $laporan->asesor->nama_asesor ?? '-' }}" readonly>
-            <input type="hidden" name="asesor_id" value="{{ $asesor->id ?? '' }}">
+            <input type="hidden" name="asesor_id" value="{{ $laporan->asesor->id ?? '' }}">
         </div>
 
         <!-- Nomor Registrasi -->
         <div class="col-md-12 mb-3">
-            <label for="nomorregistrasi" class="form-label fw-semibold">Nomor Registrasi</label>
-            <input type="text" class="form-control" id="nomorregistrasi" 
+            <label for="no_registrasi" class="form-label fw-semibold">Nomor Registrasi</label>
+            <input type="text" class="form-control" id="no_registrasi" 
                 value="{{ $laporan->asesor->no_registrasi ?? '-' }}" readonly>
-            <input type="hidden" name="no_registrasi" value="{{ $asesor->no_registrasi ?? '' }}">
+            <input type="hidden" name="no_registrasi" value="{{ $laporan->asesor->no_registrasi ?? '' }}">
         </div>
-        
 
-        <!-- Skema (hidden aja kalau sudah pasti) -->
-        <input type="hidden" name="skema_id" value="{{ $skema->id ?? '' }}">
+        <!-- Skema -->
+        <input type="hidden" name="asesor_id" value="{{ $laporan->asesor->id_asesor ?? '' }}">
+        <input type="hidden" name="skema_id" value="{{ $laporan->skema->id_skema ?? '' }}">
 
         <!-- Tanggal Asesmen -->
         <div class="col-md-12 mb-3">
@@ -65,7 +65,7 @@
         <!-- Signature -->
         <div class="col-md-6 mb-3">
             <div class="card-field">
-                <label class="form-label">Tanda Tangan</label>
+                <label class="form-label fw-semibold">Tanda Tangan</label>
                 <div class="signature-container border rounded">
                     <canvas id="signature-pad" class="signature-pad"></canvas>
                 </div>
