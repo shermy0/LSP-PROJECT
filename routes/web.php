@@ -9,6 +9,7 @@ use App\Http\Controllers\FormPerencanaan\Mapa01Controller;
 use App\Http\Controllers\FormPerencanaan\Mapa02Controller;
 use App\Http\Controllers\FormPerencanaan\ModifikasiController;
 use App\Http\Controllers\FormPerencanaan\KonfirmasiController;
+use App\Http\Controllers\FormPerencanaan\LaporanController;
 use App\Http\Controllers\SkemaController;
 use App\Models\UnitKompetensi;
 use App\Http\Controllers\InstrumenController;
@@ -66,6 +67,8 @@ Route::get('/mapa01/{id_skema}', [Mapa01Controller::class, 'showMapa01'])->name(
     Route::get('/mapa02/{id_skema}', [Mapa02Controller::class, 'showMapa02'])->name('form.mapa02');
     //MODIFIKASI
     Route::get('/mapa01/modifikasi/{skema_id}', [ModifikasiController::class, 'index'])->name('form.mapa01.modifikasi');
+    // Halaman utama laporan (FR.AK.05)
+    Route::get('/laporan/{id_skema}', [LaporanController::class, 'showLaporan'])->name('laporan');
 // ============================
 // END NAVIGASI PERFORM
 // ============================
@@ -170,8 +173,6 @@ Route::post('/ninjau_asesemen/ninjau-asesmen-asesor', [PerencanaanController::cl
 
 
 
-// Halaman utama laporan (FR.AK.05)
-Route::get('/laporan', [SkemaController::class, 'laporan'])->name('laporan');
 
 // Halaman daftar laporan
 Route::get('/laporan_asesor', [PerencanaanController::class, 'laporan_asesor'])->name('laporan_asesor');
