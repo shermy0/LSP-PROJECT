@@ -39,13 +39,17 @@
             </h2>
         </div>
 
-        <!-- Item 4 -->
+     <!-- Item 4 -->
 <div class="accordion-item mb-3">
     <h2 class="accordion-header p-3 border rounded">
-        <a href="{{ route('formasesmen.pertanyaanDemonstrasi', ['id_asesmen' => $asesmen->id_asesmen]) }}" 
-   class="text-dark text-decoration-none">
-   <i class="fa-solid fa-stop me-2"></i> Tugas Praktik Demonstrasi
-</a>
+        <a href="{{ route('formasesmen.pertanyaanDemonstrasi', ['id_skema' => $skema->id_skema]) }}" 
+           class="text-dark text-decoration-none">
+            <i class="fa-solid fa-stop me-2"></i> Tugas Praktik Demonstrasi
+        </a>
+    </h2>
+</div>
+
+
 
 </a>
 

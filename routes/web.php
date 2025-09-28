@@ -148,27 +148,36 @@ Route::post('/pertanyaan/lisan', [PertanyaanController::class, 'storeLisan'])->n
 
 
 
-// CRUD Demonstrasi (berdasarkan id_asesmen)
-Route::get('/demonstrasi/create/{id_asesmen}', [DemonstrasiController::class, 'create'])->name('demonstrasi.create');
-Route::post('/demonstrasi/store', [DemonstrasiController::class, 'store'])->name('demonstrasi.store');
-Route::get('/demonstrasi/{id_asesmen}/crud', [DemonstrasiController::class, 'crud'])->name('demonstrasi.crud');
 
-// Edit/Update/Delete
-Route::get('/demonstrasi/{id}/edit', [DemonstrasiController::class, 'edit'])->name('demonstrasi.edit');
-Route::put('/demonstrasi/{id}/update', [DemonstrasiController::class, 'update'])->name('demonstrasi.update');
-Route::delete('/demonstrasi/{id}/delete', [DemonstrasiController::class, 'destroy'])->name('demonstrasi.destroy');
 
-Route::get('/form-asesmen/pertanyaan-demonstrasi/{id_asesmen}', 
+
+Route::prefix('demonstrasi')->group(function () {
+    // input tugas HARUS lebih dulu sebelum {id_skema}
+   Route::get('/create-tugas', [DemonstrasiController::class, 'createTugas'])->name('demonstrasi.createTugas');
+
+    Route::post('/store-tugas', [DemonstrasiController::class, 'storeTugas'])->name('demonstrasi.storeTugas');
+
+    Route::post('/store', [DemonstrasiController::class, 'store'])->name('demonstrasi.store');
+    Route::get('/kelompok/{id_skema}', [DemonstrasiController::class, 'kelompok'])->name('pertanyaan.demonstrasi.kelompok');
+
+    // CRUD tugas
+    Route::get('/crud/{id_skema}/{id_kelompok}', [DemonstrasiController::class, 'crud'])->name('demonstrasi.crud');
+   Route::get('/edit/{id}', [DemonstrasiController::class, 'edit'])->name('demonstrasi.edit');
+
+Route::put('/update/{id}', [DemonstrasiController::class, 'update'])->name('demonstrasi.update');
+Route::delete('/destroy/{id}', [DemonstrasiController::class, 'destroy'])->name('demonstrasi.destroy');
+
+    // ini taruh PALING BAWAH, biar tidak bentrok
+    Route::get('/{id_skema}', [DemonstrasiController::class, 'index'])->name('demonstrasi.index');
+});
+
+
+
+
+// Form Asesmen → Pertanyaan Demonstrasi
+Route::get('/form-asesmen/pertanyaan-demonstrasi/{id_skema}', 
     [DemonstrasiController::class, 'index']
 )->name('formasesmen.pertanyaanDemonstrasi');
-
-
-// Kelompok Pekerjaan Demonstrasi
-Route::get('/form-asesmen/{id_asesmen}/kelompok-demonstrasi', 
-    [DemonstrasiController::class, 'kelompokPekerjaanDemo']
-)->name('pertanyaan.demonstrasi.kelompok');
-
-
 
 
 

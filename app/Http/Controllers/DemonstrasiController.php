@@ -3,177 +3,183 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Demonstrasi;
-use App\Models\MasterTugasDemonstrasi;
-use App\Models\SkemaSertifikasi;
-use App\Models\KelompokPekerjaan;
-use App\Models\Asesmen;
+use App\Models\{Demonstrasi, MasterTugasDemonstrasi, Skema, KelompokPekerjaan};
 use Illuminate\Support\Facades\Storage;
 
 class DemonstrasiController extends Controller
 {
-    /**
-     * Menampilkan daftar demonstrasi untuk sebuah asesmen
-     * Route: GET /form-asesmen/pertanyaan-demonstrasi/{id_asesmen}
-     */
-    public function index($id_asesmen)
+    public function index($id_skema)
+{
+    $skema = Skema::findOrFail($id_skema);
+
+    $demonstrasi = Demonstrasi::where('id_skema', $id_skema)
+        ->with('tugas') // relasi ke MasterTugasDemonstrasi
+        ->get();
+
+    return view('demonstrasi', compact('skema','demonstrasi'));
+
+}
+
+    public function create(Request $request)
     {
-        $asesmen = Asesmen::with('skema')->findOrFail($id_asesmen);
-
-        $demonstrasi = Demonstrasi::with(['asesor', 'tugas'])
-            ->where('id_asesmen', $id_asesmen)
-            ->get();
-
-        return view('demonstrasi', [
-            'asesmen'      => $asesmen,
-            'skema'        => $asesmen->skema,
-            'demonstrasi'  => $demonstrasi
-        ]);
+        $skema = Skema::findOrFail($request->id_skema);
+        return view('demonstrasi.create', compact('skema'));
     }
 
-    /**
-     * Tampilkan form create
-     * Route: GET /demonstrasi/create/{id_asesmen}
-     */
-    public function create($id_asesmen)
-    {
-        $asesmen = Asesmen::with('skema')->findOrFail($id_asesmen);
-        $timer   = 30;
-
-        return view('input_demonstrasi', [
-            'asesmen' => $asesmen,
-            'skema'   => $asesmen->skema,
-            'timer'   => $timer
-        ]);
-    }
-
-    /**
-     * Simpan demonstrasi baru
-     * Route: POST /demonstrasi/store
-     */
     public function store(Request $request)
     {
         $request->validate([
-            'id_asesmen' => 'required|integer|exists:asesmen,id_asesmen',
-            'id_asesor'  => 'required|integer',
-            'timer'      => 'required|integer|min:1',
-        ]);
+    'id_skema' => 'required|exists:skema_sertifikasi,id_skema',
+    'timer'    => 'required|integer|min:1'
+]);
 
-        $asesmen = Asesmen::with('skema')->findOrFail($request->id_asesmen);
+$demo = Demonstrasi::create([
+    'id_skema' => $request->id_skema,
+    'timer'    => $request->timer
+]);
 
-        $demonstrasi = new Demonstrasi();
-        $demonstrasi->id_asesmen = $asesmen->id_asesmen;
-        $demonstrasi->id_asesor  = $request->id_asesor;
-        $demonstrasi->instruksi  = $request->instruksi 
-                                   ?? "Tugas demonstrasi untuk skema " . $asesmen->skema->nama_skema;
-        $demonstrasi->timer      = $request->timer;
-        $demonstrasi->save();
 
-        return redirect()->route('pertanyaan.demonstrasi.kelompok', $asesmen->id_asesmen)
-                         ->with('success', 'Tugas demonstrasi berhasil dibuat!');
+        return redirect()->route('pertanyaan.demonstrasi.kelompok',$request->id_skema)
+                         ->with('success','Timer demonstrasi disimpan.');
     }
 
-    /**
-     * CRUD per asesmen
-     * Route: GET /demonstrasi/{id_asesmen}/crud
-     */
-    public function crud($id_asesmen)
+    public function kelompok($id_skema, Request $request)
     {
-        $asesmen = Asesmen::with('skema')->findOrFail($id_asesmen);
+        $skema = Skema::findOrFail($id_skema);
+        $timer = $request->query('timer');
+        $kelompok = KelompokPekerjaan::where('id_skema',$id_skema)->get();
 
-        $demonstrasi = Demonstrasi::with('tugas')
-            ->where('id_asesmen', $id_asesmen)
-            ->get();
+       return view('kelompok_pekerjaan_demo', compact('skema','kelompok','timer'));
 
-        return view('demonstrasi_crud', [
-            'asesmen'     => $asesmen,
-            'skema'       => $asesmen->skema,
-            'demonstrasi' => $demonstrasi
-        ]);
     }
 
-    /**
-     * Edit form
-     * Route: GET /demonstrasi/{id}/edit
-     */
-    public function edit($id)
-    {
-        $demonstrasi = Demonstrasi::findOrFail($id);
-        $asesmen     = $demonstrasi->asesmen()->with('skema')->first();
-
-        return view('input_demonstrasi_edit', [
-            'demonstrasi' => $demonstrasi,
-            'asesmen'     => $asesmen,
-            'skema'       => $asesmen->skema
-        ]);
-    }
-
-    /**
-     * Update demonstrasi
-     * Route: PUT /demonstrasi/{id}/update
-     */
-    public function update(Request $request, $id)
-    {
-        $demonstrasi = Demonstrasi::findOrFail($id);
-
-        $request->validate([
-            'instruksi' => 'required|string',
-            'timer'     => 'required|integer|min:1',
-            'file'      => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:10240'
-        ]);
-
-        $demonstrasi->instruksi = $request->instruksi;
-        $demonstrasi->timer     = $request->timer;
-
-        if ($request->hasFile('file') && $request->file('file')->isValid()) {
-            if ($demonstrasi->file_path && Storage::disk('public')->exists($demonstrasi->file_path)) {
-                Storage::disk('public')->delete($demonstrasi->file_path);
-            }
-            $file = $request->file('file');
-            $filePath = $file->store('uploads/demonstrasi', 'public');
-            $demonstrasi->file_path = $filePath;
-            $demonstrasi->file_type = $file->getClientOriginalExtension();
-        }
-
-        $demonstrasi->save();
-
-        return back()->with('success', 'Tugas demonstrasi berhasil diupdate!');
-    }
-
-    /**
-     * Hapus demonstrasi
-     * Route: DELETE /demonstrasi/{id}/delete
-     */
-    public function destroy($id)
-    {
-        $demonstrasi = Demonstrasi::findOrFail($id);
-
-        if ($demonstrasi->file_path && Storage::disk('public')->exists($demonstrasi->file_path)) {
-            Storage::disk('public')->delete($demonstrasi->file_path);
-        }
-
-        MasterTugasDemonstrasi::where('id_demonstrasi', $id)->delete();
-        $demonstrasi->delete();
-
-        return back()->with('success', 'Tugas demonstrasi berhasil dihapus!');
-    }
-
-    /**
-     * Halaman kelompok pekerjaan demonstrasi
-     * Route: GET /form-asesmen/{id_asesmen}/kelompok-demonstrasi
-     */
-    public function kelompokPekerjaanDemo(Request $request, $id_asesmen)
+    public function createTugas(Request $request)
 {
-    $asesmen = Asesmen::with('skema')->findOrFail($id_asesmen);
-    $skema = $asesmen->skema;
+    $jumlah      = $request->query('jumlah', 5);
+    $id_skema    = $request->query('id_skema');
+    $id_kelompok = $request->query('kelompok_id');
+    $timer       = $request->query('timer');
 
-    $kelompok = KelompokPekerjaan::where('id_skema', $skema->id_skema)
-                ->with('unitKompetensi')
-                ->get();
+    $skema = Skema::findOrFail($id_skema);
 
-    $timer  = $request->get('timer', null);
+    // Cek apakah demonstrasi sudah ada untuk skema ini
+    $demo = Demonstrasi::firstOrCreate(
+        [
+            'id_skema' => $id_skema,
+        ],
+        [
+            'timer' => $timer
+        ]
+    );
 
-    return view('kelompok_pekerjaan_demo', compact('asesmen','skema','kelompok','timer'));
+    return view('demonstrasi_create', [
+        'skema' => $skema,
+        'id_kelompok' => $id_kelompok,
+        'jumlah' => $jumlah,
+        'timer' => $timer,
+        'id_demonstrasi' => $demo->id_demonstrasi // lempar ke view
+    ]);
 }
 
+
+ public function storeTugas(Request $request)
+{
+    $request->validate([
+        'id_demonstrasi' => 'required|exists:demonstrasi,id_demonstrasi',
+        'id_skema'       => 'required|exists:skema_sertifikasi,id_skema',
+        'id_asesor'      => 'required|exists:asesor,id_asesor',
+        'id_kelompok'    => 'required|exists:kelompok_pekerjaan,id_kelompok',
+        'isi_pertanyaan_demonstrasi.*' => 'required|string',
+        'kunci_jawaban.*' => 'nullable|string',
+        'deskripsi_pertanyaan.*' => 'nullable|string',
+        'file.*' => 'nullable|file|max:2048'
+    ]);
+
+    foreach ($request->isi_pertanyaan_demonstrasi as $i => $isi) {
+        // ✅ Skip kalau input kosong
+        if (empty($isi)) continue;
+
+        $filePath = null;
+        $fileType = null;
+
+        if ($request->hasFile("file.$i")) {
+            $file = $request->file("file.$i");
+            $filePath = $file->store('uploads/demonstrasi', 'public');
+            $fileType = $file->getClientOriginalExtension();
+        }
+
+      MasterTugasDemonstrasi::create([
+    'id_demonstrasi'             => $request->id_demonstrasi,
+    'id_skema'                   => $request->id_skema,
+    'id_asesor'                  => $request->id_asesor,
+    'id_kelompok'                => $request->id_kelompok,
+    'isi_pertanyaan_demonstrasi' => $isi, // ✅ penting
+    'deskripsi_pertanyaan'       => $request->deskripsi_pertanyaan[$i] ?? null,
+    'kunci_jawaban'              => $request->kunci_jawaban[$i] ?? null,
+    'file_path'                  => $filePath,
+    'file_type'                  => $request->file_type[$i] ?? null,
+]);
+
+
+    }
+
+    return $request->action === 'back'
+        ? redirect()->route('demonstrasi.crud', [$request->id_skema, $request->id_kelompok])
+                    ->with('success', 'Tugas demonstrasi berhasil disimpan!')
+        : back()->with('success', 'Tugas demonstrasi berhasil disimpan!');
+}
+
+
+
+// 📍 Menampilkan daftar tugas demonstrasi (crud.blade.php)
+    public function crud($id_skema, $id_kelompok)
+    {
+        $skema = Skema::findOrFail($id_skema);
+        $tugas = MasterTugasDemonstrasi::where('id_skema', $id_skema)
+                               ->where('id_kelompok', $id_kelompok)
+                               ->get();
+
+
+        return view('demonstrasi_crud', compact('skema', 'tugas', 'id_kelompok'));
+    }
+
+    // 📍 Form edit tugas demonstrasi (demonstrasi_edit.blade.php)
+    public function edit($id)
+{
+    $tugas = MasterTugasDemonstrasi::findOrFail($id);
+    $skema = Skema::findOrFail($tugas->id_skema);
+
+    return view('demonstrasi_edit', compact('tugas', 'skema'));
+}
+
+public function update(Request $request, $id)
+{
+    $tugas = MasterTugasDemonstrasi::findOrFail($id);
+
+    $tugas->update([
+        'isi_pertanyaan_demonstrasi' => $request->isi_pertanyaan_demonstrasi,
+        'deskripsi_pertanyaan'       => $request->deskripsi_pertanyaan,
+        'kunci_jawaban'              => $request->kunci_jawaban,
+        'file_type'                  => $request->file_type,
+    ]);
+
+    return redirect()->route('demonstrasi.crud', [
+        'id_skema'   => $tugas->id_skema,
+        'id_kelompok'=> $tugas->id_kelompok
+    ])->with('success', 'Tugas demonstrasi berhasil diperbarui!');
+}
+
+public function destroy($id)
+{
+    $tugas = MasterTugasDemonstrasi::findOrFail($id);
+    $id_skema = $tugas->id_skema;
+    $id_kelompok = $tugas->id_kelompok;
+
+    $tugas->delete();
+
+    return redirect()->route('demonstrasi.crud', [
+        'id_skema'   => $id_skema,
+        'id_kelompok'=> $id_kelompok
+    ])->with('success', 'Tugas demonstrasi berhasil dihapus!');
+}
 }
