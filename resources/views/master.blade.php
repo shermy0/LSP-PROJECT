@@ -9,9 +9,6 @@
     {{-- Tambah CSRF Token untuk semua request POST --}}
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <link rel="stylesheet" href="{{ asset('assets/css/global.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/index.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/asesmen.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/master.css')}}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -48,7 +45,7 @@
                 @endif
 
                 @if(Auth::user()->role == 'asesor')
-                    <li><i class="bi bi-house-door-fill"></i><a href="{{ route('dashboard.asesor') }}">Dashboard</a></li>
+                    <li><i class="bi bi-house-door-fill"></i><a href="{{ route('asesor.dashboard') }}">Dashboard</a></li>
                     <li><i class="bi bi-journal-album"></i><a href="{{ route('formasesmen') }}">Form Asesmen</a></li>
                     <li><i class="bi bi-people-fill"></i><a href="#">Data Peserta Uji</a></li>
                     <li><i class="bi bi-pencil-square"></i><a href="{{ route('formperencanaan') }}">Form Perencanaan</a>

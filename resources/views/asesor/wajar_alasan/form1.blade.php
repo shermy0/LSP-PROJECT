@@ -1,7 +1,7 @@
 <!-- resources/views/asesor/wajar_alasan/form1.blade.php -->
 @extends('master')
 
-@section('title', 'Form Asesor - FR.AK.07')
+@section('title', 'Form Asesmen - FR.AK.07')
 
 @section('konten')
 <style>

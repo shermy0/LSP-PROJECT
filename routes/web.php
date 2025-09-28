@@ -16,12 +16,14 @@ use App\Http\Controllers\BandingAsesmenController;
 use App\Http\Controllers\Asesi\AsesmenMandiriController as AsesiAsesmenMandiriController;
 use App\Http\Controllers\Asesor\AsesmenMandiriController as AsesorAsesmenMandiriController;
 
+// Tambahan controller Wajar Alasan
+use App\Http\Controllers\Asesi\WajarAlasanController as AsesiWajarAlasanController;
+use App\Http\Controllers\Asesor\WajarAlasanController as AsesorWajarAlasanController;
+
 // ================== AUTH ==================
-// login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
-// pilih role register
 Route::get('/register-role', [AuthController::class, 'showRegisterRole'])->name('register.role');
 
 // register asesi
@@ -60,7 +62,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/get-skema/{id}', [PermohonanController::class, 'getSkema'])->name('get.skema');
 
     // ================== ASESOR ==================
-    Route::get('/asesor/dashboard', [DashboardController::class, 'asesor'])->name('dashboard.asesor');
+    Route::get('/asesor/dashboard', [DashboardController::class, 'asesor'])->name('asesor.dashboard');
 
     // ================== FORM ASESMEN ==================
     Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('formperencanaan');
@@ -100,6 +102,20 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/form1', [AsesorAsesmenMandiriController::class, 'form1'])->name('form1');
         Route::get('/form2', [AsesorAsesmenMandiriController::class, 'form2'])->name('form2');
         Route::get('/form3', [AsesorAsesmenMandiriController::class, 'form3'])->name('form3');
+    });
+
+    // ================== WAJAR ALASAN (ASESI) ==================
+    Route::prefix('asesi/wajar-alasan')->name('asesi.wajar_alasan.')->group(function () {
+        Route::get('/form1', [AsesiWajarAlasanController::class, 'form1'])->name('form1');
+        Route::get('/form2', [AsesiWajarAlasanController::class, 'form2'])->name('form2');
+        Route::get('/form3', [AsesiWajarAlasanController::class, 'form3'])->name('form3');
+    });
+
+    // ================== WAJAR ALASAN (ASESOR) ==================
+    Route::prefix('asesor/wajar-alasan')->name('asesor.wajar_alasan.')->group(function () {
+        Route::get('/form1', [AsesorWajarAlasanController::class, 'form1'])->name('form1');
+        Route::get('/form2', [AsesorWajarAlasanController::class, 'form2'])->name('form2');
+        Route::get('/form3', [AsesorWajarAlasanController::class, 'form3'])->name('form3');
     });
 });
 
