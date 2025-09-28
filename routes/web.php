@@ -161,7 +161,6 @@ Route::post('/kerahasiaan', [KerahasiaanController::class, 'store'])->name('kera
     // ================== PRA ASESMEN ==================
     Route::get('/asesi/form-pra-asesmen', [FormPraAsesmenController::class, 'index'])
         ->name('asesi.form_pra_asesmen');
-;
 
 // ================== LOGOUT ==================
 Route::post('/logout', function () {
@@ -175,6 +174,7 @@ Route::post('/logout', function () {
 Route::get('/asesi', function () {
     return view('asesi.index');
 })->name('index-asesi');
+
 
 Route::get('/asesmen', function () {
     return view('asesi.asesmen');
