@@ -392,3 +392,28 @@ Route::get('/pertanyaan/pg/{id_skema}/{id_kelompok}/crud', [PertanyaanController
 Route::get('/pertanyaan/pg/{id}/edit', [PertanyaanController::class, 'editPG'])->name('pertanyaan.pg.edit');
 Route::put('/pertanyaan/pg/{id}', [PertanyaanController::class, 'updatePG'])->name('pertanyaan.pg.update');
 Route::delete('/pertanyaan/pg/{id}', [PertanyaanController::class, 'destroyPG'])->name('pertanyaan.pg.destroy');
+    ->defaults('jenis', 'essai')
+    ->name('pertanyaan.essai.kelompok');
+    
+// ================================
+// ROUTE PMO (digabung di PertanyaanController)
+// ================================
+Route::prefix('pmo')->group(function () {
+    // List / Search PMO
+    Route::get('/', [PertanyaanController::class, 'indexPMO'])->name('pmo.index');
+
+    // Create PMO
+    Route::get('/create', [PertanyaanController::class, 'createPMO'])->name('pmo.create');
+
+    // CRUD detail PMO
+    Route::get('/{id_pmo}', [PertanyaanController::class, 'crudPMO'])->name('pmo.crud');
+
+    // Store pertanyaan
+    Route::post('/{id_pmo}/pertanyaan', [PertanyaanController::class, 'storePertanyaanPMO'])->name('pmo.pertanyaan.store');
+
+    // Store tanggapan
+    Route::post('/tanggapan/{id_pmo_pertanyaan}', [PertanyaanController::class, 'tanggapanPMO'])->name('pmo.tanggapan');
+
+    // Persetujuan
+    Route::post('/{id_pmo}/persetujuan', [PertanyaanController::class, 'persetujuanPMO'])->name('pmo.persetujuan');
+});

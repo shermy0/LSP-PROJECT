@@ -733,5 +733,111 @@ public function destroyPG($id)
         return redirect()->route('tanda.tangan.asesmen', [$id_skema, $id_pembuatan_pertanyaan])
                         ->with('success', 'TTD Asesor berhasil disimpan!');
     }
-    
-};
+
+// ================================
+// CRUD PMO
+// ================================
+public function createPMO(Request $request)
+{
+    $id_skema = $request->query('id_skema');
+    $id_asesmen = $request->query('id_asesmen');
+
+    $skema = Skema::findOrFail($id_skema);
+
+    // buat record pmo
+    $pmo = DB::table('pmo')->insertGetId([
+        'id_asesmen' => $id_asesmen,
+        'id_skema' => $id_skema,
+        'id_tuk' => $request->query('id_tuk'),
+        'id_asesor' => $request->query('id_asesor'),
+        'id_asesi' => $request->query('id_asesi'),
+        'umpan_balik_untuk_asesi' => null,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    return view('pmo.input_pmo', compact('skema', 'pmo'));
+}
+
+public function crudPMO($id_pmo)
+{
+    $pmo = DB::table('pmo')->where('id_pmo', $id_pmo)->first();
+    $skema = Skema::findOrFail($pmo->id_skema);
+
+    // ambil pertanyaan & tanggapan
+    $pertanyaan = DB::table('pmo_pertanyaan')
+        ->leftJoin('pmo_tanggapan', 'pmo_pertanyaan.id_pmo_pertanyaan', '=', 'pmo_tanggapan.id_pmo_pertanyaan')
+        ->select('pmo_pertanyaan.*', 'pmo_tanggapan.tanggapan', 'pmo_tanggapan.pencapaian')
+        ->where('pmo_pertanyaan.id_pmo', $id_pmo)
+        ->get();
+
+    $persetujuan = DB::table('pmo_persetujuan')->where('id_pmo', $id_pmo)->first();
+
+    return view('pmo.crud_pmo', compact('pmo', 'skema', 'pertanyaan', 'persetujuan'));
+}
+
+public function storePertanyaanPMO(Request $request, $id_pmo)
+{
+    $request->validate([
+        'pertanyaan.*' => 'required|string',
+        'deskripsi_pertanyaan.*' => 'nullable|string',
+    ]);
+
+    foreach ($request->pertanyaan as $i => $isi) {
+        DB::table('pmo_pertanyaan')->insert([
+            'id_pmo' => $id_pmo,
+            'id_unit' => $request->id_unit,
+            'pertanyaan' => $isi,
+            'deskripsi_pertanyaan' => $request->deskripsi_pertanyaan[$i] ?? null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    return redirect()->route('pmo.crud', $id_pmo)
+        ->with('success', 'Pertanyaan PMO berhasil ditambahkan');
+}
+
+public function tanggapanPMO(Request $request, $id_pmo_pertanyaan)
+{
+    $request->validate([
+        'id_pmo' => 'required|exists:pmo,id_pmo',
+        'tanggapan' => 'required|string',
+        'pencapaian' => 'nullable|string',
+    ]);
+
+    DB::table('pmo_tanggapan')->updateOrInsert(
+        ['id_pmo_pertanyaan' => $id_pmo_pertanyaan, 'id_pmo' => $request->id_pmo],
+        [
+            'tanggapan' => $request->tanggapan,
+            'pencapaian' => $request->pencapaian,
+            'updated_at' => now()
+        ]
+    );
+
+    return back()->with('success', 'Tanggapan berhasil disimpan');
+}
+
+public function persetujuanPMO(Request $request, $id_pmo)
+{
+    $request->validate([
+        'tgl_ttd_asesi' => 'nullable|date',
+        'ttd_asesi' => 'nullable|string',
+        'tgl_ttd_asesor' => 'nullable|date',
+        'ttd_asesor' => 'nullable|string',
+    ]);
+
+    DB::table('pmo_persetujuan')->updateOrInsert(
+        ['id_pmo' => $id_pmo],
+        [
+            'tgl_ttd_asesi' => $request->tgl_ttd_asesi,
+            'ttd_asesi' => $request->ttd_asesi,
+            'tgl_ttd_asesor' => $request->tgl_ttd_asesor,
+            'ttd_asesor' => $request->ttd_asesor,
+            'updated_at' => now()
+        ]
+    );
+
+    return back()->with('success', 'Persetujuan PMO berhasil disimpan');
+}
+}
