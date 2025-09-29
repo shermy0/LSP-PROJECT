@@ -44,7 +44,45 @@
             </ol>
         </div>
     </div>
-
+        <!-- Daftar pembuatan pertanyaan -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header" style="background-color:#f9fbff; font-weight:bold;">
+            Pembuatan Pertanyaan yang Sudah Ada
+        </div>
+        <div class="card-body">
+            @if($pembuatanList->isEmpty())
+                <p class="text-muted">Belum ada pembuatan pertanyaan untuk skema ini.</p>
+            @else
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID Pembuatan</th>
+                            <th>Timer</th>
+                            <th>Tanggal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($pembuatanList as $pembuatan)
+                            <tr>
+                                <td>{{ $pembuatan->id_pembuatan_pertanyaan }}</td>
+                                <td>{{ $pembuatan->timer }} menit</td>
+                                <td>{{ $pembuatan->timescap ? \Carbon\Carbon::parse($pembuatan->timescap)->format('d-m-Y H:i') : '-' }}</td>
+                                <td>
+                                    <a href="{{ route('pertanyaan.lisan.kelompok', [
+                                        'id_skema' => $skema->id_skema,
+                                        'id_pembuatan' => $pembuatan->id_pembuatan_pertanyaan
+                                    ]) }}" class="btn btn-sm btn-primary">
+                                        Lanjutkan
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
+        </div>
+    </div>
     <!-- Tombol Masukkan Pertanyaan -->
     <div class="text-end">
         <button class="btn text-white px-4 py-2" style="background-color:#041562;" data-bs-toggle="modal" data-bs-target="#modalPertanyaan">

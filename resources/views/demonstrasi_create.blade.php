@@ -6,10 +6,17 @@
     <p class="text-center text-muted">Skema: <span class="fw-bold">{{ $skema->nama_skema }}</span></p>
     <p class="text-center text-muted">Timer: <span class="fw-bold">{{ $timer }} menit</span></p>
 
-    <form id="formTugasDemonstrasi" action="{{ route('demonstrasi.store') }}" method="POST">
+    <form id="formTugasDemonstrasi" 
+          action="{{ route('demonstrasi.storeTugas') }}" 
+          method="POST" 
+          enctype="multipart/form-data">
         @csrf
+
+        <!-- Hidden input -->
         <input type="hidden" name="id_skema" value="{{ $skema->id_skema }}">
+        <input type="hidden" name="id_kelompok" value="{{ $id_kelompok }}">
         <input type="hidden" name="id_asesor" value="{{ auth()->id() }}">
+        <input type="hidden" name="id_demonstrasi" value="{{ $id_demonstrasi }}">
         <input type="hidden" name="timer" value="{{ $timer }}">
 
         <!-- Daftar tugas -->
@@ -19,14 +26,33 @@
                 <div class="card-body">
                     <div class="mb-3">
                         <label class="fw-bold">Tugas {{ $i }}</label>
-                        <input type="text" name="nama_tugas[]" class="form-control"
-                            placeholder="Masukkan nama tugas demonstrasi ke-{{ $i }}" required>
+                        <input type="text" name="isi_pertanyaan_demonstrasi[]" class="form-control"
+                               placeholder="Masukkan soal/tugas demonstrasi ke-{{ $i }}" required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="fw-bold">Deskripsi Pertanyaan</label>
+                        <label class="fw-bold">Deskripsi Pertanyaan (Opsional)</label>
                         <textarea name="deskripsi_pertanyaan[]" class="form-control"
-                            placeholder="Masukkan deskripsi pertanyaan demonstrasi ke-{{ $i }}" required></textarea>
+                                  placeholder="Masukkan deskripsi pertanyaan demonstrasi ke-{{ $i }}"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="fw-bold">Kunci Jawaban (Opsional)</label>
+                        <input type="text" name="kunci_jawaban[]" class="form-control"
+                               placeholder="Masukkan kunci jawaban demonstrasi ke-{{ $i }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="fw-bold">Jenis Pertanyaan</label>
+                        <select name="file_type[]" class="form-control">
+                            <option value="">-- Pilih Jenis Pertanyaan --</option>
+                            <option value="text">Teks (jawaban ketik)</option>
+                            <option value="file">File Dokumen</option>
+                            <option value="video">Video</option>
+                            <option value="audio">Audio</option>
+                            <option value="gambar">Gambar</option>
+                        </select>
+                        <small class="text-muted">Jenis pertanyaan menentukan bentuk jawaban yang harus dikumpulkan asesi.</small>
                     </div>
                 </div>
             </div>
@@ -34,11 +60,20 @@
         </div>
 
         <!-- Tombol simpan -->
-        <div class="text-center mt-4">
-            <button type="button" class="btn px-4"
-                style="background-color:#041562; color:#fff; font-weight:bold;"
-                onclick="konfirmasiSimpan()">Simpan</button>
-        </div>
+        <div class="text-center mt-4 d-flex gap-2 justify-content-center">
+            <button type="submit" name="action" value="stay"
+                class="btn px-4 fw-bold text-white"
+                style="background-color:#041562;">
+                Simpan
+            </button>
+
+            <button type="submit" name="action" value="back"
+                class="btn px-4 fw-bold text-white"
+                style="background-color:#28a745;">
+                Simpan & Kembali
+            </button>
+</div>
+
     </form>
 </div>
 
@@ -64,15 +99,8 @@ function konfirmasiSimpan() {
         didRender: () => {
             let confirmBtn = document.querySelector('.swal2-confirm');
             let denyBtn = document.querySelector('.swal2-deny');
-
-            if (confirmBtn) {
-                confirmBtn.style.backgroundColor = '#041562'; // biru
-                confirmBtn.style.cursor = 'pointer';
-            }
-            if (denyBtn) {
-                denyBtn.style.backgroundColor = '#28a745'; // hijau
-                denyBtn.style.cursor = 'pointer';
-            }
+            if (confirmBtn) confirmBtn.style.backgroundColor = '#041562';
+            if (denyBtn) denyBtn.style.backgroundColor = '#28a745';
         }
     }).then((result) => {
         if (result.isConfirmed) {
@@ -85,7 +113,7 @@ function konfirmasiSimpan() {
                            min="1" max="15" value="1">
                     <small class="text-danger d-block mb-3">note: maksimal 15 tugas</small>
                     <button type="button" id="btnTambahTugas" 
-                        class="btn w-100 fw-bold text-white" style="background-color:#041562; cursor:pointer;">Simpan</button>
+                        class="btn w-100 fw-bold text-white" style="background-color:#041562;">Tambah</button>
                 `,
                 showConfirmButton: false,
                 allowOutsideClick: false,
@@ -96,16 +124,12 @@ function konfirmasiSimpan() {
                 didRender: () => {
                     document.getElementById('btnTambahTugas').addEventListener('click', () => {
                         let jumlah = parseInt(document.getElementById('jumlahTugas').value);
-
                         if (isNaN(jumlah) || jumlah < 1) {
-                            Swal.fire('Error', 'Minimal 1 tugas', 'error');
-                            return;
+                            Swal.fire('Error', 'Minimal 1 tugas', 'error'); return;
                         }
                         if (jumlah > 15) {
-                            Swal.fire('Error', 'Maksimal 15 tugas', 'error');
-                            return;
+                            Swal.fire('Error', 'Maksimal 15 tugas', 'error'); return;
                         }
-
                         Swal.close();
                         tambahTugas(jumlah);
                     });
@@ -119,21 +143,31 @@ function konfirmasiSimpan() {
 function tambahTugas(jumlahBaru) {
     for (let j = 1; j <= jumlahBaru; j++) {
         totalTugas++;
-
         let div = document.createElement('div');
         div.classList.add('card', 'mb-3', 'shadow-sm');
         div.innerHTML = `
             <div class="card-body">
                 <div class="mb-3">
                     <label class="fw-bold">Tugas ${totalTugas}</label>
-                    <input type="text" name="nama_tugas[]" class="form-control"
-                        placeholder="Masukkan nama tugas demonstrasi ke-${totalTugas}" required>
+                    <input type="text" name="isi_pertanyaan_demonstrasi[]" class="form-control"
+                           placeholder="Masukkan soal/tugas demonstrasi ke-${totalTugas}" required>
                 </div>
 
                 <div class="mb-3">
                     <label class="fw-bold">Deskripsi Pertanyaan</label>
                     <textarea name="deskripsi_pertanyaan[]" class="form-control"
-                        placeholder="Masukkan deskripsi pertanyaan demonstrasi ke-${totalTugas}" required></textarea>
+                              placeholder="Masukkan deskripsi pertanyaan demonstrasi ke-${totalTugas}"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="fw-bold">Kunci Jawaban (Opsional)</label>
+                    <input type="text" name="kunci_jawaban[]" class="form-control"
+                           placeholder="Masukkan kunci jawaban demonstrasi ke-${totalTugas}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="fw-bold">Lampiran (Opsional)</label>
+                    <input type="file" name="file[]" class="form-control">
                 </div>
             </div>
         `;

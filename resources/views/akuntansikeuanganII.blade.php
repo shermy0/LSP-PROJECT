@@ -45,17 +45,34 @@
         </div>
     </div>
 
-    <!-- Dropdown sejajar & rapi -->
-    <div class="dropdown w-100 mt-2">
-        <button class="btn btn-light border w-100 text-start d-flex align-items-center justify-content-between" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-            <span><i class="fa-solid fa-stop me-2"></i> Penilaian Asesmen</span>
-            <i class="fa-solid fa-chevron-down"></i>
-        </button>
-        <ul class="dropdown-menu w-100 shadow-sm" aria-labelledby="dropdownMenuButton">
-            <li><a class="dropdown-item" href="/fr-va-sebelum">CEKLIS OBSERVASI</a></li>
-            <li><a class="dropdown-item" href="/fr-va-saat">Pertanyaan PMO</a></li>
-            <li><a class="dropdown-item" href="/fr-va-setelah">Penjelasan Proyek</a></li>
-        </ul>
-    </div>
+      <!-- Dropdown sejajar & rapi -->
+<div class="dropdown w-100 mt-2">
+    <button class="btn btn-light border w-100 text-start d-flex align-items-center justify-content-between" 
+            type="button" 
+            id="dropdownMenuButton" 
+            data-bs-toggle="dropdown" 
+            aria-expanded="false">
+        <span><i class="fa-solid fa-stop me-2"></i> Penilaian Asesmen</span>
+        <i class="fa-solid fa-chevron-down"></i>
+    </button>
+    <ul class="dropdown-menu w-100 shadow-sm" aria-labelledby="dropdownMenuButton">
+        <li>
+            <a class="dropdown-item" href="{{ url('/fr-va-sebelum') }}">
+                CEKLIS OBSERVASI
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" 
+               href="{{ route('formasesmen.pertanyaanPMO', ['id_skema' => $skema->id_skema]) }}">
+                Pertanyaan PMO
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="{{ url('/fr-va-setelah') }}">
+                Penjelasan Proyek
+            </a>
+        </li>
+    </ul>
+</div>
 </div>
 @endsection
