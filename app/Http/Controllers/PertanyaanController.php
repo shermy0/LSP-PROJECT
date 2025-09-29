@@ -197,7 +197,6 @@ class PertanyaanController extends Controller
         ])->with('success', 'Semua pertanyaan esai berhasil disimpan dengan timer!');
     }
 
-<<<<<<< HEAD
     return redirect()->route('esai.crud', [
         'id_skema'    => $id_skema,
         'id_kelompok' => $id_kelompok
@@ -205,8 +204,6 @@ class PertanyaanController extends Controller
 }
 
 
-=======
->>>>>>> 0327bc2 (commit perubahan)
     public function crudEsai($id_skema, $id_kelompok)
 {
     $skema = Skema::findOrFail($id_skema);
@@ -953,40 +950,43 @@ public function crudPMO($id_pmo)
         return view('jawaban_PMO', compact('skema', 'kelompok', 'pertanyaan', 'pembuatan', 'timer'));
     }
 
-public function storePMO(Request $request)
-{
-    $request->validate([
-        'id_skema' => 'required|exists:skema_sertifikasi,id_skema',
-        'id_kelompok' => 'nullable|exists:kelompok_pekerjaan,id_kelompok',
-        'pertanyaan' => 'required|array',
-        'pertanyaan.*' => 'required|array', 
-        'pertanyaan.*.*' => 'required|string',
-        'deskripsi_pertanyaan' => 'nullable|array',
-        'deskripsi_pertanyaan.*.*' => 'nullable|string',
-    ]);
+            public function storePMO(Request $request)
+            {
+                $request->validate([
+                    'id_skema' => 'required|exists:skema_sertifikasi,id_skema',
+                    'pertanyaan' => 'required|array',
+                    'pertanyaan.*' => 'required|array',
+                    'pertanyaan.*.*' => 'required|string',
+                    'deskripsi_pertanyaan' => 'nullable|array',
+                    'deskripsi_pertanyaan.*.*' => 'nullable|string',
+                ]);
 
-    // Ambil dari request
-    $id_skema = $request->id_skema;
-    $id_kelompok = $request->id_kelompok;
+                $id_skema = $request->id_skema;
 
-    foreach ($request->pertanyaan as $unitId => $pertanyaanArr) {
-        foreach ($pertanyaanArr as $index => $isi) {
-            Pertanyaan::create([
+                foreach($request->pertanyaan as $unitId => $pertanyaanArr) {
+                    foreach($pertanyaanArr as $index => $isi) {
+
+                   // 1️⃣ Masuk ke tabel pmo dulu
+            $id_pmo = DB::table('pmo')->insertGetId([
                 'id_skema' => $id_skema,
-                'id_asesor' => auth()->id() ?? 1,
-                'id_kelompok' => $id_kelompok,
-                'id_unit' => $unitId,
-                'isi_pertanyaan' => $isi,
-                'deskripsi_pertanyaan' => $request->deskripsi_pertanyaan[$unitId][$index] ?? null,
             ]);
+
+            // 2️⃣ Masuk ke tabel pmo_pertanyaan
+            foreach($request->pertanyaan as $unitId => $pertanyaanArr) {
+                foreach($pertanyaanArr as $index => $isi) {
+                    DB::table('pmo_pertanyaan')->insert([
+                        'id_pmo' => $id_pmo,
+                        'id_unit' => $unitId,
+                        'pertanyaan' => $isi,
+                        'deskripsi_pertanyaan' => $request->deskripsi_pertanyaan[$unitId][$index] ?? null,
+                    ]);
+                }
+            }
         }
     }
-
-    return redirect()->route('pmo.crud', [
-        'id_skema' => $id_skema,
-        'id_kelompok' => $id_kelompok
-    ])->with('success', 'Pertanyaan PMO berhasil ditambahkan!');
+    return redirect()->back()->with('success', 'Pertanyaan PMO berhasil ditambahkan!');
 }
+
 
 public function inputPMO(Request $request)
 {
