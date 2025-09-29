@@ -56,20 +56,27 @@ public function getAsesiByAsesor($skema_id, $asesor_id)
     // simpan catatan asesmen
 public function store(Request $request)
 {
-    // simpan data laporan di tabel laporan_asesmen / hasil_laporan
-    // contoh dummy:
-    // LaporanAsesmen::create([
-    //     'skema_id'       => $request->skema_id,
-    //     'asesor_id'      => $request->asesor_id,
-    //     'no_registrasi'  => $request->no_registrasi,
-    //     'aspek_positif_negatif' => $request->aspek_positif_negatif,
-    //     'penolakan'      => $request->penolakan,
-    //     'saran_perbaikan'=> $request->saran_perbaikan,
-    // ]);
+    $skemaId = $request->skema_id;
+    $asesorId = $request->asesor_id;
 
-    return redirect()->route('laporan.asesor', $request->skema_id)
+    foreach ($request->all() as $key => $value) {
+        if (str_starts_with($key, 'rekomendasi_')) {
+            $asesiId = explode('_', $key)[1];
+            $hasil   = $value;
+            $unitId  = $request->input("keterangan_$asesiId");
+
+            \DB::table('hasil_unit_kompetensi')->insert([
+                'id_asesi' => $asesiId,
+                'id_unit'  => $unitId ?? 0,
+                'hasil'    => $hasil,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+    }
+
+    return redirect()->route('laporan.asesor', $skemaId)
         ->with('success', 'Laporan berhasil disimpan');
 }
-
     
 }

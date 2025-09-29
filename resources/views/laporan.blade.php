@@ -102,6 +102,9 @@
     </div>
 </div>
 
+<form id="simpan-lanjut-form" action="{{ route('laporan_asesor.store') }}" method="POST" class="simpan-form mt-4">
+    @csrf
+
 <!-- Data Asesi -->
 <div class="card-box mt-4">
     <div class="judul-box">
@@ -131,8 +134,6 @@
 </div>
 
 <!-- Catatan Asesmen -->
-<form id="simpan-lanjut-form" action="{{ route('laporan_asesor.store') }}" method="POST" class="simpan-form mt-4">
-    @csrf
     <!-- hidden input supaya data ikut terkirim -->
     <input type="hidden" name="asesor_id" id="asesor_id_hidden">
     <input type="hidden" name="skema_id" id="skema_id_hidden" value="{{ $skema->id_skema }}">
@@ -179,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
         noRegHidden.value    = noReg;
 
         if (asesorId) {
-            const url = `{{ url('/laporan/'.$skema->id_skema.'/asesi') }}/${asesorId}`;
+            const url = `{{ url('form-perencanaan/laporan/'.$skema->id_skema.'/asesi') }}/${asesorId}`;
             
             fetch(url)
                 .then(res => res.json())
@@ -187,13 +188,30 @@ document.addEventListener('DOMContentLoaded', function () {
                     asesiTableBody.innerHTML = '';
                     if (data.length > 0) {
                         data.forEach((asesi, index) => {
+                            // bikin dropdown option dari unit_kompetensi
+                            let unitOptions = '';
+                            @foreach($skema->unitKompetensi as $unit)
+                                unitOptions += `<option value="{{ $unit->id_unit }}">{{ $unit->kode_unit }} - {{ $unit->judul_unit }}</option>`;
+                            @endforeach
+
                             asesiTableBody.innerHTML += `
                                 <tr>
                                     <td>${index + 1}</td>
                                     <td>${asesi.nama_lengkap}</td>
-                                    <td><input type="radio" name="rekomendasi_${asesi.id_asesi}" value="K"></td>
-                                    <td><input type="radio" name="rekomendasi_${asesi.id_asesi}" value="BK"></td>
-                                    <td><input type="text" name="keterangan_${asesi.id_asesi}" class="form-control"></td>
+                                    <td>
+                                        <input type="radio" name="rekomendasi_${asesi.id_asesi}" value="K"
+                                            onchange="toggleKeterangan(${asesi.id_asesi}, false)">
+                                    </td>
+                                    <td>
+                                        <input type="radio" name="rekomendasi_${asesi.id_asesi}" value="BK"
+                                            onchange="toggleKeterangan(${asesi.id_asesi}, true)">
+                                    </td>
+                                    <td>
+                                        <select name="keterangan_${asesi.id_asesi}" id="keterangan_${asesi.id_asesi}" class="form-control" disabled>
+                                            <option value="">-- Pilih Unit --</option>
+                                            ${unitOptions}
+                                        </select>
+                                    </td>
                                 </tr>
                             `;
                         });
@@ -215,5 +233,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+// fungsi untuk toggle keterangan
+function toggleKeterangan(asesiId, enable) {
+    const selectEl = document.getElementById(`keterangan_${asesiId}`);
+    if (enable) {
+        selectEl.disabled = false;
+    } else {
+        selectEl.value = '';
+        selectEl.disabled = true;
+    }
+}
 </script>
 @endsection
