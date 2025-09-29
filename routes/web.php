@@ -64,8 +64,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/asesi/dashboard', [DashboardController::class, 'asesi'])->name('asesi.dashboard');
 
     // Asesor
-    Route::get('/asesor/dashboard', [DashboardController::class, 'asesor'])->name('dashboard.asesor');
+    Route::prefix('asesor')->middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'asesor'])
+        ->name('asesor.dashboard');
 });
+
 
 // ============ Tambahan untuk Form Permohonan ============
 Route::prefix('asesi/permohonan')->name('asesi.permohonan.')->group(function () {
@@ -106,8 +109,6 @@ Route::post('/kerahasiaan', [KerahasiaanController::class, 'store'])->name('kera
     // ambil data skema via ajax
     Route::get('/get-skema/{id}', [PermohonanController::class, 'getSkema'])->name('get.skema');
 
-    // ================== ASESOR ==================
-    Route::get('/asesor/dashboard', [DashboardController::class, 'asesor'])->name('asesor.dashboard');
 
     // ================== FORM ASESMEN ==================
     Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('formperencanaan');
@@ -209,3 +210,4 @@ Route::get('/verifasesmen', function () {
 Route::get('/verifasesmen2', function () {
     return view('asesor.verifasesmen2');
 })->name('verifasesmen2');
+});

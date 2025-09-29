@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             @if(Auth::user()->role == 'asesor')
 
-            <li> <i class="bi bi-house-door-fill"></i><a href="{{ route('dashboard.asesor') }}">Dashboard</a></li>
+                <li><i class="bi bi-house-door-fill"></i><a href="{{ route('asesor.dashboard') }}">Dashboard</a>
                 <li><i class="bi bi-journal-album"></i><a href="{{ route('formasesmen') }}">Form Asesmen</a></li>
                 <li><i class="bi bi-people-fill"></i><a href="#">Data Peserta Uji</a></li>
                 <li><i class="bi bi-pencil-square"></i><a href="{{ route('formperencanaan') }}">Form Perencanaan</a></li>
@@ -79,31 +79,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
             @endif
-                @if(Auth::user()->role == 'asesor')
-                    <li><i class="bi bi-house-door-fill"></i><a href="{{ route('asesor.dashboard') }}">Dashboard</a></li>
-                    <li><i class="bi bi-file-earmark-text-fill"></i><a href="{{ route('form_pra_assesmen') }}">Form Pra Asesmen </a></li>
-                    <li><i class="bi bi-journal-album"></i><a href="{{ route('formasesmen') }}">Form Asesmen</a></li>
-                    <li><i class="bi bi-people-fill"></i><a href="#">Data Peserta Uji</a></li>
-                    <li><i class="bi bi-pencil-square"></i><a href="{{ route('formperencanaan') }}">Form Perencanaan</a>
-                    </li>
-                    <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
-                @endif
 
             @if(Auth::user()->role == 'asesi')
-                <li><i class="bi bi-house-door-fill"></i><a href="#">Dashboard</a></li>
+                <li><i class="bi bi-house-door-fill"></i><a href="{{ route('asesi.dashboard') }}">Dashboard</a></li>
                 <li><i class="bi bi-pencil-square"></i><a href="#">Form Asesmen </a></li>
                 <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
                 <li><i class="bi bi-pencil-square"></i><a href="{{ route('asesi.kerahasiaan') }}">Form Kerahasiaan</a>
 
             @endif
-        </ul>
-    </div>
-                @if(Auth::user()->role == 'asesi')
-                    <li><i class="bi bi-house-door-fill"></i><a href="{{ route('asesi.dashboard') }}">Dashboard</a></li>
-                    <li><i class="bi bi-file-earmark-text-fill"></i><a href="{{ route('form_pra_assesmen') }}">Form Pra Asesmen </a></li>
-                    <li><i class="bi bi-pencil-square"></i><a href="#">Form Asesmen </a></li>
-                    <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
-                @endif
+        
+                
             </ul>
         </div>
 
@@ -164,24 +149,7 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         });
     </script>
-        logoutBtn.addEventListener("click", function () {
-            Swal.fire({
-                title: 'Yakin mau keluar?',
-                text: "Kamu akan logout dari sistem.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, Logout',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    logoutForm.submit();
-                }
-            });
-        });
-    });
-</script>
+        
 @stack('scripts')
 
 

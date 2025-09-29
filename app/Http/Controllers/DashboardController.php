@@ -17,11 +17,11 @@ class DashboardController extends Controller
                 ['name' => 'Dashboard', 'route' => route('admin.dashboard'), 'icon' => 'fas fa-home'],
                 ['name' => 'Data Peserta Uji', 'route' => '#', 'icon' => 'fas fa-users'],
             ];
-        } elseif ($user->role == 'asesor') {
+        } elseif ($user->role !== 'asesor') {
             $menus = [
                 ['name' => 'Dashboard', 'route' => route('asesor.dashboard'), 'icon' => 'fas fa-home'],
                 ['name' => 'Form Perencanaan', 'route' => route('formperencanaan'), 'icon' => 'fas fa-file-alt'],
-
+                abort(403, 'Unauthorized')
             ];
         } elseif ($user->role == 'asesi') {
             $menus = [
