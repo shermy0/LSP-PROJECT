@@ -285,171 +285,169 @@ class PertanyaanController extends Controller
 // ================================
 public function createPG(Request $request)
 {
+
     $request->validate([
         'jumlah' => 'required|integer|min:1|max:20',
         'id_skema' => 'required|exists:skema_sertifikasi,id_skema',
         'id_kelompok' => 'required|exists:kelompok_pekerjaan,id_kelompok',
-        'timer' => 'required|integer|min:1'
+        'timer' => 'required|integer|min:1',
+        'id_pembuatan_pertanyaan' => 'nullable|exists:pembuatan_pertanyaan,id_pembuatan_pertanyaan'
     ]);
 
     $jumlah = $request->query('jumlah', 5);
     $id_skema = $request->query('id_skema');
     $id_kelompok = $request->query('id_kelompok');
     $timer = $request->query('timer', 30);
+    $id_pembuatan = $request->query('id_pembuatan_pertanyaan');
 
     $skema = Skema::findOrFail($id_skema);
     $kelompok = KelompokPekerjaan::findOrFail($id_kelompok);
 
-    // Log untuk debugging
-    \Log::info('CreatePG called', [
-        'jumlah' => $jumlah,
-        'id_skema' => $id_skema,
-        'id_kelompok' => $id_kelompok,
-        'timer' => $timer
-    ]);
+
+
+    // Jika ada id_pembuatan_pertanyaan, ambil timer dari database
+    if ($id_pembuatan) {
+        $pembuatan = PembuatanPertanyaan::findOrFail($id_pembuatan);
+        $timer = $pembuatan->timer;
+    }
 
     return view('pertanyaan.input_pg', [
         'skema' => $skema,
         'kelompok' => $kelompok,
         'jumlah' => $jumlah,
         'timer' => $timer,
-        'id_pembuatan_pertanyaan' => $request->query('id_pembuatan_pertanyaan')
+        'id_pembuatan_pertanyaan' => $id_pembuatan
     ]);
 }
 
-public function storePG(Request $request)
-{
-    \Log::info('=== StorePG masuk ===');
 
-    // Validasi
-    try {
-        $validated = $request->validate([
-            'id_skema' => 'required|exists:skema_sertifikasi,id_skema',
-            'id_kelompok' => 'required|exists:kelompok_pekerjaan,id_kelompok',
-            'id_pembuatan_pertanyaan' => 'nullable|exists:pembuatan_pertanyaan,id_pembuatan_pertanyaan',
-            'timer' => 'required|integer|min:1',
-            'isi_pertanyaan' => 'required|array|min:1',
-            'isi_pertanyaan.*' => 'required|string|min:5',
-            'jenis_opsi' => 'required|array',
-            'jenis_opsi.*' => 'required|array|min:5',
-            'jenis_opsi.*.*' => 'required|string|in:text,gambar',
-            'opsi_text' => 'required|array',
-            'opsi_text.*' => 'required|array',
-            'opsi_text.*.*' => 'nullable|string',
-            'opsi_gambar' => 'required|array',
-            'opsi_gambar.*' => 'required|array',
-            'opsi_gambar.*.*' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
-            'kunci_jawaban' => 'required|array',
-            'kunci_jawaban.*' => 'required|string|in:A,B,C,D,E',
-            'file.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
-        ]);
-        \Log::info('Validasi sukses', $validated);
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        \Log::error('Validasi gagal', $e->errors());
-        return back()->withErrors($e->errors())->withInput();
-    }
+    public function storePG(Request $request)
+    {
 
-    DB::beginTransaction();
-    try {
-        \Log::info('Mulai simpan pembuatan pertanyaan');
 
-        if ($request->filled('id_pembuatan_pertanyaan')) {
-            $pembuatanId = $request->id_pembuatan_pertanyaan;
-            PembuatanPertanyaan::where('id_pembuatan_pertanyaan', $pembuatanId)
-                ->update(['timer' => $request->timer]);
-            \Log::info("Update pembuatan_pertanyaan id=$pembuatanId");
-        } else {
-            $pembuatan = PembuatanPertanyaan::create([
-                'id_skema' => $request->id_skema,
-                'timer'    => $request->timer,
-                'timescap' => now(),
+        try {
+            $validated = $request->validate([
+                'id_skema' => 'required|exists:skema_sertifikasi,id_skema',
+                'id_kelompok' => 'required|exists:kelompok_pekerjaan,id_kelompok',
+                'id_pembuatan_pertanyaan' => 'nullable|exists:pembuatan_pertanyaan,id_pembuatan_pertanyaan',
+                'timer' => 'required|integer|min:1',
+                'isi_pertanyaan' => 'required|array|min:1',
+                'isi_pertanyaan.*' => 'required|string|min:5',
+                'jenis_opsi' => 'required|array',
+                'jenis_opsi.*' => 'required|array|min:5',
+                'jenis_opsi.*.*' => 'required|string|in:text,gambar',
+                'opsi_text' => 'nullable|array',
+                'opsi_text.*' => 'nullable|array',
+                'opsi_text.*.*' => 'nullable|string',
+                'opsi_gambar' => 'nullable|array',
+                'opsi_gambar.*' => 'nullable|array',
+                'opsi_gambar.*.*' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+                'kunci_jawaban' => 'required|array',
+                'kunci_jawaban.*' => 'required|string|in:A,B,C,D,E',
+                'file.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
             ]);
-            $pembuatanId = $pembuatan->id_pembuatan_pertanyaan;
-            \Log::info("Insert pembuatan_pertanyaan baru id=$pembuatanId");
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validasi gagal', $e->errors());
+            return back()->withErrors($e->errors())->withInput();
         }
 
-        $id_asesor = auth()->user()->asesor->id_asesor;
+        DB::beginTransaction();
+        try {
 
-        foreach ($request->isi_pertanyaan as $i => $isi) {
-            if (empty(trim($isi))) continue;
 
-            \Log::info("Proses pertanyaan ke-$i: $isi");
-
-            $filePath = null;
-            $fileType = null;
-            if ($request->hasFile("file.$i") && $request->file("file.$i")->isValid()) {
-                $file = $request->file("file.$i");
-                $filePath = $file->store("uploads/pertanyaan", "public");
-                $fileType = $file->getClientOriginalExtension();
-                \Log::info("File diupload untuk pertanyaan ke-$i: $filePath");
+            // 🔹 LOGIKA TIMER SAMA PERSIS DENGAN ESAI
+            if ($request->filled('id_pembuatan_pertanyaan')) {
+                // Mode LANJUTKAN - gunakan timer yang sudah ada di database
+                $pembuatan = PembuatanPertanyaan::findOrFail($request->id_pembuatan_pertanyaan);
+                $pembuatan->update([
+                    'timescap'         => now(),
+                    'jenis_pertanyaan' => 'pilihan_ganda',
+                    // Timer tidak diubah, tetap pakai yang lama
+                ]);
+            } else {
+                // Mode SELANJUTKAN - buat record baru dengan timer dari input
+                $pembuatan = PembuatanPertanyaan::create([
+                    'id_skema'         => $request->id_skema,
+                    'timer'            => $request->timer, // Timer dari input modal
+                    'timescap'         => now(),
+                    'jenis_pertanyaan' => 'pilihan_ganda',
+                ]);
             }
 
-            $pertanyaan = Pertanyaan::create([
-                'id_skema' => $request->id_skema,
-                'id_kelompok' => $request->id_kelompok,
-                'id_pembuatan_pertanyaan' => $pembuatanId,
-                'id_asesor' => $id_asesor,
-                'jenis_pertanyaan' => 'pilihan_ganda',
-                'isi_pertanyaan' => $isi,
-                'file_path' => $filePath,
-                'file_type' => $fileType,
-                'kunci_jawaban' => $request->kunci_jawaban[$i],
-            ]);
+            $id_asesor = auth()->user()->asesor->id_asesor;
 
-            \Log::info("Pertanyaan tersimpan id={$pertanyaan->id_pertanyaan}");
+            // Simpan pertanyaan dan opsi
+            foreach ($request->isi_pertanyaan as $i => $isi) {
+                if (empty(trim($isi))) continue;
 
-            // Simpan opsi jawaban
-            if (isset($request->jenis_opsi[$i])) {
-                foreach ($request->jenis_opsi[$i] as $j => $jenis) {
-                    $kode = chr(65 + $j);
-                    $isiOpsi = null;
+            
 
-                    if ($jenis === 'text') {
-                        // Simpan teks langsung
-                        $isiOpsi = $request->opsi_text[$i][$j] ?? '';
-                    } elseif ($jenis === 'gambar') {
-                        // Simpan gambar sebagai file dan simpan path-nya
-                        if ($request->hasFile("opsi_gambar.$i.$j") && $request->file("opsi_gambar.$i.$j")->isValid()) {
-                            $fileOpsi = $request->file("opsi_gambar.$i.$j");
-                            
-                            // Generate nama file yang singkat
-                            $timestamp = now()->format('YmdHis');
-                            $fileName = "opsi_{$pertanyaan->id_pertanyaan}_{$kode}_{$timestamp}.{$fileOpsi->getClientOriginalExtension()}";
-                            
-                            $filePath = $fileOpsi->storeAs("uploads/opsi_jawaban", $fileName, "public");
-                            $isiOpsi = $filePath; // Simpan path file saja
-                            
-                            \Log::info("Gambar opsi disimpan: $filePath");
+                // Handle file pertanyaan
+                $filePath = null;
+                $fileType = null;
+                if ($request->hasFile("file.$i") && $request->file("file.$i")->isValid()) {
+                    $file = $request->file("file.$i");
+                    $filePath = $file->store("uploads/pertanyaan", "public");
+                    $fileType = $file->getClientOriginalExtension();
+                }
+
+                // Simpan pertanyaan
+                $pertanyaan = Pertanyaan::create([
+                    'id_skema'                => $request->id_skema,
+                    'id_kelompok'             => $request->id_kelompok,
+                    'id_pembuatan_pertanyaan' => $pembuatan->id_pembuatan_pertanyaan,
+                    'id_asesor'               => $id_asesor,
+                    'jenis_pertanyaan'        => 'pilihan_ganda',
+                    'isi_pertanyaan'          => $isi,
+                    'file_path'               => $filePath,
+                    'file_type'               => $fileType,
+                    'kunci_jawaban'           => $request->kunci_jawaban[$i],
+                ]);
+
+                // Simpan opsi jawaban
+                if (isset($request->jenis_opsi[$i])) {
+                    foreach ($request->jenis_opsi[$i] as $j => $jenis) {
+                        $kode = chr(65 + $j); // A, B, C, D, E
+                        $isiOpsi = null;
+
+                        if ($jenis === 'text') {
+                            $isiOpsi = $request->opsi_text[$i][$j] ?? '';
+                        } elseif ($jenis === 'gambar') {
+                            if ($request->hasFile("opsi_gambar.$i.$j") && $request->file("opsi_gambar.$i.$j")->isValid()) {
+                                $fileOpsi = $request->file("opsi_gambar.$i.$j");
+                                $filePath = $fileOpsi->store("uploads/opsi_jawaban", "public");
+                                $isiOpsi = $filePath;
+                            }
                         }
-                    }
 
-                    if (!empty($isiOpsi)) {
-                        OpsiJawaban::create([
-                            'id_pertanyaan' => $pertanyaan->id_pertanyaan,
-                            'kode_opsi' => $kode,
-                            'isi_opsi' => $isiOpsi,
-                            'benar' => ($request->kunci_jawaban[$i] === $kode) ? 1 : 0,
-                        ]);
-                        \Log::info("Opsi $kode ($jenis) disimpan untuk pertanyaan {$pertanyaan->id_pertanyaan}");
+                        if (!empty($isiOpsi)) {
+                            OpsiJawaban::create([
+                                'id_pertanyaan' => $pertanyaan->id_pertanyaan,
+                                'kode_opsi'     => $kode,
+                                'isi_opsi'      => $isiOpsi,
+                                'benar'         => ($request->kunci_jawaban[$i] === $kode) ? 1 : 0,
+                            ]);
+                        }
                     }
                 }
             }
+
+            DB::commit();
+            
+            return redirect()->route('pg.crud', [
+                'id_skema'    => $request->id_skema,
+                'id_kelompok' => $request->id_kelompok
+            ])->with('success', 'Pertanyaan pilihan ganda berhasil disimpan!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('StorePG error: ' . $e->getMessage());
+            return back()->with('error', 'Gagal menyimpan pertanyaan: ' . $e->getMessage())->withInput();
         }
-
-        DB::commit();
-        \Log::info('StorePG sukses total');
-
-        return redirect()->route('pg.crud', [
-            'id_skema' => $request->id_skema,
-            'id_kelompok' => $request->id_kelompok
-        ])->with('success', 'Pertanyaan pilihan ganda berhasil disimpan!');
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        \Log::error('StorePG error: ' . $e->getMessage());
-        return back()->with('error', 'Gagal menyimpan pertanyaan: ' . $e->getMessage())->withInput();
     }
-}
+
+
+
 
 public function crudPG($id_skema, $id_kelompok)
 {
@@ -509,10 +507,6 @@ public function editPG($id)
 
 public function updatePG(Request $request, $id)
 {
-    \Log::info('=== UpdatePG Dimulai ===');
-    \Log::info('Request Data:', $request->all());
-    \Log::info('Files:', $request->file() ?: []);
-
     $pertanyaan = Pertanyaan::findOrFail($id);
 
     $request->validate([

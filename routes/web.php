@@ -372,6 +372,9 @@ Route::get('/pertanyaan/{id_skema}/kelompok-pg', [PertanyaanController::class, '
 ->name('pertanyaan.pg.kelompok')
 ->defaults('jenis', 'pilihan_ganda');
 
+Route::get('/pertanyaan/pg/kelompok/{id_skema}/{id_pembuatan_pertanyaan?}', [PertanyaanController::class, 'kelompokPekerjaanPG'])
+    ->name('pertanyaan.pg.kelompok.withId');
+
 Route::get('/pertanyaan/pg/create', [PertanyaanController::class, 'createPG'])->name('pertanyaan.pg.create');
 Route::post('/pertanyaan/pg/store', [PertanyaanController::class, 'storePG'])->name('pertanyaan.pg.store');
 Route::get('/pertanyaan/pg/{id_skema}/{id_kelompok}/crud', [PertanyaanController::class, 'crudPG'])->name('pg.crud');

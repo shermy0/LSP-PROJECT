@@ -39,8 +39,12 @@ public function pertanyaanPG($id_skema)
 {
     // cari skema berdasarkan ID
     $skema = Skema::findOrFail($id_skema);
+       // ambil semua pembuatan pertanyaan untuk skema ini
+       $pembuatanList = PembuatanPertanyaan::where('id_skema', $id_skema)
+       ->orderBy('id_pembuatan_pertanyaan', 'desc')
+       ->get();
 
-    return view('pg', compact('skema')); // pastikan view pg.blade.php ada
+    return view('pg', compact('skema', 'pembuatanList')); // pastikan view pg.blade.php ada
 }
 
 public function showSkema($id_skema)
@@ -96,15 +100,41 @@ public function createEsai(Request $request)
     $pembuatan = PembuatanPertanyaan::with('pertanyaan')->findOrFail($id_pembuatan);
 
 }
-public function kelompokPekerjaanPG($id_skema)
+
+
+// ================================
+// HALAMAN KELOMPOK PEKERJAAN PG - PERBAIKAN
+// ================================
+public function kelompokPekerjaanPG(Request $request, $id_skema)
 {
-    $skema = Skema::findOrFail($id_skema);
-    
-    // Redirect ke controller PertanyaanController untuk menangani kelompok pekerjaan
-    return redirect()->route('pertanyaan.pg.kelompok', [
+    $timer = $request->query('timer');
+    $id_pembuatan = $request->query('id_pembuatan_pertanyaan');
+
+    // Debug log
+    \Log::info('kelompokPekerjaanPG - Parameters:', [
         'id_skema' => $id_skema,
-        'jenis' => 'pilihan_ganda'
+        'timer' => $timer,
+        'id_pembuatan_pertanyaan' => $id_pembuatan,
+        'all_query_params' => $request->query()
     ]);
+
+    $kelompok = KelompokPekerjaan::with(['unitKompetensi' => function ($q) use ($id_skema) {
+        $q->where('unit_kompetensi.id_skema', $id_skema);
+    }])->where('id_skema', $id_skema)->get();
+
+    $skema = Skema::find($id_skema);
+
+    // Pastikan variabel terdefinisi dengan nilai default jika null
+    $timer = $timer ?? 30; // Default timer 30 menit
+    $id_pembuatan = $id_pembuatan ?? null;
+
+    return view('kelompok_pekerjaan_pg', compact(
+        'kelompok', 
+        'timer', 
+        'id_skema', 
+        'skema',
+        'id_pembuatan_pertanyaan' // Pastikan ini dikirim ke view
+    ));
 }
 
 public function createPG(Request $request)
