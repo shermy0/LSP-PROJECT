@@ -230,8 +230,10 @@
                 @csrf
                 <div class="modal-body pt-2">
                     <!-- Hidden id_skema & asesor -->
-                    <input type="hidden" name="id_skema" value="{{ $skema->id_skema }}">
-                    <input type="hidden" name="id_asesor" value="1">
+<input type="hidden" name="id_skema" value="{{ $skema->id_skema }}">
+<input type="hidden" name="id_asesor" value="1">
+
+
 
                     <!-- Instruksi default -->
                     <input type="hidden" name="instruksi" value="Tugas demonstrasi untuk skema {{ $skema->nama_skema }}">

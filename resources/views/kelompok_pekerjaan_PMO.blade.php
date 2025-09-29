@@ -4,7 +4,7 @@
 <div class="container mt-4">
 
     <div class="text-center mb-4">
-        <h4 class="fw-bold text-dark">Kelompok Pekerjaan & Unit Kompetensi (DEMONSTRASI)</h4>
+        <h4 class="fw-bold text-dark">Kelompok Pekerjaan & Unit Kompetensi</h4>
         <p class="text-muted">
             Skema ID: <span class="fw-bold">{{ $skema->id_skema ?? '—' }}</span> |
             Timer: <span class="fw-bold">{{ $timer ?? '—' }} menit</span>
@@ -17,12 +17,10 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <span>Kelompok {{ $index+1 }}: {{ $k->nama_kelompok }}</span>
                     <button 
-    class="btn btn-light btn-sm"
-    onclick="popupJumlahPertanyaan({{ $skema->id_skema }}, '{{ $timer ?? '' }}', {{ $k->id_kelompok }})">
-    <i class="bi bi-plus-circle"></i> Tambahkan Tugas Demonstrasi
-</button>
-
-
+                        class="btn btn-light btn-sm"
+                        onclick="popupJumlahPertanyaan({{ $skema->id_skema }}, '{{ $timer ?? '' }}', {{ $k->id_kelompok }})">
+                        <i class="bi bi-plus-circle"></i> Tambahkan Pertanyaan PMO
+                    </button>
                 </div>
             </div>
             <div class="card-body p-0">
@@ -108,12 +106,10 @@ function popupJumlahPertanyaan(id_skema, timer, kelompok_id) {
                 return;
             }
 
-           // ✅ Panggil route demonstrasi.tugas.create
-            let url = `{{ route('demonstrasi.createTugas') }}?id_skema=${id_skema}&kelompok_id=${kelompok_id}&timer=${timer}&jumlah=${jumlah}`;
+           let url = `/input_PMO?id_skema=${id_skema}&timer=${timer}&kelompok_id=${kelompok_id}&jumlah=${jumlah}`;
             window.location.href = url;
         }
     });
 }
-
 </script>
 @endsection

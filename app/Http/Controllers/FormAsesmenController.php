@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\KelompokPekerjaan;
 use Illuminate\Http\Request;
 use App\Models\Skema;
 use App\Models\PembuatanPertanyaan;
+use App\Models\Pertanyaan;
+
 class FormAsesmenController extends Controller
 {
     public function index()
@@ -32,8 +35,14 @@ public function pertanyaanLisan($id_skema)
 {
     $skema = Skema::findOrFail($id_skema);
 
-    return view('lisan', compact('skema'));
+    // Ambil semua pembuatan pertanyaan untuk skema ini
+    $pembuatanList = PembuatanPertanyaan::where('id_skema', $id_skema)
+                                        ->where('jenis_pertanyaan', 'lisan') // sesuai jenis pertanyaan
+                                        ->get();
+
+    return view('lisan', compact('skema', 'pembuatanList'));
 }
+
 
 public function pertanyaanPG($id_skema)
 {
@@ -167,7 +176,77 @@ public function listPembuatan($id_skema)
     return view('esai_list_pembuatan', compact('skema', 'pembuatanList'));
 }
 
+// FormAsesmenController.php
+public function pertanyaanPMO($id_skema)
+{
+    $skema = \App\Models\Skema::findOrFail($id_skema);
 
+    // kalau butuh tambahan data
+    $kelompok = \App\Models\KelompokPekerjaan::where('id_skema', $id_skema)->first();
+    $pembuatanList = \App\Models\PembuatanPertanyaan::where('id_skema', $id_skema)->get();
+
+    return view('PMO', compact('skema', 'kelompok', 'pembuatanList'));
+}
+ public function jawabanPMO($id_skema)
+    {
+        // Ambil data skema
+        $skema = Skema::findOrFail($id_skema);
+
+        // Ambil semua kelompok beserta unit kompetensi
+        $kelompok = KelompokPekerjaan::with('unitKompetensi')
+                            ->where('id_skema', $id_skema)
+                            ->get();
+
+        // Ambil pembuatan pertanyaan PMO untuk skema ini
+        $pembuatanList = PembuatanPertanyaan::where('id_skema', $id_skema)
+                                            ->where('jenis_pertanyaan', 'pmo')
+                                            ->get();
+
+        // Ambil timer dari pembuatan pertama (default 30 menit)
+        $timer = $pembuatanList->first()->timer ?? 30;
+
+        return view('jawaban_kelompok_PMO', compact('skema', 'kelompok', 'pembuatanList', 'timer'));
+    }
+public function tampilJawabanPMO($id_skema, $id_pembuatan)
+{
+    $skema = Skema::findOrFail($id_skema);
+
+    $pembuatan = PembuatanPertanyaan::findOrFail($id_pembuatan);
+
+    $kelompok = KelompokPekerjaan::with('unitKompetensi')
+                    ->where('id_skema', $id_skema)
+                    ->get();
+
+    $pertanyaan = Pertanyaan::where('id_pembuatan_pertanyaan', $id_pembuatan)->get();
+
+    $timer = $pembuatan->timer ?? 30;
+
+    return view('jawaban_PMO', compact('skema', 'kelompok', 'pertanyaan', 'pembuatan', 'timer'));
+}
+// app/Http/Controllers/FormAsesmenController.php
+
+public function tampilPMO(Request $request, $id_skema)
+{
+    // Ambil data skema
+    $skema = Skema::findOrFail($id_skema);
+
+    // Ambil semua pembuatan pertanyaan PMO untuk skema ini
+    $pembuatanList = PembuatanPertanyaan::where('id_skema', $id_skema)
+                                        ->where('jenis_pertanyaan', 'pmo')
+                                        ->get();
+
+    // Kalau ada pembuatan pertama, redirect langsung ke halaman jawaban
+    if ($pembuatanList->isNotEmpty()) {
+        $pembuatan = $pembuatanList->first();
+        return redirect()->route('jawaban_pmo.form', [
+            'id_skema' => $id_skema,
+            'id_pembuatan' => $pembuatan->id_pembuatan_pertanyaan
+        ]);
+    }
+
+    // Kalau belum ada, tampilkan pesan / halaman kosong
+    return back()->with('warning', 'Belum ada pembuatan PMO untuk skema ini.');
+}
 
 }
 
