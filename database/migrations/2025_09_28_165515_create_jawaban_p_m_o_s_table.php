@@ -13,8 +13,8 @@ return new class extends Migration
 {
     Schema::create('jawaban_pmo', function (Blueprint $table) {
         $table->id();
-        $table->foreignId('id_pembuatan_pertanyaan')->constrained('pembuatan_pertanyaan')->onDelete('cascade');
-        $table->foreignId('id_asesi')->constrained('asesi')->onDelete('cascade');
+        // $table->foreignId('id_pembuatan_pertanyaan')->constrained('pembuatan_pertanyaan')->onDelete('cascade');
+        // $table->foreignId('id_asesi')->constrained('asesi')->onDelete('cascade');
         $table->text('jawaban')->nullable();
         $table->timestamps();
     });
