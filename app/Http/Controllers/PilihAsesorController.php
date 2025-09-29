@@ -24,7 +24,7 @@ class PilihAsesorController extends Controller
       ]);
 
 
-        $asesi = Asesi::findOrFail($request->id_asesi);
+        $asesi = Asesi::findOrFail($request->asesi_id);
         $asesi->asesor_id = $request->asesor_id;
         $asesi->save();
 

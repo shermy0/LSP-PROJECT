@@ -52,8 +52,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
     Route::get('/admin/dataasesor', [DataAsesorController::class, 'admin'])->name('admin.dataasesor');
     Route::post('/admin/asesor/store', [DataAsesorController::class, 'store'])->name('admin.asesor.store');
-    Route::get('/admin/pilih_asesor', [PilihAsesorController::class, 'index'])->name('admin.pilih_asesor');
-    Route::post('/admin/pilih_asesor', [PilihAsesorController::class, 'store'])->name('admin.pilih_asesor.store');
+    Route::get('/admin/pilih-asesor', [PilihAsesorController::class, 'index'])->name('admin.pilih_asesor');
+    Route::post('/admin/pilih-asesor', [PilihAsesorController::class, 'store'])->name('admin.pilih_asesor.store');
 
 
     // Asesi
