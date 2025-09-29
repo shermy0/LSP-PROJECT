@@ -73,27 +73,31 @@
   </div>
 </div>
 
- {{-- Statistik --}}
- <div class="col-md-4">
-  <div class="card shadow-sm border-0 rounded-3 p-3">
-    <div class="d-flex align-items-center">
-      <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-        <i class="fas fa-user-tie"></i>
-      </div>
-      <div>
-        <h4 class="mb-0 text-primary">{{ $total }}</h4>
-        <small class="text-muted">Total Asesor</small>
-      </div>
+{{-- Statistik + Tombol Tambah --}}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    {{-- Statistik --}}
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 rounded-3 p-3 mb-0">
+            <div class="d-flex align-items-center">
+                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div>
+                    <h4 class="mb-0 text-primary">{{ $total }}</h4>
+                    <small class="text-muted">Total Asesor</small>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+
+    {{-- Tombol Tambah --}}
+    <div>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalTambah">
+            + Tambah Asesor
+        </button>
+    </div>
 </div>
 
- {{-- Tombol Tambah --}}
-<div class="mb-3">
-    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalTambah">
-        + Tambah Asesor
-    </button>
-</div>
 
 
  <form action="{{ route('admin.dataasesor') }}" method="GET" class="d-flex mb-3">

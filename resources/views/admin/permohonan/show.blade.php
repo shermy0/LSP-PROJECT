@@ -4,15 +4,30 @@
 
 @section('konten')
 <div class="container mt-4 my-5">
-    <div class="bg-white border rounded-3 shadow-sm p-4">
+    <!-- Main Card Container -->
+    <div class="main-card bg-white border-0 rounded-4 shadow-lg p-4 p-md-5">
 
-        <!-- Header -->
-        <div class="mb-4">
-            <p class="small text-muted mb-1">Form Asesmen &gt; <span class="fw-semibold">FR.APL.02</span></p>
-            <div class="d-flex flex-column align-items-center text-center">
-                <div class="rounded mb-3" style="width:40px; height:40px; background-color:#041562;"></div>
-                <h1 class="h5 fw-bold">Detail Permohonan Sertifikasi (FR.APL.02)</h1>
-                <span class="badge bg-light text-dark mt-2 px-3 py-2 rounded-pill">Rincian Data Pemohon</span>
+        <!-- Header Section -->
+        <div class="header-section mb-5">
+            <div class="breadcrumb-wrapper mb-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ route('admin.permohonan.index') }}"><i class="fas fa-home me-1"></i>Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.permohonan.index') }}">Permohonan</a></li>
+                        <li class="breadcrumb-item active">FR.APL.02</li>
+                    </ol>
+                </nav>
+            </div>
+            
+            <div class="text-center">
+                <div class="logo-badge mx-auto mb-3" style="width:60px; height:60px; background: linear-gradient(135deg, #041562 0%, #0a2472 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(4, 21, 98, 0.3);">
+                    <i class="fas fa-file-alt text-white fs-3"></i>
+                </div>
+                <h1 class="h3 fw-bold mb-2">Detail Permohonan Sertifikasi</h1>
+                <p class="text-muted mb-3">Form Asesmen FR.APL.02</p>
+                <span class="badge bg-gradient-primary px-4 py-2 rounded-pill">
+                    <i class="fas fa-info-circle me-2"></i>Rincian Data Pemohon
+                </span>
             </div>
         </div>
 
@@ -21,175 +36,334 @@
             @csrf
 
             {{-- Data Pribadi --}}
-            <div class="border rounded-3 p-3 mb-4 shadow-sm">
-                <div class="bg-light position-relative mb-3 px-3 py-2 fw-semibold text-dark rounded">
-                    <span class="position-absolute top-0 start-0 h-100 bg-primary rounded-start" style="width:8px;"></span>
-                    &nbsp;&nbsp;Data Pribadi
+            <div class="section-card mb-4">
+                <div class="section-header">
+                    <i class="fas fa-user me-2"></i>
+                    <span>Data Pribadi</span>
                 </div>
-                <div class="ps-2">
-                    <p><strong>Nama Lengkap:</strong> {{ $asesi->nama_lengkap }}</p>
-                    <p><strong>NIK:</strong> {{ $asesi->nik }}</p>
-                    <p><strong>Tempat/Tgl Lahir:</strong> {{ $asesi->tempat_lahir }}, {{ $asesi->tgl_lahir }}</p>
-                    <p><strong>Jenis Kelamin:</strong> {{ $asesi->jenis_kelamin }}</p>
-                    <p><strong>Alamat:</strong> {{ $asesi->alamat }}</p>
-                    <p><strong>Telepon/Email:</strong> {{ $asesi->telepon }} / {{ $asesi->email }}</p>
-                    <p><strong>Pendidikan Terakhir:</strong> {{ $asesi->pendidikan_terakhir }}</p>
+                <div class="section-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label><i class="fas fa-id-card text-primary me-2"></i>Nama Lengkap</label>
+                                <p>{{ $asesi->nama_lengkap }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label><i class="fas fa-fingerprint text-primary me-2"></i>NIK</label>
+                                <p>{{ $asesi->nik }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label><i class="fas fa-birthday-cake text-primary me-2"></i>Tempat/Tgl Lahir</label>
+                                <p>{{ $asesi->tempat_lahir }}, {{ $asesi->tgl_lahir }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label><i class="fas fa-venus-mars text-primary me-2"></i>Jenis Kelamin</label>
+                                <p>{{ $asesi->jenis_kelamin }}</p>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="info-item">
+                                <label><i class="fas fa-map-marker-alt text-primary me-2"></i>Alamat</label>
+                                <p>{{ $asesi->alamat }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label><i class="fas fa-phone text-primary me-2"></i>Telepon</label>
+                                <p>{{ $asesi->telepon }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label><i class="fas fa-envelope text-primary me-2"></i>Email</label>
+                                <p>{{ $asesi->email }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label><i class="fas fa-graduation-cap text-primary me-2"></i>Pendidikan Terakhir</label>
+                                <p>{{ $asesi->pendidikan_terakhir }}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             {{-- Data Pekerjaan --}}
-            <div class="border rounded-3 p-3 mb-4 shadow-sm">
-                <div class="bg-light position-relative mb-3 px-3 py-2 fw-semibold text-dark rounded">
-                    <span class="position-absolute top-0 start-0 h-100 bg-primary rounded-start" style="width:8px;"></span>
-                    &nbsp;&nbsp;Data Pekerjaan
+            <div class="section-card mb-4">
+                <div class="section-header">
+                    <i class="fas fa-building me-2"></i>
+                    <span>Data Pekerjaan</span>
                 </div>
-                <div class="ps-2">
-                    <p><strong>Nama Institusi:</strong> {{ $tuk->nama_tuk ?? '-' }}</p>
-                    <p><strong>Alamat Instansi:</strong> {{ $tuk->alamat_tuk ?? '-' }}</p>
-                    <p><strong>Telepon Instansi:</strong> {{ $tuk->telepon ?? '-' }}</p>
-                    <p><strong>Email Instansi:</strong> {{ $tuk->email ?? '-' }}</p>
+                <div class="section-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label><i class="fas fa-briefcase text-success me-2"></i>Nama Institusi</label>
+                                <p>{{ $tuk->nama_tuk ?? '-' }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label><i class="fas fa-map-marked-alt text-success me-2"></i>Alamat Instansi</label>
+                                <p>{{ $tuk->alamat_tuk ?? '-' }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label><i class="fas fa-phone-alt text-success me-2"></i>Telepon Instansi</label>
+                                <p>{{ $tuk->telepon ?? '-' }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label><i class="fas fa-envelope text-success me-2"></i>Email Instansi</label>
+                                <p>{{ $tuk->email ?? '-' }}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             {{-- Data Sertifikasi --}}
-            <div class="border rounded-3 p-3 mb-4 shadow-sm">
-                <div class="bg-light position-relative mb-3 px-3 py-2 fw-semibold text-dark rounded">
-                    <span class="position-absolute top-0 start-0 h-100 bg-primary rounded-start" style="width:8px;"></span>
-                    &nbsp;&nbsp;Data Sertifikasi
+            <div class="section-card mb-4">
+                <div class="section-header">
+                    <i class="fas fa-certificate me-2"></i>
+                    <span>Data Sertifikasi</span>
                 </div>
-                <div class="ps-2">
-                    <p><strong>Skema Sertifikasi:</strong> {{ $skema->nama_skema ?? '-' }}</p>
-                    <p><strong>Judul Sertifikasi:</strong> {{ $skema->judul_skema ?? '-' }}</p>
-                    <p><strong>Nomor Skema:</strong> {{ $skema->kode_skema ?? '-' }}</p>
-                    <p><strong>Tujuan Asesmen:</strong> {{ $permohonan->tujuan_asesmen }}</p>
-                    <p><strong>Status:</strong>
-                        <span class="badge bg-{{ $permohonan->status=='Diajukan' ? 'warning' : ($permohonan->status=='Diterima' ? 'success' : 'danger') }}">
-                            {{ $permohonan->status }}
-                        </span>
-                    </p>
+                <div class="section-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label><i class="fas fa-award text-warning me-2"></i>Skema Sertifikasi</label>
+                                <p>{{ $skema->nama_skema ?? '-' }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label><i class="fas fa-bookmark text-warning me-2"></i>Judul Sertifikasi</label>
+                                <p>{{ $skema->judul_skema ?? '-' }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label><i class="fas fa-barcode text-warning me-2"></i>Nomor Skema</label>
+                                <p>{{ $skema->kode_skema ?? '-' }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label><i class="fas fa-bullseye text-warning me-2"></i>Tujuan Asesmen</label>
+                                <p>{{ $permohonan->tujuan_asesmen }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label><i class="fas fa-flag text-warning me-2"></i>Status Permohonan</label>
+                                <p>
+                                    <span class="badge status-badge bg-{{ $permohonan->status=='Diajukan' ? 'warning' : ($permohonan->status=='Diterima' ? 'success' : 'danger') }}">
+                                        @if($permohonan->status == 'Diajukan')
+                                            <i class="fas fa-clock me-1"></i>
+                                        @elseif($permohonan->status == 'Diterima')
+                                            <i class="fas fa-check-circle me-1"></i>
+                                        @else
+                                            <i class="fas fa-times-circle me-1"></i>
+                                        @endif
+                                        {{ $permohonan->status }}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             {{-- Daftar Unit Kompetensi --}}
-            <div class="border rounded-3 p-3 mb-4 shadow-sm">
-                <div class="bg-light position-relative mb-3 px-3 py-2 fw-semibold text-dark rounded">
-                    <span class="position-absolute top-0 start-0 h-100 bg-primary rounded-start" style="width:8px;"></span>
-                    &nbsp;&nbsp;Daftar Unit Kompetensi
+            <div class="section-card mb-4">
+                <div class="section-header">
+                    <i class="fas fa-list-check me-2"></i>
+                    <span>Daftar Unit Kompetensi</span>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-bordered align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>No</th>
-                                <th>Kode Unit</th>
-                                <th>Judul Unit</th>
-                                <th>Standar Kompetensi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($units as $i => $unit)
+                <div class="section-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 modern-table">
+                            <thead>
                                 <tr>
-                                    <td>{{ $i + 1 }}</td>
-                                    <td>{{ $unit->kode_unit }}</td>
-                                    <td>{{ $unit->judul_unit }}</td>
-                                    <td>{{ $unit->standar_kompetensi }}</td>
+                                    <th width="60">No</th>
+                                    <th>Kode Unit</th>
+                                    <th>Judul Unit</th>
+                                    <th>Standar Kompetensi</th>
                                 </tr>
-                            @empty
-                                <tr><td colspan="4" class="text-center text-muted">Belum ada unit kompetensi</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @forelse ($units as $i => $unit)
+                                    <tr>
+                                        <td class="text-center">
+                                            <span class="badge bg-light text-dark">{{ $i + 1 }}</span>
+                                        </td>
+                                        <td><code class="text-primary">{{ $unit->kode_unit }}</code></td>
+                                        <td class="fw-semibold">{{ $unit->judul_unit }}</td>
+                                        <td>{{ $unit->standar_kompetensi }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4 text-muted">
+                                            <i class="fas fa-inbox fs-1 mb-2 d-block"></i>
+                                            Belum ada unit kompetensi
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             {{-- Bukti Kelengkapan --}}
-            <div class="border rounded-3 p-3 mb-4 shadow-sm">
-                <div class="bg-light position-relative mb-3 px-3 py-2 fw-semibold text-dark rounded">
-                    <span class="position-absolute top-0 start-0 h-100 bg-primary rounded-start" style="width:8px;"></span>
-                    &nbsp;&nbsp;Bukti Kelengkapan
+            <div class="section-card mb-4">
+                <div class="section-header">
+                    <i class="fas fa-folder-open me-2"></i>
+                    <span>Bukti Kelengkapan Dokumen</span>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-bordered align-middle">
-                        <thead class="table-light text-center">
-                            <tr>
-                                <th>No</th>
-                                <th>Jenis Dokumen</th>
-                                <th>Lampiran</th>
-                                <th>Memenuhi Syarat</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($dokumen as $i => $d)
+                <div class="section-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 modern-table">
+                            <thead>
                                 <tr>
-                                    <td class="text-center">{{ $i + 1 }}</td>
-                                    <td>{{ $d->jenis }}</td>
-                                    <td class="text-center">
-                                        @if($d->file_path)
-                                            <button type="button" class="btn btn-sm btn-info"
-                                                onclick="openPreview('{{ asset('storage/' . $d->file_path) }}', '{{ pathinfo($d->file_path, PATHINFO_EXTENSION) }}')">
-                                                Lihat
-                                            </button>
-                                        @else
-                                            <span class="text-muted">Belum diunggah</span>
-                                        @endif
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" 
-                                                name="syarat[{{ $d->id_dokumen }}]" value="Ya" id="ya{{ $i }}">
-                                            <label class="form-check-label" for="ya{{ $i }}">Memenuhi</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" 
-                                                name="syarat[{{ $d->id_dokumen }}]" value="Tidak" id="tidak{{ $i }}">
-                                            <label class="form-check-label" for="tidak{{ $i }}">Tidak Memenuhi</label>
-                                        </div>
-                                    </td>
+                                    <th width="60">No</th>
+                                    <th>Jenis Dokumen</th>
+                                    <th width="120" class="text-center">Lampiran</th>
+                                    <th width="280">Status Kelengkapan</th>
                                 </tr>
-                            @empty
-                                <tr><td colspan="4" class="text-center text-muted">Belum ada dokumen persyaratan</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @forelse($dokumen as $i => $d)
+                                    <tr>
+                                        <td class="text-center">
+                                            <span class="badge bg-light text-dark">{{ $i + 1 }}</span>
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-file-alt text-muted me-2"></i>
+                                            {{ $d->jenis }}
+                                        </td>
+                                        <td class="text-center">
+                                            @if($d->file_path)
+                                                <button type="button" class="btn btn-sm btn-info btn-preview"
+                                                    onclick="openPreview('{{ asset('storage/' . $d->file_path) }}', '{{ pathinfo($d->file_path, PATHINFO_EXTENSION) }}')">
+                                                    <i class="fas fa-eye me-1"></i>Lihat
+                                                </button>
+                                            @else
+                                                <span class="text-muted small">
+                                                    <i class="fas fa-ban me-1"></i>Tidak ada file
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="d-flex gap-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" 
+                                                        name="syarat[{{ $d->id_dokumen }}]" value="Ya" id="ya{{ $i }}">
+                                                    <label class="form-check-label text-success fw-semibold" for="ya{{ $i }}">
+                                                        <i class="fas fa-check-circle me-1"></i>Memenuhi
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" 
+                                                        name="syarat[{{ $d->id_dokumen }}]" value="Tidak" id="tidak{{ $i }}">
+                                                    <label class="form-check-label text-danger fw-semibold" for="tidak{{ $i }}">
+                                                        <i class="fas fa-times-circle me-1"></i>Tidak Memenuhi
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4 text-muted">
+                                            <i class="fas fa-inbox fs-1 mb-2 d-block"></i>
+                                            Belum ada dokumen persyaratan
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             {{-- Tanda Tangan Persetujuan --}}
-            <div class="border rounded-3 p-3 mb-4 shadow-sm">
-                <div class="bg-light position-relative mb-3 px-3 py-2 fw-semibold text-dark rounded">
-                    <span class="position-absolute top-0 start-0 h-100 bg-primary rounded-start" style="width:8px;"></span>
-                    &nbsp;&nbsp;Tanda Tangan Persetujuan
+            <div class="section-card mb-4">
+                <div class="section-header">
+                    <i class="fas fa-signature me-2"></i>
+                    <span>Tanda Tangan Persetujuan</span>
                 </div>
-                <div class="row">
-                    <!-- Asesi -->
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-title">Asesi</div>
-                            <p><strong>Tanggal:</strong> {{ $persetujuan->tgl_ttd_asesi ?? '-' }}</p>
-                            @if(!empty($persetujuan->ttd_asesi))
-                                <img src="{{ asset('storage/' . $persetujuan->ttd_asesi) }}" alt="TTD Asesi" class="border rounded" style="max-width:100%; height:150px; object-fit:contain;">
-                            @else
-                                <p class="text-muted">Belum ada tanda tangan asesi</p>
-                            @endif
+                <div class="section-body">
+                    <div class="row g-4">
+                        <!-- Asesi -->
+                        <div class="col-lg-6">
+                            <div class="signature-card">
+                                <div class="signature-card-header">
+                                    <i class="fas fa-user-circle me-2"></i>Tanda Tangan Asesi
+                                </div>
+                                <div class="signature-card-body">
+                                    <div class="mb-3">
+                                        <label class="small text-muted mb-1">Tanggal</label>
+                                        <p class="fw-semibold mb-0">{{ $persetujuan->tgl_ttd_asesi ?? '-' }}</p>
+                                    </div>
+                                    <div class="signature-container">
+                                        @if(!empty($persetujuan->ttd_asesi))
+                                            <img src="{{ asset('storage/' . $persetujuan->ttd_asesi) }}" 
+                                                 alt="TTD Asesi" 
+                                                 class="signature-image">
+                                        @else
+                                            <div class="signature-empty">
+                                                <i class="fas fa-pen-fancy fs-1 text-muted mb-2"></i>
+                                                <p class="text-muted mb-0">Belum ada tanda tangan</p>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Admin -->
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-title">Admin</div>
-                            <div class="mb-2">
-                                <label for="tanggal-admin">Tanggal</label>
-                                <input type="date" id="tanggal-admin" name="tanggal_admin" class="form-control" value="{{ date('Y-m-d') }}">
-                            </div>
-                            <div class="mb-3">
-                                <label for="ttd-admin">Tanda Tangan</label>
-                                <canvas id="ttd-admin" width="400" height="150"></canvas>
-                                <input type="hidden" name="ttd_admin" id="ttd_admin_data">
-                            </div>
-                            <div class="btns">
-                                <button type="button" class="btn clear" onclick="clearCanvasAdmin()">Hapus</button>
-                                <button type="button" class="btn download" onclick="downloadTTDAdmin()">Unduh</button>
+                        <!-- Admin -->
+                        <div class="col-lg-6">
+                            <div class="signature-card">
+                                <div class="signature-card-header">
+                                    <i class="fas fa-user-shield me-2"></i>Tanda Tangan Admin
+                                </div>
+                                <div class="signature-card-body">
+                                    <div class="mb-3">
+                                        <label for="tanggal-admin" class="form-label small text-muted">Tanggal</label>
+                                        <input type="date" id="tanggal-admin" name="tanggal_admin" 
+                                               class="form-control" value="{{ date('Y-m-d') }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small text-muted mb-2">Tanda Tangan</label>
+                                        <div class="signature-pad-wrapper">
+                                            <canvas id="ttd-admin" width="500" height="180"></canvas>
+                                            <div class="signature-pad-hint">
+                                                <i class="fas fa-hand-pointer me-2"></i>
+                                                Klik dan geser untuk membuat tanda tangan
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="ttd_admin" id="ttd_admin_data">
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-outline-danger btn-sm flex-fill" onclick="clearCanvasAdmin()">
+                                            <i class="fas fa-eraser me-2"></i>Hapus
+                                        </button>
+                                        <button type="button" class="btn btn-outline-primary btn-sm flex-fill" onclick="downloadTTDAdmin()">
+                                            <i class="fas fa-download me-2"></i>Unduh
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -197,45 +371,67 @@
             </div>
 
             {{-- Keputusan Permohonan --}}
-            <div class="border rounded-3 p-3 mb-4 shadow-sm">
-                <div class="bg-light position-relative mb-3 px-3 py-2 fw-semibold text-dark rounded">
-                    <span class="position-absolute top-0 start-0 h-100 bg-primary rounded-start" style="width:8px;"></span>
-                    &nbsp;&nbsp;Keputusan Permohonan
+            <div class="section-card mb-4">
+                <div class="section-header bg-gradient-warning">
+                    <i class="fas fa-gavel me-2"></i>
+                    <span>Keputusan Permohonan</span>
                 </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Status Keputusan</label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" 
-                               name="status_permohonan" id="statusDiterima" value="Diterima" 
-                               {{ old('status_permohonan', $permohonan->status ?? '') == 'Diterima' ? 'checked' : '' }}>
-                        <label class="form-check-label text-success fw-semibold" for="statusDiterima">
-                            ✅ Diterima
+                <div class="section-body">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold mb-3">
+                            <i class="fas fa-clipboard-check me-2 text-primary"></i>Status Keputusan
                         </label>
+                        <div class="decision-options">
+                            <div class="decision-card">
+                                <input class="form-check-input" type="radio" 
+                                       name="status_permohonan" id="statusDiterima" value="Diterima" 
+                                       {{ old('status_permohonan', $permohonan->status ?? '') == 'Diterima' ? 'checked' : '' }}>
+                                <label class="decision-label" for="statusDiterima">
+                                    <div class="decision-icon bg-success">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div>
+                                        <div class="decision-title">Diterima</div>
+                                        <div class="decision-desc">Permohonan memenuhi persyaratan</div>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <div class="decision-card">
+                                <input class="form-check-input" type="radio" 
+                                       name="status_permohonan" id="statusDitolak" value="Ditolak" 
+                                       {{ old('status_permohonan', $permohonan->status ?? '') == 'Ditolak' ? 'checked' : '' }}>
+                                <label class="decision-label" for="statusDitolak">
+                                    <div class="decision-icon bg-danger">
+                                        <i class="fas fa-times-circle"></i>
+                                    </div>
+                                    <div>
+                                        <div class="decision-title">Ditolak</div>
+                                        <div class="decision-desc">Permohonan tidak memenuhi syarat</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" 
-                               name="status_permohonan" id="statusDitolak" value="Ditolak" 
-                               {{ old('status_permohonan', $permohonan->status ?? '') == 'Ditolak' ? 'checked' : '' }}>
-                        <label class="form-check-label text-danger fw-semibold" for="statusDitolak">
-                            ❌ Ditolak
+
+                    <div class="mb-0">
+                        <label for="catatan" class="form-label fw-bold mb-2">
+                            <i class="fas fa-comment-dots me-2 text-primary"></i>Catatan / Keterangan
                         </label>
+                        <textarea id="catatan" name="catatan" class="form-control" rows="4" 
+                                  placeholder="Masukkan catatan atau alasan keputusan...">{{ old('catatan', $permohonan->catatan ?? '') }}</textarea>
                     </div>
-                </div>
-
-                <div class="mb-3">
-                    <label for="alasan" class="form-label fw-semibold">Alasan / Keterangan</label>
-                    <textarea id="catatan" name="catatan" class="form-control" rows="3">
-    {{ old('catatan', $permohonan->catatan ?? '') }}
-</textarea>
-
                 </div>
             </div>
 
-            {{-- Tombol --}}
-            <div class="d-flex justify-content-end gap-2">
-                <a href="{{ route('admin.permohonan.index') }}" class="btn btn-danger">Kembali</a>
-                <button type="submit" class="btn btn-primary">Simpan</button>
+            {{-- Action Buttons --}}
+            <div class="d-flex justify-content-end gap-3 mt-4">
+                <a href="{{ route('admin.permohonan.index') }}" class="btn btn-outline-secondary btn-lg px-4">
+                    <i class="fas fa-arrow-left me-2"></i>Kembali
+                </a>
+                <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm">
+                    <i class="fas fa-save me-2"></i>Simpan Perubahan
+                </button>
             </div>
         </form>
     </div>
@@ -244,13 +440,16 @@
 {{-- Modal Preview --}}
 <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Preview Dokumen</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-gradient-primary text-white border-0">
+                <h5 class="modal-title"><i class="fas fa-eye me-2"></i>Preview Dokumen</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
-            <div class="modal-body text-center" id="previewContent">
-                <p class="text-muted">Memuat...</p>
+            <div class="modal-body text-center p-4" id="previewContent">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="text-muted mt-3">Memuat dokumen...</p>
             </div>
         </div>
     </div>
@@ -262,11 +461,14 @@
         let content = '';
         ext = ext.toLowerCase();
         if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
-            content = `<img src="${url}" class="img-fluid" alt="preview">`;
+            content = `<img src="${url}" class="img-fluid rounded shadow-sm" alt="preview" style="max-height: 70vh;">`;
         } else if (ext === 'pdf') {
-            content = `<embed src="${url}" type="application/pdf" width="100%" height="600px">`;
+            content = `<embed src="${url}" type="application/pdf" width="100%" height="600px" class="rounded">`;
         } else {
-            content = `<a href="${url}" target="_blank">Download File</a>`;
+            content = `<div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Format file tidak dapat ditampilkan. <a href="${url}" target="_blank" class="alert-link">Klik di sini untuk mengunduh</a>
+            </div>`;
         }
         document.getElementById('previewContent').innerHTML = content;
         let modal = new bootstrap.Modal(document.getElementById('previewModal'));
@@ -279,6 +481,7 @@
         const ctx = canvas.getContext('2d');
         let isDrawing = false, lastX = 0, lastY = 0;
 
+        // Set white background
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.lineWidth = 2;
@@ -314,15 +517,24 @@
 
         function stopDrawing() { isDrawing = false; }
 
+        // Mouse events
         canvas.addEventListener('mousedown', startDrawing);
         canvas.addEventListener('mousemove', draw);
         canvas.addEventListener('mouseup', stopDrawing);
         canvas.addEventListener('mouseout', stopDrawing);
 
-        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e.touches[0]); });
-        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
+        // Touch events
+        canvas.addEventListener('touchstart', (e) => { 
+            e.preventDefault(); 
+            startDrawing(e.touches[0]); 
+        });
+        canvas.addEventListener('touchmove', (e) => { 
+            e.preventDefault(); 
+            draw(e.touches[0]); 
+        });
         canvas.addEventListener('touchend', stopDrawing);
 
+        // Save signature on form submit
         document.querySelector('form')?.addEventListener('submit', function () {
             document.getElementById('ttd_admin_data').value = canvas.toDataURL();
         });
@@ -346,36 +558,465 @@
     }
 </script>
 
-{{-- Style tambahan --}}
+{{-- Enhanced Styles --}}
 <style>
-    .border.rounded-3 { border: 1px solid #ddd; border-radius: 12px !important; }
-    .shadow-sm { box-shadow: 0 4px 10px rgba(0,0,0,0.08) !important; }
-    .card {
-        background: #fff;
-        border: 1px solid #ddd;
+    /* Main Card */
+    .main-card {
+        animation: fadeInUp 0.5s ease;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin: 0;
+    }
+
+    .breadcrumb-item a {
+        color: #6c757d;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+
+    .breadcrumb-item a:hover {
+        color: #007bff;
+    }
+
+    .breadcrumb-item.active {
+        color: #007bff;
+        font-weight: 600;
+    }
+
+    /* Gradients */
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    }
+
+    .bg-gradient-warning {
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+    }
+
+    /* Section Cards */
+    .section-card {
+        border: 1px solid #e9ecef;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .section-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-header {
+        background: linear-gradient(135deg, #041562 0%, #0a2472 100%);
+        color: white;
+        padding: 16px 24px;
+        font-weight: 600;
+        font-size: 1.05rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .section-body {
+        padding: 24px;
+    }
+
+    /* Info Items */
+    .info-item {
+        margin-bottom: 1rem;
+    }
+
+    .info-item label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+        display: block;
+        font-weight: 500;
+    }
+
+    .info-item p {
+        font-size: 1rem;
+        color: #212529;
+        margin: 0;
+        font-weight: 500;
+    }
+
+    /* Modern Table */
+    .modern-table {
+        border: none;
+    }
+
+    .modern-table thead {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+
+    .modern-table thead th {
+        border: none;
+        color: #495057;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        padding: 16px;
+    }
+
+    .modern-table tbody tr {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid #f1f3f5;
+    }
+
+    .modern-table tbody tr:hover {
+        background-color: #f8f9fa;
+        transform: scale(1.01);
+    }
+
+    .modern-table tbody td {
+        padding: 16px;
+        vertical-align: middle;
+        border: none;
+    }
+
+    /* Status Badge */
+    .status-badge {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 20px;
+    }
+
+    /* Button Preview */
+    .btn-preview {
+        border-radius: 8px;
+        font-weight: 500;
+        padding: 6px 16px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-preview:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    }
+
+    /* Signature Cards */
+    .signature-card {
+        border: 2px solid #e9ecef;
         border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        overflow: hidden;
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .signature-card:hover {
+        border-color: #007bff;
+        box-shadow: 0 4px 16px rgba(0, 123, 255, 0.15);
+    }
+
+    .signature-card-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 16px 20px;
+        font-weight: 600;
+        color: #495057;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .signature-card-body {
         padding: 20px;
-        margin-bottom: 20px;
     }
-    .card-title {
-        font-weight: bold;
-        margin-bottom: 15px;
-        font-size: 1.1rem;
-        color: #333;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 8px;
+
+    .signature-container {
+        min-height: 180px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8f9fa;
+        border: 2px dashed #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
     }
-    .card canvas {
-        border: 1px solid #999;
-        border-radius: 6px;
+
+    .signature-image {
+        max-width: 100%;
+        height: auto;
+        max-height: 180px;
+        object-fit: contain;
+    }
+
+    .signature-empty {
+        text-align: center;
+    }
+
+    /* Signature Pad */
+    .signature-pad-wrapper {
+        position: relative;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        overflow: hidden;
+        background: white;
+    }
+
+    #ttd-admin {
+        display: block;
         width: 100%;
-        height: 150px;
-        background-color: #ffffff;
+        height: 180px;
         cursor: crosshair;
+        touch-action: none;
     }
-    .btns { display: flex; justify-content: space-between; gap: 10px; }
-    .btns .clear { background: #dc3545; color: white; }
-    .btns .download { background: #0d6efd; color: white; }
-</style>
-@endsection
+
+    .signature-pad-hint {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #adb5bd;
+        font-size: 0.9rem;
+        pointer-events: none;
+        opacity: 0.5;
+        text-align: center;
+    }
+
+    /* Decision Cards */
+    .decision-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .decision-card {
+        position: relative;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 20px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .decision-card:hover {
+        border-color: #007bff;
+        box-shadow: 0 4px 16px rgba(0, 123, 255, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .decision-card input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .decision-card input[type="radio"]:checked ~ .decision-label {
+        border-color: #007bff;
+        background: #f0f7ff;
+    }
+
+    .decision-label {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        cursor: pointer;
+        margin: 0;
+        padding: 8px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .decision-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .decision-title {
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #212529;
+        margin-bottom: 4px;
+    }
+
+    .decision-desc {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    /* Form Controls */
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.15);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    /* Buttons */
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 123, 255, 0.3);
+    }
+
+    .btn-outline-secondary:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Code styling */
+    code {
+        background: #f8f9fa;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.9em;
+    }
+
+    /* Modal Enhancements */
+    .modal-content {
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .modal-header {
+        border-bottom: none;
+        padding: 20px 24px;
+    }
+
+    .modal-body {
+        padding: 24px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .main-card {
+            padding: 20px !important;
+        }
+
+        .section-header {
+            font-size: 0.95rem;
+            padding: 12px 16px;
+        }
+
+        .section-body {
+            padding: 16px;
+        }
+
+        .info-item label {
+            font-size: 0.8rem;
+        }
+
+        .info-item p {
+            font-size: 0.9rem;
+        }
+
+        .modern-table thead th {
+            font-size: 0.75rem;
+            padding: 12px 8px;
+        }
+
+        .modern-table tbody td {
+            padding: 12px 8px;
+            font-size: 0.85rem;
+        }
+
+        .decision-options {
+            grid-template-columns: 1fr;
+        }
+
+        .signature-card-body {
+            padding: 16px;
+        }
+
+        #ttd-admin {
+            height: 150px;
+        }
+    }
+
+    /* Print styles */
+    @media print {
+        .btn,
+        .breadcrumb-wrapper,
+        .signature-pad-hint {
+            display: none !important;
+        }
+
+        .section-card {
+            page-break-inside: avoid;
+            box-shadow: none;
+            border: 1px solid #dee2e6;
+        }
+
+        .main-card {
+            box-shadow: none;
+        }
+    }
+
+    /* Animations */
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    .spinner-border {
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    /* Custom Scrollbar */
+    .table-responsive::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .table-responsive::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    /* Badge improvements */
+    .badge {
+        font-weight: 500;
+        letter-spacing: 0.3px;
+    }
+
+    /* Empty state */
+    tbody tr td i.fa-inbox {
+        opacity: 0.3;
+    }
