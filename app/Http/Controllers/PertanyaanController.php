@@ -197,7 +197,6 @@ class PertanyaanController extends Controller
         ])->with('success', 'Semua pertanyaan esai berhasil disimpan dengan timer!');
     }
 
-<<<<<<< HEAD
     return redirect()->route('esai.crud', [
         'id_skema'    => $id_skema,
         'id_kelompok' => $id_kelompok
@@ -205,8 +204,6 @@ class PertanyaanController extends Controller
 }
 
 
-=======
->>>>>>> 0327bc2 (commit perubahan)
     public function crudEsai($id_skema, $id_kelompok)
 {
     $skema = Skema::findOrFail($id_skema);

@@ -185,10 +185,7 @@ Route::get('/form-asesmen/pertanyaan-demonstrasi/{id_skema}',
     [DemonstrasiController::class, 'index']
 )->name('formasesmen.pertanyaanDemonstrasi');
 
-// Kelompok Pekerjaan Demonstrasi
-Route::get('/form-asesmen/{id_skema}/kelompok-demonstrasi', 
-    [DemonstrasiController::class, 'kelompokPekerjaanDemo']
-)->name('pertanyaan.demonstrasi.kelompok');
+
 
 /*
 |--------------------------------------------------------------------------|

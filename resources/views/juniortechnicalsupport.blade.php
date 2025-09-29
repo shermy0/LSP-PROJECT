@@ -37,19 +37,6 @@
             </h2>
         </div>
 
-<<<<<<< HEAD
-     <!-- Item 4 -->
-<div class="accordion-item mb-3">
-    <h2 class="accordion-header p-3 border rounded">
-        <a href="{{ route('formasesmen.pertanyaanDemonstrasi', ['id_skema' => $skema->id_skema]) }}" 
-           class="text-dark text-decoration-none">
-            <i class="fa-solid fa-stop me-2"></i> Tugas Praktik Demonstrasi
-        </a>
-    </h2>
-</div>
-
-
-=======
         <!-- Item 4 - Tugas Praktik Demonstrasi -->
         <div class="accordion-item mb-3">
             <h2 class="accordion-header p-3 border rounded">
@@ -59,7 +46,6 @@
                 </a>
             </h2>
         </div>
->>>>>>> 84faf6a (pmo)
 
         <!-- Dropdown Penilaian Asesmen -->
         <div class="dropdown w-100 mt-2">
