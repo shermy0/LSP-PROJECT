@@ -35,7 +35,7 @@
             @endif
 
             @if(Auth::user()->role == 'asesor')
-                <li><i class="bi bi-pencil-square"></i><a href="{{ route('formperencanaan') }}">Form Perencanaan</a></li>
+                <li><i class="bi bi-pencil-square"></i><a href="{{ route('formperencanaan.index') }}">Form Perencanaan</a></li>
             @endif
 
             @if(Auth::user()->role == 'asesi')

@@ -6,10 +6,12 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
-                <a href="{{ route('formperencanaan') }}">Form Perencanaan</a>
+                <a href="{{ route('formperencanaan.index') }}">Form Perencanaan</a>
             </li>
             <li class="breadcrumb-item">
-                <a href="{{ route('fr_va', ['periode' => $periode]) }}">FR.VA {{ $periode }}</a>
+                <a href="{{ route('form_perencanaan.fr_va', ['periode' => $periode, 'skema_id' => $id_skema]) }}">
+                    FR.VA {{ $periode }}
+                </a>
             </li>
             <li class="breadcrumb-item active" aria-current="page">
                 Memberikan Kontribusi dan Rencana Perbaikan
@@ -18,6 +20,9 @@
     </nav>
 </div>
 
+<input type="hidden" name="skema_id" value="{{ $id_skema }}">
+
+<form action="{{ route('formperencanaan.show', ['id_skema' => $id_skema]) }}" method="GET">
 <div class="container mt-4"><br>
     <!-- Memberikan Kontribusi untuk Hasil Asesmen -->
     <div class="card-box">
@@ -132,10 +137,8 @@
     </div>
 </div>
 
-<!-- Simpan dan Lanjut -->
-<form id="simpan-form" action="{{ route('formperencanaan') }}" method="POST" class="simpan-form">
-    @csrf
-    <button type="submit" class="simpan-btn"><span>Simpan</span></button>
+    <input type="hidden" name="skema_id" value="{{ $id_skema }}">
+    <button type="submit" class="btn btn-primary">Simpan</button>
 </form>
 
 <!-- Modal tanda tangan -->

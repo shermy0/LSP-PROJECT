@@ -1,34 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\FormPerencanaan;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use App\Models\InstrumenAsesmen;
-use App\Models\LaporanAsesmen;
+use Illuminate\Support\Facades\DB;  
+use App\Http\Controllers\Controller;
 use App\Models\Skema;
-use App\Models\Asesor;
-use Carbon\Carbon;
-
+use App\Models\InstrumenAsesmen;
+use Illuminate\Http\Request;
 class LaporanController extends Controller
 {
-    public function store(Request $request)
-    {
-        $request->validate([
-            'asesor_id' => 'required|exists:asesor,id_asesor',
-            'skema_id' => 'required|exists:skema_sertifikasi,id_skema',
-        ]);
+    public function showLaporan($skema_id)
+{
+    $skema = Skema::findOrFail($skema_id);
 
-        LaporanAsesmen::create([
-            'asesor_id' => $request->asesor_id,
-            'skema_id' => $request->skema_id,
-            'aspek_positif_negatif' => $request->aspek_positif_negatif,
-            'penolakan' => $request->penolakan,
-            'saran_perbaikan' => $request->saran_perbaikan,
-            'tgl_laporan' => now(),
-        ]);
-
-        return redirect()->route('laporan_asesor')
-            ->with('success','Laporan asesmen berhasil disimpan.');
-    }
+    return view('laporan', compact('skema'));
+}
 }
