@@ -25,4 +25,8 @@ class Asesor extends Model
     {
         return $this->belongsToMany(Skema::class, 'skema_asesor', 'id_asesor', 'id_skema');
     }
+    public function skemas()
+    {
+        return $this->belongsToMany(Skema::class, 'asesor_skema', 'asesor_id', 'skema_id');
+    }
 }

@@ -1,17 +1,21 @@
 @extends('master')
 
 @section('konten')
-    <div class="card mapa-card">
+<div class="card-box">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
                 <a href="{{ route('formperencanaan.index') }}">Daftar Skema</a>
             </li>
-            <li class="breadcrumb-item">
-                <a href="{{ route('formperencanaan.show', $skema->id_skema) }}">Form Perencanaan</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">FR.VA.K</li>
+<li class="breadcrumb-item">
+    @isset($skema)
+        <a href="{{ route('formperencanaan.show', $skema->id_skema) }}">Form Perencanaan</a>
+    @else
+        <span>Form Perencanaan</span>
+    @endisset
+</li>
+            <li class="breadcrumb-item active" aria-current="page">FR.MAPA.01</li>
         </ol>
     </nav>
 
@@ -21,94 +25,85 @@
         <h3 class="fw-bold">FR.AK.05 – LAPORAN ASESMEN</h3>
     </div>
 
-    <!-- Skema -->
+    <!-- skema -->
     <div class="skema-container">
         <div class="skema-group">
             <span class="skema-label">SKEMA:</span>
-            <select name="skema_id" id="skema_id" class="skema-select">
-                <option value="">-- Pilih Skema --</option>
-                @foreach($skemas as $skema)
-                    <option value="{{ $skema->id_skema }}"
-                            data-kode="{{ $skema->kode_skema }}"
-                            data-jenjang="{{ $skema->jenjang }}">
-                        {{ $skema->nama_skema }}
-                    </option>
-                @endforeach
-            </select>
+            <span class="skema-select">{{ $skema->nama_skema }}</span>
+        </div>
+    </div>
+    
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="mapa-box">
+                <label class="fw-semibold d-block mb-2">Skema Sertifikasi</label>
+                <div class="jenis-skema">
+                    <input type="radio" id="kkni" name="skema" class="form-check-input me-2"
+                        value="KKNI"
+                        @if($skema->jenjang == 'KKNI') checked @endif disabled>
+                    <label for="kkni">KKNI</label>
+
+                    <input type="radio" id="okupasi" name="skema" class="form-check-input me-2"
+                        value="Okupasi"
+                        @if($skema->jenjang == 'Okupasi') checked @endif disabled>
+                    <label for="okupasi">Okupasi</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mapa-box">
+                <label class="fw-semibold d-block mb-2">Nomor Skema</label>
+                <input type="text" class="form-control" value="{{ $skema->kode_skema }}" readonly>
+            </div>
+        </div>
+
+        <!-- Nama Asesor -->
+        <div class="col-md-6">
+            <div class="card-field">
+                <label for="namaAsesor" class="form-label">Nama Asesor</label>
+                <select class="form-control" id="namaAsesor" name="asesor_id">
+                    <option value="">-- Pilih Asesor --</option>
+                    @foreach($asesors as $asesor)
+                        <option value="{{ $asesor->id_asesor }}" data-no="{{ $asesor->no_registrasi }}">
+                            {{ $asesor->nama_asesor }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
+        <!-- Tanggal Asesmen -->
+        <div class="col-md-6">
+            <div class="card-field">
+                <label for="tanggalAsesmen" class="form-label">Tanggal Asesmen</label>
+                <input type="date" class="form-control" id="tanggalAsesmen">
+            </div>
         </div>
     </div>
 
-    <!-- Form -->
-    <form>
-        <div class="row g-3 mb-4">
-            <!-- Skema Sertifikasi -->
-            <div class="col-md-6">
-                <div class="card-field">
-                    <label class="form-label">Skema Sertifikasi</label>
-                    <div class="d-flex gap-3 mt-1">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="skema" id="skema1" value="KKNI">
-                            <label class="form-check-label" for="skema1">KKNI</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="skema" id="skema2" value="Okupasi">
-                            <label class="form-check-label" for="skema2">Okupasi</label>
-                        </div>
-                    </div>
-                </div>
+    <!-- TUK -->
+    <div class="col-12 text-center mt-3">
+        <label class="form-label fw-semibold d-block mb-2">TUK (Tempat Uji Kompetensi) SMKN 11 Bandung:</label>
+        <div class="d-flex justify-content-center gap-4">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="tuk" id="tukSewaktu" value="Sewaktu" disabled>
+                <label class="form-check-label" for="tukSewaktu">Sewaktu</label>
             </div>
-
-            <!-- Nomor -->
-            <div class="col-md-6">
-                <div class="card-field">
-                    <label for="nomor" class="form-label">Nomor</label>
-                    <input type="text" class="form-control" id="nomor" placeholder="Nomor Skema" readonly>
-                </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="tuk" id="tukTempatKerja" value="Tempat Kerja" disabled>
+                <label class="form-check-label" for="tukTempatKerja">Tempat Kerja</label>
             </div>
-
-            <!-- Nama Asesor -->
-            <div class="col-md-6">
-                <div class="card-field">
-                    <label for="namaAsesor" class="form-label">Nama Asesor</label>
-                    <select class="form-control" id="namaAsesor" name="asesor_id">
-                        <option value="">-- Pilih Asesor --</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Tanggal Asesmen -->
-            <div class="col-md-6">
-                <div class="card-field">
-                    <label for="tanggalAsesmen" class="form-label">Tanggal Asesmen</label>
-                    <input type="date" class="form-control" id="tanggalAsesmen">
-                </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="tuk" id="tukMandiri" value="Mandiri" checked>
+                <label class="form-check-label" for="tukMandiri">Mandiri</label>
             </div>
         </div>
-
-        <!-- TUK -->
-        <div class="col-12 text-center">
-            <label class="form-label fw-semibold d-block mb-2">TUK (Tempat Uji Kompetensi) SMKN 11 Bandung:</label>
-            <div class="d-flex justify-content-center gap-4">
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="tuk" id="tukSewaktu" value="Sewaktu">
-                    <label class="form-check-label" for="tukSewaktu">Sewaktu</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="tuk" id="tukTempatKerja" value="Tempat Kerja">
-                    <label class="form-check-label" for="tukTempatKerja">Tempat Kerja</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="tuk" id="tukMandiri" value="Mandiri">
-                    <label class="form-check-label" for="tukMandiri">Mandiri</label>
-                </div>
-            </div>
-        </div>
-        <br>
-    </form>
+    </div>
 </div>
 
 <!-- Data Asesi -->
-<div class="card-box">
+<div class="card-box mt-4">
     <div class="judul-box">
         <div class="judul-header">Data Asesi</div>
         <div class="table-responsive mt-4">
@@ -127,7 +122,7 @@
                 </thead>
                 <tbody id="asesiTableBody">
                     <tr>
-                        <td colspan="5">Silakan pilih skema dan asesor terlebih dahulu</td>
+                        <td colspan="5">Silakan pilih asesor terlebih dahulu</td>
                     </tr>
                 </tbody>
             </table>
@@ -135,194 +130,90 @@
     </div>
 </div>
 
-<form id="simpan-lanjut-form" action="{{ route('laporan_asesor') }}" method="POST" class="simpan-form">
+<!-- Catatan Asesmen -->
+<form id="simpan-lanjut-form" action="{{ route('laporan_asesor.store') }}" method="POST" class="simpan-form mt-4">
     @csrf
-    <input type="hidden" name="asesor_id" id="asesor_id_hidden" value="{{ $asesor->id ?? '' }}">
-    <input type="hidden" name="skema_id" id="skema_id_hidden" value="{{ $skema->id ?? '' }}">
-    <input type="hidden" name="no_registrasi" id="no_registrasi_hidden" value="{{ $no_registrasi ?? '' }}">
+    <!-- hidden input supaya data ikut terkirim -->
+    <input type="hidden" name="asesor_id" id="asesor_id_hidden">
+    <input type="hidden" name="skema_id" id="skema_id_hidden" value="{{ $skema->id_skema }}">
+    <input type="hidden" name="no_registrasi" id="no_registrasi_hidden">
 
-    <div class="box">
-        <div class="box-header">Aspek Negatif dan Positif dalam Asesmen</div>
-        <textarea name="aspek_positif_negatif" class="box-input" rows="3"></textarea>
+    <div class="card-box">
+        <div class="judul-box">
+            <div class="judul-header">Catatan Asesmen</div>
+
+            <div class="box">
+                <div class="box-header">Aspek Negatif dan Positif dalam Asesmen</div>
+                <textarea name="aspek_positif_negatif" class="box-input" rows="3" placeholder="Masukkan teks"></textarea>
+            </div>
+
+            <div class="box">
+                <div class="box-header">Pencatatan Penolakan Hasil Asesmen</div>
+                <textarea name="penolakan" class="box-input" rows="3" placeholder="Masukkan teks"></textarea>
+            </div>
+
+            <div class="box">
+                <div class="box-header">Saran Perbaikan : (Asesor/Personil Terkait)</div>
+                <textarea name="saran_perbaikan" class="box-input" rows="3" placeholder="Masukkan teks"></textarea>
+            </div>
+        </div>
     </div>
 
-    <div class="box">
-        <div class="box-header">Pencatatan Penolakan Hasil Asesmen</div>
-        <textarea name="penolakan" class="box-input" rows="3"></textarea>
-    </div>
-
-    <div class="box">
-        <div class="box-header">Saran Perbaikan : (Asesor/Personil Terkait)</div>
-        <textarea name="saran_perbaikan" class="box-input" rows="3"></textarea>
-    </div>
-
-    <button type="submit" class="simpan-btn">
+    <button type="submit" class="simpan-btn mt-3">
         <span>Simpan dan Lanjut</span>
     </button>
 </form>
 
-
 <script>
-    // Saat ganti skema
-    document.getElementById('skema_id').addEventListener('change', function() {
-        let selected = this.options[this.selectedIndex];
-        let kode = selected.getAttribute('data-kode');
-        let jenjang = selected.getAttribute('data-jenjang');
+document.addEventListener('DOMContentLoaded', function () {
+    const asesorSelect   = document.getElementById('namaAsesor');
+    const asesiTableBody = document.getElementById('asesiTableBody');
+    const asesorIdHidden = document.getElementById('asesor_id_hidden');
+    const noRegHidden    = document.getElementById('no_registrasi_hidden');
 
-        // isi nomor otomatis
-        document.getElementById('nomor').value = kode || '';
+    asesorSelect.addEventListener('change', function () {
+        const asesorId = this.value;
+        const noReg    = this.selectedOptions[0]?.dataset.no ?? '';
 
-        // pilih radio otomatis
-        if (jenjang) {
-            if (jenjang.toLowerCase().includes("kkni")) {
-                document.getElementById('skema1').checked = true;
-            } else if (jenjang.toLowerCase().includes("okupasi")) {
-                document.getElementById('skema2').checked = true;
-            }
-        }
+        asesorIdHidden.value = asesorId;
+        noRegHidden.value    = noReg;
 
-        // ambil asesor sesuai skema via AJAX
-        let skemaId = this.value;
-        if (skemaId) {
-            fetch(`/get-asesor/${skemaId}`)
+        if (asesorId) {
+            const url = `{{ url('/laporan/'.$skema->id_skema.'/asesi') }}/${asesorId}`;
+            
+            fetch(url)
                 .then(res => res.json())
                 .then(data => {
-                    let select = document.getElementById('namaAsesor');
-                    select.innerHTML = '<option value="">-- Pilih Asesor --</option>';
-                    data.forEach(a => {
-                        let opt = document.createElement('option');
-                        opt.value = a.id_asesor;
-                        opt.textContent = a.nama_asesor;
-                        opt.setAttribute('data-noreg', a.no_registrasi);
-                        select.appendChild(opt);
-                    });
-                });
-        }
-    });
-</script>
-<script>
-    // saat pilih Asesor
-    document.getElementById('namaAsesor').addEventListener('change', function() {
-        let asesorId = this.value;
-        let noreg = this.options[this.selectedIndex].getAttribute('data-noreg');
-        let skemaId = document.getElementById('skema_id').value;
-
-        // isi hidden input biar kebawa ke laporan_asesor
-        document.getElementById('asesor_id_hidden').value = asesorId;
-        document.getElementById('skema_id_hidden').value = skemaId;
-        document.getElementById('no_registrasi_hidden').value = noreg; // <--- penting
-    });
-</script>
-<script>
-    // Saat ganti asesor, ambil asesi
-    document.getElementById('namaAsesor').addEventListener('change', function() {
-        let asesorId = this.value;
-        let skemaId = document.getElementById('skema_id').value;
-
-        if (skemaId && asesorId) {
-            fetch(`/get-asesi/${skemaId}/${asesorId}`)
-                .then(res => res.json())
-                .then(data => {
-                    let tbody = document.getElementById("asesiTableBody");
-                    tbody.innerHTML = ""; // kosongkan isi lama
-
-                    if (data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="5">Tidak ada Asesi</td></tr>`;
-                        return;
-                    }
-
-                    data.forEach((asesi, index) => {
-                        let tr = document.createElement("tr");
-                        tr.innerHTML = `
-                            <td>${index+1}</td>
-                            <td>
-                                <input type="text" 
-                                       name="nama[${index+1}]" 
-                                       class="form-control" 
-                                       value="${asesi.nama_lengkap}" readonly>
-                            </td>
-                            <td>
-                                <input type="radio" name="rekomendasi[${index+1}][]" value="K">
-                            </td>
-                            <td>
-                                <input type="radio" name="rekomendasi[${index+1}][]" value="BK">
-                            </td>
-                            <td>
-                                <select name="keterangan[${index+1}]" class="form-control unit-select">
-                                    <option value="">-- Pilih Kode & Judul Unit --</option>
-                                </select>
-                            </td>
+                    asesiTableBody.innerHTML = '';
+                    if (data.length > 0) {
+                        data.forEach((asesi, index) => {
+                            asesiTableBody.innerHTML += `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${asesi.nama_lengkap}</td>
+                                    <td><input type="radio" name="rekomendasi_${asesi.id_asesi}" value="K"></td>
+                                    <td><input type="radio" name="rekomendasi_${asesi.id_asesi}" value="BK"></td>
+                                    <td><input type="text" name="keterangan_${asesi.id_asesi}" class="form-control"></td>
+                                </tr>
+                            `;
+                        });
+                    } else {
+                        asesiTableBody.innerHTML = `
+                            <tr><td colspan="5">Tidak ada asesi untuk asesor ini</td></tr>
                         `;
-                        tbody.appendChild(tr);
-                    });
+                    }
+                })
+                .catch(() => {
+                    asesiTableBody.innerHTML = `
+                        <tr><td colspan="5">Gagal memuat data asesi</td></tr>
+                    `;
                 });
+        } else {
+            asesiTableBody.innerHTML = `
+                <tr><td colspan="5">Silakan pilih asesor terlebih dahulu</td></tr>
+            `;
         }
     });
-</script>
-<script>
-const skemaData = @json($skemas);
-
-function populateUnitSelects(skemaId) {
-    let selectedSkema = skemaData.find(s => s.id_skema == skemaId);
-    let options = '<option value="">-- Pilih Kode & Judul Unit --</option>';
-
-    if (selectedSkema && selectedSkema.units && selectedSkema.units.length > 0) {
-        selectedSkema.units.forEach(unit => {
-            options += `<option value="${unit.kode_unit}">
-                           ${unit.kode_unit} - ${unit.judul_unit}
-                        </option>`;
-        });
-    } else {
-        options += `<option value="">Tidak ada unit kompetensi</option>`;
-    }
-
-    document.querySelectorAll('.unit-select').forEach(select => {
-        select.innerHTML = options;
-    });
-}
-
-// Saat pilih Asesor → tampilkan asesi + isi unit kompetensi
-document.getElementById('namaAsesor').addEventListener('change', function() {
-    let asesorId = this.value;
-    let skemaId = document.getElementById('skema_id').value;
-
-    if (skemaId && asesorId) {
-        fetch(`/get-asesi/${skemaId}/${asesorId}`)
-            .then(res => res.json())
-            .then(data => {
-                let tbody = document.getElementById("asesiTableBody");
-                tbody.innerHTML = "";
-
-                if (data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5">Tidak ada Asesi</td></tr>`;
-                    return;
-                }
-
-                data.forEach((asesi, index) => {
-                    let tr = document.createElement("tr");
-                    tr.innerHTML = `
-                        <td>${index+1}</td>
-                        <td>
-                            <input type="text" 
-                                   name="nama[${index+1}]" 
-                                   class="form-control" 
-                                   value="${asesi.nama_lengkap}" readonly>
-                        </td>
-                        <td><input type="radio" name="rekomendasi[${index+1}][]" value="K"></td>
-                        <td><input type="radio" name="rekomendasi[${index+1}][]" value="BK"></td>
-                        <td>
-                            <select name="keterangan[${index+1}]" class="form-control unit-select">
-                                <option value="">-- Pilih Kode & Judul Unit --</option>
-                            </select>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-
-                // setelah table asesi dibuat, isi dropdown unit sesuai skema
-                populateUnitSelects(skemaId);
-            });
-    }
 });
 </script>
 @endsection

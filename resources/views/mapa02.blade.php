@@ -67,6 +67,8 @@
 <!-- Instrumen Asesmen -->
 <form action="{{ route('mapa02.simpanInstrumen') }}" method="POST">
     @csrf
+<input type="hidden" name="skema_id" value="{{ $skema->id_skema }}">
+
 {{-- Looping kelompok pekerjaan --}}
 @forelse ($kelompokPekerjaan as $index => $kelompok)
     <div class="mapa-card">

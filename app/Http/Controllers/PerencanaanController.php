@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\InstrumenAsesmen;
 use App\Models\LaporanAsesmen;
+use App\Models\Asesor;
+use App\Models\Skema;
 
 class PerencanaanController extends Controller
 {

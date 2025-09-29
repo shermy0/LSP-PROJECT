@@ -5,12 +5,20 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('formperencanaan') }}">Form Perencanaan</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('mapa02.show') }}">FR.MAPA.02</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Data Penyusun & Validator</li>
+            <li class="breadcrumb-item">
+                <a href="{{ route('formperencanaan.index') }}">Daftar Skema</a>
+            </li>
+            @if(isset($skema))
+            <li class="breadcrumb-item">
+                <a href="{{ route('formperencanaan.show', $skema->id_skema) }}">Form Perencanaan</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">FR.MAPA.02</li>
+            @endif
         </ol>
     </nav>
 </div>
+
+
 
 <div class="container mt-4">
     <!-- Penyusun -->
@@ -110,8 +118,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 <!-- Simpan dan Lanjut -->
-<form id="simpan-form" action="{{ route('formperencanaan') }}" method="POST" class="simpan-form">
-    @csrf
     <button type="submit" class="simpan-btn">
         <span>Simpan</span>
     </button>

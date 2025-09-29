@@ -33,8 +33,8 @@
         <!-- Item 3 -->
         <div class="accordion-item">
             <h2 class="accordion-header">
-                <a href="{{ route('laporan', ['id_skema' => $skema->id_skema]) }}" class="text-decoration-none text-dark">
-                    <i class="fa-solid fa-stop me-2"></i> FR.AK.06 - LAPORAN ASESMEN
+                <a href="{{ route('laporan.show', $skema->id_skema) }}" class="text-decoration-none text-dark">
+                    <i class="fa-solid fa-stop me-2"></i> FR.AK.05 - LAPORAN ASESMEN
                 </a>
             </h2>
         </div>

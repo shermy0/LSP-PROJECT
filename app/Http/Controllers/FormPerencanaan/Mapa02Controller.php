@@ -65,16 +65,16 @@ class Mapa02Controller extends Controller
         return response()->json($asesi);
     }
 
-    // Simpan jawaban instrumen MAPA02
-    public function simpanInstrumen(Request $request)
-    {
-        $skemaId = $request->skema_id;
-        $asesorId = auth()->user()->asesor->id_asesor ?? null;
+public function simpanInstrumen(Request $request)
+{
+    $skemaId = $request->skema_id;
+    $asesorId = auth()->user()->asesor->id_asesor ?? null;
 
-        if (!$asesorId) {
-            return back()->with('error', 'Asesor tidak ditemukan.');
-        }
+    if (!$asesorId) {
+        return back()->with('error', 'Asesor tidak ditemukan.');
+    }
 
+    if ($request->has('potensi')) {
         foreach ($request->potensi as $instrumenId => $value) {
             DB::table('asesmen_instrumen_jawaban')->insert([
                 'skema_id'     => $skemaId,
@@ -85,9 +85,24 @@ class Mapa02Controller extends Controller
                 'updated_at'   => now(),
             ]);
         }
-
-        return back()->with('success', 'Instrumen berhasil disimpan');
     }
+
+return redirect()->route('form.mapa02.asesor', ['skema_id' => $skemaId])
+                 ->with('success', 'Instrumen berhasil disimpan');
+}
+
+
+    
+public function showMapa02Asesor($id_skema)
+{
+    $skema = Skema::findOrFail($id_skema);
+    $asesors = DB::table('asesor')->get();
+
+    return view('mapa02_asesor', compact('skema', 'asesors'));
+}
+
+
+
 
     // Ambil unit per skema (AJAX)
     public function getUnits($skemaId)
