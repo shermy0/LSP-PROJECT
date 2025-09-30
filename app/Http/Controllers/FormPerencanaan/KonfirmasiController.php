@@ -22,7 +22,7 @@ class KonfirmasiController extends Controller
         $asesors = DB::table('asesor')
             ->join('asesor_skema', 'asesor.id_asesor', '=', 'asesor_skema.asesor_id')
             ->where('asesor_skema.skema_id', $skema_id)
-            ->select('asesor.id_asesor', 'asesor.nama_asesor')
+            ->select('asesor.id_asesor', 'asesor.nama_asesor', 'asesor.no_registrasi as no_met')
             ->get();
 
         // Ambil data orang relevan per role
@@ -67,44 +67,59 @@ class KonfirmasiController extends Controller
 
     public function store(Request $request, $skema_id)
     {
-        // Simpan Orang Relevan
+                // Simpan Orang Relevan
         if ($request->has('asesor')) {
             foreach ($request->asesor as $role => $idAsesor) {
                 if (!$idAsesor) continue;
 
-                $ttdBase64 = $request->tanda_tangan[$role] ?? null;
+                $dataUpdate = [
+                    'id_asesor' => $idAsesor,
+                    'tanggal'   => $request->tanggal[$role] ?? null,
+                ];
+
+                // Hanya update tanda tangan kalau ada input baru
+                if (!empty($request->tanda_tangan[$role])) {
+                    $dataUpdate['tanda_tangan'] = $request->tanda_tangan[$role];
+                }
 
                 DB::table('penyusun_persetujuan')->updateOrInsert(
                     ['id_skema' => $skema_id, 'role' => $role],
-                    [
-                        'id_asesor'    => $idAsesor,
-                        'tanggal'      => $request->tanggal[$role] ?? null,
-                        'tanda_tangan' => $ttdBase64,
-                    ]
+                    $dataUpdate
                 );
             }
         }
-// Simpan Penyusun
-if ($request->has('nama_asesor')) {
-    foreach ($request->nama_asesor as $i => $idAsesor) {
-        if (!$idAsesor) continue;
 
-        $ttdBase64 = $request->tanda_tangan[$i] ?? null;
+        // Simpan Penyusun
+        if ($request->has('nama_asesor')) {
+        foreach ($request->nama_asesor as $i => $idAsesor) {
+            if (!$idAsesor) continue;
 
-        // Ambil no_met dari tabel asesor
-        $asesorData = DB::table('asesor')->where('id_asesor', $idAsesor)->first();
-        $noMet = $asesorData->no_registrasi ?? ($request->nomet[$i] ?? null);
+            $asesorData = DB::table('asesor')->where('id_asesor', $idAsesor)->first();
+            $noMet = $asesorData->no_registrasi ?? ($request->nomet[$i] ?? null);
 
-        DB::table('penyusun_persetujuan')->updateOrInsert(
-            ['id_skema' => $skema_id, 'id_asesor' => $idAsesor, 'role' => 'penyusun'],
-            [
-                'no_met'       => $noMet,
-                'tanggal'      => $request->tanggal[$i] ?? null,
-                'tanda_tangan' => $ttdBase64,
-            ]
-        );
+            $dataUpdate = [
+                'id_asesor' => $idAsesor,   // 🔥 update juga id_asesor
+                'no_met'    => $noMet,
+                'tanggal'   => $request->tanggal[$i] ?? null,
+            ];
+
+            if (!empty($request->tanda_tangan[$i])) {
+                $dataUpdate['tanda_tangan'] = $request->tanda_tangan[$i];
+            }
+
+            if (!empty($request->penyusun_id[$i])) {
+                // Update baris lama
+                DB::table('penyusun_persetujuan')->where('id', $request->penyusun_id[$i])->update($dataUpdate);
+            } else {
+                // Insert baris baru
+                $dataUpdate['id_skema'] = $skema_id;
+                $dataUpdate['role'] = 'penyusun';
+                DB::table('penyusun_persetujuan')->insert($dataUpdate);
+            }
+        }
     }
-}
+
+
 
 
         return redirect()->route('form.mapa01.konfirmasi', $skema_id)

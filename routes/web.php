@@ -149,6 +149,11 @@ Route::get('/mapa01/kode-unit/{skema_id}', [Mapa01Controller::class, 'kodeUnit']
 
 Route::get('mapa01/konfirmasi/ttd/{id}/download', [KonfirmasiController::class, 'downloadTtd'])->name('form.mapa01.konfirmasi.ttd.download');
 Route::delete('mapa01/konfirmasi/ttd/{id}/delete', [KonfirmasiController::class, 'deleteTtd'])->name('form.mapa01.konfirmasi.ttd.delete');
+// routes/web.php
+Route::delete('mapa01/konfirmasi/penyusun/{id}/delete', 
+    [KonfirmasiController::class, 'deletePenyusun']
+)->name('form.mapa01.konfirmasi.penyusun.delete');
+
 
 
 // Route::post('/mapa01/konfirmasi/{skema_id}/simpan', [KonfirmasiController::class, 'simpanKonfirmasi'])

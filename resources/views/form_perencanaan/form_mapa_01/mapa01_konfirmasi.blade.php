@@ -6,7 +6,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('formperencanaan.index') }}">Daftar Skema</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('formperencanaan.index') }}">Form Perencanaan</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('formperencanaan.show', $skema->id_skema) }}">Form Perencanaan</a></li>
             <li class="breadcrumb-item"><a href="{{ route('form.mapa01', $skema->id_skema) }}">FR.MAPA.01</a></li>
             <li class="breadcrumb-item"><a href="{{ route('form.mapa01.kodeunit', $skema->id_skema) }}">Rencana Asesmen</a></li>
             <li class="breadcrumb-item"><a href="{{ route('form.mapa01.modifikasi', $skema->id_skema) }}">Persyaratan</a></li>
@@ -55,7 +55,9 @@
                                 @if(!empty($info['data']->tanda_tangan))
                                     <img src="{{ $info['data']->tanda_tangan }}" width="120"><br>
                                     <a href="{{ route('form.mapa01.konfirmasi.ttd.download', $info['data']->id) }}" class="btn btn-sm btn-primary mt-1">Download</a>
-                                    <button type="button" class="btn btn-sm btn-danger mt-1 delete-ttd" data-id="{{ $info['data']->id }}">Hapus</button>
+                                    <button type="button" class="btn btn-sm btn-danger mt-1 delete-ttd"
+                                            data-id="{{ $info['data']->id }}"
+                                            data-role="{{ $role }}">Hapus</button>
                                 @else
                                     <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc;cursor:pointer;"></canvas>
                                     <input type="hidden" name="tanda_tangan[{{ $role }}]" class="tanda_tangan">
@@ -87,7 +89,8 @@
                     <tbody>
                     @foreach($penyusun as $i => $item)
                         <tr>
-                            <td>
+                           <td>
+                                <input type="hidden" name="penyusun_id[{{ $i }}]" value="{{ $item->id }}">
                                 <select name="nama_asesor[{{ $i }}]" class="form-select asesor-select">
                                     <option value="">-- Pilih Asesor --</option>
                                     @foreach($asesors as $asesor)
@@ -110,7 +113,9 @@
                                 @if($item->tanda_tangan)
                                     <img src="{{ $item->tanda_tangan }}" width="120"><br>
                                     <a href="{{ route('form.mapa01.konfirmasi.ttd.download', $item->id) }}" class="btn btn-sm btn-primary mt-1">Download</a>
-                                    <button type="button" class="btn btn-sm btn-danger mt-1 delete-ttd" data-id="{{ $item->id }}">Hapus</button>
+                                    <button type="button" class="btn btn-sm btn-danger mt-1 delete-ttd"
+                                            data-id="{{ $item->id }}"
+                                            data-index="{{ $i }}">Hapus</button>
                                 @else
                                     <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc;cursor:pointer;"></canvas>
                                     <input type="hidden" name="tanda_tangan[{{ $i }}]" class="tanda_tangan">
@@ -124,6 +129,26 @@
                 <button type="button" id="add-row" class="btn btn-success mt-2">+ Tambah Penyusun</button>
             </div>
         </div>
+    </div>
+
+    <!-- Modal Konfirmasi Hapus Penyusun -->
+    <div class="modal fade" id="deletePenyusunModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title">Konfirmasi Hapus</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p>Apakah Anda yakin ingin menghapus penyusun ini?</p>
+            <input type="hidden" id="deletePenyusunId">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="button" class="btn btn-danger" id="confirmDeletePenyusun">Hapus</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     {{-- Validator --}}
@@ -229,11 +254,6 @@ document.addEventListener("DOMContentLoaded", () => {
         `);
     };
 
-    // Hapus row penyusun baru
-    document.addEventListener("click", e => {
-        if (e.target.closest(".delete-row")) e.target.closest("tr").remove();
-    });
-
     // Update No Met otomatis saat pilih asesor
     document.addEventListener("change", e => {
         if (e.target.classList.contains("asesor-select")) {
@@ -250,6 +270,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if(e.target.classList.contains('delete-ttd')) {
             const btn = e.target;
             const id = btn.dataset.id;
+            const role = btn.dataset.role;
+            const index = btn.dataset.index;
+
             if(confirm('Yakin ingin menghapus tanda tangan?')) {
                 fetch(`{{ url('form-perencanaan/mapa01/konfirmasi/ttd') }}/${id}/delete`, {
                     method: 'DELETE',
@@ -262,8 +285,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then(data => {
                     if(data.success) {
                         const td = btn.closest('td');
-                        td.innerHTML = `<canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc;cursor:pointer;"></canvas>
-                                        <input type="hidden" name="tanda_tangan[${id}]" class="tanda_tangan">`;
+                        let hiddenName = '';
+                        if (role) hiddenName = `tanda_tangan[${role}]`;
+                        else if (index) hiddenName = `tanda_tangan[${index}]`;
+
+                        td.innerHTML = `
+                            <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc;cursor:pointer;"></canvas>
+                            <input type="hidden" name="${hiddenName}" class="tanda_tangan">
+                        `;
+
                         alert(data.message);
                     } else {
                         alert(data.message || 'Gagal menghapus tanda tangan.');
@@ -272,6 +302,45 @@ document.addEventListener("DOMContentLoaded", () => {
                 .catch(() => alert('Gagal menghapus tanda tangan.'));
             }
         }
+    });
+
+    // ==== Hapus penyusun ====
+    document.addEventListener("click", e => {
+        if (e.target.classList.contains("delete-row")) {
+            const row = e.target.closest("tr");
+            const penyusunIdInput = row.querySelector("input[name^='penyusun_id']");
+            if (penyusunIdInput) {
+                // penyusun lama → modal
+                const penyusunId = penyusunIdInput.value;
+                document.getElementById("deletePenyusunId").value = penyusunId;
+                const modal = new bootstrap.Modal(document.getElementById("deletePenyusunModal"));
+                modal.show();
+            } else {
+                // penyusun baru → langsung hapus
+                row.remove();
+            }
+        }
+    });
+
+    // Konfirmasi hapus penyusun lama
+    document.getElementById("confirmDeletePenyusun").addEventListener("click", () => {
+        const id = document.getElementById("deletePenyusunId").value;
+        fetch(`{{ url('form-perencanaan/mapa01/konfirmasi/penyusun') }}/${id}/delete`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                document.querySelector(`#penyusun-table input[value='${id}']`).closest("tr").remove();
+                bootstrap.Modal.getInstance(document.getElementById("deletePenyusunModal")).hide();
+            }
+            alert(data.message);
+        })
+        .catch(() => alert("Gagal menghapus penyusun."));
     });
 });
 </script>
