@@ -67,7 +67,7 @@ public function store(Request $request, $skema_id)
         ]
     );
 
-    return redirect()->route('form.mapa01.konfirmasi', ['skema_id' => $skema_id])
-                     ->with('success', 'Data persyaratan modifikasi berhasil disimpan.');
+return redirect()->route('form.mapa01.konfirmasi', ['skema_id' => $skema_id])
+                 ->with('modifikasi_success', 'Data persyaratan modifikasi berhasil disimpan.');
 }
 }

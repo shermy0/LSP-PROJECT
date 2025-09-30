@@ -126,6 +126,18 @@ class KonfirmasiController extends Controller
             ->with('success', 'Data konfirmasi berhasil disimpan.');
     }
 
+
+public function deletePenyusun($id)
+{
+    $deleted = DB::table('penyusun_persetujuan')->where('id', $id)->delete();
+
+    if ($deleted) {
+        return response()->json(['success' => true, 'message' => 'Penyusun berhasil dihapus.']);
+    }
+    return response()->json(['success' => false, 'message' => 'Gagal menghapus penyusun.'], 400);
+}
+
+
     // Hapus TTD
     public function deleteTtd($id)
     {

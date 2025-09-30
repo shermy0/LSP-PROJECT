@@ -20,7 +20,7 @@
 <div class="container">
 
     <div class="card p-3">
-        <h6 class="judul-header">Kelompok Pekerjaan 1</h6>
+        <h6 class="judul-header">Tambah Unit ke Kelompok Pekerjaan</h6>
 
 <form id="formUnit" action="{{ route('form.mapa01.simpanunit', [$skema->id_skema, $kelompok_id]) }}" method="POST">
     @csrf
@@ -83,7 +83,7 @@
 </div>
             <div class="d-flex justify-content-between">
                 <a href="{{ route('form.mapa01.kodeunit', $skema->id_skema) }}" class="btn btn-secondary">Kembali</a>
-                <button class="btn btn-primary" type="submit">Simpan Unit</button>
+                <button class="simpan-btn" type="submit">Simpan Unit</button>
             </div>
         </form>
 

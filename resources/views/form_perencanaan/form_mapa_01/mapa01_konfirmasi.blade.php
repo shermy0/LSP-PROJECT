@@ -15,7 +15,7 @@
     </nav>
 </div>
 
-<form action="{{ route('form.mapa01.konfirmasi.simpan', $skema->id_skema) }}" method="POST">
+<form action="{{ route('form.mapa01.konfirmasi.simpan', $skema->id_skema) }}" method="POST" id="page-konfirmasi-marker">
     @csrf
 
     {{-- Orang yang Relevan --}}
@@ -170,7 +170,7 @@
     </div>
 
     <div class="mt-4">
-        <button type="submit" class="btn btn-primary">Simpan</button>
+        <button type="submit" class="simpan-btn">Simpan</button>
     </div>
 </form>
 
@@ -343,5 +343,26 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(() => alert("Gagal menghapus penyusun."));
     });
 });
+document.addEventListener("DOMContentLoaded", () => {
+    const isKonfirmasi = document.querySelector('#page-konfirmasi-marker'); 
+    if (isKonfirmasi) {   // <--- cek dulu marker halaman
+        @if(session('success'))
+            Swal.fire({
+                title: "Berhasil!",
+                text: "{{ session('success') }}",
+                icon: "success",
+                showCancelButton: true,
+                confirmButtonText: "Tetap di Halaman",
+                cancelButtonText: "Ke Form Perencanaan"
+            }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.cancel) {
+                    window.location.href = "{{ route('formperencanaan.show', $skema->id_skema) }}";
+                }
+            });
+        @endif
+    }
+});
+
+
 </script>
 @endsection

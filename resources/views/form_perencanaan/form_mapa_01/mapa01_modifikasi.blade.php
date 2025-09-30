@@ -130,7 +130,9 @@
     <!-- Tombol -->
     <div class="d-flex justify-content-between mt-4">
         <a href="{{ route('form.mapa01.kodeunit', ['skema_id' => $skema->id_skema]) }}" class="btn btn-secondary">Kembali</a>
-        <button type="submit" class="btn btn-primary">Simpan dan Lanjut</button>
+    <button type="submit" class="simpan-btn">
+        <span>Simpan dan Lanjut</span>
+    </button>
     </div>
 
 </form>
