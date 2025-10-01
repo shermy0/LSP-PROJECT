@@ -71,7 +71,7 @@ Route::get('/mapa02/{skema_id}/asesor', [Mapa02Controller::class, 'showMapa02Ase
 
 // Halaman utama laporan (FR.AK.05)
 Route::get('/laporan/{skema_id}', [LaporanController::class, 'showLaporan'])->name('laporan.show');
-Route::get('/laporan_asesor/{skema_id}', [LaporanController::class, 'showLaporanAsesor'])->name('laporan.asesor');
+Route::get('/laporan_asesor/{skema_id}', [LaporanController::class, 'showLaporanAsesor'])->name('form_perencanaan.laporan_asesmen.laporan_asesor');
 Route::get('/laporan/{skema_id}/asesi/{asesor_id}', [LaporanController::class, 'getAsesiByAsesor'])->name('laporan.getAsesi');
 Route::post('/laporan/store', [LaporanController::class, 'store'])->name('laporan_asesor.store');
 

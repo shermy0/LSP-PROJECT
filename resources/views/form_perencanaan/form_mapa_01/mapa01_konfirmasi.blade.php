@@ -325,22 +325,23 @@ document.addEventListener("DOMContentLoaded", () => {
     // Konfirmasi hapus penyusun lama
     document.getElementById("confirmDeletePenyusun").addEventListener("click", () => {
         const id = document.getElementById("deletePenyusunId").value;
-        fetch(`{{ url('form-perencanaan/mapa01/konfirmasi/penyusun') }}/${id}/delete`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json'
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if(data.success) {
-                document.querySelector(`#penyusun-table input[value='${id}']`).closest("tr").remove();
-                bootstrap.Modal.getInstance(document.getElementById("deletePenyusunModal")).hide();
-            }
-            alert(data.message);
-        })
-        .catch(() => alert("Gagal menghapus penyusun."));
+fetch(`{{ url('form-perencanaan/mapa01/konfirmasi/penyusun') }}/${id}/delete`, {
+    method: 'DELETE',
+    headers: {
+        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        'Accept': 'application/json'
+    }
+})
+.then(res => {
+    if (res.ok) {
+        document.querySelector(`#penyusun-table input[value='${id}']`).closest("tr").remove();
+        bootstrap.Modal.getInstance(document.getElementById("deletePenyusunModal")).hide();
+    } else {
+        alert("Gagal menghapus penyusun.");
+    }
+})
+.catch(() => alert("Gagal menghapus penyusun."));
+
     });
 });
 document.addEventListener("DOMContentLoaded", () => {

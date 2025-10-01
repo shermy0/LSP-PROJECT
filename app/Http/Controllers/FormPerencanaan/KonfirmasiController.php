@@ -132,9 +132,10 @@ public function deletePenyusun($id)
     $deleted = DB::table('penyusun_persetujuan')->where('id', $id)->delete();
 
     if ($deleted) {
-        return response()->json(['success' => true, 'message' => 'Penyusun berhasil dihapus.']);
+        // cukup balikin 204 (no content) tanpa json
+        return response(null, 204);
     }
-    return response()->json(['success' => false, 'message' => 'Gagal menghapus penyusun.'], 400);
+    return response(null, 400);
 }
 
 

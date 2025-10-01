@@ -175,6 +175,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const asesiTableBody = document.getElementById('asesiTableBody');
     const asesorIdHidden = document.getElementById('asesor_id_hidden');
     const noRegHidden    = document.getElementById('no_registrasi_hidden');
+    const simpanForm     = document.getElementById('simpan-lanjut-form');
 
     asesorSelect.addEventListener('change', function () {
         const asesorId = this.value;
@@ -189,42 +190,48 @@ document.addEventListener('DOMContentLoaded', function () {
             fetch(url)
                 .then(res => res.json())
                 .then(data => {
-                    asesiTableBody.innerHTML = '';
-                    if (data.length > 0) {
-                        data.forEach((asesi, index) => {
-                            // bikin dropdown option dari unit_kompetensi
-                            let unitOptions = '';
-                            @foreach($skema->unitKompetensi as $unit)
-                                unitOptions += `<option value="{{ $unit->id_unit }}">{{ $unit->kode_unit }} - {{ $unit->judul_unit }}</option>`;
-                            @endforeach
+    asesiTableBody.innerHTML = '';
+    if (data.length > 0) {
+        data.forEach((asesi, index) => {
+            let unitOptions = '<option value="">-- Pilih Unit --</option>';
+            @foreach($skema->unitKompetensi as $unit)
+                unitOptions += `<option value="{{ $unit->id_unit }}"
+                    ${asesi.id_unit == {{ $unit->id_unit }} ? 'selected' : ''}>
+                    {{ $unit->kode_unit }} - {{ $unit->judul_unit }}
+                </option>`;
+            @endforeach
 
-                            asesiTableBody.innerHTML += `
-                                <tr>
-                                    <td>${index + 1}</td>
-                                    <td>${asesi.nama_lengkap}</td>
-                                    <td>
-                                        <input type="radio" name="rekomendasi_${asesi.id_asesi}" value="K"
-                                            onchange="toggleKeterangan(${asesi.id_asesi}, false)">
-                                    </td>
-                                    <td>
-                                        <input type="radio" name="rekomendasi_${asesi.id_asesi}" value="BK"
-                                            onchange="toggleKeterangan(${asesi.id_asesi}, true)">
-                                    </td>
-                                    <td>
-                                        <select name="keterangan_${asesi.id_asesi}" id="keterangan_${asesi.id_asesi}" class="form-control" disabled>
-                                            <option value="">-- Pilih Unit --</option>
-                                            ${unitOptions}
-                                        </select>
-                                    </td>
-                                </tr>
-                            `;
-                        });
-                    } else {
-                        asesiTableBody.innerHTML = `
-                            <tr><td colspan="5">Tidak ada asesi untuk asesor ini</td></tr>
-                        `;
-                    }
-                })
+            asesiTableBody.innerHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${asesi.nama_lengkap}</td>
+                    <td>
+                        <input type="radio" name="rekomendasi_${asesi.id_asesi}" value="K"
+                            ${asesi.hasil === 'K' ? 'checked' : ''}
+                            onchange="toggleKeterangan(${asesi.id_asesi}, false)">
+                    </td>
+                    <td>
+                        <input type="radio" name="rekomendasi_${asesi.id_asesi}" value="BK"
+                            ${asesi.hasil === 'BK' ? 'checked' : ''}
+                            onchange="toggleKeterangan(${asesi.id_asesi}, true)">
+                    </td>
+                    <td>
+                        <select name="keterangan_${asesi.id_asesi}" id="keterangan_${asesi.id_asesi}" 
+                            class="form-control" ${asesi.hasil === 'BK' ? '' : 'disabled'}>
+                            ${unitOptions}
+                        </select>
+                    </td>
+                </tr>
+            `;
+        });
+    } else {
+        asesiTableBody.innerHTML = `
+            <tr><td colspan="5">Tidak ada asesi untuk asesor ini</td></tr>
+        `;
+    }
+})
+
+
                 .catch(() => {
                     asesiTableBody.innerHTML = `
                         <tr><td colspan="5">Gagal memuat data asesi</td></tr>
@@ -234,6 +241,30 @@ document.addEventListener('DOMContentLoaded', function () {
             asesiTableBody.innerHTML = `
                 <tr><td colspan="5">Silakan pilih asesor terlebih dahulu</td></tr>
             `;
+        }
+    });
+
+    // 🔴 validasi sebelum submit
+    simpanForm.addEventListener('submit', function(e) {
+        let valid = true;
+        const rows = asesiTableBody.querySelectorAll('tr');
+
+        rows.forEach(row => {
+            const radioBK = row.querySelector('input[type=radio][value=BK]:checked');
+            if (radioBK) {
+                const select = row.querySelector('select');
+                if (select && select.value === "") {
+                    valid = false;
+                    select.classList.add('is-invalid'); // kasih highlight merah
+                } else if (select) {
+                    select.classList.remove('is-invalid');
+                }
+            }
+        });
+
+        if (!valid) {
+            e.preventDefault(); // stop submit
+            alert("Jika memilih BK, wajib memilih unit pada kolom Keterangan.");
         }
     });
 });
@@ -246,6 +277,7 @@ function toggleKeterangan(asesiId, enable) {
     } else {
         selectEl.value = '';
         selectEl.disabled = true;
+        selectEl.classList.remove('is-invalid'); // hapus merah kalau pindah ke K
     }
 }
 </script>

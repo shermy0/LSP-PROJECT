@@ -47,11 +47,19 @@ public function showLaporanAsesor($skema_id)
 public function getAsesiByAsesor($skema_id, $asesor_id)
 {
     $asesis = DB::table('asesi')
+        ->leftJoin('hasil_unit_kompetensi', 'asesi.id_asesi', '=', 'hasil_unit_kompetensi.id_asesi')
         ->where('asesi.asesor_id', $asesor_id)
+        ->select(
+            'asesi.id_asesi',
+            'asesi.nama_lengkap',
+            'hasil_unit_kompetensi.hasil',
+            'hasil_unit_kompetensi.id_unit'
+        )
         ->get();
 
     return response()->json($asesis);
 }
+
 
     // simpan catatan asesmen
 public function store(Request $request)
@@ -65,17 +73,25 @@ public function store(Request $request)
             $hasil   = $value;
             $unitId  = $request->input("keterangan_$asesiId");
 
-            \DB::table('hasil_unit_kompetensi')->insert([
-                'id_asesi' => $asesiId,
-                'id_unit'  => $unitId ?? 0,
-                'hasil'    => $hasil,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            // Validasi BK wajib pilih unit
+            if ($hasil === 'BK' && empty($unitId)) {
+                return back()->withErrors("Asesi $asesiId wajib pilih unit jika BK");
+            }
+
+            // ✅ Kalau sudah ada id_asesi, update
+            DB::table('hasil_unit_kompetensi')->updateOrInsert(
+                ['id_asesi' => $asesiId], // kunci pencarian
+                [
+                    'id_unit'    => $hasil === 'K' ? null : $unitId,
+                    'hasil'      => $hasil,
+                    'updated_at' => now(),
+                    'created_at' => now(), // kalau insert baru
+                ]
+            );
         }
     }
 
-    return redirect()->route('form_perencanaan.laporan_asesmen.laporan.asesor', $skemaId)
+    return redirect()->route('form_perencanaan.laporan_asesmen.laporan_asesor', $skemaId)
         ->with('success', 'Laporan berhasil disimpan');
 }
     
