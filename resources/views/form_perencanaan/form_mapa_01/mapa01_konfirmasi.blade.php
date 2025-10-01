@@ -6,7 +6,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('formperencanaan.index') }}">Daftar Skema</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('formperencanaan.index') }}">Form Perencanaan</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('formperencanaan.show', $skema->id_skema) }}">Form Perencanaan</a></li>
             <li class="breadcrumb-item"><a href="{{ route('form.mapa01', $skema->id_skema) }}">FR.MAPA.01</a></li>
             <li class="breadcrumb-item"><a href="{{ route('form.mapa01.kodeunit', $skema->id_skema) }}">Rencana Asesmen</a></li>
             <li class="breadcrumb-item"><a href="{{ route('form.mapa01.modifikasi', $skema->id_skema) }}">Persyaratan</a></li>
@@ -15,7 +15,7 @@
     </nav>
 </div>
 
-<form action="{{ route('form.mapa01.konfirmasi.simpan', $skema->id_skema) }}" method="POST">
+<form action="{{ route('form.mapa01.konfirmasi.simpan', $skema->id_skema) }}" method="POST" id="page-konfirmasi-marker">
     @csrf
 
     {{-- Orang yang Relevan --}}
@@ -32,58 +32,40 @@
                             <th>Tanda Tangan</th>
                         </tr>
                     </thead>
-<tbody>
-    @php
-        // mapping label supaya gampang dipakai
-        $roleLabels = [
-            'manajer_lsp' => 'Manajer Sertifikasi LSP',
-            'master_asesor' => 'Master Asesor / Lead Asesor',
-            'manajer_pelatihan' => 'Manajer Pelatihan',
-            'supervisor' => 'Supervisor di Tempat Kerja',
-        ];
-    @endphp
-
-    @foreach ($roleLabels as $role => $label)
-        @php
-            // cek apakah di halaman sebelumnya role ini dipilih
-            $field = 'konfirmasi_'.$role;
-        @endphp
-
-        @if ($konfirmasi && $konfirmasi->$field) 
-            <tr>
-                <td>{{ $label }}</td>
-                <td>
-                    <select name="asesor[{{ $role }}]" class="form-select">
-                        <option value="">-- Pilih Asesor --</option>
-                        @foreach($asesors as $asesor)
-                            <option value="{{ $asesor->id_asesor }}"
-                                {{ isset($roles[$role]) && $roles[$role]->id_asesor == $asesor->id_asesor ? 'selected' : '' }}>
-                                {{ $asesor->nama_asesor }}
-                            </option>
-                        @endforeach
-                    </select>
-                </td>
-                <td>
-                    <input type="date" name="tanggal[{{ $role }}]" class="form-control"
-                           value="{{ $roles[$role]->tanggal ?? '' }}">
-                </td>
-                <td class="text-center">
-                    @if(!empty($roles[$role]->tanda_tangan))
-                        <img src="{{ $roles[$role]->tanda_tangan }}" width="120"><br>
-                        <a href="{{ route('form.mapa01.konfirmasi.ttd.download', $roles[$role]->id) }}" class="btn btn-sm btn-primary mt-1">Download</a>
-                        <form action="{{ route('form.mapa01.konfirmasi.ttd.delete', $roles[$role]->id) }}" method="POST" style="display:inline-block;">
-                            @csrf @method('DELETE')
-                            <button class="btn btn-sm btn-danger mt-1">Hapus</button>
-                        </form>
-                    @else
-                        <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc;cursor:pointer;"></canvas>
-                        <input type="hidden" name="tanda_tangan[{{ $role }}]" class="tanda_tangan">
-                    @endif
-                </td>
-            </tr>
-        @endif
-    @endforeach
-</tbody>
+                    <tbody>
+                    @foreach($activeRoles as $role => $info)
+                        <tr>
+                            <td>{{ $info['label'] }}</td>
+                            <td>
+                                <select name="asesor[{{ $role }}]" class="form-select">
+                                    <option value="">-- Pilih Asesor --</option>
+                                    @foreach($asesors as $asesor)
+                                        <option value="{{ $asesor->id_asesor }}"
+                                            {{ isset($info['data']) && $info['data']->id_asesor == $asesor->id_asesor ? 'selected' : '' }}>
+                                            {{ $asesor->nama_asesor }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td>
+                                <input type="date" name="tanggal[{{ $role }}]" class="form-control"
+                                       value="{{ $info['data']->tanggal ?? '' }}">
+                            </td>
+                            <td class="text-center">
+                                @if(!empty($info['data']->tanda_tangan))
+                                    <img src="{{ $info['data']->tanda_tangan }}" width="120"><br>
+                                    <a href="{{ route('form.mapa01.konfirmasi.ttd.download', $info['data']->id) }}" class="btn btn-sm btn-primary mt-1">Download</a>
+                                    <button type="button" class="btn btn-sm btn-danger mt-1 delete-ttd"
+                                            data-id="{{ $info['data']->id }}"
+                                            data-role="{{ $role }}">Hapus</button>
+                                @else
+                                    <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc;cursor:pointer;"></canvas>
+                                    <input type="hidden" name="tanda_tangan[{{ $role }}]" class="tanda_tangan">
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -97,7 +79,7 @@
                 <table class="table table-bordered custom-table" id="penyusun-table">
                     <thead class="table-title">
                         <tr>
-                            <th>Nama</th>
+                            <th>Nama Asesor</th>
                             <th>No Met</th>
                             <th>Tanggal</th>
                             <th>Tanda Tangan</th>
@@ -105,42 +87,68 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach(DB::table('penyusun_persetujuan')->where('id_skema',$skema->id_skema)->where('role','penyusun')->get() as $item)
+                    @foreach($penyusun as $i => $item)
                         <tr>
-                            <td>{{ $item->nama }}</td>
-                            <td>{{ $item->no_met }}</td>
-                            <td>{{ $item->tanggal }}</td>
+                           <td>
+                                <input type="hidden" name="penyusun_id[{{ $i }}]" value="{{ $item->id }}">
+                                <select name="nama_asesor[{{ $i }}]" class="form-select asesor-select">
+                                    <option value="">-- Pilih Asesor --</option>
+                                    @foreach($asesors as $asesor)
+                                        <option value="{{ $asesor->id_asesor }}"
+                                            data-nomet="{{ $asesor->no_met ?? '' }}"
+                                            {{ $item->id_asesor == $asesor->id_asesor ? 'selected' : '' }}>
+                                            {{ $asesor->nama_asesor }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </td>
                             <td>
+                                <input type="text" name="nomet[{{ $i }}]" class="form-control nomet-input" readonly
+                                    value="{{ $item->no_met ?? ($asesors->firstWhere('id_asesor', $item->id_asesor)->no_met ?? '') }}">
+                            </td>
+                            <td>
+                                <input type="date" name="tanggal[{{ $i }}]" class="form-control" value="{{ $item->tanggal ?? '' }}">
+                            </td>
+                            <td class="text-center">
                                 @if($item->tanda_tangan)
                                     <img src="{{ $item->tanda_tangan }}" width="120"><br>
                                     <a href="{{ route('form.mapa01.konfirmasi.ttd.download', $item->id) }}" class="btn btn-sm btn-primary mt-1">Download</a>
-                                    <form action="{{ route('form.mapa01.konfirmasi.ttd.delete', $item->id) }}" method="POST" style="display:inline-block;">
-                                        @csrf @method('DELETE')
-                                        <button class="btn btn-sm btn-danger mt-1">Hapus</button>
-                                    </form>
+                                    <button type="button" class="btn btn-sm btn-danger mt-1 delete-ttd"
+                                            data-id="{{ $item->id }}"
+                                            data-index="{{ $i }}">Hapus</button>
                                 @else
-                                    <em>Belum ada tanda tangan</em>
+                                    <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc;cursor:pointer;"></canvas>
+                                    <input type="hidden" name="tanda_tangan[{{ $i }}]" class="tanda_tangan">
                                 @endif
                             </td>
                             <td><button type="button" class="btn btn-danger btn-sm delete-row">Hapus</button></td>
                         </tr>
-                        @endforeach
-
-                        <tr>
-                            <td><input type="text" name="nama[]" class="form-control" placeholder="Nama Penyusun"></td>
-                            <td><input type="text" name="nomet[]" class="form-control" placeholder="No Met"></td>
-                            <td><input type="date" name="tanggal[]" class="form-control"></td>
-                            <td>
-                                <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc;cursor:pointer;"></canvas>
-                                <input type="hidden" name="tanda_tangan[]" class="tanda_tangan">
-                            </td>
-                            <td><button type="button" class="btn btn-danger btn-sm delete-row">Hapus</button></td>
-                        </tr>
+                    @endforeach
                     </tbody>
                 </table>
                 <button type="button" id="add-row" class="btn btn-success mt-2">+ Tambah Penyusun</button>
             </div>
         </div>
+    </div>
+
+    <!-- Modal Konfirmasi Hapus Penyusun -->
+    <div class="modal fade" id="deletePenyusunModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title">Konfirmasi Hapus</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p>Apakah Anda yakin ingin menghapus penyusun ini?</p>
+            <input type="hidden" id="deletePenyusunId">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="button" class="btn btn-danger" id="confirmDeletePenyusun">Hapus</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     {{-- Validator --}}
@@ -162,7 +170,7 @@
     </div>
 
     <div class="mt-4">
-        <button type="submit" class="btn btn-primary">Simpan</button>
+        <button type="submit" class="simpan-btn">Simpan</button>
     </div>
 </form>
 
@@ -225,22 +233,136 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Tambah baris penyusun
     document.getElementById("add-row").onclick = () => {
+        const i = document.querySelectorAll("#penyusun-table tbody tr").length;
+        const options = `@foreach($asesors as $asesor)<option value="{{ $asesor->id_asesor }}" data-nomet="{{ $asesor->no_met ?? '' }}">{{ $asesor->nama_asesor }}</option>@endforeach`;
         document.querySelector("#penyusun-table tbody").insertAdjacentHTML("beforeend", `
             <tr>
-                <td><input type="text" name="nama[]" class="form-control"></td>
-                <td><input type="text" name="nomet[]" class="form-control"></td>
-                <td><input type="date" name="tanggal[]" class="form-control"></td>
+                <td>
+                    <select name="nama_asesor[${i}]" class="form-select asesor-select">
+                        <option value="">-- Pilih Asesor --</option>
+                        ${options}
+                    </select>
+                </td>
+                <td><input type="text" name="nomet[${i}]" class="form-control nomet-input" readonly></td>
+                <td><input type="date" name="tanggal[${i}]" class="form-control"></td>
                 <td>
                     <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc;cursor:pointer;"></canvas>
-                    <input type="hidden" name="tanda_tangan[]" class="tanda_tangan">
+                    <input type="hidden" name="tanda_tangan[${i}]" class="tanda_tangan">
                 </td>
                 <td><button type="button" class="btn btn-danger btn-sm delete-row">Hapus</button></td>
-            </tr>`);
+            </tr>
+        `);
     };
 
+    // Update No Met otomatis saat pilih asesor
+    document.addEventListener("change", e => {
+        if (e.target.classList.contains("asesor-select")) {
+            const selected = e.target.selectedOptions[0];
+            const noMet = selected.dataset.nomet || '';
+            const row = e.target.closest("tr");
+            const nometInput = row.querySelector(".nomet-input");
+            if (nometInput) nometInput.value = noMet;
+        }
+    });
+
+    // ==== AJAX Hapus TTD ====
     document.addEventListener("click", e => {
-        if (e.target.closest(".delete-row")) e.target.closest("tr").remove();
+        if(e.target.classList.contains('delete-ttd')) {
+            const btn = e.target;
+            const id = btn.dataset.id;
+            const role = btn.dataset.role;
+            const index = btn.dataset.index;
+
+            if(confirm('Yakin ingin menghapus tanda tangan?')) {
+                fetch(`{{ url('form-perencanaan/mapa01/konfirmasi/ttd') }}/${id}/delete`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        const td = btn.closest('td');
+                        let hiddenName = '';
+                        if (role) hiddenName = `tanda_tangan[${role}]`;
+                        else if (index) hiddenName = `tanda_tangan[${index}]`;
+
+                        td.innerHTML = `
+                            <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc;cursor:pointer;"></canvas>
+                            <input type="hidden" name="${hiddenName}" class="tanda_tangan">
+                        `;
+
+                        alert(data.message);
+                    } else {
+                        alert(data.message || 'Gagal menghapus tanda tangan.');
+                    }
+                })
+                .catch(() => alert('Gagal menghapus tanda tangan.'));
+            }
+        }
+    });
+
+    // ==== Hapus penyusun ====
+    document.addEventListener("click", e => {
+        if (e.target.classList.contains("delete-row")) {
+            const row = e.target.closest("tr");
+            const penyusunIdInput = row.querySelector("input[name^='penyusun_id']");
+            if (penyusunIdInput) {
+                // penyusun lama → modal
+                const penyusunId = penyusunIdInput.value;
+                document.getElementById("deletePenyusunId").value = penyusunId;
+                const modal = new bootstrap.Modal(document.getElementById("deletePenyusunModal"));
+                modal.show();
+            } else {
+                // penyusun baru → langsung hapus
+                row.remove();
+            }
+        }
+    });
+
+    // Konfirmasi hapus penyusun lama
+    document.getElementById("confirmDeletePenyusun").addEventListener("click", () => {
+        const id = document.getElementById("deletePenyusunId").value;
+        fetch(`{{ url('form-perencanaan/mapa01/konfirmasi/penyusun') }}/${id}/delete`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                document.querySelector(`#penyusun-table input[value='${id}']`).closest("tr").remove();
+                bootstrap.Modal.getInstance(document.getElementById("deletePenyusunModal")).hide();
+            }
+            alert(data.message);
+        })
+        .catch(() => alert("Gagal menghapus penyusun."));
     });
 });
+document.addEventListener("DOMContentLoaded", () => {
+    const isKonfirmasi = document.querySelector('#page-konfirmasi-marker'); 
+    if (isKonfirmasi) {   // <--- cek dulu marker halaman
+        @if(session('success'))
+            Swal.fire({
+                title: "Berhasil!",
+                text: "{{ session('success') }}",
+                icon: "success",
+                showCancelButton: true,
+                confirmButtonText: "Tetap di Halaman",
+                cancelButtonText: "Ke Form Perencanaan"
+            }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.cancel) {
+                    window.location.href = "{{ route('formperencanaan.show', $skema->id_skema) }}";
+                }
+            });
+        @endif
+    }
+});
+
+
 </script>
 @endsection

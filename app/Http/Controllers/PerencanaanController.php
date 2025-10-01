@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Skema;
 use App\Models\InstrumenAsesmen;
 use App\Models\LaporanAsesmen;
+use App\Models\Asesor;
 
 class PerencanaanController extends Controller
 {

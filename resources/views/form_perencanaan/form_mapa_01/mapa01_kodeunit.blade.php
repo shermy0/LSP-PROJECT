@@ -100,6 +100,6 @@
 
 <div class="d-flex justify-content-between mt-3">
 <a href="{{ route('form.mapa01', ['id_skema' => $skema->id_skema]) }}" class="btn btn-secondary">Kembali</a>
-<a href="{{ route('form.mapa01.modifikasi', ['skema_id' => $skema->id_skema]) }}" class="btn btn-primary">Simpan dan Lanjut</a>
+<a href="{{ route('form.mapa01.modifikasi', ['skema_id' => $skema->id_skema]) }}" class="simpan-btn">Simpan dan Lanjut</a>
 </div>
 @endsection

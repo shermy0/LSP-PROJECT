@@ -10,7 +10,6 @@ use App\Http\Controllers\FormPerencanaan\Mapa02Controller;
 use App\Http\Controllers\FormPerencanaan\ModifikasiController;
 use App\Http\Controllers\FormPerencanaan\KonfirmasiController;
 use App\Http\Controllers\FormPerencanaan\LaporanController;
-use App\Http\Controllers\FormPerencanaan\MeninjauController;
 use App\Http\Controllers\FormPerencanaan\MeninjauAsesmenController;
 use App\Http\Controllers\SkemaController;
 use App\Models\UnitKompetensi;
@@ -57,6 +56,7 @@ Route::get('/perencanaan/skema/{id_skema}', [FormPerencanaanController::class, '
 
 Route::post('/formperencanaan', [PerencanaanController::class, 'simpan'])->name('formperencanaan.simpan');
 
+
 // form perencanaan mapa 01
 Route::prefix('form-perencanaan')->group(function () {
 // ============================
@@ -65,12 +65,52 @@ Route::prefix('form-perencanaan')->group(function () {
     // MAPA01
 Route::get('/mapa01/{id_skema}', [Mapa01Controller::class, 'showMapa01'])->name('form.mapa01');
    // MAPA02
-    Route::get('/mapa02/{id_skema}', [Mapa02Controller::class, 'showMapa02'])->name('form.mapa02');
+Route::get('/mapa02/{skema_id}', [Mapa02Controller::class, 'showMapa02'])->name('form.mapa02');
+Route::get('/mapa02/{skema_id}/asesor', [Mapa02Controller::class, 'showMapa02Asesor'])
+    ->name('form.mapa02.asesor');
+
+// Halaman utama laporan (FR.AK.05)
+Route::get('/laporan/{skema_id}', [LaporanController::class, 'showLaporan'])->name('laporan.show');
+Route::get('/laporan_asesor/{skema_id}', [LaporanController::class, 'showLaporanAsesor'])->name('laporan.asesor');
+Route::get('/laporan/{skema_id}/asesi/{asesor_id}', [LaporanController::class, 'getAsesiByAsesor'])->name('laporan.getAsesi');
+Route::post('/laporan/store', [LaporanController::class, 'store'])->name('laporan_asesor.store');
+
+// ============================
+// Meninjau Asesmen
+// ============================
+Route::get('/ninjau_asesemen/{id_skema}', [MeninjauAsesmenController::class, 'showNinjauAsesmen'])
+    ->name('form_perencanaan.ninjau_asesemen');
+
+Route::get('/ninjau-asesmen-asesor/{id_skema}', [MeninjauAsesmenController::class, 'showAsesor'])
+    ->name('form_perencanaan.ninjau_asesmen_asesor.view');
+
+Route::post('/meninjau-asesmen/store', [MeninjauAsesmenController::class, 'store'])
+    ->name('meninjau_asesmen.store');
+
+Route::post('/ninjau-asesmen-asesor/{asesor_id}/simpan-persetujuan', [MeninjauAsesmenController::class, 'simpanPersetujuan'])
+    ->name('ninjau_asesmen_asesor.simpan');
+
+// simpan dan lanjut
+Route::post('/ninjau-asesmen-asesor', [MeninjauAsesmenController::class, 'simpanLanjut'])
+    ->name('ninjau_asesmen_asesor');
+
+Route::get('/ninjau-asesmen-asesor/{asesor_id}', [MeninjauAsesmenController::class, 'showAsesor'])
+    ->name('ninjau_asesmen_asesor.view');
+    
+Route::get('/ninjau_asesemen/ninjau-asesmen-asesor', [MeninjauAsesmenController::class, 'showAsesor'])
+    ->name('ninjau_asesmen_asesor.show');
+
+Route::post('/ninjau_asesemen/ninjau-asesmen-asesor', [MeninjauAsesmenController::class, 'simpanLanjut'])
+    ->name('ninjau_asesmen_asesor.store');
+
     //MODIFIKASI
     Route::get('/mapa01/modifikasi/{skema_id}', [ModifikasiController::class, 'index'])->name('form.mapa01.modifikasi');
     // Halaman utama laporan (FR.AK.05)
-    Route::get('/laporan/{id_skema}', [LaporanController::class, 'showLaporan'])->name('laporan');
-// ============================
+// Route::get('/laporan/{skema_id}', [LaporanController::class, 'showLaporan'])->name('laporan.show');
+// Route::get('/laporan/{skema_id}/asesi/{asesor_id}', [LaporanController::class, 'getAsesiByAsesor'])->name('laporan.getAsesi');
+// Route::post('/laporan/store', [LaporanController::class, 'store'])->name('laporan_asesor.store');
+    
+    // ============================
 // END NAVIGASI PERFORM
 // ============================
 Route::post('/mapa01/modifikasi/{skema_id}', [ModifikasiController::class, 'store'])
@@ -107,6 +147,12 @@ Route::get('/mapa01/kode-unit/{skema_id}', [Mapa01Controller::class, 'kodeUnit']
 
 Route::get('mapa01/konfirmasi/ttd/{id}/download', [KonfirmasiController::class, 'downloadTtd'])->name('form.mapa01.konfirmasi.ttd.download');
 Route::delete('mapa01/konfirmasi/ttd/{id}/delete', [KonfirmasiController::class, 'deleteTtd'])->name('form.mapa01.konfirmasi.ttd.delete');
+// routes/web.php
+Route::delete('mapa01/konfirmasi/penyusun/{id}/delete', 
+    [KonfirmasiController::class, 'deletePenyusun']
+)->name('form.mapa01.konfirmasi.penyusun.delete');
+
+
 
 // Route::post('/mapa01/konfirmasi/{skema_id}/simpan', [KonfirmasiController::class, 'simpanKonfirmasi'])
 //     ->name('form.mapa01.konfirmasi.simpan');
@@ -142,9 +188,9 @@ Route::get('/mapa02', [Mapa02Controller::class, 'index'])->name('mapa02.index');
 Route::get('/mapa02/{id_skema}', [Mapa02Controller::class, 'showMapa02'])->name('form.mapa02');
 
 // AJAX
-Route::get('/mapa02/skema/{skemaId}/asesor', [Mapa02Controller::class, 'getAsesor'])->name('mapa02.getAsesor');
-Route::get('/mapa02/skema/{skemaId}/asesi/{asesorId}', [Mapa02Controller::class, 'getAsesi'])->name('mapa02.getAsesi');
-Route::get('/mapa02/skema/{skemaId}/units', [Mapa02Controller::class, 'getUnits'])->name('mapa02.getUnits');
+// Route::get('/mapa02/skema/{skemaId}/asesor', [Mapa02Controller::class, 'getAsesor'])->name('mapa02.getAsesor');
+// Route::get('/mapa02/skema/{skemaId}/asesi/{asesorId}', [Mapa02Controller::class, 'getAsesi'])->name('mapa02.getAsesi');
+// Route::get('/mapa02/skema/{skemaId}/units', [Mapa02Controller::class, 'getUnits'])->name('mapa02.getUnits');
 
 // Simpan jawaban instrumen
 Route::post('/mapa02/instrumen/simpan-potensi', [Mapa02Controller::class, 'simpanInstrumen'])
@@ -164,51 +210,27 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 // ============================
 // Meninjau Asesmen
 // ============================
-Route::get('/ninjau_asesemen', [MeninjauAsesmenController::class, 'index'])
-    ->name('ninjau_asesemen');
-
-Route::get('/ninjau-asesmen-asesor/{id_skema}', [MeninjauAsesmenController::class, 'showAsesor'])
-    ->name('ninjau_asesmen_asesor.view');
-
-Route::post('/meninjau-asesmen/store', [MeninjauAsesmenController::class, 'store'])
-    ->name('meninjau_asesmen.store');
-
-Route::post('/ninjau-asesmen-asesor/{asesor_id}/simpan-persetujuan', [MeninjauAsesmenController::class, 'simpanPersetujuan'])
-    ->name('ninjau_asesmen_asesor.simpan');
-Route::get('/formperencanaan', [FormPerencanaanController::class, 'index'])
-     ->name('formperencanaan');
-
-// simpan dan lanjut
-Route::post('/ninjau-asesmen-asesor', [MeninjauAsesmenController::class, 'simpanLanjut'])
-    ->name('ninjau_asesmen_asesor');
-
-Route::get('/ninjau-asesmen-asesor/{asesor_id}', [MeninjauAsesmenController::class, 'showAsesor'])
-    ->name('ninjau_asesmen_asesor.view');
-
-Route::get('/get-asesor/{skema_id}', [MeninjauAsesmenController::class, 'getAsesor']);
-
-Route::get('/ninjau_asesemen/ninjau-asesmen-asesor', [MeninjauAsesmenController::class, 'showAsesor'])
-    ->name('ninjau_asesmen_asesor.show');
-
-Route::post('/ninjau_asesemen/ninjau-asesmen-asesor', [MeninjauAsesmenController::class, 'simpanLanjut'])
-    ->name('ninjau_asesmen_asesor.store');
+// Route::get('/ninjau_asesemen', [SkemaController::class, 'ninjau_asesemen'])->name('ninjau_asesemen');
+// Route::get('/ninjau_asesemen/ninjau-asesmen-asesor', [PerencanaanController::class, 'ninjauAsesmenAsesor'])->name('ninjau_asesmen_asesor.show');
+// Route::post('/ninjau_asesemen/ninjau-asesmen-asesor', [PerencanaanController::class, 'simpanLanjut'])->name('ninjau_asesmen_asesor.store');
 
 // ============================
 // Laporan
 // ============================
+// Halaman daftar laporan asesmen
+// Route::get('/laporan-asesor', [PerencanaanController::class, 'laporan'])
+//     ->name('laporan_asesor.index');
+// // Simpan catatan asesmen
+// Route::post('/laporan-asesor', [PerencanaanController::class, 'simpanLanjutLaporan'])
+//     ->name('laporan_asesor.store');
+// // Halaman laporan umum (kalau memang perlu dari SkemaController)
+// Route::get('/laporan', [SkemaController::class, 'laporan'])
+//     ->name('laporan
+// Route::get('laporan/{skema_id}/asesi/{asesor_id}', 
+//     [LaporanController::class, 'getAsesiByAsesor']
+// );
 
 
-
-
-// Halaman daftar laporan
-Route::get('/laporan_asesor', [PerencanaanController::class, 'laporan_asesor'])->name('laporan_asesor');
-
-// Halaman Catatan Asesor & TTD (laporan_asesor)
-Route::get('/laporan_asesor', [PerencanaanController::class, 'laporanAsesor'])
-    ->name('laporan_asesor');
-
-// Simpan data laporan
-Route::post('/laporan_asesor', [PerencanaanController::class, 'store'])->name('laporan_asesor.store');
 
 // Ajax ambil asesor & asesi
 Route::get('/get-asesor/{skemaId}', [SkemaController::class, 'getAsesor']);

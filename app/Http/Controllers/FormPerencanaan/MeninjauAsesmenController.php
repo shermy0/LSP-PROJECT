@@ -11,24 +11,31 @@ use Illuminate\Support\Facades\DB;
 class MeninjauAsesmenController extends Controller
 {
     // Halaman awal meninjau asesmen (pilih skema)
-    public function index()
-    {
-        $skemas = Skema::all(); 
-        return view('meninjau_asesmen.ninjau_asesemen', compact('skemas'));
-    }
+public function showNinjauAsesmen($id_skema)
+{
+    $skema = Skema::findOrFail($id_skema);
+
+    $asesors = DB::table('asesor_skema')
+        ->join('asesor', 'asesor_skema.asesor_id', '=', 'asesor.id_asesor')
+        ->where('asesor_skema.skema_id', $id_skema)
+        ->select('asesor.id_asesor', 'asesor.nama_asesor')
+        ->get();
+
+    return view('form_perencanaan.meninjau_asesmen.ninjau_asesmen', compact('skema', 'asesors'));
+}
 
     // Halaman per skema (tampilkan daftar asesor di skema tersebut)
-    public function ninjauAsesmenAsesor($id_skema)
-    {
-        $skema = Skema::findOrFail($id_skema);
-        $asesors = DB::table('asesor_skema')
-            ->join('asesor', 'asesor_skema.asesor_id', '=', 'asesor.id_asesor')
-            ->where('asesor_skema.skema_id', $id_skema)
-            ->select('asesor.id_asesor', 'asesor.nama_asesor')
-            ->get();
+public function ninjauAsesmenAsesor($id_skema)
+{
+    $skema = Skema::findOrFail($id_skema);
+    $asesors = DB::table('asesor_skema')
+        ->join('asesor', 'asesor_skema.asesor_id', '=', 'asesor.id_asesor')
+        ->where('asesor_skema.skema_id', $id_skema)
+        ->select('asesor.id_asesor', 'asesor.nama_asesor')
+        ->get();
 
-        return view('meninjau_asesmen.ninjau_asesemen_skema', compact('skema', 'asesors'));
-    }
+    return view('form_perencanaan.meninjau_asesmen.ninjau_asesmen_skema', compact('skema', 'asesors'));
+}
 
     // Ambil asesor berdasarkan skema (AJAX)
     public function getAsesor($skema_id)
@@ -41,12 +48,12 @@ class MeninjauAsesmenController extends Controller
 
         return response()->json($asesors);
     }
-
+    
     // Tampilkan detail asesmen untuk asesor tertentu
     public function showAsesor($asesor_id)
     {
         $asesor = DB::table('asesor')->where('id_asesor', $asesor_id)->first();
-        return view('meninjau_asesmen.ninjau_asesmen_asesor', compact('asesor'));
+return view('form_perencanaan.meninjau_asesmen.ninjau_asesmen_asesor', compact('asesor'));
     }
 
     // Simpan hasil review asesmen
@@ -99,7 +106,7 @@ class MeninjauAsesmenController extends Controller
         ]);
 
         return redirect()
-            ->route('ninjau_asesemen.asesor', ['asesor_id' => $request->asesor_id])
+            ->route('form_perencanaan.ninjau_asesemen.asesor', ['asesor_id' => $request->asesor_id])
             ->with('success', 'Data berhasil disimpan!');
     }
 
@@ -107,7 +114,7 @@ class MeninjauAsesmenController extends Controller
     public function simpanLanjut(Request $request)
     {
         return redirect()
-            ->route('ninjau_asesemen.asesor', ['asesor_id' => $request->asesor_id])
+            ->route('form_perencanaan.ninjau_asesemen.asesor', ['asesor_id' => $request->asesor_id])
             ->with('success', 'Data berhasil disimpan dan dilanjutkan!');
     }
 
@@ -116,7 +123,7 @@ class MeninjauAsesmenController extends Controller
     {
         // logika simpan persetujuan di sini
         return redirect()
-            ->route('ninjau_asesemen.asesor', ['asesor_id' => $asesor_id])
+            ->route('form_perencanaan.ninjau_asesemen.asesor', ['asesor_id' => $asesor_id])
             ->with('success', 'Persetujuan berhasil disimpan!');
     }
 }

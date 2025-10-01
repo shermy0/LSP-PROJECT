@@ -29,45 +29,45 @@ public function index($skema_id)
 public function store(Request $request, $skema_id)
 {
     $validated = $request->validate([
-        'karakteristik_kandidat' => 'required|in:Tidak Ada,Ada',
+        'karakteristik_kandidat' => 'nullable|in:Tidak Ada,Ada',
         'karakteristik_text' => 'nullable|string',
         
-        'kebutuhan_kontekstual' => 'required|in:Tidak Ada,Ada',
+        'kebutuhan_kontekstual' => 'nullable|in:Tidak Ada,Ada',
         'kontekstual_text' => 'nullable|string',
         
-        'saran_pelatihan' => 'required|in:Tidak Ada,Ada',
+        'saran_pelatihan' => 'nullable|in:Tidak Ada,Ada',
         'saran_text' => 'nullable|string',
         
-        'penyesuaian_asesmen' => 'required|in:Tidak Ada,Ada',
+        'penyesuaian_asesmen' => 'nullable|in:Tidak Ada,Ada',
         'penyesuaian_text' => 'nullable|string',
         
-        'peluang_asesmen' => 'required|in:Tidak Ada,Ada',
+        'peluang_asesmen' => 'nullable|in:Tidak Ada,Ada',
         'peluang_text' => 'nullable|string',
     ]);
 
     DB::table('persyaratan_modifikasi')->updateOrInsert(
-        ['skema_id' => $skema_id], // kondisi: kalau skema_id sudah ada, update
+        ['skema_id' => $skema_id], 
         [
-            'karakteristik_kandidat' => $validated['karakteristik_kandidat'],
+            'karakteristik_kandidat'   => $validated['karakteristik_kandidat'] ?? null,
             'karakteristik_keterangan' => $validated['karakteristik_text'] ?? null,
 
-            'kebutuhan_tempat_kerja' => $validated['kebutuhan_kontekstual'],
-            'kebutuhan_keterangan' => $validated['kontekstual_text'] ?? null,
+            'kebutuhan_tempat_kerja'   => $validated['kebutuhan_kontekstual'] ?? null,
+            'kebutuhan_keterangan'     => $validated['kontekstual_text'] ?? null,
 
-            'saran_pelatihan' => $validated['saran_pelatihan'],
-            'saran_keterangan' => $validated['saran_text'] ?? null,
+            'saran_pelatihan'          => $validated['saran_pelatihan'] ?? null,
+            'saran_keterangan'         => $validated['saran_text'] ?? null,
 
-            'penyesuaian_asesmen' => $validated['penyesuaian_asesmen'],
-            'penyesuaian_keterangan' => $validated['penyesuaian_text'] ?? null,
+            'penyesuaian_asesmen'      => $validated['penyesuaian_asesmen'] ?? null,
+            'penyesuaian_keterangan'   => $validated['penyesuaian_text'] ?? null,
 
-            'peluang_asesmen' => $validated['peluang_asesmen'],
-            'peluang_keterangan' => $validated['peluang_text'] ?? null,
+            'peluang_asesmen'          => $validated['peluang_asesmen'] ?? null,
+            'peluang_keterangan'       => $validated['peluang_text'] ?? null,
 
             'updated_at' => now()
         ]
     );
 
-    return redirect()->route('form.mapa01.konfirmasi', ['skema_id' => $skema_id])
-                     ->with('success', 'Data persyaratan modifikasi berhasil disimpan.');
-}}
-
+return redirect()->route('form.mapa01.konfirmasi', ['skema_id' => $skema_id])
+                 ->with('modifikasi_success', 'Data persyaratan modifikasi berhasil disimpan.');
+}
+}

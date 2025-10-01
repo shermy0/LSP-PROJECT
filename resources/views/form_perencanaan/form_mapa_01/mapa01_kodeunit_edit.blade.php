@@ -83,7 +83,7 @@
 
             <div class="d-flex justify-content-between">
                 <a href="{{ route('form.mapa01.kodeunit', $skema->id_skema) }}" class="btn btn-secondary">Kembali</a>
-                <button class="btn btn-primary">Update</button>
+                <button class="simpan-btn">Update</button>
             </div>
         </form>
     </div>
