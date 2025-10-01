@@ -21,7 +21,7 @@ class Mapa02Controller extends Controller
     public function index()
     {
         $skemas = Skema::all();
-        return view('mapa02', compact('skemas'));
+        return view('form_perencanaan.form_mapa_02.mapa02', compact('skemas'));
     }
 
     // Halaman MAPA02 berdasarkan skema
@@ -37,7 +37,7 @@ class Mapa02Controller extends Controller
             ->where('id_skema', $skema_id)
             ->get();
 
-        return view('mapa02', compact('skema', 'kelompokPekerjaan'));
+        return view('form_perencanaan.form_mapa_02.mapa02', compact('skema', 'kelompokPekerjaan'));
     }
 
     // Ambil data asesor berdasarkan skema (AJAX)

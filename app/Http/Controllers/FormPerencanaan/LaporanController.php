@@ -22,7 +22,7 @@ class LaporanController extends Controller
             ->select('asesor.*')
             ->get();
 
-        return view('laporan', compact('skema', 'asesors'));
+        return view('form_perencanaan.laporan_asesmen.laporan', compact('skema', 'asesors'));
     }
 
 public function showLaporanAsesor($skema_id)
@@ -37,7 +37,7 @@ public function showLaporanAsesor($skema_id)
 
     // $laporans = LaporanAsesmen::with('asesor')->where('skema_id', $skema_id)->get();
 
-    return view('laporan_asesor', compact('skema', 'asesors'));
+    return view('form_perencanaan.laporan_asesmen.laporan_asesor', compact('skema', 'asesors'));
 }
 
 
@@ -75,7 +75,7 @@ public function store(Request $request)
         }
     }
 
-    return redirect()->route('laporan.asesor', $skemaId)
+    return redirect()->route('form_perencanaan.laporan_asesmen.laporan.asesor', $skemaId)
         ->with('success', 'Laporan berhasil disimpan');
 }
     

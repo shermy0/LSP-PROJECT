@@ -1,7 +1,9 @@
 @extends('master')
 
 @section('konten')
-<div class="card-box">
+<link rel="stylesheet" href="{{ asset('assets/css/mapa01.css') }}">
+
+    <div class="card mapa-card">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -60,7 +62,7 @@
 
         <!-- Nama Asesor -->
         <div class="col-md-6">
-            <div class="card-field">
+            <div class="mapa-box">
                 <label for="namaAsesor" class="form-label">Nama Asesor</label>
                 <select class="form-control" id="namaAsesor" name="asesor_id">
                     <option value="">-- Pilih Asesor --</option>
@@ -75,7 +77,7 @@
 
         <!-- Tanggal Asesmen -->
         <div class="col-md-6">
-            <div class="card-field">
+            <div class="mapa-box">
                 <label for="tanggalAsesmen" class="form-label">Tanggal Asesmen</label>
                 <input type="date" class="form-control" id="tanggalAsesmen">
             </div>
@@ -84,6 +86,7 @@
 
     <!-- TUK -->
     <div class="col-12 text-center mt-3">
+                    <div class="mapa-box">
         <label class="form-label fw-semibold d-block mb-2">TUK (Tempat Uji Kompetensi) SMKN 11 Bandung:</label>
         <div class="d-flex justify-content-center gap-4">
             <div class="form-check">
@@ -100,13 +103,14 @@
             </div>
         </div>
     </div>
+    </div>
 </div>
 
 <form id="simpan-lanjut-form" action="{{ route('laporan_asesor.store') }}" method="POST" class="simpan-form mt-4">
     @csrf
 
 <!-- Data Asesi -->
-<div class="card-box mt-4">
+    <div class="card mapa-card">
     <div class="judul-box">
         <div class="judul-header">Data Asesi</div>
         <div class="table-responsive mt-4">
@@ -139,7 +143,7 @@
     <input type="hidden" name="skema_id" id="skema_id_hidden" value="{{ $skema->id_skema }}">
     <input type="hidden" name="no_registrasi" id="no_registrasi_hidden">
 
-    <div class="card-box">
+    <div class="card mapa-card">
         <div class="judul-box">
             <div class="judul-header">Catatan Asesmen</div>
 
