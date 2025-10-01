@@ -67,7 +67,9 @@
                 <select class="form-control" id="namaAsesor" name="asesor_id">
                     <option value="">-- Pilih Asesor --</option>
                     @foreach($asesors as $asesor)
-                        <option value="{{ $asesor->id_asesor }}" data-no="{{ $asesor->no_registrasi }}">
+                        <option value="{{ $asesor->id_asesor }}"
+                            data-no="{{ $asesor->no_registrasi }}"
+                            @if(session('asesor_terpilih') == $asesor->id_asesor) selected @endif>
                             {{ $asesor->nama_asesor }}
                         </option>
                     @endforeach
@@ -177,6 +179,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const noRegHidden    = document.getElementById('no_registrasi_hidden');
     const simpanForm     = document.getElementById('simpan-lanjut-form');
 
+    // auto-trigger jika ada asesor terakhir dipilih
+    @if(session('asesor_terpilih'))
+        asesorSelect.value = "{{ session('asesor_terpilih') }}";
+        asesorSelect.dispatchEvent(new Event('change'));
+    @endif
+
     asesorSelect.addEventListener('change', function () {
         const asesorId = this.value;
         const noReg    = this.selectedOptions[0]?.dataset.no ?? '';
@@ -184,67 +192,72 @@ document.addEventListener('DOMContentLoaded', function () {
         asesorIdHidden.value = asesorId;
         noRegHidden.value    = noReg;
 
-        if (asesorId) {
-            const url = `{{ url('form-perencanaan/laporan/'.$skema->id_skema.'/asesi') }}/${asesorId}`;
-            
-            fetch(url)
-                .then(res => res.json())
-                .then(data => {
-    asesiTableBody.innerHTML = '';
-    if (data.length > 0) {
-        data.forEach((asesi, index) => {
-            let unitOptions = '<option value="">-- Pilih Unit --</option>';
-            @foreach($skema->unitKompetensi as $unit)
-                unitOptions += `<option value="{{ $unit->id_unit }}"
-                    ${asesi.id_unit == {{ $unit->id_unit }} ? 'selected' : ''}>
-                    {{ $unit->kode_unit }} - {{ $unit->judul_unit }}
-                </option>`;
-            @endforeach
-
-            asesiTableBody.innerHTML += `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${asesi.nama_lengkap}</td>
-                    <td>
-                        <input type="radio" name="rekomendasi_${asesi.id_asesi}" value="K"
-                            ${asesi.hasil === 'K' ? 'checked' : ''}
-                            onchange="toggleKeterangan(${asesi.id_asesi}, false)">
-                    </td>
-                    <td>
-                        <input type="radio" name="rekomendasi_${asesi.id_asesi}" value="BK"
-                            ${asesi.hasil === 'BK' ? 'checked' : ''}
-                            onchange="toggleKeterangan(${asesi.id_asesi}, true)">
-                    </td>
-                    <td>
-                        <select name="keterangan_${asesi.id_asesi}" id="keterangan_${asesi.id_asesi}" 
-                            class="form-control" ${asesi.hasil === 'BK' ? '' : 'disabled'}>
-                            ${unitOptions}
-                        </select>
-                    </td>
-                </tr>
-            `;
-        });
-    } else {
-        asesiTableBody.innerHTML = `
-            <tr><td colspan="5">Tidak ada asesi untuk asesor ini</td></tr>
-        `;
-    }
-})
-
-
-                .catch(() => {
-                    asesiTableBody.innerHTML = `
-                        <tr><td colspan="5">Gagal memuat data asesi</td></tr>
-                    `;
-                });
-        } else {
-            asesiTableBody.innerHTML = `
-                <tr><td colspan="5">Silakan pilih asesor terlebih dahulu</td></tr>
-            `;
+        if (!asesorId) {
+            asesiTableBody.innerHTML = `<tr><td colspan="5">Silakan pilih asesor terlebih dahulu</td></tr>`;
+            document.querySelector('textarea[name="aspek_positif_negatif"]').value = '';
+            document.querySelector('textarea[name="penolakan"]').value = '';
+            document.querySelector('textarea[name="saran_perbaikan"]').value = '';
+            return;
         }
+
+        const url = `{{ url('form-perencanaan/laporan/'.$skema->id_skema.'/asesi') }}/${asesorId}`;
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                const asesises = data.asesis;
+                const catatan  = data.catatan;
+
+                // render tabel asesi
+                asesiTableBody.innerHTML = '';
+                if (asesises.length > 0) {
+                    asesises.forEach((asesi, index) => {
+                        let unitOptions = '<option value="">-- Pilih Unit --</option>';
+                        @foreach($skema->unitKompetensi as $unit)
+                            unitOptions += `<option value="{{ $unit->id_unit }}"
+                                ${asesi.id_unit == {{ $unit->id_unit }} ? 'selected' : ''}>
+                                {{ $unit->kode_unit }} - {{ $unit->judul_unit }}
+                            </option>`;
+                        @endforeach
+
+                        asesiTableBody.innerHTML += `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${asesi.nama_lengkap}</td>
+                                <td>
+                                    <input type="radio" name="rekomendasi_${asesi.id_asesi}" value="K"
+                                        ${asesi.hasil === 'K' ? 'checked' : ''}
+                                        onchange="toggleKeterangan(${asesi.id_asesi}, false)">
+                                </td>
+                                <td>
+                                    <input type="radio" name="rekomendasi_${asesi.id_asesi}" value="BK"
+                                        ${asesi.hasil === 'BK' ? 'checked' : ''}
+                                        onchange="toggleKeterangan(${asesi.id_asesi}, true)">
+                                </td>
+                                <td>
+                                    <select name="keterangan_${asesi.id_asesi}" id="keterangan_${asesi.id_asesi}" 
+                                        class="form-control" ${asesi.hasil === 'BK' ? '' : 'disabled'}>
+                                        ${unitOptions}
+                                    </select>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    asesiTableBody.innerHTML = `<tr><td colspan="5">Tidak ada asesi untuk asesor ini</td></tr>`;
+                }
+
+                // load catatan asesmen
+                document.querySelector('textarea[name="aspek_positif_negatif"]').value = catatan?.aspek_positif_negatif || '';
+                document.querySelector('textarea[name="penolakan"]').value             = catatan?.penolakan || '';
+                document.querySelector('textarea[name="saran_perbaikan"]').value       = catatan?.saran_perbaikan || '';
+            })
+            .catch(() => {
+                asesiTableBody.innerHTML = `<tr><td colspan="5">Gagal memuat data asesi</td></tr>`;
+            });
     });
 
-    // 🔴 validasi sebelum submit
+    // validasi sebelum submit
     simpanForm.addEventListener('submit', function(e) {
         let valid = true;
         const rows = asesiTableBody.querySelectorAll('tr');
@@ -255,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const select = row.querySelector('select');
                 if (select && select.value === "") {
                     valid = false;
-                    select.classList.add('is-invalid'); // kasih highlight merah
+                    select.classList.add('is-invalid');
                 } else if (select) {
                     select.classList.remove('is-invalid');
                 }
@@ -263,13 +276,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         if (!valid) {
-            e.preventDefault(); // stop submit
+            e.preventDefault();
             alert("Jika memilih BK, wajib memilih unit pada kolom Keterangan.");
         }
     });
 });
 
-// fungsi untuk toggle keterangan
+// toggle keterangan select
 function toggleKeterangan(asesiId, enable) {
     const selectEl = document.getElementById(`keterangan_${asesiId}`);
     if (enable) {
@@ -277,7 +290,7 @@ function toggleKeterangan(asesiId, enable) {
     } else {
         selectEl.value = '';
         selectEl.disabled = true;
-        selectEl.classList.remove('is-invalid'); // hapus merah kalau pindah ke K
+        selectEl.classList.remove('is-invalid');
     }
 }
 </script>

@@ -57,14 +57,22 @@ public function getAsesiByAsesor($skema_id, $asesor_id)
         )
         ->get();
 
-    return response()->json($asesis);
+    $catatan = DB::table('laporan_asesmen')
+        ->where('skema_id', $skema_id)
+        ->where('asesor_id', $asesor_id)
+        ->first();
+
+    return response()->json([
+        'asesis'  => $asesis,
+        'catatan' => $catatan,
+    ]);
 }
 
 
     // simpan catatan asesmen
 public function store(Request $request)
 {
-    $skemaId = $request->skema_id;
+    $skemaId  = $request->skema_id;
     $asesorId = $request->asesor_id;
 
     foreach ($request->all() as $key => $value) {
@@ -73,26 +81,40 @@ public function store(Request $request)
             $hasil   = $value;
             $unitId  = $request->input("keterangan_$asesiId");
 
-            // Validasi BK wajib pilih unit
             if ($hasil === 'BK' && empty($unitId)) {
                 return back()->withErrors("Asesi $asesiId wajib pilih unit jika BK");
             }
 
-            // ✅ Kalau sudah ada id_asesi, update
             DB::table('hasil_unit_kompetensi')->updateOrInsert(
-                ['id_asesi' => $asesiId], // kunci pencarian
+                ['id_asesi' => $asesiId],
                 [
                     'id_unit'    => $hasil === 'K' ? null : $unitId,
                     'hasil'      => $hasil,
                     'updated_at' => now(),
-                    'created_at' => now(), // kalau insert baru
+                    'created_at' => now(),
                 ]
             );
         }
     }
 
-    return redirect()->route('form_perencanaan.laporan_asesmen.laporan_asesor', $skemaId)
-        ->with('success', 'Laporan berhasil disimpan');
-}
-    
+    DB::table('laporan_asesmen')->updateOrInsert(
+        [
+            'skema_id'  => $skemaId,
+            'asesor_id' => $asesorId,
+        ],
+        [
+            'aspek_positif_negatif' => $request->input('aspek_positif_negatif'),
+            'penolakan'             => $request->input('penolakan'),
+            'saran_perbaikan'       => $request->input('saran_perbaikan'),
+            'tgl_laporan'           => now(),
+            'updated_at'            => now(),
+            'created_at'            => now(),
+        ]
+    );
+
+    return redirect()
+        ->route('form_perencanaan.laporan_asesmen.laporan_asesor', $skemaId)
+        ->with('success', 'Laporan berhasil disimpan')
+        ->with('asesor_terpilih', $asesorId);
+}    
 }
