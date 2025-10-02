@@ -2,7 +2,6 @@
 
 @section('konten')
 <div class="container mt-4">
-
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -48,15 +47,58 @@
         </div>
     </div>
 
-    <!-- Tombol Masukkan Pertanyaan -->
+    <!-- Daftar pembuatan pertanyaan yang sudah ada -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header" style="background-color:#f9fbff; font-weight:bold;">
+            Pembuatan Pertanyaan yang Sudah Ada
+        </div>
+        <div class="card-body">
+            @if($pembuatanList->isEmpty())
+                <p class="text-muted">Belum ada pembuatan pertanyaan untuk skema ini.</p>
+            @else
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID Pembuatan</th>
+                            <th>Timer</th>
+                            <th>Tanggal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($pembuatanList as $pembuatan)
+                            <tr>
+                                <td>{{ $pembuatan->id_pembuatan_pertanyaan }}</td>
+                                <td>{{ $pembuatan->timer }} menit</td>
+                                <td>
+                                    {{ $pembuatan->timescap 
+                                        ? \Carbon\Carbon::parse($pembuatan->timescap)->format('d-m-Y H:i') 
+                                        : '-' }}
+                                </td>
+                                <td>
+                                <a href="{{ route('pertanyaan.pg.kelompok', [
+                'id_skema' => $skema->id_skema,
+                'id_pembuatan_pertanyaan' => $pembuatan->id_pembuatan_pertanyaan
+            ]) }}" class="btn btn-sm btn-success">
+                <i class="bi bi-pencil-square"></i> Lanjutkan
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
+        </div>
+    </div>
+
+    <!-- Tombol Selanjutnya -->
     <div class="text-end">
-        <button class="btn text-white px-4 py-2" style="background-color:#003366;" data-bs-toggle="modal" data-bs-target="#modalPertanyaan">
+        <button class="btn text-white px-4 py-2" style="background-color:#003366;" 
+                data-bs-toggle="modal" data-bs-target="#modalPertanyaan">
             Selanjutnya
         </button>
     </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal Timer -->
 <div class="modal fade" id="modalPertanyaan" tabindex="-1" aria-labelledby="modalPertanyaanLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 350px;">
         <div class="modal-content" style="border-radius: 10px; border: none;">
@@ -65,38 +107,24 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            {{-- PERBAIKAN: Arahkan ke route PG yang benar --}}
-            <form method="GET" action="{{ route('pertanyaan.pg.kelompok', $skema->id_skema) }}">
-                @csrf
+            <form method="GET" action="{{ route('pertanyaan.pg.kelompok', ['id_skema' => $skema->id_skema]) }}">
                 <div class="modal-body pt-2">
                     <!-- Timer -->
                     <label for="timer" class="fw-bold small mt-3">Timer (menit)</label>
-                    <input type="number" name="timer" id="timer" class="form-control" min="1" value="30" required>
-                    <small class="text-muted">Waktu pengerjaan untuk seluruh soal pilihan ganda</small>
+                    <input type="number" name="timer" id="timer" class="form-control" 
+                           min="1" max="180" value="30" required>
                 </div>
 
+                <input type="hidden" name="jenis_pertanyaan" value="pilihan_ganda">
+
                 <div class="modal-footer border-0">
-                    <button type="submit" class="btn w-100 text-white" style="background-color:#003366; font-weight:bold;">
-                        Lanjutkan ke Kelompok Pekerjaan
+                    <button type="submit" class="btn w-100 text-white" 
+                            style="background-color:#003366; font-weight:bold;">
+                        Simpan
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
-<script>
-function redirectToForm() {
-    let timer = document.getElementById('timer').value;
-    let id_skema = "{{ $skema->id_skema }}";
-
-    if(timer < 1 || timer > 180) {
-        alert("Timer harus antara 1 - 180 menit");
-        return;
-    }
-
-    // PERBAIKAN: Redirect ke route PG
-    window.location.href = "{{ route('pertanyaan.pg.kelompok', $skema->id_skema) }}?timer=" + timer;
-}
-</script>
 @endsection

@@ -2,7 +2,6 @@
 
 @section('konten')
 <div class="container mt-4">
-
     <div class="text-center mb-4">
         <h4 class="fw-bold text-dark">Kelompok Pekerjaan & Unit Kompetensi - Pilihan Ganda</h4>
         <p class="text-muted">
@@ -17,9 +16,13 @@
             <div class="card-header" style="background-color:#0d6efd; color:white; font-weight:bold;">
                 <div class="d-flex justify-content-between align-items-center">
                     <span>Kelompok {{ $index+1 }}: {{ $k->nama_kelompok }}</span>
-                    <button 
-                        class="btn btn-light btn-sm"
-                        onclick="popupJumlahPertanyaan({{ $id_skema }}, '{{ $timer }}', {{ $k->id_kelompok }})">
+                    <button class="btn btn-light btn-sm"
+                            onclick="popupJumlahPertanyaan(
+                                {{ $id_skema }}, 
+                                '{{ $timer }}', 
+                                {{ $k->id_kelompok }},
+                                '{{ $id_pembuatan_pertanyaan ?? '' }}'
+                            )">
                         <i class="bi bi-plus-circle"></i> Tambahkan Pertanyaan
                     </button>
                 </div>
@@ -62,12 +65,10 @@
             Belum ada kelompok pekerjaan untuk skema ini.
         </div>
     @endforelse
-
 </div>
 
-{{-- Script SweetAlert untuk Pilihan Ganda --}}
 <script>
-function popupJumlahPertanyaan(id_skema, timer, id_kelompok) {
+function popupJumlahPertanyaan(id_skema, timer, id_kelompok, id_pembuatan_pertanyaan = '') {
     Swal.fire({
         title: '<h6 class="fw-bold mb-3">Masukkan Jumlah Pertanyaan Pilihan Ganda</h6>',
         html: `
@@ -112,8 +113,14 @@ function popupJumlahPertanyaan(id_skema, timer, id_kelompok) {
                 return;
             }
 
-            // PERBAIKI: Gunakan parameter yang benar
+            // Build URL dengan parameter yang sesuai
             let url = `{{ route('pertanyaan.pg.create') }}?id_skema=${id_skema}&timer=${timer}&id_kelompok=${id_kelompok}&jumlah=${jumlah}`;
+            
+            // Tambahkan id_pembuatan_pertanyaan jika ada (mode Lanjutkan)
+            if (id_pembuatan_pertanyaan) {
+                url += `&id_pembuatan_pertanyaan=${id_pembuatan_pertanyaan}`;
+            }
+
             window.location.href = url;
         }
     });

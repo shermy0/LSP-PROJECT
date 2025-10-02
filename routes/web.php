@@ -27,6 +27,14 @@ use App\Http\Controllers\DemonstrasiController;
 
 
 
+use App\Http\Controllers\CeklisObservasiController;
+
+Route::prefix('ceklisobservasi')->group(function () {
+    Route::get('/',        [CeklisObservasiController::class, 'index'])->name('ceklisobservasi.index');
+    Route::get('/data/{skemaId}', [CeklisObservasiController::class, 'loadData'])->name('ceklisobservasi.data');
+    Route::post('/store',  [CeklisObservasiController::class, 'store'])->name('ceklisobservasi.store');
+});
+
 
 
 Route::get('/pembuatan/{id_pembuatan}', [FormAsesmenController::class, 'showPembuatan'])
@@ -392,6 +400,9 @@ Route::prefix('opsi-jawaban')->group(function () {
 Route::get('/pertanyaan/{id_skema}/kelompok-pg', [PertanyaanController::class, 'kelompokPekerjaan'])
 ->name('pertanyaan.pg.kelompok')
 ->defaults('jenis', 'pilihan_ganda');
+
+Route::get('/pertanyaan/pg/kelompok/{id_skema}/{id_pembuatan_pertanyaan?}', [PertanyaanController::class, 'kelompokPekerjaanPG'])
+    ->name('pertanyaan.pg.kelompok.withId');
 
 Route::get('/pertanyaan/pg/create', [PertanyaanController::class, 'createPG'])->name('pertanyaan.pg.create');
 Route::post('/pertanyaan/pg/store', [PertanyaanController::class, 'storePG'])->name('pertanyaan.pg.store');
