@@ -257,29 +257,38 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 
-    // validasi sebelum submit
-    simpanForm.addEventListener('submit', function(e) {
-        let valid = true;
-        const rows = asesiTableBody.querySelectorAll('tr');
+// validasi sebelum submit
+simpanForm.addEventListener('submit', function(e) {
+    let valid = true;
 
-        rows.forEach(row => {
-            const radioBK = row.querySelector('input[type=radio][value=BK]:checked');
-            if (radioBK) {
-                const select = row.querySelector('select');
-                if (select && select.value === "") {
-                    valid = false;
-                    select.classList.add('is-invalid');
-                } else if (select) {
-                    select.classList.remove('is-invalid');
-                }
+    // 🔴 cek kalau asesor belum dipilih
+    if (!asesorSelect.value) {
+        e.preventDefault();
+        alert("Silakan pilih asesor terlebih dahulu sebelum menyimpan.");
+        return;
+    }
+
+    // cek validasi BK wajib pilih unit
+    const rows = asesiTableBody.querySelectorAll('tr');
+    rows.forEach(row => {
+        const radioBK = row.querySelector('input[type=radio][value=BK]:checked');
+        if (radioBK) {
+            const select = row.querySelector('select');
+            if (select && select.value === "") {
+                valid = false;
+                select.classList.add('is-invalid');
+            } else if (select) {
+                select.classList.remove('is-invalid');
             }
-        });
-
-        if (!valid) {
-            e.preventDefault();
-            alert("Jika memilih BK, wajib memilih unit pada kolom Keterangan.");
         }
     });
+
+    if (!valid) {
+        e.preventDefault();
+        alert("Jika memilih BK, wajib memilih unit pada kolom Keterangan.");
+    }
+});
+
 });
 
 // toggle keterangan select

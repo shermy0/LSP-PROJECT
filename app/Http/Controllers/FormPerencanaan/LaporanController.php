@@ -35,9 +35,13 @@ public function showLaporanAsesor($skema_id)
         ->select('asesor.*')
         ->get();
 
-    // $laporans = LaporanAsesmen::with('asesor')->where('skema_id', $skema_id)->get();
+    // cek kalau ada session dari store()
+    $asesorTerpilih = session('asesor_terpilih', $asesors->first()->id_asesor ?? null);
+    $noRegTerpilih  = session('no_registrasi_terpilih', $asesors->first()->no_registrasi ?? null);
 
-    return view('form_perencanaan.laporan_asesmen.laporan_asesor', compact('skema', 'asesors'));
+    return view('form_perencanaan.laporan_asesmen.laporan_asesor', compact('skema', 'asesors'))
+        ->with('asesor_terpilih', $asesorTerpilih)
+        ->with('no_registrasi_terpilih', $noRegTerpilih);
 }
 
 
@@ -115,6 +119,7 @@ public function store(Request $request)
     return redirect()
         ->route('form_perencanaan.laporan_asesmen.laporan_asesor', $skemaId)
         ->with('success', 'Laporan berhasil disimpan')
-        ->with('asesor_terpilih', $asesorId);
+        ->with('asesor_terpilih', $asesorId)
+        ->with('no_registrasi_terpilih', $request->no_registrasi);
 }    
 }

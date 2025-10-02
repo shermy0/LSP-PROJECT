@@ -26,20 +26,28 @@
         <textarea id="rekomendasi" class="form-control mt-2" rows="3" placeholder="Masukkan Catatan Anda"></textarea>
     </div>
     <div class="col-md-12">
-        <label for="namaasesor" class="form-label fw-semibold">Nama Asesor</label>
-        <input type="text" class="form-control" id="namaasesor" placeholder="Nama Asesor">
+    <label for="namaasesor" class="form-label fw-semibold">Nama Asesor</label>
+    <input type="text" class="form-control"
+       value="{{ optional($asesors->firstWhere('id_asesor', $asesor_terpilih))->nama_asesor }}"
+       readonly>
     </div>
+
     <div class="col-md-12">
         <label for="nomorregistrasi" class="form-label fw-semibold">Nomor Registrasi</label>
-        <input type="text" class="form-control" id="nomorregistrasi" placeholder="Nomor Registrasi">
+        <input type="text" class="form-control"
+       value="{{ $no_registrasi_terpilih }}"
+       readonly>
     </div>
+
+    <input type="hidden" name="asesor_id" value="{{ $asesor_terpilih }}">
+
     <div class="col-md-12">
         <label for="tanggalAsesmen" class="form-label fw-semibold">Tanggal Asesmen</label>
         <input type="date" class="form-control" id="tanggalAsesmen">
     </div>
-    <div class="col-md-6">
+    <div class="col-md-12">
         <div class="card-field">
-            <label class="form-label">Tanda Tangan</label>
+            <label class="form-label fw-semibold">Tanda Tangan</label>
             <div class="signature-container">
                 <canvas id="signature-pad" class="signature-pad"></canvas>
             </div>
