@@ -65,6 +65,52 @@ class KonfirmasiController extends Controller
         ));
     }
 
+public function storeLaporanAsesor(Request $request, $skema_id)
+{
+    $request->validate([
+        'asesor_id'    => 'required|exists:asesor,id_asesor',
+        'catatan'      => 'nullable|string',
+        'tanggal'      => 'nullable|date',
+        'tanda_tangan' => 'nullable|string', // base64
+    ]);
+
+    $asesorData = DB::table('asesor')->where('id_asesor', $request->asesor_id)->first();
+    $noMet = $asesorData->no_registrasi ?? null;
+
+    // Ambil data lama (kalau ada)
+    $existing = DB::table('penyusun_persetujuan')
+        ->where('id_skema', $skema_id)
+        ->where('id_asesor', $request->asesor_id)
+        ->where('role', 'asesor')
+        ->first();
+
+    $dataUpdate = [
+        'id_skema'  => $skema_id,
+        'id_asesor' => $request->asesor_id,
+        'no_met'    => $noMet,
+        'catatan'   => $request->catatan,
+        'tanggal'   => $request->tanggal ?? now(),
+        'role'      => 'asesor',
+    ];
+
+    // Hanya update tanda tangan kalau ada input baru
+    if (!empty($request->tanda_tangan)) {
+        $dataUpdate['tanda_tangan'] = $request->tanda_tangan;
+    } elseif ($existing) {
+        // Kalau ga ada input baru, biarkan tanda tangan lama
+        $dataUpdate['tanda_tangan'] = $existing->tanda_tangan;
+    }
+
+    DB::table('penyusun_persetujuan')->updateOrInsert(
+        ['id_skema' => $skema_id, 'id_asesor' => $request->asesor_id, 'role' => 'asesor'],
+        $dataUpdate
+    );
+
+    return redirect()->route('form_perencanaan.laporan_asesmen.laporan_asesor', $skema_id)
+        ->with('success', 'Data catatan dan tanda tangan asesor berhasil disimpan.');
+}
+
+
     public function store(Request $request, $skema_id)
     {
                 // Simpan Orang Relevan

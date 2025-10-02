@@ -108,7 +108,7 @@
     </div>
 </div>
 
-<form id="simpan-lanjut-form" action="{{ route('laporan_asesor.store') }}" method="POST" class="simpan-form mt-4">
+<form id="simpan-lanjut-form" action="{{ route('laporan.store', $skema->id_skema) }}" method="POST" class="simpan-form mt-4">
     @csrf
 
 <!-- Data Asesi -->

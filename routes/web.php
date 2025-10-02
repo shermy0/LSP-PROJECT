@@ -68,12 +68,35 @@ Route::get('/mapa01/{id_skema}', [Mapa01Controller::class, 'showMapa01'])->name(
 Route::get('/mapa02/{skema_id}', [Mapa02Controller::class, 'showMapa02'])->name('form.mapa02');
 Route::get('/mapa02/{skema_id}/asesor', [Mapa02Controller::class, 'showMapa02Asesor'])
     ->name('form.mapa02.asesor');
+// Route::get('/laporan/{skema_id}', [LaporanController::class, 'showLaporan'])->name('form_perencanaan.laporan_asesmen.laporan_asesor');
+// Menampilkan halaman laporan per skema (laporan.blade.php)
 
 // Halaman utama laporan (FR.AK.05)
 Route::get('/laporan/{skema_id}', [LaporanController::class, 'showLaporan'])->name('laporan.show');
 Route::get('/laporan_asesor/{skema_id}', [LaporanController::class, 'showLaporanAsesor'])->name('form_perencanaan.laporan_asesmen.laporan_asesor');
 Route::get('/laporan/{skema_id}/asesi/{asesor_id}', [LaporanController::class, 'getAsesiByAsesor'])->name('laporan.getAsesi');
 Route::post('/laporan/store', [LaporanController::class, 'store'])->name('laporan_asesor.store');
+
+Route::post('/laporan/{skema_id}/store', [LaporanController::class, 'store'])
+    ->name('laporan.store');
+
+
+// Halaman laporan asesor (FR.MAPA.01)
+Route::get('/laporan_asesor/{skema_id}', [LaporanController::class, 'showLaporanAsesor'])
+    ->name('form_perencanaan.laporan_asesmen.laporan_asesor');
+
+// Simpan catatan + tanda tangan asesor ke penyusun_persetujuan
+Route::post('/laporan_asesor/{skema_id}/asesor/store', [KonfirmasiController::class, 'storeLaporanAsesor'])
+    ->name('form_perencanaan.laporan_asesmen.laporan_asesor.store');
+
+// Hapus TTD
+Route::delete('/laporan_asesor/ttd/{id}', [KonfirmasiController::class, 'deleteTtd'])
+    ->name('form_perencanaan.laporan_asesmen.ttd.delete');
+
+// Download TTD
+Route::get('/laporan_asesor/ttd/{id}/download', [KonfirmasiController::class, 'downloadTtd'])
+    ->name('form_perencanaan.laporan_asesmen.ttd.download');
+
 
 // ============================
 // Meninjau Asesmen
@@ -108,7 +131,6 @@ Route::post('/ninjau_asesemen/ninjau-asesmen-asesor', [MeninjauAsesmenController
     //MODIFIKASI
     Route::get('/mapa01/modifikasi/{skema_id}', [ModifikasiController::class, 'index'])->name('form.mapa01.modifikasi');
     // Halaman utama laporan (FR.AK.05)
-// Route::get('/laporan/{skema_id}', [LaporanController::class, 'showLaporan'])->name('laporan.show');
 // Route::get('/laporan/{skema_id}/asesi/{asesor_id}', [LaporanController::class, 'getAsesiByAsesor'])->name('laporan.getAsesi');
 // Route::post('/laporan/store', [LaporanController::class, 'store'])->name('laporan_asesor.store');
     
@@ -209,30 +231,6 @@ Route::get('/search-unit', [Mapa01Controller::class, 'searchUnit'])->name('form.
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
 });
-// ============================
-// Meninjau Asesmen
-// ============================
-// Route::get('/ninjau_asesemen', [SkemaController::class, 'ninjau_asesemen'])->name('ninjau_asesemen');
-// Route::get('/ninjau_asesemen/ninjau-asesmen-asesor', [PerencanaanController::class, 'ninjauAsesmenAsesor'])->name('ninjau_asesmen_asesor.show');
-// Route::post('/ninjau_asesemen/ninjau-asesmen-asesor', [PerencanaanController::class, 'simpanLanjut'])->name('ninjau_asesmen_asesor.store');
-
-// ============================
-// Laporan
-// ============================
-// Halaman daftar laporan asesmen
-// Route::get('/laporan-asesor', [PerencanaanController::class, 'laporan'])
-//     ->name('laporan_asesor.index');
-// // Simpan catatan asesmen
-// Route::post('/laporan-asesor', [PerencanaanController::class, 'simpanLanjutLaporan'])
-//     ->name('laporan_asesor.store');
-// // Halaman laporan umum (kalau memang perlu dari SkemaController)
-// Route::get('/laporan', [SkemaController::class, 'laporan'])
-//     ->name('laporan
-// Route::get('laporan/{skema_id}/asesi/{asesor_id}', 
-//     [LaporanController::class, 'getAsesiByAsesor']
-// );
-
-
 
 // Ajax ambil asesor & asesi
 Route::get('/get-asesor/{skemaId}', [SkemaController::class, 'getAsesor']);
