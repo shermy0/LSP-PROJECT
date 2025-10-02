@@ -155,8 +155,8 @@
 
             <!-- Form tambahan kalau diceklis -->
             <div id="{{ $id }}Form" class="mt-2" style="display:none;">
-                <input type="text" class="form-control" name="{{ $id }}_nama" placeholder="Masukkan nama">
-                <input type="text" class="form-control mt-2" name="{{ $id }}_hasil" placeholder="Masukkan hasil">
+                <input type="text" name="asesorCheckbox_nama[]" class="form-control" placeholder="Nama Asesor">
+                <input type="text" name="asesorCheckbox_hasil[]" class="form-control" placeholder="Hasil Diskusi">
             </div>
         </div>
     @endforeach

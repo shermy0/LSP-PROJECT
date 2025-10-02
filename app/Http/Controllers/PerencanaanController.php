@@ -159,13 +159,14 @@ public function simpanLanjutfrVa(Request $request)
 {
     // --- Simpan ke proses_validasi dan ambil id_validasi ---
     $id_validasi = \DB::table('proses_validasi')->insertGetId([
+        'skema_id'        => $request->skema_id, 
         'tujuan'          => $request->tujuan ? implode(", ", $request->tujuan) : null,
         'tujuan_lain'     => $request->tujuan_lain,
         'konteks'         => $request->konteks ? implode(", ", $request->konteks) : null,
         'konteks_lain'    => $request->konteks_lain,
         'pendekatan'      => $request->pendekatan ? implode(", ", $request->pendekatan) : null,
         'pendekatan_lain' => $request->pendekatan_lain,
-    ]);
+    ]);    
 
     // --- Simpan ke diskusi (orang relevan) ---
     $orangRelevan = $request->input('orangRelevan', []);
@@ -191,6 +192,8 @@ public function simpanLanjutfrVa(Request $request)
 
                 // insert diskusi dan ambil id_diskusi
                 $id_diskusi = \DB::table('diskusi')->insertGetId([
+                    'skema_id'        => $request->skema_id, 
+                    
                     'id_asesor'    => $id_asesor,
                     'nama_asesor'  => $nama,
                     'jabatan'      => $jabatanMap[$idCheckbox] ?? null,

@@ -22,7 +22,7 @@
 
 <input type="hidden" name="skema_id" value="{{ $id_skema }}">
 
-<form action="{{ route('formperencanaan.show', ['id_skema' => $id_skema]) }}" method="GET">
+<form action="{{ route('form_perencanaan.fr_va', ['periode' => $periode, 'skema_id' => $id_skema]) }}" method="GET">
 <div class="container mt-4"><br>
     <!-- Memberikan Kontribusi untuk Hasil Asesmen -->
     <div class="card-box">
