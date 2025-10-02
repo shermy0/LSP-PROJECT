@@ -357,8 +357,12 @@ Route::get('/form-asesmen/{id_skema}/kelompok', [PertanyaanController::class, 'k
 // ========== ROUTE PILIHAN GANDA (FLOW ADMIN/ASESI/ASESOR) ==========
 
 // ================== DATA PESERTA UJI ==================
+// Halaman daftar peserta
 Route::get('datapesertauji', [DataPesertaUjiController::class, 'index'])->name('datapesertauji');
-Route::resource('peserta', DataPesertaUjiController::class);
+
+// Detail peserta
+Route::get('peserta/{id}', [DataPesertaUjiController::class, 'show'])->name('peserta.show');
+
 
 // ================== PROFILE ASESOR ==================
 Route::prefix('profileasesor')->group(function () {
@@ -448,3 +452,7 @@ Route::get('/input_PMO', [PertanyaanController::class, 'inputPMO'])->name('input
 
 Route::post('/evaluasi/store', [EvaluasiController::class, 'store'])->name('evaluasi.store');
 Route::post('/pmo/store', [PertanyaanController::class, 'storePMO'])->name('pmo.store');
+
+Route::get('/data-peserta-uji', [PertanyaanController::class, 'dataPesertaUji'])->name('data.peserta.uji');
+Route::get('/detail-jawaban/{skema}/{jenis}', [PertanyaanController::class, 'detailJawaban'])
+    ->name('detail.jawaban');

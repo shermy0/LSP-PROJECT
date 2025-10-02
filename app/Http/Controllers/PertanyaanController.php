@@ -204,33 +204,44 @@ class PertanyaanController extends Controller
 }
 
 
-    public function crudEsai($id_skema, $id_kelompok)
+public function crudEsai($id_skema, $id_kelompok)
 {
     $skema = Skema::findOrFail($id_skema);
 
     $pertanyaan = Pertanyaan::where('jenis_pertanyaan', 'esai')
-                            ->where('id_skema', $id_skema)
-                            ->where('id_kelompok', $id_kelompok) // ✅ filter kelompok juga
-                            ->get();
-    
-    $pembuatan_pertanyaan = PembuatanPertanyaan::find($pertanyaan->first()->id_pembuatan_pertanyaan);
+        ->where('id_skema', $id_skema)
+        ->where('id_kelompok', $id_kelompok)
+        ->get();
+
+    // ✅ ambil pembuatan_pertanyaan hanya kalau ada pertanyaan
+    $firstPertanyaan = $pertanyaan->first();
+    $pembuatan_pertanyaan = null;
+
+    if ($firstPertanyaan) {
+        $pembuatan_pertanyaan = PembuatanPertanyaan::find($firstPertanyaan->id_pembuatan_pertanyaan);
+    }
 
     $asesor = DB::table('asesor')
-    ->leftJoin('pertanyaan_asesmen_persetujuan', function($join) use ($pembuatan_pertanyaan) {
-        $join->on('asesor.id_asesor', '=', 'pertanyaan_asesmen_persetujuan.id_asesor')
-                ->where('pertanyaan_asesmen_persetujuan.id_pembuatan_pertanyaan', $pembuatan_pertanyaan->id_pembuatan_pertanyaan);
-    })
-                ->select(
-                    'asesor.id_asesor',
-                    'asesor.nama_asesor',
-                    'asesor.no_registrasi',
-                    'pertanyaan_asesmen_persetujuan.tgl_ttd_asesor'
-                )
-                ->orderBy('asesor.nama_asesor')
-                ->get();
-    
+        ->leftJoin('pertanyaan_asesmen_persetujuan', function ($join) use ($pembuatan_pertanyaan) {
+            $join->on('asesor.id_asesor', '=', 'pertanyaan_asesmen_persetujuan.id_asesor');
+
+            // ✅ tambahkan where hanya kalau $pembuatan_pertanyaan ada
+            if ($pembuatan_pertanyaan) {
+                $join->where('pertanyaan_asesmen_persetujuan.id_pembuatan_pertanyaan', $pembuatan_pertanyaan->id_pembuatan_pertanyaan);
+            }
+        })
+        ->select(
+            'asesor.id_asesor',
+            'asesor.nama_asesor',
+            'asesor.no_registrasi',
+            'pertanyaan_asesmen_persetujuan.tgl_ttd_asesor'
+        )
+        ->orderBy('asesor.nama_asesor')
+        ->get();
+
     return view('esai_crud', compact('pertanyaan', 'skema', 'id_kelompok', 'pembuatan_pertanyaan', 'asesor'));
 }
+
 
    public function editEsai($id)
 {
@@ -1018,4 +1029,134 @@ public function kelompokPMO($id_skema, Request $request)
 
 return view('kelompok_pekerjaan_PMO', compact('skema', 'pembuatan', 'kelompok', 'timer'));
 }
+
+public function dataPesertaUji()
+{
+    $user = Auth::user();
+    $asesi = DB::table('asesi')->where('nama_lengkap', $user->name)->first();
+
+    if (!$asesi) {
+        return view('peserta_uji', ['dataPeserta' => collect(), 'rekap' => collect()]);
+    }
+
+    // ambil semua jawaban peserta
+    $dataPeserta = DB::table('jawaban_asesmen as ja')
+        ->join('asesi as a', 'ja.id_asesi', '=', 'a.id_asesi')
+        ->join('skema_sertifikasi as s', 'ja.id_skema', '=', 's.id_skema')
+        ->join('pertanyaan as p', 'ja.id_pertanyaan', '=', 'p.id_pertanyaan')
+        ->leftJoin('opsi_jawaban as o', 'ja.jawaban_opsi', '=', 'o.id_opsi')
+        ->select(
+            'ja.id_jawaban',
+            's.nama_skema',
+            'p.isi_pertanyaan',
+            'p.jenis_pertanyaan',
+            'ja.jawaban_text',
+            'o.isi_opsi',
+            'ja.pencapaian'
+        )
+        ->where('ja.id_asesi', $asesi->id_asesi)
+        ->get();
+
+    // buat rekap per skema & jenis pertanyaan
+    $rekap = $dataPeserta
+        ->groupBy(fn($item) => $item->nama_skema . '|' . $item->jenis_pertanyaan)
+        ->map(function ($group) {
+            $skema = $group->first()->nama_skema;
+            $jenis = $group->first()->jenis_pertanyaan;
+
+            $dinilai = $group->whereNotNull('pencapaian');
+            $total = $dinilai->count();
+            $benar = $dinilai->where('pencapaian', 1)->count();
+            $salah = $dinilai->where('pencapaian', 0)->count();
+
+            return [
+                'skema'      => $skema,
+                'jenis'      => $jenis,
+                'total'      => $total ?: '-',
+                'benar'      => $total ? $benar : '-',
+                'salah'      => $total ? $salah : '-',
+                'persentase' => $total > 0 ? round(($benar / $total) * 100) : null,
+            ];
+        })
+        ->values();
+
+    return view('peserta_uji', compact('dataPeserta', 'rekap'));
+}
+
+public function detailJawaban($skema, $jenis)
+{
+    $user = Auth::user();
+    $asesi = DB::table('asesi')->where('nama_lengkap', $user->name)->first();
+
+    if (!$asesi) {
+        return view('detail_jawaban', ['dataPeserta' => collect(), 'skema' => $skema, 'jenis' => $jenis]);
+    }
+
+    if ($jenis === 'pilihan_ganda') {
+        $dataPeserta = DB::table('jawaban_asesmen as ja')
+            ->join('asesi as a', 'ja.id_asesi', '=', 'a.id_asesi')
+            ->join('skema_sertifikasi as s', 'ja.id_skema', '=', 's.id_skema')
+            ->join('pertanyaan as p', 'ja.id_pertanyaan', '=', 'p.id_pertanyaan')
+            ->leftJoin('opsi_jawaban as o', 'ja.jawaban_opsi', '=', 'o.id_opsi')
+            ->select(
+                'ja.id_jawaban',
+                's.nama_skema',
+                'p.id_pertanyaan',
+                'p.isi_pertanyaan',
+                'p.file_path',
+                'p.file_type',
+                'p.jenis_pertanyaan',
+                'ja.jawaban_text',
+                'ja.jawaban_opsi',
+                'o.isi_opsi as jawaban_opsi_isi',
+                'o.id_opsi as jawaban_opsi_id',
+                'ja.pencapaian'
+            )
+            ->where('ja.id_asesi', $asesi->id_asesi)
+            ->where('s.nama_skema', $skema)
+            ->where('p.jenis_pertanyaan', $jenis)
+            ->get();
+
+        // Ambil semua opsi untuk setiap pertanyaan
+        foreach ($dataPeserta as $peserta) {
+            $peserta->semua_opsi = DB::table('opsi_jawaban')
+                ->where('id_pertanyaan', $peserta->id_pertanyaan)
+                ->select('id_opsi', 'kode_opsi', 'isi_opsi', 'benar')
+                ->get();
+        }
+    } else {
+        $dataPeserta = DB::table('jawaban_asesmen as ja')
+            ->join('asesi as a', 'ja.id_asesi', '=', 'a.id_asesi')
+            ->join('skema_sertifikasi as s', 'ja.id_skema', '=', 's.id_skema')
+            ->join('pertanyaan as p', 'ja.id_pertanyaan', '=', 'p.id_pertanyaan')
+            ->leftJoin('opsi_jawaban as o', 'ja.jawaban_opsi', '=', 'o.id_opsi')
+            ->select(
+                'ja.id_jawaban',
+                's.nama_skema',
+                'p.id_pertanyaan',
+                'p.isi_pertanyaan',
+                'p.file_path',
+                'p.file_type',
+                'p.jenis_pertanyaan',
+                'ja.jawaban_text',
+                'o.isi_opsi',
+                'ja.pencapaian'
+            )
+            ->where('ja.id_asesi', $asesi->id_asesi)
+            ->where('s.nama_skema', $skema)
+            ->where('p.jenis_pertanyaan', $jenis)
+            ->get();
+    }
+
+    return view('detail_jawaban', compact('dataPeserta', 'skema', 'jenis'));
+}
+
+
+
+
+
+
+
+
+
 }

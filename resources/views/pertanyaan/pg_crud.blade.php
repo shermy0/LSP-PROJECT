@@ -110,6 +110,13 @@
                 </tbody>
             </table>
         </div>
+
+<!-- Tombol Kembali -->
+<a href="{{ route('formasesmen.pertanyaanPG', $skema->id_skema) }}" 
+   class="btn btn-secondary mt-3">
+    <i class="fas fa-arrow-left"></i> Kembali
+</a>
+
     </div>
 </div>
 @endsection
