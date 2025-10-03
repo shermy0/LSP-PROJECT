@@ -31,14 +31,18 @@ class Mapa02Controller extends Controller
 
         $kelompokPekerjaan = KelompokPekerjaan::with([
                 'hasilAsesmen.unit',
-                // 'hasilAsesmen.bukti.jenisBukti',
-                // 'hasilAsesmen.perangkat.perangkat'
             ])
             ->where('id_skema', $skema_id)
             ->get();
 
-        return view('form_perencanaan.form_mapa_02.mapa02', compact('skema', 'kelompokPekerjaan'));
+        // ambil data instrumen asesmen
+        $instrumen = DB::table('instrumen_asesmen')
+            ->where('id_skema', $skema_id)
+            ->first();
+
+        return view('form_perencanaan.form_mapa_02.mapa02', compact('skema', 'kelompokPekerjaan', 'instrumen'));
     }
+
 
     // Ambil data asesor berdasarkan skema (AJAX)
     public function getAsesor($skemaId)
@@ -69,25 +73,33 @@ public function simpanInstrumen(Request $request)
 {
     $skemaId = $request->input('skema_id');
 
-    $instrumenList = $request->input('instrumen', []);
+    // mapping sesuai nama kolom di tabel
+    $fields = [
+        'cek_observasi',
+        'tugas_praktik',
+        'tanya_observasi',
+        'instruksi_tertulis',
+        'soal_pg',
+        'soal_esai',
+        'soal_uraian',
+        'cek_portofolio',
+        'tanya_wawancara',
+        'verifikasi_pihak3',
+        'cek_produk',
+    ];
 
-    if(empty($instrumenList)) {
-        return back()->with('error', 'Belum ada instrumen yang diisi.');
+    $data = [];
+    foreach ($fields as $field) {
+        $data[$field] = $request->input($field, null);
     }
 
-    foreach($instrumenList as $item) {
-        DB::table('instrumen_asesmen')->insert([
-            'id_skema'       => $skemaId,
-            'nama_instrumen' => $item['nama'] ?? null,
-            'kode_instrumen' => null,   // bisa tambahkan sesuai kebutuhan
-            'jenis_instrumen'=> null,   // bisa tambahkan sesuai kebutuhan
-            'potensi_asesi'  => $item['potensi'] ?? null,
-
-        ]);
-    }
+    DB::table('instrumen_asesmen')->updateOrInsert(
+        ['id_skema' => $skemaId], // key pencarian
+        $data // data yang diupdate/insert
+    );
 
     return redirect()->route('formperencanaan.show', $skemaId)
-                     ->with('success', 'Instrumen asesmen berhasil disimpan.');
+                     ->with('success', 'Instrumen asesmen berhasil disimpan/diupdate.');
 }
 
 

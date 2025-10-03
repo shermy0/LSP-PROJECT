@@ -135,40 +135,41 @@
                         <th class="text-center">5</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @php
-                        $instrumenList = [
-                            'FR.IA.01. CL - Ceklis Observasi Aktivitas Di Tempat Kerja atau Tempat Kerja Simulasi',
-                        'FR.IA.02. TPD - Tugas Praktik Demonstrasi',
-                        'FR.IA.03. PMO – Pertanyaan Untuk Mendukung Observasi',
-                        'FR.IA.04. DIT - Daftar Instruksi Tertulis (Pengerjaan Singkat Proyek/Teknik/Pekerjaan/ Kegiatan Terstruktur Lainnya)',
-                        'FR.IA.05. DPT – Daftar Pertanyaan Tertulis Pilihan Ganda',
-                        'FR.IA.06. DPT – Daftar Pertanyaan Tertulis Pilihan Esai',
-                        'FR.IA.07. DPT – Daftar Pertanyaan Uraian',
-                        'FR.IA.08. CVP – Ceklis Verifikasi Portofolio',
-                        'FR.IA.09. PW – Pertanyaan Wawancara',
-                        'FR.IA.10. VPK – Verifikasi Pihak Ketiga',
-                        'FR.IA.11. CRP – Ceklis Reviu Produk',
-                        ];
-                    @endphp
+@php
+$instrumenMap = [
+    'cek_observasi'    => 'FR.IA.01. CL - Ceklis Observasi Aktivitas Di Tempat Kerja atau Tempat Kerja Simulasi',
+    'tugas_praktik'    => 'FR.IA.02. TPD - Tugas Praktik Demonstrasi',
+    'tanya_observasi'  => 'FR.IA.03. PMO – Pertanyaan Untuk Mendukung Observasi',
+    'instruksi_tertulis'=> 'FR.IA.04. DIT - Daftar Instruksi Tertulis',
+    'soal_pg'          => 'FR.IA.05. DPT – Pertanyaan Tertulis Pilihan Ganda',
+    'soal_esai'        => 'FR.IA.06. DPT – Pertanyaan Tertulis Pilihan Esai',
+    'soal_uraian'      => 'FR.IA.07. DPT – Pertanyaan Tertulis Uraian',
+    'cek_portofolio'   => 'FR.IA.08. CVP – Ceklis Verifikasi Portofolio',
+    'tanya_wawancara'  => 'FR.IA.09. PW – Pertanyaan Wawancara',
+    'verifikasi_pihak3'=> 'FR.IA.10. VPK – Verifikasi Pihak Ketiga',
+    'cek_produk'       => 'FR.IA.11. CRP – Ceklis Reviu Produk',
+];
+@endphp
 
-                    @foreach($instrumenList as $i => $judul)
-                        <tr>
-                            <td class="text-center">{{ $i+1 }}</td>
-                            <td>
-                                <input type="hidden" name="instrumen[{{ $i }}][nama]" value="{{ $judul }}">
-                                {{ $judul }}
-                            </td>
-                            @for($j=1; $j<=5; $j++)
-                                <td class="text-center">
-                                    <input type="radio" 
-                                           name="instrumen[{{ $i }}][potensi]" 
-                                           value="{{ $j }}">
-                                </td>
-                            @endfor
-                        </tr>
-                    @endforeach
-                </tbody>
+<tbody>
+@foreach($instrumenMap as $field => $judul)
+    <tr>
+        <td class="text-center">{{ $loop->iteration }}</td>
+        <td>{{ $judul }}</td>
+        @for($j=1; $j<=5; $j++)
+            <td class="text-center">
+                <input type="radio"
+                        class="form-check-input me-2"
+                       name="{{ $field }}" 
+                       value="{{ $j }}"
+                       @if(isset($instrumen) && $instrumen->$field == $j) checked @endif>
+            </td>
+        @endfor
+    </tr>
+@endforeach
+
+</tbody>
+
             </table>
             <div class="text-danger mt-2">
                 *diisi berdasarkan hasil penentuan pendekatan asesmen dan perencanaan asesmen
