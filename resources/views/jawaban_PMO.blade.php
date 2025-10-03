@@ -25,7 +25,7 @@
                             <td>
                                 <textarea name="jawaban[{{ $p->id_pmo_pertanyaan }}]" 
                                           class="form-control rounded-3" rows="2" 
-                                          placeholder="Tanggapan...">{{ old('jawaban.'.$p->id_pmo_pertanyaan) }}</textarea>
+                                          placeholder="Tanggapan...">{{ old('jawaban.'.$p->id_pmo_pertanyaan, $p->jawaban ?? '') }}</textarea>
                             </td>
                         </tr>
                         @empty

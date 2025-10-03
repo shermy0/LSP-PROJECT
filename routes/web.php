@@ -18,7 +18,7 @@ use App\Http\Controllers\FormAsesmenController;
 use App\Http\Controllers\Asesi\PermohonanController;
 use App\Http\Controllers\Admin\Form1AdminController;
 use App\Http\Controllers\OpsiJawabanController;
-
+use App\Http\Controllers\EvaluasiController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\DataPesertaUjiController;
 use App\Http\Controllers\ProfileAsesorController;
@@ -448,3 +448,27 @@ Route::get('/input_PMO', [PertanyaanController::class, 'inputPMO'])->name('input
 
 Route::post('/evaluasi/store', [EvaluasiController::class, 'store'])->name('evaluasi.store');
 Route::post('/pmo/store', [PertanyaanController::class, 'storePMO'])->name('pmo.store');
+
+
+// ================================
+// PMO Routes
+// ================================
+
+// Tampilkan daftar kelompok PMO
+Route::get('/pmo/{id_skema}/kelompok', [FormAsesmenController::class, 'kelompokPMO'])
+    ->name('kelompok.pmo');
+
+// Tampilkan halaman input PMO
+Route::get('/pmo/input', [FormAsesmenController::class, 'inputPMO'])
+    ->name('input.pmo');
+
+// Tampilkan jawaban PMO
+Route::get('/pmo/{id_skema}/jawaban/{id_pembuatan}', [FormAsesmenController::class, 'tampilJawabanPMO'])
+    ->name('jawaban_pmo.form');
+
+// Simpan jawaban PMO
+Route::post('/pmo/{id_skema}/jawaban/{id_pembuatan}', [FormAsesmenController::class, 'simpanJawabanPMO'])
+    ->name('simpan.jawaban.pmo');
+
+// Create PMO baru
+Route::post('/pmo/store', [FormAsesmenController::class, 'storePMO'])->name('pmo.store');

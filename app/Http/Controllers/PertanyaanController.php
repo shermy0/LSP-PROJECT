@@ -933,58 +933,48 @@ public function crudPMO($id_pmo)
             'id_pembuatan' => $id_pembuatan
         ])->with('success', 'Jawaban PMO berhasil disimpan');
     }
-        public function tampilJawabanPMO($id_skema, $id_pembuatan)
+
+       public function tampilJawabanPMO($id_skema, $id_pembuatan)
     {
-        $skema = Skema::findOrFail($id_skema);
-
-        $pembuatan = PembuatanPertanyaan::findOrFail($id_pembuatan);
-
-        $kelompok = KelompokPekerjaan::with('unitKompetensi')
-                        ->where('id_skema', $id_skema)
-                        ->get();
-
+        dd($id_skema, $id_pembuatan); // cek apakah param diterima
+        $skema = Skema::findOrFail($id_skema); // pastikan id_skema valid
+        $pembuatan = PembuatanPertanyaan::findOrFail($id_pembuatan); // pastikan id_pembuatan valid
+        $kelompok = KelompokPekerjaan::with('unitKompetensi')->where('id_skema', $id_skema)->get();
         $pertanyaan = Pertanyaan::where('id_pembuatan_pertanyaan', $id_pembuatan)->get();
-
         $timer = $pembuatan->timer ?? 30;
 
         return view('jawaban_PMO', compact('skema', 'kelompok', 'pertanyaan', 'pembuatan', 'timer'));
     }
 
-            public function storePMO(Request $request)
-            {
-                $request->validate([
-                    'id_skema' => 'required|exists:skema_sertifikasi,id_skema',
-                    'pertanyaan' => 'required|array',
-                    'pertanyaan.*' => 'required|array',
-                    'pertanyaan.*.*' => 'required|string',
-                    'deskripsi_pertanyaan' => 'nullable|array',
-                    'deskripsi_pertanyaan.*.*' => 'nullable|string',
-                ]);
+  public function storePMO(Request $request)
+{
+    $id_skema = $request->id_skema;
+    $id_asesmen = 7;  // contoh default
 
-                $id_skema = $request->id_skema;
+    // 1️⃣ Insert sekali ke tabel pmo
+    $id_pmo = DB::table('pmo')->insertGetId([
+        'id_skema' => $id_skema,
+        'id_asesmen' => $id_asesmen,
+        'id_tuk' => null,
+        'id_kuk' => null,
+        'id_asesor' => null,
+        'id_asesi' => null,
+        'umpan_balik_untuk_asesi' => null,
+    ]);
 
-                foreach($request->pertanyaan as $unitId => $pertanyaanArr) {
-                    foreach($pertanyaanArr as $index => $isi) {
-
-                   // 1️⃣ Masuk ke tabel pmo dulu
-            $id_pmo = DB::table('pmo')->insertGetId([
-                'id_skema' => $id_skema,
+    // 2️⃣ Loop pertanyaan untuk pmo_pertanyaan
+    foreach($request->pertanyaan as $unitId => $pertanyaanArr) {
+        foreach($pertanyaanArr as $index => $isi) {
+            DB::table('pmo_pertanyaan')->insert([
+                'id_pmo' => $id_pmo,
+                'id_unit' => $unitId,
+                'pertanyaan' => $isi,
+                'deskripsi_pertanyaan' => $request->deskripsi_pertanyaan[$unitId][$index] ?? null,
             ]);
-
-            // 2️⃣ Masuk ke tabel pmo_pertanyaan
-            foreach($request->pertanyaan as $unitId => $pertanyaanArr) {
-                foreach($pertanyaanArr as $index => $isi) {
-                    DB::table('pmo_pertanyaan')->insert([
-                        'id_pmo' => $id_pmo,
-                        'id_unit' => $unitId,
-                        'pertanyaan' => $isi,
-                        'deskripsi_pertanyaan' => $request->deskripsi_pertanyaan[$unitId][$index] ?? null,
-                    ]);
-                }
-            }
         }
     }
-    return redirect()->back()->with('success', 'Pertanyaan PMO berhasil ditambahkan!');
+
+    return redirect()->back()->with('success', 'PMO dan pertanyaan berhasil ditambahkan!');
 }
 
 

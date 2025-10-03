@@ -157,26 +157,29 @@ public function pertanyaanPMO($id_skema)
 
     return view('PMO', compact('skema', 'kelompok', 'pembuatanList'));
 }
- public function jawabanPMO($id_skema)
-    {
-        // Ambil data skema
-        $skema = Skema::findOrFail($id_skema);
+public function simpanJawabanPMO(Request $request, $id_skema, $id_pembuatan)
+{
+    // Ambil ID PMO berdasarkan skema & pembuatan pertanyaan
+    $id_pmo = DB::table('pmo')
+        ->where('id_skema', $id_skema)
+        ->where('id_asesmen', $id_pembuatan)
+        ->value('id_pmo');
 
-        // Ambil semua kelompok beserta unit kompetensi
-        $kelompok = KelompokPekerjaan::with('unitKompetensi')
-                            ->where('id_skema', $id_skema)
-                            ->get();
-
-        // Ambil pembuatan pertanyaan PMO untuk skema ini
-        $pembuatanList = PembuatanPertanyaan::where('id_skema', $id_skema)
-                                            ->where('jenis_pertanyaan', 'pmo')
-                                            ->get();
-
-        // Ambil timer dari pembuatan pertama (default 30 menit)
-        $timer = $pembuatanList->first()->timer ?? 30;
-
-        return view('jawaban_kelompok_PMO', compact('skema', 'kelompok', 'pembuatanList', 'timer'));
+    if (!$id_pmo) {
+        return back()->withErrors(['error' => 'PMO belum dibuat untuk skema ini.']);
     }
+
+    // Simpan jawaban
+    foreach($request->jawaban as $id_pmo_pertanyaan => $jawaban) {
+        DB::table('jawaban_pmo')->updateOrInsert(
+            ['id_pmo' => $id_pmo, 'id_pmo_pertanyaan' => $id_pmo_pertanyaan],
+            ['jawaban' => $jawaban]
+        );
+    }
+
+    return redirect()->back()->with('success', 'Jawaban PMO berhasil disimpan!');
+}
+
 public function tampilJawabanPMO($id_skema, $id_pembuatan)
 {
     $skema = Skema::findOrFail($id_skema);
