@@ -11,8 +11,11 @@
             </li>
             <li class="breadcrumb-item">
                 <a href="{{ route('formperencanaan.show', $skema->id_skema) }}">Form Perencanaan</a>
+            <li class="breadcrumb-item">
+                <a href="{{ route('form_perencanaan.ninjau_asesmen_asesor', $skema->id_skema) }}">
+                    FR.AK.06 – Ninjau Asesmen Asesor
+                </a>
             </li>
-            <li class="breadcrumb-item active" aria-current="page">FR.AK.06</li>
         </ol>
     </nav>
 
@@ -32,10 +35,12 @@
         </div>
     </div>
 
-    <!-- FORM UTAMA -->
 <!-- FORM UTAMA -->
-<form action="{{ route('meninjau_asesmen.store') }}" method="POST">
+<form action="{{ route('form_perencanaan.ninjau_asesmen', ['id_skema' => $skema->id_skema]) }}" method="POST">
     @csrf
+    <input type="hidden" name="skema_id" value="{{ $skema->id_skema }}">
+    <input type="hidden" name="id_asesmen" value="{{ $skema->id_skema }}-{{ date('YmdHis') }}">
+    <input type="hidden" name="asesor_id" id="asesor_id_hidden">
     <div class="row g-3 mb-4">
         <!-- Baris 1: Skema Sertifikasi & Nomor Skema -->
         <div class="col-md-6">
@@ -233,16 +238,15 @@
         <div class="card-box">
             <textarea name="rekomendasi2" class="form-control mt-2" rows="3" placeholder="Masukkan teks"></textarea>
         </div>
-
-        <!-- Simpan dan Lanjut -->
-        <form action="{{ route('ninjau_asesmen_asesor') }}" method="POST">
+    </form>
+    <!-- Simpan dan Lanjut -->
+    <form action="{{ route('form_perencanaan.ninjau_asesmen_asesor.store', ['id_skema' => $skema->id_skema]) }}" method="POST">
             @csrf
             ...
             <button type="submit" class="simpan-btn mt-3">
                 <span>Simpan dan Lanjut</span>
             </button>
         </form>
-    </form>
 </div>
 
 <script>
@@ -251,7 +255,9 @@
         let kode = selected.getAttribute('data-kode');
         let jenjang = selected.getAttribute('data-jenjang');
         let skemaId = this.value;
-
+        document.getElementById("namaAsesor").addEventListener("change", function(){
+        document.getElementById("asesor_id_hidden").value = this.value;
+        });
         // isi nomor otomatis
         document.getElementById('nomor').value = kode || '';
 

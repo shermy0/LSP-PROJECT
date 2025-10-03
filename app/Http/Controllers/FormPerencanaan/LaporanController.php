@@ -22,7 +22,7 @@ class LaporanController extends Controller
             ->select('asesor.*')
             ->get();
 
-        return view('laporan', compact('skema', 'asesors'));
+        return view('form_perencanaan.laporan_asesmen.laporan', compact('skema', 'asesors'));
     }
 
 public function showLaporanAsesor($skema_id)
@@ -35,9 +35,13 @@ public function showLaporanAsesor($skema_id)
         ->select('asesor.*')
         ->get();
 
-    // $laporans = LaporanAsesmen::with('asesor')->where('skema_id', $skema_id)->get();
+    // cek kalau ada session dari store()
+    $asesorTerpilih = session('asesor_terpilih', $asesors->first()->id_asesor ?? null);
+    $noRegTerpilih  = session('no_registrasi_terpilih', $asesors->first()->no_registrasi ?? null);
 
-    return view('laporan_asesor', compact('skema', 'asesors'));
+    return view('form_perencanaan.laporan_asesmen.laporan_asesor', compact('skema', 'asesors'))
+        ->with('asesor_terpilih', $asesorTerpilih)
+        ->with('no_registrasi_terpilih', $noRegTerpilih);
 }
 
 
@@ -47,16 +51,32 @@ public function showLaporanAsesor($skema_id)
 public function getAsesiByAsesor($skema_id, $asesor_id)
 {
     $asesis = DB::table('asesi')
+        ->leftJoin('hasil_unit_kompetensi', 'asesi.id_asesi', '=', 'hasil_unit_kompetensi.id_asesi')
         ->where('asesi.asesor_id', $asesor_id)
+        ->select(
+            'asesi.id_asesi',
+            'asesi.nama_lengkap',
+            'hasil_unit_kompetensi.hasil',
+            'hasil_unit_kompetensi.id_unit'
+        )
         ->get();
 
-    return response()->json($asesis);
+    $catatan = DB::table('laporan_asesmen')
+        ->where('skema_id', $skema_id)
+        ->where('asesor_id', $asesor_id)
+        ->first();
+
+    return response()->json([
+        'asesis'  => $asesis,
+        'catatan' => $catatan,
+    ]);
 }
+
 
     // simpan catatan asesmen
 public function store(Request $request)
 {
-    $skemaId = $request->skema_id;
+    $skemaId  = $request->skema_id;
     $asesorId = $request->asesor_id;
 
     foreach ($request->all() as $key => $value) {
@@ -65,18 +85,41 @@ public function store(Request $request)
             $hasil   = $value;
             $unitId  = $request->input("keterangan_$asesiId");
 
-            \DB::table('hasil_unit_kompetensi')->insert([
-                'id_asesi' => $asesiId,
-                'id_unit'  => $unitId ?? 0,
-                'hasil'    => $hasil,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            if ($hasil === 'BK' && empty($unitId)) {
+                return back()->withErrors("Asesi $asesiId wajib pilih unit jika BK");
+            }
+
+            DB::table('hasil_unit_kompetensi')->updateOrInsert(
+                ['id_asesi' => $asesiId],
+                [
+                    'id_unit'    => $hasil === 'K' ? null : $unitId,
+                    'hasil'      => $hasil,
+                    'updated_at' => now(),
+                    'created_at' => now(),
+                ]
+            );
         }
     }
 
-    return redirect()->route('laporan.asesor', $skemaId)
-        ->with('success', 'Laporan berhasil disimpan');
-}
-    
+    DB::table('laporan_asesmen')->updateOrInsert(
+        [
+            'skema_id'  => $skemaId,
+            'asesor_id' => $asesorId,
+        ],
+        [
+            'aspek_positif_negatif' => $request->input('aspek_positif_negatif'),
+            'penolakan'             => $request->input('penolakan'),
+            'saran_perbaikan'       => $request->input('saran_perbaikan'),
+            'tgl_laporan'           => now(),
+            'updated_at'            => now(),
+            'created_at'            => now(),
+        ]
+    );
+
+    return redirect()
+        ->route('form_perencanaan.laporan_asesmen.laporan_asesor', $skemaId)
+        ->with('success', 'Laporan berhasil disimpan')
+        ->with('asesor_terpilih', $asesorId)
+        ->with('no_registrasi_terpilih', $request->no_registrasi);
+}    
 }

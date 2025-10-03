@@ -117,61 +117,66 @@
 
 
 <!-- Instrumen Asesmen -->
-<div class="mapa-card">
-    <div class="judul-header">Instrumen Asesmen</div>
-    <div class="table-responsive mt-4">
-        <table class="table table-bordered custom-table">
-            <thead class="table-title">
-                <tr>
-                    <th rowspan="2" class="text-center align-middle">No</th>
-                    <th rowspan="2" class="text-center align-middle">Instrumen Asesi</th>
-                    <th colspan="5" class="text-center">Potensi Asesi</th>
-                </tr>
-                <tr>
-                    <th class="text-center">1</th>
-                    <th class="text-center">2</th>
-                    <th class="text-center">3</th>
-                    <th class="text-center">4</th>
-                    <th class="text-center">5</th>
-                </tr>
-            </thead>
-            <tbody>
-                @php
-                    $instrumen = [
-                        'FR.IA.01. CL - Ceklis Observasi Aktivitas Di Tempat Kerja atau Tempat Kerja Simulasi',
-                        'FR.IA.02. TPD - Tugas Praktik Demonstrasi',
-                        'FR.IA.03. PMO – Pertanyaan Untuk Mendukung Observasi',
-                        'FR.IA.04. DIT - Daftar Instruksi Tertulis (Pengerjaan Singkat Proyek/Teknik/Pekerjaan/ Kegiatan Terstruktur Lainnya)',
-                        'FR.IA.05. DPT – Daftar Pertanyaan Tertulis Pilihan Ganda',
-                        'FR.IA.06. DPT – Daftar Pertanyaan Tertulis Pilihan Esai',
-                        'FR.IA.07. DPT – Daftar Pertanyaan Uraian',
-                        'FR.IA.08. CVP – Ceklis Verifikasi Portofolio',
-                        'FR.IA.09. PW – Pertanyaan Wawancara',
-                        'FR.IA.10. VPK – Verifikasi Pihak Ketiga',
-                        'FR.IA.11. CRP – Ceklis Reviu Produk',
-                    ];
-                @endphp
-
-                @foreach($instrumen as $i => $judul)
+  <div class="mapa-card">
+        <div class="judul-header">Instrumen Asesmen</div>
+        <div class="table-responsive mt-4">
+            <table class="table table-bordered custom-table">
+                <thead class="table-title">
                     <tr>
-                        <td class="text-center">{{ $i+1 }}</td>
-                        <td>{{ $judul }}</td>
-                        @for($j=1; $j<=5; $j++)
-                            <td class="text-center">
-                                <input type="radio" name="potensi{{ $i+1 }}" value="{{ $j }}">
-                            </td>
-                        @endfor
+                        <th rowspan="2" class="text-center align-middle">No</th>
+                        <th rowspan="2" class="text-center align-middle">Instrumen Asesi</th>
+                        <th colspan="5" class="text-center">Potensi Asesi</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                    <tr>
+                        <th class="text-center">1</th>
+                        <th class="text-center">2</th>
+                        <th class="text-center">3</th>
+                        <th class="text-center">4</th>
+                        <th class="text-center">5</th>
+                    </tr>
+                </thead>
+@php
+$instrumenMap = [
+    'cek_observasi'    => 'FR.IA.01. CL - Ceklis Observasi Aktivitas Di Tempat Kerja atau Tempat Kerja Simulasi',
+    'tugas_praktik'    => 'FR.IA.02. TPD - Tugas Praktik Demonstrasi',
+    'tanya_observasi'  => 'FR.IA.03. PMO – Pertanyaan Untuk Mendukung Observasi',
+    'instruksi_tertulis'=> 'FR.IA.04. DIT - Daftar Instruksi Tertulis',
+    'soal_pg'          => 'FR.IA.05. DPT – Pertanyaan Tertulis Pilihan Ganda',
+    'soal_esai'        => 'FR.IA.06. DPT – Pertanyaan Tertulis Pilihan Esai',
+    'soal_uraian'      => 'FR.IA.07. DPT – Pertanyaan Tertulis Uraian',
+    'cek_portofolio'   => 'FR.IA.08. CVP – Ceklis Verifikasi Portofolio',
+    'tanya_wawancara'  => 'FR.IA.09. PW – Pertanyaan Wawancara',
+    'verifikasi_pihak3'=> 'FR.IA.10. VPK – Verifikasi Pihak Ketiga',
+    'cek_produk'       => 'FR.IA.11. CRP – Ceklis Reviu Produk',
+];
+@endphp
 
-        <div class="text-danger mt-2">
-            *diisi berdasarkan hasil penentuan pendekatan asesmen dan perencanaan asesmen
+<tbody>
+@foreach($instrumenMap as $field => $judul)
+    <tr>
+        <td class="text-center">{{ $loop->iteration }}</td>
+        <td>{{ $judul }}</td>
+        @for($j=1; $j<=5; $j++)
+            <td class="text-center">
+                <input type="radio"
+                        class="form-check-input me-2"
+                       name="{{ $field }}" 
+                       value="{{ $j }}"
+                       @if(isset($instrumen) && $instrumen->$field == $j) checked @endif>
+            </td>
+        @endfor
+    </tr>
+@endforeach
+
+</tbody>
+
+            </table>
+            <div class="text-danger mt-2">
+                *diisi berdasarkan hasil penentuan pendekatan asesmen dan perencanaan asesmen
+            </div>
         </div>
     </div>
-</div>
-
+    
 <!-- Penjelasan -->
 <div class="card-box">
     <div class="judul-box">

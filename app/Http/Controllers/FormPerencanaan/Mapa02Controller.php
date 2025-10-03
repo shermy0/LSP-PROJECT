@@ -21,7 +21,7 @@ class Mapa02Controller extends Controller
     public function index()
     {
         $skemas = Skema::all();
-        return view('mapa02', compact('skemas'));
+        return view('form_perencanaan.form_mapa_02.mapa02', compact('skemas'));
     }
 
     // Halaman MAPA02 berdasarkan skema
@@ -31,14 +31,18 @@ class Mapa02Controller extends Controller
 
         $kelompokPekerjaan = KelompokPekerjaan::with([
                 'hasilAsesmen.unit',
-                // 'hasilAsesmen.bukti.jenisBukti',
-                // 'hasilAsesmen.perangkat.perangkat'
             ])
             ->where('id_skema', $skema_id)
             ->get();
 
-        return view('mapa02', compact('skema', 'kelompokPekerjaan'));
+        // ambil data instrumen asesmen
+        $instrumen = DB::table('instrumen_asesmen')
+            ->where('id_skema', $skema_id)
+            ->first();
+
+        return view('form_perencanaan.form_mapa_02.mapa02', compact('skema', 'kelompokPekerjaan', 'instrumen'));
     }
+
 
     // Ambil data asesor berdasarkan skema (AJAX)
     public function getAsesor($skemaId)
@@ -65,43 +69,66 @@ class Mapa02Controller extends Controller
         return response()->json($asesi);
     }
 
-public function simpanInstrumen(Request $request)
-{
-    $skemaId = $request->skema_id;
-    $asesorId = auth()->user()->asesor->id_asesor ?? null;
+    public function simpanInstrumen(Request $request)
+    {
+        $skemaId = $request->input('skema_id');
 
-    if (!$asesorId) {
-        return back()->with('error', 'Asesor tidak ditemukan.');
-    }
+        // mapping sesuai nama kolom di tabel
+        $fields = [
+            'cek_observasi',
+            'tugas_praktik',
+            'tanya_observasi',
+            'instruksi_tertulis',
+            'soal_pg',
+            'soal_esai',
+            'soal_uraian',
+            'cek_portofolio',
+            'tanya_wawancara',
+            'verifikasi_pihak3',
+            'cek_produk',
+        ];
 
-    if ($request->has('potensi')) {
-        foreach ($request->potensi as $instrumenId => $value) {
-            DB::table('asesmen_instrumen_jawaban')->insert([
-                'skema_id'     => $skemaId,
-                'instrumen_id' => $instrumenId,
-                'asesor_id'    => $asesorId,
-                'potensi'      => $value,
-                'created_at'   => now(),
-                'updated_at'   => now(),
-            ]);
+        $data = [];
+        foreach ($fields as $field) {
+            $data[$field] = $request->input($field, null);
         }
+
+        DB::table('instrumen_asesmen')->updateOrInsert(
+            ['id_skema' => $skemaId], // key pencarian
+            $data // data yang diupdate/insert
+        );
+
+        return redirect()->route('form.mapa02.asesor', $skemaId)
+                        ->with('success', 'Instrumen asesmen berhasil disimpan/diupdate.');
     }
 
-return redirect()->route('form.mapa02.asesor', ['skema_id' => $skemaId])
-                 ->with('success', 'Instrumen berhasil disimpan');
-}
 
 
     
 public function showMapa02Asesor($id_skema)
 {
     $skema = Skema::findOrFail($id_skema);
-    $asesors = DB::table('asesor')->get();
 
-    return view('mapa02_asesor', compact('skema', 'asesors'));
+    // ambil semua asesor (buat dropdown)
+ $asesors = DB::table('asesor')
+            ->join('asesor_skema', 'asesor.id_asesor', '=', 'asesor_skema.asesor_id')
+            ->where('asesor_skema.skema_id', $id_skema)
+            ->select('asesor.id_asesor', 'asesor.nama_asesor', 'asesor.no_registrasi as no_met')
+            ->get();
+    // ambil data penyusun sesuai skema
+    $penyusun = DB::table('penyusun_persetujuan')
+        ->where('id_skema', $id_skema)
+        ->where('role', 'penyusun')
+        ->get();
+
+        
+
+    return view('form_perencanaan.form_mapa_02.mapa02_asesor', compact(
+        'skema',
+        'asesors',
+        'penyusun'
+    ));
 }
-
-
 
 
     // Ambil unit per skema (AJAX)
