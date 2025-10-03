@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Skema extends Model
 {
-    protected $table = 'skema_sertifikasi';
+    protected $table = 'skema_sertifikasi'; 
     protected $primaryKey = 'id_skema';
-    public $timestamps = true;
+    public $timestamps = false;
 
     protected $fillable = [
         'nama_skema',
@@ -19,11 +19,57 @@ class Skema extends Model
         'status_skema',
     ];
 
-    // ================================
-    // Relasi: Skema punya banyak KelompokPekerjaan
-    // ================================
-    public function kelompokPekerjaan()
+        public function unitKompetensi()
     {
+        return $this->hasMany(UnitKompetensi::class, 'id_skema', 'id_skema');
+    }
+
+    public function units()
+    {
+        return $this->hasMany(UnitKompetensi::class, 'id_skema', 'id_skema');
+    }
+
+    public function instrumen()
+    {
+        return $this->hasMany(InstrumenAsesmen::class, 'skema_id', 'id_skema');
+    }
+    public function kelompokPekerjaan()
+{
         return $this->hasMany(KelompokPekerjaan::class, 'id_skema', 'id_skema');
     }
+    public function tujuans()
+    {
+        return $this->belongsToMany(
+            TujuanAsesmen::class,
+            'skema_tujuan',   // nama pivot
+            'skema_id',       // foreign key di pivot untuk skema
+            'tujuan_id'       // foreign key di pivot untuk tujuan
+        );
+    }
+
+      public function laporan()
+    {
+        return $this->hasMany(LaporanAsesmen::class, 'skema_id');
+    }
+
+    public function validasi()
+    {
+        return $this->hasMany(ValidasiAsesmen::class, 'skema_id');
+    }
+
+    public function konfirmasi()
+    {
+        return $this->hasMany(KonfirmasiOrangRelevan::class, 'skema_id');
+    }
+
+    public function asesor()
+    {
+        return $this->belongsToMany(Asesor::class, 'skema_asesor', 'id_skema', 'id_asesor');
+    }
+
+    public function dasarAsesmen()
+{
+    return $this->hasOne(DasarAsesmen::class, 'skema_id', 'id_skema');
+}
+
 }

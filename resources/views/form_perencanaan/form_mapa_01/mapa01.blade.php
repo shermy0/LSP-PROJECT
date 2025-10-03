@@ -2,64 +2,65 @@
 
 @section('konten')
 <link rel="stylesheet" href="{{ asset('assets/css/mapa01.css') }}">
-
-        <div class="card mapa-card">
+    <div class="card mapa-card">
     <!-- Breadcrumb -->
-         <nav aria-label="breadcrumb">
+    <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('formperencanaan') }}">Form Perencanaan</a></li>
+            <li class="breadcrumb-item">
+                <a href="{{ route('formperencanaan.index') }}">Daftar Skema</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ route('formperencanaan.show', $skema->id_skema) }}">Form Perencanaan</a>
+            </li>
             <li class="breadcrumb-item active" aria-current="page">FR.MAPA.01</li>
         </ol>
     </nav>
 
+
+<div class="container mt-4">
     <!-- Header -->
     <div class="text-center mb-4">
         <div class="mapa-logo"></div>
         <h3 class="fw-bold">FR.MAPA 01. Merencanakan Aktivitas dan Proses</h3>
         <p class="text-muted">Peninjauan Proses Asesmen</p>
     </div>
-
-        <!-- Dropdown skema -->
-<div class="skema-container">
+    <!-- skema -->
+    <div class="skema-container">
         <div class="skema-group">
-        <span class="skema-label">SKEMA:</span>
-            <select name="skema_id" id="skema_id" class="skema-select">
-                <option value="">-- Pilih Skema --</option>
-                @foreach($skemas as $skema)
-                    <option value="{{ $skema->id_skema }}"
-                            data-kode="{{ $skema->kode_skema }}"
-                            data-jenjang="{{ $skema->jenjang }}">
-                        {{ $skema->nama_skema }}
-                    </option>
-                @endforeach
-            </select>
+            <span class="skema-label">SKEMA:</span>
+            <span class="skema-select">{{ $skema->nama_skema }}</span>
         </div>
     </div>
-
-        <!-- Form input -->
+    
         <div class="row g-3">
             <div class="col-md-6">
                 <div class="mapa-box">
-                    <label class="fw-semibold d-block mb-2">Skema Sertifikasi</label>
-                    <div class="jenis-skema">
-                        <input type="radio" id="kkni" name="skema" class="form-check-input me-2">
-                        <label for="kkni">KKNI</label>
-                        <input type="radio" id="okupasi" name="skema" class="form-check-input me-2" checked>
-                        <label for="okupasi">Okupasi</label>
-                    </div>
-                </div>
+            <label class="fw-semibold d-block mb-2">Skema Sertifikasi</label>
+            <div class="jenis-skema">
+                <input type="radio" id="kkni" name="skema" class="form-check-input me-2"
+                       value="KKNI"
+                       @if($skema->jenjang == 'KKNI') checked @endif disabled>
+                <label for="kkni">KKNI</label>
+
+                <input type="radio" id="okupasi" name="skema" class="form-check-input me-2"
+                       value="Okupasi"
+                       @if($skema->jenjang == 'Okupasi') checked @endif disabled>
+                <label for="okupasi">Okupasi</label>
+            </div>                </div>
             </div>
 
             <div class="col-md-6">
                 <div class="mapa-box">
-                    <label for="nomorSkema" class="fw-semibold d-block mb-2">Nomor</label>
-                    <input type="text" id="nomorSkema" class="form-control" placeholder="Nomor Skema">
+                    <label class="fw-semibold d-block mb-2">Nomor Skema</label>
+                    <input type="text" class="form-control" value="{{ $skema->kode_skema }}" readonly>
                 </div>
             </div>
         </div>
     </div>
-        </div>
+</div>
 
+<form action="{{ route('form.mapa01.store', $skema->id_skema) }}" method="POST">
+    @csrf
     <!-- Menentukan Pendekatan Asesmen -->
 <div class="mapa-section">
     <div class="card mapa-card">
@@ -69,47 +70,75 @@
                 <div class="mapa-subsection-header">Asesi</div>
                 <div class="mapa-options">
                     <div>
-                        <input type="checkbox" id="asesi1" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2">
+                        <input class="form-check-input" type="checkbox" name="pelatihan_standar" id="pelatihan_standar"
+            {{ $pendekatan && $pendekatan->pelatihan_standar ? 'checked' : '' }}>
                         <label for="asesi1">Hasil pelatihan dan / atau pendidikan, dimana Kurikulum dan fasilitas praktek mampu telusur terhadap standar kompetensi</label>
                     </div>
                     <div>
-                        <input type="checkbox" id="asesi2" name="asesi[]" value="Pelatihan dengan kurikulum belum berbasis kompetensi" class="form-check-input me-2">
+                         <input class="form-check-input" type="checkbox" name="pelatihan_nonstandar" id="pelatihan_nonstandar"
+            {{ $pendekatan && $pendekatan->pelatihan_nonstandar ? 'checked' : '' }}>
                         <label for="asesi2">Hasil pelatihan dan / atau pendidikan, dimana kurikulum belum berbasis kompetensi</label>
                     </div>
                     <div>
-                        <input type="checkbox" id="asesi3" name="asesi[]" value="Pekerja berpengalaman kompeten" class="form-check-input me-2">
+                        <input class="form-check-input" type="checkbox" name="pengalaman_standar" id="pengalaman_standar"
+            {{ $pendekatan && $pendekatan->pengalaman_standar ? 'checked' : '' }}>
                         <label for="asesi3">Pekerja berpengalaman, dimana berasal dari industri/tempat kerja yang dalam operasionalnya mampu telusur dengan standar kompetensi</label>
                     </div>
                     <div>
-                        <input type="checkbox" id="asesi4" name="asesi[]" value="Pekerja berpengalaman belum kompeten" class="form-check-input me-2">
+                       <input class="form-check-input" type="checkbox" name="pengalaman_nonstandar" id="pengalaman_nonstandar"
+            {{ $pendekatan && $pendekatan->pengalaman_nonstandar ? 'checked' : '' }}>
                         <label for="asesi4">Pekerja berpengalaman, dimana berasal dari industri/tempat kerja yang dalam operasionalnya belum berbasis kompetensi</label>
                     </div>
                     <div>
-                        <input type="checkbox" id="asesi5" name="asesi[]" value="Belajar mandiri/otodidak" class="form-check-input me-2">
+                        <input class="form-check-input" type="checkbox" name="otodidak" id="otodidak"
+            {{ $pendekatan && $pendekatan->otodidak ? 'checked' : '' }}>
                         <label for="asesi5">Pelatihan / belajar mandiri atau otodidak.</label>
                     </div>
             </div>
-        <!-- Tujuan Asesmen -->
+<!-- Tujuan Asesmen -->
 <div class="mapa-section">
     <div class="mapa-subsection-header">Tujuan Asesmen</div>
     <div class="mapa-options" id="tujuan-asesmen-list">
-        <div>
-            <input type="checkbox" id="sertifikasi" name="tujuan[]" value="Sertifikasi" class="form-check-input me-2">
-            <label for="sertifikasi">Sertifikasi</label>
-        </div>
-        <div>
-            <input type="checkbox" id="pkt" name="tujuan[]" value="Pengakuan Kompetensi Terkini (PKT)" class="form-check-input me-2">
-            <label for="pkt">Pengakuan Kompetensi Terkini (PKT)</label>
-        </div>
-        <div>
-            <input type="checkbox" id="rpl" name="tujuan[]" value="Rekognisi Pembelajaran Lampau (RPL)" class="form-check-input me-2">
-            <label for="rpl">Rekognisi Pembelajaran Lampau (RPL)</label>
-        </div>
+        {{-- Default tujuan (tidak bisa dihapus/diubah) --}}
+        @foreach($defaultTujuan as $nama)
+            <div class="tujuan-item">
+                <input type="checkbox" name="tujuan[]" value="{{ $nama }}"
+                       class="form-check-input me-2"
+                       @if(in_array($nama, $tujuanDipilih ?? [])) checked @endif>
+                <label>{{ $nama }}</label>
+            </div>
+        @endforeach
+
+        {{-- Custom tujuan (bisa edit & hapus) --}}
+        @foreach($customTujuan as $nama)
+            @php
+                $tujuan = DB::table('tujuan_asesmen')->where('nama_tujuan', $nama)->first();
+            @endphp
+            <div class="tujuan-item">
+                <input type="checkbox" name="tujuan[]" value="{{ $nama }}"
+                       class="form-check-input me-2"
+                       @if(in_array($nama, $tujuanDipilih ?? [])) checked @endif>
+                <label>{{ $nama }}</label>
+
+                <button type="button" class="btn btn-sm btn-warning edit-tujuan"
+                        data-id="{{ $tujuan->id_tujuan }}"
+                        data-nama="{{ $nama }}">Edit</button>
+
+                <button type="button" 
+                        class="btn btn-sm btn-danger delete-tujuan"
+                        data-url="{{ route('mapa01.tujuan.delete', ['skema' => $skema->id_skema, 'tujuan' => $tujuan->id_tujuan]) }}">
+                    Hapus
+                </button>
+            </div>
+        @endforeach
     </div>
+
     <button type="button" class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#modalTambahTujuan">
         + Tambah opsi tujuan lainnya
     </button>
 </div>
+
+
 
 <!-- Modal Tambah Opsi -->
 <div class="modal fade" id="modalTambahTujuan" tabindex="-1" aria-labelledby="modalTambahTujuanLabel" aria-hidden="true">
@@ -130,131 +159,184 @@
     </div>
   </div>
 </div>
+<!-- Modal edit Opsi -->
+<div class="modal fade" id="modalEditTujuan" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Tujuan Asesmen</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editIdTujuan">
+        <input type="text" id="editNamaTujuan" class="form-control">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="btnUpdateTujuan">Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 
+<!-- KONTEKS ASESMEN -->
 <div class="mapa-section">
     <div class="mapa-subsection-header">Konteks Asesmen</div>
-        <div class="konteks-section">
-    <!-- Lingkungan -->
-    <div class="form-group">
-        <label class="form-label">Lingkungan</label>
-        <div class="mapa-options-konteks radio">
-            <label> <input type="radio" id="aa" name="aa" class="form-check-input"> Tempat kerja nyata</label>
-            <label> <input type="radio" id="dd" name="aa" class="form-check-input"> Tempat kerja simulasi</label>
-        </div>
-    </div>
+    <div class="konteks-section">
 
-    <!-- Peluang -->
-    <div class="form-group radio">
-        <label class="form-label">Peluang untuk mengumpulkan bukti dalam sejumlah situasi</label>
-        <div class="mapa-options-konteks">
-            <label><input type="radio" id="bb" name="bb" class="form-check-input">  Tersedia</label>
-            <label><input type="radio" id="cc" name="bb" class="form-check-input"> Terbatas</label>
+        <!-- LINGKUNGAN -->
+        <div class="form-group mb-3">
+            <label class="form-label d-block">Lingkungan</label>
+            <label class="me-3">
+                <input type="radio" name="lingkungan" value="Tempat kerja nyata" class="form-check-input me-1"
+                       {{ $konteks->lingkungan == 'Tempat kerja nyata' ? 'checked' : '' }}>
+                Tempat kerja nyata
+            </label>
+            <label>
+                <input type="radio" name="lingkungan" value="Tempat kerja simulasi" class="form-check-input me-1"
+                       {{ $konteks->lingkungan == 'Tempat kerja simulasi' ? 'checked' : '' }}>
+                Tempat kerja simulasi
+            </label>
         </div>
-    </div>
 
-    <!-- Hubungan -->
-    <div class="form-group">
-        <label class="form-label">Hubungan antara standarkompetensi dan:</label>
-        <div class="mapa-options-konteks">
-            <label><input type="checkbox" id="asesi1" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Bukti untuk mendukung asesmen</label>
-            <label><input type="checkbox" id="asesi1" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Aktivitas kerja di tempat kerja Asesi</label>
-            <label><input type="checkbox" id="asesi1" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Kegiatan Pembelajaran</label>
+        <!-- PELUANG -->
+        <div class="form-group mb-3">
+            <label class="form-label d-block">Peluang untuk mengumpulkan bukti dalam sejumlah situasi</label>
+            <label class="me-3">
+                <input type="radio" name="peluang" value="Tersedia" class="form-check-input me-1"
+                       {{ $konteks->peluang == 'Tersedia' ? 'checked' : '' }}>
+                Tersedia
+            </label>
+            <label>
+                <input type="radio" name="peluang" value="Terbatas" class="form-check-input me-1"
+                       {{ $konteks->peluang == 'Terbatas' ? 'checked' : '' }}>
+                Terbatas
+            </label>
         </div>
-    </div>
 
-    <!-- Pelaksana -->
-    <div class="form-group">
-        <label class="form-label">Siapa yang melakukan asesmen / RPL</label>
-        <div class="mapa-options-konteks">
-            <label><input type="checkbox" id="asesi1" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Lembaga Sertifikasi</label>
-            <label><input type="checkbox" id="asesi1" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Organisasi Pelatihan</label>
-            <label><input type="checkbox" id="asesi1" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2"> Asesor Perusahaan</label>
-        </div>
-    </div>
-</div>
-</div>
-
-                <div class="mapa-subsection-header">Konfirmasi dengan Orang Lain yang Relevan</div>
-                <div class="mapa-options">
-                    <div>
-                        <input type="checkbox" id="asesi1" name="asesi[]" value="Pelatihan dengan kurikulum & fasilitas sesuai standar" class="form-check-input me-2">
-                        <label for="asesi1">Manajer sertifikasi LSP P1 SMKN 11 Bandungi</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="asesi2" name="asesi[]" value="Pelatihan dengan kurikulum belum berbasis kompetensi" class="form-check-input me-2">
-                        <label for="asesi2">Master Asesor / Master Trainer / Lead Asesor Kompetensi</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="asesi3" name="asesi[]" value="Pekerja berpengalaman kompeten" class="form-check-input me-2">
-                        <label for="asesi3">Manajer Pelatihan Lembaga Training terakreditasi / Lembaga Training Terdaftar</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="asesi4" name="asesi[]" value="Pekerja berpengalaman belum kompeten" class="form-check-input me-2">
-                        <label for="asesi4">Manajer atau supervisor ditempat kerja</label>
-                    </div>
+        <!-- HUBUNGAN -->
+        <div class="form-group mb-3">
+            <label class="form-label d-block">Hubungan antara standar kompetensi dan:</label>
+            @foreach(['Bukti untuk mendukung asesmen','Aktivitas kerja di tempat kerja Asesi','Kegiatan Pembelajaran'] as $h)
+            <div>
+                <label>
+                    <input type="checkbox" name="hubungan[]" value="{{ $h }}"
+                           class="form-check-input me-1"
+                           {{ in_array($h, $konteks->hubungan) ? 'checked' : '' }}>
+                    {{ $h }}
+                </label>
             </div>
+            @endforeach
+        </div>
 
-            
+        <!-- PELAKSANA -->
+        <div class="form-group mb-3">
+            <label class="form-label d-block">Siapa yang melakukan asesmen / RPL</label>
+            @foreach(['Lembaga Sertifikasi','Organisasi Pelatihan','Asesor Perusahaan'] as $p)
+            <div>
+                <label>
+                    <input type="checkbox" name="pelaksana[]" value="{{ $p }}"
+                           class="form-check-input me-1"
+                           {{ in_array($p, $konteks->pelaksana) ? 'checked' : '' }}>
+                    {{ $p }}
+                </label>
+            </div>
+            @endforeach
+        </div>
+
+    </div>
+</div>
+
+
+<div class="mapa-subsection-header">Konfirmasi dengan Orang Lain yang Relevan</div>
+<div class="mapa-options">
+    <div>
+        <input type="checkbox" class="form-check-input me-2"  name="orang_relevan[]" value="Manajer sertifikasi LSP P1 SMKN 11 Bandung"
+    @if($konfirmasi && $konfirmasi->konfirmasi_manajer_lsp) checked @endif>
+Manajer sertifikasi LSP P1 SMKN 11 Bandung
+    </div>
+    <div>
+        <input type="checkbox" class="form-check-input me-2" name="orang_relevan[]" value="Master Asesor / Master Trainer / Lead Asesor Kompetensi"
+    @if($konfirmasi && $konfirmasi->konfirmasi_master_asesor) checked @endif>
+Master Asesor / Master Trainer / Lead Asesor Kompetensi
+    </div>
+    <div>
+       <input type="checkbox" class="form-check-input me-2" name="orang_relevan[]" value="Manajer Pelatihan Lembaga Training terakreditasi / Lembaga Training Terdaftar"
+    @if($konfirmasi && $konfirmasi->konfirmasi_manajer_pelatihan) checked @endif>
+Manajer Pelatihan Lembaga Training
+    </div>
+    <div>
+       <input type="checkbox" class="form-check-input me-2" name="orang_relevan[]" value="Manajer atau supervisor di tempat kerja"
+    @if($konfirmasi && $konfirmasi->konfirmasi_supervisor) checked @endif>
+Manajer atau supervisor di tempat kerja
+    </div>
+</div>
+
+
+
+
 <div class="mapa-subsection-header">Standar Industri atau Tempat Kerja</div>
 <div class="mapa-options">
-    {{-- Standar Kompetensi --}}
-    <div>
-        <input type="checkbox" id="asesi1" name="asesi[]" 
-               value="Standar Kompetensi" class="form-check-input me-2 toggle-input"
-               data-target="input-asesi1">
-        <label for="asesi1">Standar Kompetensi:</label>
-        <input type="text" id="input-asesi1" name="standar_kompetensi" 
-               class="form-control mt-2" placeholder="Isi standar kompetensi"
-               disabled style="display:none;">
-    </div>
-
-    {{-- Kriteria asesmen dari kurikulum pelatihan --}}
-    <div>
-        <input type="checkbox" id="asesi2" name="asesi[]" 
-               value="Kriteria asesmen" class="form-check-input me-2">
-        <label for="asesi2">Kriteria asesmen dari kurikulum pelatihan</label>
-    </div>
-
-    {{-- Spesifikasi Kinerja Perusahaan --}}
-    <div>
-        <input type="checkbox" id="asesi3" name="asesi[]" 
-               value="Spesifikasi Kinerja" class="form-check-input me-2">
-        <label for="asesi3">Spesifikasi kinerja suatu perusahaan atau industri</label>
-    </div>
-
-    {{-- Spesifikasi Produk --}}
-    <div>
-        <input type="checkbox" id="asesi4" name="asesi[]" 
-               value="Spesifikasi Produk" class="form-check-input me-2 toggle-input"
-               data-target="input-asesi4">
-        <label for="asesi4">Spesifikasi Produk:</label>
-        <input type="text" id="input-asesi4" name="spesifikasi_produk" 
-               class="form-control mt-2" placeholder="Isi spesifikasi produk"
-               disabled style="display:none;">
-    </div>
-
-    {{-- Pedoman Khusus --}}
-    <div>
-        <input type="checkbox" id="asesi5" name="asesi[]" 
-               value="Pedoman Khusus" class="form-check-input me-2 toggle-input"
-               data-target="input-asesi5">
-        <label for="asesi5">Pedoman Khusus:</label>
-        <input type="text" id="input-asesi5" name="pedoman_khusus" 
-               class="form-control mt-2" placeholder="Isi pedoman khusus"
-               disabled style="display:none;">
-    </div>
+{{-- Standar Kompetensi --}}
+<div>
+    @foreach($standarKompetensi as $sk)
+        <input type="checkbox" class="form-check-input me-2" checked disabled>
+        <label>Standar Kompetensi: {{ $sk }}</label>
+    @endforeach
 </div>
 
 
-        </div>
-    </div>
+{{-- Kriteria Asesmen dari Kurikulum Pelatihan --}}
+<div>
+    <input type="checkbox" id="asesi2" name="kriteria_asesmen"
+           value="1" class="form-check-input me-2"
+           {{ isset($standar) && $standar->standar_kriteria_asesmen ? 'checked' : '' }}>
+    <label for="asesi2">Kriteria asesmen dari kurikulum pelatihan</label>
+</div>
+
+{{-- Spesifikasi Kinerja Perusahaan --}}
+<div>
+    <input type="checkbox" id="asesi3" class="form-check-input me-2 toggle-input"
+           data-target="input-asesi3"
+           {{ isset($standar) && $standar->standar_kinerja_perusahaan ? 'checked' : '' }}>
+    <label for="asesi3">Spesifikasi kinerja suatu perusahaan atau industri</label>
+    <input type="text" id="input-asesi3" name="standar_kinerja_perusahaan"
+           class="form-control mt-2"
+           value="{{ $standar->standar_kinerja_perusahaan ?? '' }}"
+           {{ isset($standar) && $standar->standar_kinerja_perusahaan ? '' : 'disabled style=display:none;' }}>
+</div>
+
+{{-- Spesifikasi Produk --}}
+<div>
+    <input type="checkbox" id="asesi4" class="form-check-input me-2 toggle-input"
+           data-target="input-asesi4"
+           {{ isset($standar) && $standar->standar_spesifikasi_produk ? 'checked' : '' }}>
+    <label for="asesi4">Spesifikasi Produk:</label>
+    <input type="text" id="input-asesi4" name="spesifikasi_produk"
+           class="form-control mt-2" placeholder="Isi spesifikasi produk"
+           value="{{ $standar->standar_spesifikasi_produk ?? '' }}"
+           {{ isset($standar) && $standar->standar_spesifikasi_produk ? '' : 'disabled style=display:none;' }}>
+</div>
+
+{{-- Pedoman Khusus --}}
+<div>
+    <input type="checkbox" id="asesi5" class="form-check-input me-2 toggle-input"
+           data-target="input-asesi5"
+           {{ isset($standar) && $standar->standar_pedoman_khusus ? 'checked' : '' }}>
+    <label for="asesi5">Pedoman Khusus:</label>
+    <input type="text" id="input-asesi5" name="pedoman_khusus"
+           class="form-control mt-2" placeholder="Isi pedoman khusus"
+           value="{{ $standar->standar_pedoman_khusus ?? '' }}"
+           {{ isset($standar) && $standar->standar_pedoman_khusus ? '' : 'disabled style=display:none;' }}>
+</div>
+
 </div>
 
 
+        
+    </div>
 </div>
 <!-- Simpan dan Lanjut -->
-<form id="simpan-lanjut-form" action="" method="GET" class="simpan-form">
     @csrf
     <button type="submit" class="simpan-btn">
         <span>Simpan dan Lanjut</span>
@@ -262,82 +344,133 @@
 </form>
 
 <script>
-    document.getElementById('simpan-lanjut-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const skemaId = document.getElementById('skema_id').value;
-    if (skemaId) {
-        window.location.href = "/form-perencanaan/mapa01/kode-unit/" + skemaId;
-    } else {
-        alert("Silakan pilih skema terlebih dahulu");
-    }
+    document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".toggle-input").forEach(cb => {
+        cb.addEventListener("change", function () {
+            const target = document.getElementById(this.dataset.target);
+            if (this.checked) {
+                target.style.display = "block";
+                target.disabled = false;
+            } else {
+                target.style.display = "none";
+                target.disabled = true;
+                target.value = ""; // biar ga ikut ke DB
+            }
+        });
+    });
 });
-     document.getElementById('skema_id').addEventListener('change', function() {
-        let selected = this.options[this.selectedIndex];
-        let kode = selected.getAttribute('data-kode');
-        let jenjang = selected.getAttribute('data-jenjang');
+document.addEventListener("DOMContentLoaded", function () {
+    const tujuanList = document.getElementById("tujuan-asesmen-list");
+    let currentEditId = null; // simpan id tujuan yang lagi di-edit
 
-        // biar bisa isi nomor otomatis
-        document.getElementById('nomor').value = kode || '';
+    // Tambah tujuan baru lewat modal
+    document.getElementById("simpanTujuan").addEventListener("click", function () {
+        const nama = document.getElementById("tujuanBaru").value.trim();
+        if (!nama) return;
 
-        // pilih radio otomatis sesuai skemanya
-        if (jenjang) {
-            if (jenjang.toLowerCase().includes("kkni")) {
-                document.getElementById('skema1').checked = true;
-            } else if (jenjang.toLowerCase().includes("okupasi")) {
-                document.getElementById('skema2').checked = true;
+        const id = "tujuan_" + Date.now();
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("tujuan-item");
+        wrapper.innerHTML = `
+            <input type="checkbox" name="tujuan[]" value="${nama}" id="${id}" checked class="form-check-input me-2">
+            <label for="${id}" class="tujuan-label">${nama}</label>
+            <button type="button" class="btn btn-sm btn-warning edit-tujuan" data-id="${id}" data-nama="${nama}">Edit</button>
+            <button type="button" class="btn btn-sm btn-danger delete-tujuan">Hapus</button>
+        `;
+        tujuanList.appendChild(wrapper);
+
+        document.getElementById("tujuanBaru").value = "";
+        bootstrap.Modal.getInstance(document.getElementById("modalTambahTujuan")).hide();
+    });
+
+    // Delegasi event untuk Edit & Delete
+    tujuanList.addEventListener("click", function (e) {
+        const item = e.target.closest(".tujuan-item");
+        if (!item) return;
+
+        // === Edit tujuan ===
+        if (e.target.classList.contains("edit-tujuan")) {
+            currentEditId = e.target.getAttribute("data-id"); // simpan id tujuan yg diedit
+            const nama = e.target.getAttribute("data-nama");
+
+            document.getElementById("editNamaTujuan").value = nama;
+
+            // Tampilkan modal edit
+            const modal = new bootstrap.Modal(document.getElementById("modalEditTujuan"));
+            modal.show();
+        }
+
+        // === Delete tujuan ===
+        if (e.target.classList.contains("delete-tujuan")) {
+            if (!confirm("Yakin ingin menghapus tujuan ini?")) return;
+
+            const url = e.target.getAttribute("data-url");
+
+            if (url) {
+                // tujuan dari DB → hapus pakai fetch
+                fetch(url, {
+                    method: "DELETE",
+                    headers: {
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "Accept": "application/json"
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        item.remove();
+                    } else {
+                        alert("Gagal menghapus tujuan: " + data.message);
+                    }
+                })
+                .catch(() => alert("Terjadi error koneksi"));
+            } else {
+                // tujuan baru (JS-only)
+                item.remove();
             }
         }
     });
-document.getElementById('simpanTujuan').addEventListener('click', function() {
-    let input = document.getElementById('tujuanBaru');
-    let value = input.value.trim();
 
-    if(value !== "") {
-        // Buat ID unik biar gak bentrok
-        let id = 'tujuan-' + Date.now();
+// Simpan perubahan edit tujuan
+document.getElementById("btnUpdateTujuan").addEventListener("click", function () {
+    const newName = document.getElementById("editNamaTujuan").value.trim();
+    if (!newName || !currentEditId) return;
 
-        // Tambahkan ke list
-        let container = document.getElementById('tujuan-asesmen-list');
-        
-        let div = document.createElement('div');
-        div.classList.add("d-flex", "align-items-center", "mb-2", "tujuan-custom");
-        div.innerHTML = `
-            <input type="checkbox" id="${id}" name="tujuan[]" value="${value}" class="form-check-input me-2" checked>
-            <label for="${id}" class="me-2 flex-grow-1">${value}</label>
-            <button type="button" class="btn btn-sm btn-outline-danger btn-delete"><i class="bi bi-trash-fill"></i></button>
-        `;
-        container.appendChild(div);
+    // Kirim ke backend pakai fetch
+    fetch(`/form-perencanaan/mapa01/{{ $skema->id_skema }}/tujuan/${currentEditId}/update`, {
+        method: "POST",
+        headers: {
+            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify({ nama_tujuan: newName })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            // Update label & value checkbox di DOM
+            const checkbox = document.querySelector(`.edit-tujuan[data-id="${currentEditId}"]`)
+                .closest(".tujuan-item").querySelector("input[type=checkbox]");
+            
+            if (checkbox) checkbox.value = newName;
 
-        // Event hapus hanya utk opsi user
-        div.querySelector(".btn-delete").addEventListener("click", function(){
-            div.remove();
-        });
+            const label = checkbox.closest(".tujuan-item").querySelector("label");
+            if (label) label.textContent = newName;
 
-        // Reset input
-        input.value = "";
+            const editBtn = checkbox.closest(".tujuan-item").querySelector(".edit-tujuan");
+            if (editBtn) editBtn.setAttribute("data-nama", newName);
 
-        // Tutup modal
-        var modal = bootstrap.Modal.getInstance(document.getElementById('modalTambahTujuan'));
-        modal.hide();
-    }
+            // Tutup modal
+            bootstrap.Modal.getInstance(document.getElementById("modalEditTujuan")).hide();
+            currentEditId = null;
+        } else {
+            alert("Gagal update tujuan: " + (data.message ?? 'Unknown error'));
+        }
+    })
+    .catch(() => alert("Terjadi error koneksi"));
 });
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll(".toggle-input").forEach(function (checkbox) {
-            checkbox.addEventListener("change", function () {
-                const targetId = this.dataset.target;
-                const targetInput = document.getElementById(targetId);
-                if (this.checked) {
-                    targetInput.style.display = "block";
-                    targetInput.disabled = false;
-                } else {
-                    targetInput.style.display = "none";
-                    targetInput.disabled = true;
-                    targetInput.value = ""; // reset isi kalau di-uncheck
-                }
-            });
-        });
-    });
 
+});
 </script>
-
 @endsection

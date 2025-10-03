@@ -11,6 +11,7 @@ class Asesi extends Model
 
     protected $table = 'asesi';
     protected $primaryKey = 'id_asesi';
+    public $timestamps = true;
 
     protected $fillable = [
         'user_id',
@@ -24,8 +25,6 @@ class Asesi extends Model
         'alamat',
         'telepon',
         'email',
-        'kelas',
-        'bidang_keahlian',
         'pendidikan_terakhir',
         'institusi',
         'jabatan',
@@ -33,8 +32,13 @@ class Asesi extends Model
         'telepon_kantor',
     ];
 
+    public function skema()
+    {
+        return $this->belongsTo(Skema::class, 'skema_id');
+    }
+
     public function asesor()
     {
         return $this->belongsTo(Asesor::class, 'asesor_id', 'id_asesor');
-    }  
+    }
 }

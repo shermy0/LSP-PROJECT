@@ -3,8 +3,8 @@
 ========================= */
 body {
     margin: 0;
+    font-family: "Poppins", sans-serif;
     background-color: #f4f4f4;
-    font-family: 'Poppins', sans-serif !important;
 }
 
 /* =========================
@@ -32,8 +32,8 @@ body {
 /* Header Toggle */
 .toggle-btn {
     display: flex;
-    align-items: flex-end;
-    text-align: right;
+    align-items: flex-end; 
+    text-align: right; 
     gap: 10px;
     background-color: #041562;
     color: white;
@@ -47,8 +47,8 @@ body {
 .toggle-left {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
+    align-items: flex-start; 
+    text-align: left;   
 }
 
 .sidebar.collapsed .toggle-left {
@@ -111,12 +111,6 @@ body {
 .sidebar.collapsed .menu ul li span {
     opacity: 0;
     pointer-events: none;
-}
-
-.menu ul li a {
-    color: white;
-    text-decoration: none;
-    font-size: 14px;
 }
 
 /* Footer */
@@ -255,7 +249,6 @@ h5 {
 .center-underline {
     display: inline-block;
     position: relative;
-    border-top: 1px solid rgba(255,255,255,0.2);
     text-align: center;
 }
 
@@ -314,6 +307,7 @@ h5 {
     background-color: #f7f7f7;
 }
 
+/* Hapus panah default */
 .accordion-button::after {
     display: none;
 }
@@ -375,25 +369,6 @@ h5 {
 
 .breadcrumb a:hover {
     text-decoration: underline;
-}
-
-/* Card Field */
-.card-field {
-    background: #fff;
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    transition: all 0.2s ease-in-out;
-}
-
-.card-field:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-}
-
-.card-field .form-label {
-    font-weight: 600;
-    margin-bottom: 8px;
-    display: block;
 }
 
 /* Skema */
@@ -487,6 +462,7 @@ h3.fw-bold {
 
 .simpan-btn {
     background-color: #041562; 
+    text-decoration: none;
     color: white;
     font-weight: 500;
     padding: 10px 24px;
@@ -501,106 +477,6 @@ h3.fw-bold {
 .card-box {
     background: #fff;
     border-radius: 10px;
-    display: inline-block;
-}
-.role {
-    margin-top: 5px;
-    font-size: 14px;
-}
-.sidebar.collapsed .role {
-    display: none;
-}
-.logout-btn {
-    background-color: #ff7b7b;
-    color: white;
-    border: none;
-    padding: 10px;
-    width: 100%;
-    border-radius: 5px;
-    margin-top: 10px;
-    cursor: pointer;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-/* Avatar */
-.avatar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.avatar-img {
-    position: relative;
-    width: 48px;
-    height: 48px;
-    flex-shrink: 0;
-}
-
-.avatar-img img {
-    width: 100%;
-    height: 100%;
-    border-radius: 12px;
-    object-fit: cover;
-}
-
-.user-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    line-height: 1.2;
-}
-
-.username {
-    font-size: 16px;
-    font-weight: 500;
-    color: white;
-}
-
-.role {
-    font-size: 14px;
-    color: #ccc;
-}
-
-/* Logout Button */
-.logout-btn {
-    background: #f44336;
-    color: #fff;
-    width: 200px;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    transition: background 0.3s ease;
-}
-
-.logout-btn:hover {
-    background: #d32f2f;
-}
-
-.sidebar.collapsed .menu ul li a {
-    display: none;
-}
-
-.sidebar.collapsed .logout-btn {
-    width: 50px;
-    justify-content: center;
-}
-
-.sidebar.collapsed .logout-btn span {
-    display: none;
-}
-
-/* Konten utama */
-#main-content {
-    margin-left: 240px;
     padding: 20px;
     box-shadow: 0 3px 8px rgba(0,0,0,0.1);
     margin-bottom: 20px;
@@ -623,13 +499,15 @@ h3.fw-bold {
 }
 
 .judul-list {
-    padding-left: 1.5rem;
+    counter-reset: list-counter;
+    list-style: none;   /* ❌ ilangin angka bawaan <ol> */
+    padding-left: 0;    /* hilangin indent bawaan <ol> */
     margin: 0;
 }
 
 .judul-list li {
     position: relative;
-    padding-left: 40px;
+    padding-left: 40px;  /* kasih space buat bulatan angka custom */
     margin-bottom: 12px;
     line-height: 1.5;
 }
@@ -749,4 +627,44 @@ thead.table-title th {
     width: 100%;
     padding: 8px;
     resize: vertical;
+}
+
+/* kasih jarak antar pilihan */
+.form-check {
+    padding: 6px 0;
+    border-bottom: 1px solid #eee; /* garis horizontal tipis */
+}
+
+.form-check:last-child {
+    border-bottom: none; /* biar baris terakhir ga ada garis */
+}
+
+/* kasih space input tambahan */
+.form-check.with-input {
+    padding-bottom: 10px;
+}
+
+.custom-table th {
+    background: #f4f6f9;
+}
+
+.form-check {
+    margin-bottom: 6px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 4px;
+  }
+
+.form-check:last-child { border-bottom: none; }
+.with-input input[type="text"] {
+    margin-top: 6px;
+}
+
+.form-check { display: flex; align-items: center; gap: 6px; }
+.form-check.with-input { flex-direction: column; align-items: flex-start; gap: 4px; }
+.form-check.with-input input[type="text"] { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; }
+
+/* Checkbox normal biru */
+.custom-checkbox {
+    width: 18px;
+    height: 18px;
 }
