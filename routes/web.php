@@ -84,8 +84,6 @@ Route::delete('/mapa02/penyusun/{id}/delete-ttd', [KonfirmasiController::class, 
 
 Route::get('/mapa02/penyusun/{id}/download-ttd', [KonfirmasiController::class, 'downloadTtd'])
     ->name('form.mapa02.penyusun.downloadTtd');
-// Route::get('/laporan/{skema_id}', [LaporanController::class, 'showLaporan'])->name('form_perencanaan.laporan_asesmen.laporan_asesor');
-// Menampilkan halaman laporan per skema (laporan.blade.php)
 
 // Halaman utama laporan (FR.AK.05)
 Route::get('/laporan/{skema_id}', [LaporanController::class, 'showLaporan'])->name('laporan.show');
@@ -146,10 +144,7 @@ Route::post('/ninjau_asesemen/ninjau-asesmen-asesor', [MeninjauAsesmenController
 
     //MODIFIKASI
     Route::get('/mapa01/modifikasi/{skema_id}', [ModifikasiController::class, 'index'])->name('form.mapa01.modifikasi');
-    // Halaman utama laporan (FR.AK.05)
-// Route::get('/laporan/{skema_id}/asesi/{asesor_id}', [LaporanController::class, 'getAsesiByAsesor'])->name('laporan.getAsesi');
-// Route::post('/laporan/store', [LaporanController::class, 'store'])->name('laporan_asesor.store');
-    
+
     // ============================
 // END NAVIGASI PERFORM
 // ============================
@@ -192,45 +187,11 @@ Route::delete('mapa01/konfirmasi/penyusun/{id}/delete',
     [KonfirmasiController::class, 'deletePenyusun']
 )->name('form.mapa01.konfirmasi.penyusun.delete');
 
-
-
-// Route::post('/mapa01/konfirmasi/{skema_id}/simpan', [KonfirmasiController::class, 'simpanKonfirmasi'])
-//     ->name('form.mapa01.konfirmasi.simpan');
-
     // Edit & update unit
     Route::get('/mapa01/edit-unit/{skema_id}/{id}', [Mapa01Controller::class, 'editUnit'])->name('form.mapa01.editunit');
     Route::put('/mapa01/update-unit/{skema_id}/{id}', [Mapa01Controller::class, 'updateUnit'])->name('form.mapa01.updateunit');
-    // ============================
-// MAPA 01 & MAPA 02
-// ============================
-// Route::get('/mapa02', [PerencanaanController::class, 'mapa02'])->name('form.mapa02');
-
 
 });
-// ============================
-// MAPA 02 (lama, sementara dikomentari)
-// ============================
-// Route::get('/mapa02', [PerencanaanController::class, 'mapa02'])->name('form.mapa02');
-// Route::get('/mapa02', [SkemaController::class, 'showForm'])->name('mapa02.show');
-// Route::get('/mapa02/skema/{skemaId}/kelompok', [Mapa01Controller::class, 'getKelompokBySkema']);
-// Route::get('mapa02/mapa02-asesor', [PerencanaanController::class, 'mapa02'])->name('mapa02_asesor.show');
-// Route::post('mapa02/mapa02-asesor', [PerencanaanController::class, 'simpanLanjutmapa02'])->name('mapa02_asesor');
-// Route::get('/mapa02/skema/{skemaId}/instrumen', [SkemaController::class, 'getInstrumenBySkema']);
-// Route::get('/mapa02/skema/{skemaId}/asesor', [SkemaController::class, 'getAsesor']);
-// Route::post('/instrumen/simpan-potensi', [InstrumenController::class, 'simpanPotensi'])->name('instrumen.simpanPotensi');
-// Route::get('/mapa02/skema/{skemaId}/units', [SkemaController::class, 'getUnits']);
-// Route::get('/asesor/search', [AsesorController::class, 'search'])->name('asesor.search');
-
-// Halaman MAPA02 default (tampilkan semua skema)
-// Route::get('/mapa02', [Mapa02Controller::class, 'index'])->name('mapa02.index');
-
-// AJAX
-// Route::get('/mapa02/skema/{skemaId}/asesor', [Mapa02Controller::class, 'getAsesor'])->name('mapa02.getAsesor');
-// Route::get('/mapa02/skema/{skemaId}/asesi/{asesorId}', [Mapa02Controller::class, 'getAsesi'])->name('mapa02.getAsesi');
-// Route::get('/mapa02/skema/{skemaId}/units', [Mapa02Controller::class, 'getUnits'])->name('mapa02.getUnits');
-
-
-
 
 Route::get('/get-unit/{skema_id}', [Mapa01Controller::class, 'getUnitsBySkema']);
 

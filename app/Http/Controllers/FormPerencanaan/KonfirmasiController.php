@@ -106,8 +106,10 @@ public function storeLaporanAsesor(Request $request, $skema_id)
         $dataUpdate
     );
 
-    return redirect()->route('form_perencanaan.laporan_asesmen.laporan_asesor', $skema_id)
-        ->with('success', 'Data catatan dan tanda tangan asesor berhasil disimpan.');
+return redirect()->route('form_perencanaan.laporan_asesmen.laporan_asesor', $skema_id)
+    ->with('success', 'Data catatan dan tanda tangan asesor berhasil disimpan.')
+    ->with('asesor_terpilih', $request->asesor_id)
+    ->with('no_registrasi_terpilih', $noMet);
 }
 
 

@@ -17,9 +17,10 @@
         <span>Form Perencanaan</span>
     @endisset
 </li>
-            <li class="breadcrumb-item active" aria-current="page">FR.MAPA.01</li>
+            <li class="breadcrumb-item active" aria-current="page">FR.AK.01</li>
         </ol>
     </nav>
+    <div class="container mt-4">
 
     <!-- Header -->
     <div class="text-center mb-4">
@@ -106,6 +107,7 @@
         </div>
     </div>
     </div>
+    </div>
 </div>
 
 <form id="simpan-lanjut-form" action="{{ route('laporan.store', $skema->id_skema) }}" method="POST" class="simpan-form mt-4">
@@ -164,6 +166,7 @@
                 <textarea name="saran_perbaikan" class="box-input" rows="3" placeholder="Masukkan teks"></textarea>
             </div>
         </div>
+    </div>
     </div>
 
     <button type="submit" class="simpan-btn mt-3">

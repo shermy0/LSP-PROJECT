@@ -6,7 +6,8 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('formperencanaan.index') }}">Daftar Skema</a></li>
             <li class="breadcrumb-item"><a href="{{ route('formperencanaan.show', $skema->id_skema) }}">Form Perencanaan</a></li>
-            <li class="breadcrumb-item active" aria-current="page">FR.MAPA.02</li>
+            <li class="breadcrumb-item"><a href="{{ route('form.mapa02', ['id_skema' => $skema->id_skema]) }}">FR.MAPA.02</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Penyusun Persetujuan</li>
         </ol>
     </nav>
 </div>
