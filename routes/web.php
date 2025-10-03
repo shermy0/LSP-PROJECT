@@ -65,9 +65,25 @@ Route::prefix('form-perencanaan')->group(function () {
     // MAPA01
 Route::get('/mapa01/{id_skema}', [Mapa01Controller::class, 'showMapa01'])->name('form.mapa01');
    // MAPA02
-Route::get('/mapa02/{skema_id}', [Mapa02Controller::class, 'showMapa02'])->name('form.mapa02');
 Route::get('/mapa02/{skema_id}/asesor', [Mapa02Controller::class, 'showMapa02Asesor'])
     ->name('form.mapa02.asesor');
+    
+// Halaman MAPA02 per skema
+Route::get('/mapa02/{id_skema}', [Mapa02Controller::class, 'showMapa02'])->name('form.mapa02');
+Route::post('/mapa02/instrumen/simpan-potensi', [Mapa02Controller::class, 'simpanInstrumen'])
+    ->name('mapa02.simpanInstrumen');
+// ✅ Penyusun MAPA.02 (pakai KonfirmasiController)
+Route::post('/mapa02/{skema_id}/penyusun/simpan', [KonfirmasiController::class, 'store'])
+    ->name('form.mapa02.penyusun.store');
+
+Route::delete('/mapa02/penyusun/{id}', [KonfirmasiController::class, 'deletePenyusun'])
+    ->name('form.mapa02.penyusun.delete');
+
+Route::delete('/mapa02/penyusun/{id}/delete-ttd', [KonfirmasiController::class, 'deleteTtd'])
+    ->name('form.mapa02.penyusun.deleteTtd');
+
+Route::get('/mapa02/penyusun/{id}/download-ttd', [KonfirmasiController::class, 'downloadTtd'])
+    ->name('form.mapa02.penyusun.downloadTtd');
 // Route::get('/laporan/{skema_id}', [LaporanController::class, 'showLaporan'])->name('form_perencanaan.laporan_asesmen.laporan_asesor');
 // Menampilkan halaman laporan per skema (laporan.blade.php)
 
@@ -206,19 +222,15 @@ Route::delete('mapa01/konfirmasi/penyusun/{id}/delete',
 // Route::get('/asesor/search', [AsesorController::class, 'search'])->name('asesor.search');
 
 // Halaman MAPA02 default (tampilkan semua skema)
-Route::get('/mapa02', [Mapa02Controller::class, 'index'])->name('mapa02.index');
-
-// Halaman MAPA02 per skema
-Route::get('/mapa02/{id_skema}', [Mapa02Controller::class, 'showMapa02'])->name('form.mapa02');
+// Route::get('/mapa02', [Mapa02Controller::class, 'index'])->name('mapa02.index');
 
 // AJAX
 // Route::get('/mapa02/skema/{skemaId}/asesor', [Mapa02Controller::class, 'getAsesor'])->name('mapa02.getAsesor');
 // Route::get('/mapa02/skema/{skemaId}/asesi/{asesorId}', [Mapa02Controller::class, 'getAsesi'])->name('mapa02.getAsesi');
 // Route::get('/mapa02/skema/{skemaId}/units', [Mapa02Controller::class, 'getUnits'])->name('mapa02.getUnits');
 
-// Simpan jawaban instrumen
-Route::post('/mapa02/instrumen/simpan-potensi', [Mapa02Controller::class, 'simpanInstrumen'])
-    ->name('mapa02.simpanInstrumen');
+
+
 
 Route::get('/get-unit/{skema_id}', [Mapa01Controller::class, 'getUnitsBySkema']);
 

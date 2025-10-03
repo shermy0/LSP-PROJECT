@@ -292,20 +292,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // konfirmasi simpan
-        e.preventDefault();
-        Swal.fire({
-            title: 'Simpan Laporan?',
-            text: "Pastikan semua data sudah benar.",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, Simpan!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                simpanForm.submit();
-            }
-        });
+      
     });
 });
 

@@ -117,16 +117,12 @@ document.addEventListener("DOMContentLoaded", () => {
             icon: "success",
             showCancelButton: true,
             confirmButtonText: "Tetap di Halaman",
-            cancelButtonText: "Kembali ke Daftar Skema"
-        }).then((result) => {
-            if(result.isConfirmed){
-                // Tetap di halaman → kirim form
-                e.target.submit();
-            } else {
-                // Kembali ke daftar skema
-                window.location.href = "{{ route('formperencanaan.index') }}";
-            }
-        });
+                cancelButtonText: "Ke Form Perencanaan"
+            }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.cancel) {
+                    window.location.href = "{{ route('formperencanaan.show', $skema->id_skema) }}";
+                }
+            });
     });
 });
 
