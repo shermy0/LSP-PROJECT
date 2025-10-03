@@ -171,6 +171,8 @@
     </button>
 </form>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const asesorSelect   = document.getElementById('namaAsesor');
@@ -253,42 +255,58 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.querySelector('textarea[name="saran_perbaikan"]').value       = catatan?.saran_perbaikan || '';
             })
             .catch(() => {
+                Swal.fire('Error', 'Gagal memuat data asesi', 'error');
                 asesiTableBody.innerHTML = `<tr><td colspan="5">Gagal memuat data asesi</td></tr>`;
             });
     });
 
-// validasi sebelum submit
-simpanForm.addEventListener('submit', function(e) {
-    let valid = true;
+    // validasi sebelum submit
+    simpanForm.addEventListener('submit', function(e) {
+        let valid = true;
 
-    // 🔴 cek kalau asesor belum dipilih
-    if (!asesorSelect.value) {
-        e.preventDefault();
-        alert("Silakan pilih asesor terlebih dahulu sebelum menyimpan.");
-        return;
-    }
-
-    // cek validasi BK wajib pilih unit
-    const rows = asesiTableBody.querySelectorAll('tr');
-    rows.forEach(row => {
-        const radioBK = row.querySelector('input[type=radio][value=BK]:checked');
-        if (radioBK) {
-            const select = row.querySelector('select');
-            if (select && select.value === "") {
-                valid = false;
-                select.classList.add('is-invalid');
-            } else if (select) {
-                select.classList.remove('is-invalid');
-            }
+        // cek kalau asesor belum dipilih
+        if (!asesorSelect.value) {
+            e.preventDefault();
+            Swal.fire('Peringatan', 'Silakan pilih asesor terlebih dahulu sebelum menyimpan.', 'warning');
+            return;
         }
-    });
 
-    if (!valid) {
+        // cek validasi BK wajib pilih unit
+        const rows = asesiTableBody.querySelectorAll('tr');
+        rows.forEach(row => {
+            const radioBK = row.querySelector('input[type=radio][value=BK]:checked');
+            if (radioBK) {
+                const select = row.querySelector('select');
+                if (select && select.value === "") {
+                    valid = false;
+                    select.classList.add('is-invalid');
+                } else if (select) {
+                    select.classList.remove('is-invalid');
+                }
+            }
+        });
+
+        if (!valid) {
+            e.preventDefault();
+            Swal.fire('Peringatan', 'Jika memilih BK, wajib memilih unit pada kolom Keterangan.', 'warning');
+            return;
+        }
+
+        // konfirmasi simpan
         e.preventDefault();
-        alert("Jika memilih BK, wajib memilih unit pada kolom Keterangan.");
-    }
-});
-
+        Swal.fire({
+            title: 'Simpan Laporan?',
+            text: "Pastikan semua data sudah benar.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Simpan!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                simpanForm.submit();
+            }
+        });
+    });
 });
 
 // toggle keterangan select

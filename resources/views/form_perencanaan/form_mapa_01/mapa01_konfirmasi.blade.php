@@ -196,14 +196,36 @@ document.addEventListener("DOMContentLoaded", () => {
     const canvasModal = document.getElementById("signature-pad");
     let signaturePad = new SignaturePad(canvasModal);
     let activePreview;
-
-    function resizeCanvas() {
-        const ratio = Math.max(window.devicePixelRatio || 1, 1);
-        canvasModal.width = canvasModal.offsetWidth * ratio;
-        canvasModal.height = canvasModal.offsetHeight * ratio;
-        canvasModal.getContext("2d").scale(ratio, ratio);
-        signaturePad.clear();
+function resizeCanvas() {
+    // simpan data dari hidden input aktif (jika ada)
+    let dataURL = "";
+    if (activePreview && activePreview.nextElementSibling.value) {
+        dataURL = activePreview.nextElementSibling.value;
     }
+
+    // resize canvas modal
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+    canvasModal.width = canvasModal.offsetWidth * ratio;
+    canvasModal.height = canvasModal.offsetHeight * ratio;
+    canvasModal.getContext("2d").scale(ratio, ratio);
+
+    // clear dulu
+    signaturePad.clear();
+
+    // gambar ulang tanda tangan lama (dari hidden input)
+    if (dataURL) {
+        const img = new Image();
+        img.onload = () => {
+            // sesuaikan ukuran gambar dengan canvas modal tanpa ngezoom
+            const scaleX = canvasModal.width / img.width / ratio;
+            const scaleY = canvasModal.height / img.height / ratio;
+            signaturePad._ctx.scale(scaleX, scaleY);
+            signaturePad._ctx.drawImage(img, 0, 0);
+            signaturePad._ctx.setTransform(1,0,0,1,0,0); // reset transform
+        };
+        img.src = dataURL;
+    }
+}
 
     // Buka modal ketika klik preview
     document.addEventListener("click", e => {

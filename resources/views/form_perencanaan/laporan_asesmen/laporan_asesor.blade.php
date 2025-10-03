@@ -1,6 +1,7 @@
 @extends('master')
 @section('konten')
 <link rel="stylesheet" href="{{ asset('assets/css/mapa01.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="card-box">
     <!-- Breadcrumb -->
@@ -60,7 +61,10 @@
         @if($ttd && $ttd->tanda_tangan)
         <div class="mt-2">
             <a href="{{ route('form_perencanaan.laporan_asesmen.ttd.download', $ttd->id) }}" class="btn btn-sm btn-primary">Download TTD</a>
-            <button type="button" class="btn btn-sm btn-danger" onclick="hapusTtd({{ $ttd->id }})">Hapus TTD</button>
+<button type="button" class="btn btn-sm btn-danger"
+    onclick="hapusTtd({{ $ttd->id }}, '{{ route('form_perencanaan.laporan_asesmen.ttd.delete', $ttd->id) }}')">
+    Hapus TTD
+</button>
         </div>
         @endif
     </div>
@@ -81,9 +85,12 @@ document.addEventListener("DOMContentLoaded", () => {
         canvas.height = canvas.offsetHeight * ratio;
         canvas.getContext("2d").scale(ratio, ratio);
 
-        // Tampilkan TTD lama jika ada
-        if(hiddenInput.value) {
-            signaturePad.fromDataURL(hiddenInput.value);
+        if(hiddenInput.value){
+            try{
+                signaturePad.fromDataURL(hiddenInput.value);
+            }catch(e){
+                console.error("Gagal load TTD lama:", e);
+            }
         }
     }
 
@@ -95,24 +102,65 @@ document.addEventListener("DOMContentLoaded", () => {
         hiddenInput.value = '';
     });
 
-    document.getElementById("laporan-asesmen-form").addEventListener("submit", () => {
-        if(!signaturePad.isEmpty()) {
+    // SweetAlert simpan
+    document.getElementById("laporan-asesmen-form").addEventListener("submit", function(e){
+        e.preventDefault();
+
+        // Simpan TTD ke hidden input
+        if(!signaturePad.isEmpty()){
             hiddenInput.value = signaturePad.toDataURL();
         }
+
+        Swal.fire({
+            title: "Berhasil!",
+            text: "Tanda tangan dan catatan berhasil disimpan.",
+            icon: "success",
+            showCancelButton: true,
+            confirmButtonText: "Tetap di Halaman",
+            cancelButtonText: "Kembali ke Daftar Skema"
+        }).then((result) => {
+            if(result.isConfirmed){
+                // Tetap di halaman → kirim form
+                e.target.submit();
+            } else {
+                // Kembali ke daftar skema
+                window.location.href = "{{ route('formperencanaan.index') }}";
+            }
+        });
     });
 });
 
-// Hapus TTD lama via AJAX
-function hapusTtd(id){
-    if(!confirm('Yakin ingin menghapus TTD?')) return;
-
-    fetch(`/laporan_asesor/ttd/${id}`, {
-        method: 'DELETE',
-        headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
-    }).then(res => res.json()).then(res => {
-        if(res.success) location.reload();
-        else alert(res.message || 'Gagal menghapus TTD');
+function hapusTtd(id, url) {
+    Swal.fire({
+        title: 'Yakin ingin menghapus TTD?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if(result.isConfirmed){
+            fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success){
+                    Swal.fire('Terhapus!', res.message, 'success').then(()=>location.reload());
+                } else {
+                    Swal.fire('Gagal!', res.message, 'error');
+                }
+            })
+            .catch(err=>{
+                Swal.fire('Gagal!', 'Terjadi kesalahan server.', 'error');
+                console.error(err);
+            });
+        }
     });
 }
+
 </script>
 @endsection

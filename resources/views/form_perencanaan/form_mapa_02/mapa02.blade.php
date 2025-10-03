@@ -117,28 +117,28 @@
 
 
 <!-- Instrumen Asesmen -->
-<div class="mapa-card">
-    <div class="judul-header">Instrumen Asesmen</div>
-    <div class="table-responsive mt-4">
-        <table class="table table-bordered custom-table">
-            <thead class="table-title">
-                <tr>
-                    <th rowspan="2" class="text-center align-middle">No</th>
-                    <th rowspan="2" class="text-center align-middle">Instrumen Asesi</th>
-                    <th colspan="5" class="text-center">Potensi Asesi</th>
-                </tr>
-                <tr>
-                    <th class="text-center">1</th>
-                    <th class="text-center">2</th>
-                    <th class="text-center">3</th>
-                    <th class="text-center">4</th>
-                    <th class="text-center">5</th>
-                </tr>
-            </thead>
-            <tbody>
-                @php
-                    $instrumen = [
-                        'FR.IA.01. CL - Ceklis Observasi Aktivitas Di Tempat Kerja atau Tempat Kerja Simulasi',
+  <div class="mapa-card">
+        <div class="judul-header">Instrumen Asesmen</div>
+        <div class="table-responsive mt-4">
+            <table class="table table-bordered custom-table">
+                <thead class="table-title">
+                    <tr>
+                        <th rowspan="2" class="text-center align-middle">No</th>
+                        <th rowspan="2" class="text-center align-middle">Instrumen Asesi</th>
+                        <th colspan="5" class="text-center">Potensi Asesi</th>
+                    </tr>
+                    <tr>
+                        <th class="text-center">1</th>
+                        <th class="text-center">2</th>
+                        <th class="text-center">3</th>
+                        <th class="text-center">4</th>
+                        <th class="text-center">5</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                        $instrumenList = [
+                            'FR.IA.01. CL - Ceklis Observasi Aktivitas Di Tempat Kerja atau Tempat Kerja Simulasi',
                         'FR.IA.02. TPD - Tugas Praktik Demonstrasi',
                         'FR.IA.03. PMO – Pertanyaan Untuk Mendukung Observasi',
                         'FR.IA.04. DIT - Daftar Instruksi Tertulis (Pengerjaan Singkat Proyek/Teknik/Pekerjaan/ Kegiatan Terstruktur Lainnya)',
@@ -149,29 +149,33 @@
                         'FR.IA.09. PW – Pertanyaan Wawancara',
                         'FR.IA.10. VPK – Verifikasi Pihak Ketiga',
                         'FR.IA.11. CRP – Ceklis Reviu Produk',
-                    ];
-                @endphp
+                        ];
+                    @endphp
 
-                @foreach($instrumen as $i => $judul)
-                    <tr>
-                        <td class="text-center">{{ $i+1 }}</td>
-                        <td>{{ $judul }}</td>
-                        @for($j=1; $j<=5; $j++)
-                            <td class="text-center">
-                                <input type="radio" name="potensi{{ $i+1 }}" value="{{ $j }}">
+                    @foreach($instrumenList as $i => $judul)
+                        <tr>
+                            <td class="text-center">{{ $i+1 }}</td>
+                            <td>
+                                <input type="hidden" name="instrumen[{{ $i }}][nama]" value="{{ $judul }}">
+                                {{ $judul }}
                             </td>
-                        @endfor
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-        <div class="text-danger mt-2">
-            *diisi berdasarkan hasil penentuan pendekatan asesmen dan perencanaan asesmen
+                            @for($j=1; $j<=5; $j++)
+                                <td class="text-center">
+                                    <input type="radio" 
+                                           name="instrumen[{{ $i }}][potensi]" 
+                                           value="{{ $j }}">
+                                </td>
+                            @endfor
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            <div class="text-danger mt-2">
+                *diisi berdasarkan hasil penentuan pendekatan asesmen dan perencanaan asesmen
+            </div>
         </div>
     </div>
-</div>
-
+    
 <!-- Penjelasan -->
 <div class="card-box">
     <div class="judul-box">

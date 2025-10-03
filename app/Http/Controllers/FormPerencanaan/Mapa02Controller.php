@@ -67,29 +67,29 @@ class Mapa02Controller extends Controller
 
 public function simpanInstrumen(Request $request)
 {
-    $skemaId = $request->skema_id;
-    $asesorId = auth()->user()->asesor->id_asesor ?? null;
+    $skemaId = $request->input('skema_id');
 
-    if (!$asesorId) {
-        return back()->with('error', 'Asesor tidak ditemukan.');
+    $instrumenList = $request->input('instrumen', []);
+
+    if(empty($instrumenList)) {
+        return back()->with('error', 'Belum ada instrumen yang diisi.');
     }
 
-    if ($request->has('potensi')) {
-        foreach ($request->potensi as $instrumenId => $value) {
-            DB::table('asesmen_instrumen_jawaban')->insert([
-                'skema_id'     => $skemaId,
-                'instrumen_id' => $instrumenId,
-                'asesor_id'    => $asesorId,
-                'potensi'      => $value,
-                'created_at'   => now(),
-                'updated_at'   => now(),
-            ]);
-        }
+    foreach($instrumenList as $item) {
+        DB::table('instrumen_asesmen')->insert([
+            'id_skema'       => $skemaId,
+            'nama_instrumen' => $item['nama'] ?? null,
+            'kode_instrumen' => null,   // bisa tambahkan sesuai kebutuhan
+            'jenis_instrumen'=> null,   // bisa tambahkan sesuai kebutuhan
+            'potensi_asesi'  => $item['potensi'] ?? null,
+
+        ]);
     }
 
-return redirect()->route('form.mapa02.asesor', ['skema_id' => $skemaId])
-                 ->with('success', 'Instrumen berhasil disimpan');
+    return redirect()->route('formperencanaan.show', $skemaId)
+                     ->with('success', 'Instrumen asesmen berhasil disimpan.');
 }
+
 
 
     
