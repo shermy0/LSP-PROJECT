@@ -170,14 +170,30 @@ public function store(Request $request, $skema_id)
 
 public function deletePenyusun($id)
 {
-    $deleted = DB::table('penyusun_persetujuan')->where('id', $id)->delete();
+    try {
+        $deleted = DB::table('penyusun_persetujuan')->where('id', $id)->delete();
 
-    if ($deleted) {
-        // cukup balikin 204 (no content) tanpa json
-        return response(null, 204);
+        if ($deleted) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Penyusun berhasil dihapus.'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Data penyusun tidak ditemukan.'
+        ], 404);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Terjadi kesalahan server.',
+            'error'   => $e->getMessage()
+        ], 500);
     }
-    return response(null, 400);
 }
+
 
 
     // Hapus TTD

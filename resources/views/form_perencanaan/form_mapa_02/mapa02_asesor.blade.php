@@ -56,15 +56,23 @@
                                 @if($item->tanda_tangan)
                                     <img src="{{ $item->tanda_tangan }}" width="120"><br>
                                     <a href="{{ route('form.mapa02.penyusun.downloadTtd', $item->id) }}" class="btn btn-sm btn-primary mt-1">Download</a>
-<button type="button" class="btn btn-sm btn-danger mt-1 delete-ttd"
-        data-id="{{ $item->id }}"
-        data-index="{{ $i }}">Hapus</button>
+<button type="button" 
+            class="btn btn-danger btn-sm delete-ttd" 
+            data-id="{{ $item->id }}">
+        Hapus TTD
+    </button>
                                 @else
                                     <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc;cursor:pointer;"></canvas>
                                     <input type="hidden" name="tanda_tangan[{{ $i }}]" class="tanda_tangan">
                                 @endif
                             </td>
-                            <td><button type="button" class="btn btn-danger btn-sm delete-row">Hapus</button></td>
+<td>
+    <button type="button" 
+            class="btn btn-danger btn-sm delete-row" 
+            data-id="{{ $item->id }}">
+        Hapus
+    </button>
+</td>
                         </tr>
                     @endforeach
                     </tbody>
@@ -119,6 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let signaturePad = new SignaturePad(canvasModal);
     let activePreview;
 
+    // Resize canvas signature modal
     function resizeCanvas() {
         const ratio = Math.max(window.devicePixelRatio || 1, 1);
         canvasModal.width = canvasModal.offsetWidth * ratio;
@@ -127,6 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
         signaturePad.clear();
     }
 
+    // Buka modal tanda tangan
     document.addEventListener("click", e => {
         if (e.target.classList.contains("signature-preview") && !e.target.classList.contains("validator-field")) {
             activePreview = e.target;
@@ -136,7 +146,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // Clear signature di modal
     document.getElementById("clear-signature").onclick = () => signaturePad.clear();
+
+    // Simpan signature ke canvas preview & hidden input
     document.getElementById("save-signature").onclick = () => {
         if (!signaturePad.isEmpty() && activePreview) {
             const dataURL = signaturePad.toDataURL();
@@ -151,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // Tambah baris penyusun
+    // Tambah baris penyusun baru
     document.getElementById("add-row").onclick = () => {
         const i = document.querySelectorAll("#penyusun-table tbody tr").length;
         const options = `@foreach($asesors as $asesor)<option value="{{ $asesor->id_asesor }}" data-nomet="{{ $asesor->no_met ?? '' }}">{{ $asesor->nama_asesor }}</option>@endforeach`;
@@ -175,9 +188,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Hapus baris
+    // Hapus baris (baru, belum tersimpan di DB)
     document.addEventListener("click", e => {
-        if (e.target.classList.contains("delete-row")) {
+        if (e.target.classList.contains("delete-row") && !e.target.dataset.id) {
             e.target.closest("tr").remove();
         }
     });
@@ -192,7 +205,8 @@ document.addEventListener("DOMContentLoaded", () => {
         Swal.fire({icon:'warning',title:'Akses Ditolak',text:'Validator diisi di FR.VA'});
         e.target.blur();
     }
-        // 🔥 Hapus TTD dengan konfirmasi SweetAlert
+
+    // Hapus TTD lama
     document.addEventListener("click", e => {
         if (e.target.classList.contains("delete-ttd")) {
             e.preventDefault();
@@ -207,11 +221,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 confirmButtonText: "Ya, hapus!"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    let url = "{{ route('form.mapa02.penyusun.deleteTtd', ':id') }}";
-url = url.replace(':id', id);
-
-fetch(url, {
-
+                    let url = "{{ route('form.mapa02.penyusun.deleteTtd', ':id') }}".replace(':id', id);
+                    fetch(url, {
                         method: "DELETE",
                         headers: {
                             "X-CSRF-TOKEN": "{{ csrf_token() }}",
@@ -220,15 +231,46 @@ fetch(url, {
                     }).then(res => res.json())
                     .then(data => {
                         if (data.success) {
-                            Swal.fire("Terhapus!", data.message, "success").then(() => {
-                                location.reload();
-                            });
+                            Swal.fire("Terhapus!", data.message, "success").then(() => location.reload());
                         } else {
                             Swal.fire("Gagal", data.message, "error");
                         }
-                    }).catch(() => {
-                        Swal.fire("Error", "Terjadi kesalahan server.", "error");
-                    });
+                    }).catch(() => Swal.fire("Error", "Terjadi kesalahan server.", "error"));
+                }
+            });
+        }
+    });
+
+    // Hapus data penyusun lama (dari DB)
+    document.addEventListener("click", e => {
+        if (e.target.classList.contains("delete-row") && e.target.dataset.id) {
+            e.preventDefault();
+            let id = e.target.dataset.id;
+            Swal.fire({
+                title: "Hapus Penyusun?",
+                text: "Data penyusun ini akan dihapus permanen.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Ya, hapus!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let url = "{{ route('form.mapa02.penyusun.delete', ':id') }}".replace(':id', id);
+                    fetch(url, {
+                        method: "DELETE",
+                        headers: {
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                            "Accept": "application/json"
+                        }
+                    }).then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire("Terhapus!", data.message, "success").then(() => location.reload());
+                        } else {
+                            Swal.fire("Gagal", data.message, "error");
+                        }
+                    }).catch(() => Swal.fire("Error", "Terjadi kesalahan server.", "error"));
                 }
             });
         }
@@ -237,10 +279,11 @@ fetch(url, {
     // SweetAlert simpan
     document.getElementById("mapa02-asesor-form").addEventListener("submit", function(e){
         e.preventDefault();
+        let form = this;
 
-        // Simpan TTD ke hidden input
-        if(!signaturePad.isEmpty()){
-            hiddenInput.value = signaturePad.toDataURL();
+        // Simpan TTD terakhir ke hidden input
+        if (!signaturePad.isEmpty() && activePreview) {
+            activePreview.nextElementSibling.value = signaturePad.toDataURL();
         }
 
         Swal.fire({
@@ -249,12 +292,13 @@ fetch(url, {
             icon: "success",
             showCancelButton: true,
             confirmButtonText: "Tetap di Halaman",
-                cancelButtonText: "Ke Form Perencanaan"
-            }).then((result) => {
-                if (result.dismiss === Swal.DismissReason.cancel) {
-                    window.location.href = "{{ route('formperencanaan.show', $skema->id_skema) }}";
-                }
-            });
+            cancelButtonText: "Ke Form Perencanaan"
+        }).then((result) => {
+            form.submit(); // kirim form dulu
+            if (result.dismiss === Swal.DismissReason.cancel) {
+                window.location.href = "{{ route('formperencanaan.show', $skema->id_skema) }}";
+            }
+        });
     });
 
 });
