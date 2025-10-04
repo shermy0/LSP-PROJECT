@@ -23,6 +23,19 @@ use App\Http\Controllers\PdfController;
 use App\Http\Controllers\DataPesertaUjiController;
 use App\Http\Controllers\ProfileAsesorController;
 use App\Http\Controllers\DemonstrasiController;
+use App\Http\Controllers\JawabanDemonstrasiController;
+
+
+
+
+use App\Http\Controllers\CeklisObservasiController;
+
+Route::prefix('ceklisobservasi')->group(function () {
+    Route::get('/',        [CeklisObservasiController::class, 'index'])->name('ceklisobservasi.index');
+    Route::get('/data/{skemaId}', [CeklisObservasiController::class, 'loadData'])->name('ceklisobservasi.data');
+    Route::post('/store',  [CeklisObservasiController::class, 'store'])->name('ceklisobservasi.store');
+});
+
 
 
 Route::get('/pembuatan/{id_pembuatan}', [FormAsesmenController::class, 'showPembuatan'])
@@ -477,3 +490,14 @@ Route::get('/pmo/{id_pmo}/pertanyaan/{id}/edit', [PertanyaanController::class, '
 // Update pertanyaan PMO
 Route::put('/pmo/pertanyaan/{id}', [PertanyaanController::class, 'updatePertanyaanPMO'])
     ->name('pmo.pertanyaan.update');
+Route::get('/data-peserta-uji', [PertanyaanController::class, 'dataPesertaUji'])->name('data.peserta.uji');
+Route::get('/detail-jawaban/{skema}/{jenis}', [PertanyaanController::class, 'detailJawaban'])
+    ->name('detail.jawaban');
+
+// Halaman mengerjakan demonstrasi
+Route::get('/demonstrasi/{id_skema}', [JawabanDemonstrasiController::class, 'show'])
+    ->name('demonstrasi.show');
+
+// Simpan jawaban demonstrasi
+Route::post('/demonstrasi/store/jawaban', [JawabanDemonstrasiController::class, 'store'])
+    ->name('demonstrasi.storeJawaban');

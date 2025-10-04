@@ -134,36 +134,33 @@ class PertanyaanController extends Controller
     }
 
    public function storeEsai(Request $request)
-    {
-        $request->validate([
-            'id_skema'         => 'required|integer',
-            'id_asesor'        => 'required|integer',
-            'id_kelompok'      => 'required|integer',
-            'isi_pertanyaan.*' => 'required|string',
-            'kunci_jawaban.*'  => 'nullable|string',
-            'file.*'           => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
-            'timer'            => 'required|integer',
-        ]);
+{
+    $request->validate([
+        'id_skema'         => 'required|integer',
+        'id_asesor'        => 'required|integer',
+        'id_kelompok'      => 'required|integer',
+        'isi_pertanyaan.*' => 'required|string',
+        'kunci_jawaban.*'  => 'nullable|string',
+        'file.*'           => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
+        'timer'            => 'required|integer',
+    ]);
 
-        $id_skema    = $request->id_skema;
-        $id_asesor   = $request->id_asesor;
-        $id_kelompok = $request->id_kelompok;
-        $timer       = $request->timer;
+    $id_skema    = $request->id_skema;
+    $id_asesor   = $request->id_asesor;
+    $id_kelompok = $request->id_kelompok;
 
-    // 🔹 Cek apakah ini mode Lanjutkan (edit) atau Selanjutnya (baru)
+    // 🔹 Mode LANJUTKAN atau BUAT BARU
     if ($request->filled('id_pembuatan')) {
-        // Mode LANJUTKAN → update record yang ada
         $pembuatan = PembuatanPertanyaan::findOrFail($request->id_pembuatan);
         $pembuatan->update([
-            'timer'            => $timer,
+            'timer'            => $request->timer,
             'timescap'         => now(),
             'jenis_pertanyaan' => 'esai',
         ]);
     } else {
-        // Mode SELANJUTNYA → buat record baru
         $pembuatan = PembuatanPertanyaan::create([
             'id_skema'         => $id_skema,
-            'timer'            => $timer,
+            'timer'            => $request->timer,
             'timescap'         => now(),
             'jenis_pertanyaan' => 'esai',
         ]);
@@ -172,75 +169,66 @@ class PertanyaanController extends Controller
     // 🔹 Simpan pertanyaan esai
     foreach ($request->isi_pertanyaan as $key => $isi) {
         $pertanyaan = new Pertanyaan();
-        $pertanyaan->id_skema = $id_skema;
-        $pertanyaan->id_kelompok = $id_kelompok;
-        $pertanyaan->id_asesor = $id_asesor;
-        $pertanyaan->id_pembuatan_pertanyaan = $pembuatan->id_pembuatan_pertanyaan;
-        $pertanyaan->jenis_pertanyaan = 'esai';
-        $pertanyaan->isi_pertanyaan = $isi;
-        $pertanyaan->kunci_jawaban = $request->kunci_jawaban[$key] ?? null;
+        $pertanyaan->id_skema               = $id_skema;
+        $pertanyaan->id_kelompok            = $id_kelompok;
+        $pertanyaan->id_asesor              = $id_asesor;
+        $pertanyaan->id_pembuatan_pertanyaan= $pembuatan->id_pembuatan; // ✅ wajib
+        $pertanyaan->jenis_pertanyaan       = 'esai';
+        $pertanyaan->isi_pertanyaan         = $isi;
+        $pertanyaan->kunci_jawaban          = $request->kunci_jawaban[$key] ?? null;
 
         if ($request->hasFile("file.$key")) {
             $file = $request->file("file.$key");
-            if ($file) {
-                $filePath = $file->store('uploads/pertanyaan', 'public');
-                $pertanyaan->file_path = $filePath;
-                $pertanyaan->file_type = $file->getClientOriginalExtension();
-            }
-
-            $pertanyaan->save();
+            $filePath = $file->store('uploads/pertanyaan', 'public');
+            $pertanyaan->file_path = $filePath;
+            $pertanyaan->file_type = $file->getClientOriginalExtension();
         }
 
-        return redirect()->route('esai.crud', [
-            'id_skema'    => $id_skema,
-            'id_kelompok' => $id_kelompok
-        ])->with('success', 'Semua pertanyaan esai berhasil disimpan dengan timer!');
+        $pertanyaan->save();
     }
 
     return redirect()->route('esai.crud', [
         'id_skema'    => $id_skema,
-        'id_kelompok' => $id_kelompok
-    ])->with('success', 'Semua pertanyaan esai berhasil disimpan dengan timer!');
+        'id_kelompok' => $id_kelompok,
+    ])->with('success', 'Semua pertanyaan esai berhasil disimpan!');
 }
 
 
-    public function crudEsai($id_skema, $id_kelompok)
+  
+public function crudEsai($id_skema, $id_kelompok)
 {
     $skema = Skema::findOrFail($id_skema);
 
-    $pertanyaan = Pertanyaan::where('jenis_pertanyaan', 'esai')
-        ->where('id_skema', $id_skema)
+    $pertanyaan = Pertanyaan::where('id_skema', $id_skema)
         ->where('id_kelompok', $id_kelompok)
+        ->where('jenis_pertanyaan', 'esai')
         ->get();
 
-    // ✅ ambil pembuatan_pertanyaan hanya kalau ada pertanyaan
     $firstPertanyaan = $pertanyaan->first();
-    $pembuatan_pertanyaan = null;
 
-    if ($firstPertanyaan) {
+    $pembuatan_pertanyaan = null;
+    if ($firstPertanyaan && $firstPertanyaan->id_pembuatan_pertanyaan) {
         $pembuatan_pertanyaan = PembuatanPertanyaan::find($firstPertanyaan->id_pembuatan_pertanyaan);
     }
 
-    $asesor = DB::table('asesor')
-        ->leftJoin('pertanyaan_asesmen_persetujuan', function ($join) use ($pembuatan_pertanyaan) {
-            $join->on('asesor.id_asesor', '=', 'pertanyaan_asesmen_persetujuan.id_asesor');
-
-            // ✅ tambahkan where hanya kalau $pembuatan_pertanyaan ada
-            if ($pembuatan_pertanyaan) {
-                $join->where('pertanyaan_asesmen_persetujuan.id_pembuatan_pertanyaan', $pembuatan_pertanyaan->id_pembuatan_pertanyaan);
-            }
-        })
-        ->select(
-            'asesor.id_asesor',
-            'asesor.nama_asesor',
-            'asesor.no_registrasi',
-            'pertanyaan_asesmen_persetujuan.tgl_ttd_asesor'
-        )
-        ->orderBy('asesor.nama_asesor')
+    $pembuatanList = PembuatanPertanyaan::where('id_skema', $id_skema)
+        ->where('jenis_pertanyaan', 'esai')
+        ->orderBy('timescap', 'desc')
         ->get();
 
-    return view('esai_crud', compact('pertanyaan', 'skema', 'id_kelompok', 'pembuatan_pertanyaan', 'asesor'));
+    return view('esai_crud', compact(
+        'id_skema',
+        'id_kelompok',
+        'skema',
+        'pertanyaan',
+        'firstPertanyaan',
+        'pembuatan_pertanyaan',
+        'pembuatanList'
+    ));
 }
+
+
+
 
 
    public function editEsai($id)

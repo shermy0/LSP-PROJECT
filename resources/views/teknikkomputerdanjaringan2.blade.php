@@ -53,11 +53,12 @@
         <i class="fa-solid fa-chevron-down"></i>
     </button>
     <ul class="dropdown-menu w-100 shadow-sm" aria-labelledby="dropdownMenuButton">
-        <li>
-            <a class="dropdown-item" href="{{ url('/fr-va-sebelum') }}">
-                CEKLIS OBSERVASI
-            </a>
-        </li>
+         <li>
+    <a class="dropdown-item"
+       href="{{ route('ceklisobservasi.index', ['id_skema' => $skema->id_skema]) }}">
+        CEKLIS OBSERVASI
+    </a>
+</li>
         <li>
             <a class="dropdown-item" 
                href="{{ route('formasesmen.pertanyaanPMO', ['id_skema' => $skema->id_skema]) }}">
