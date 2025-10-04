@@ -23,6 +23,7 @@ use App\Http\Controllers\PdfController;
 use App\Http\Controllers\DataPesertaUjiController;
 use App\Http\Controllers\ProfileAsesorController;
 use App\Http\Controllers\DemonstrasiController;
+use App\Http\Controllers\JawabanDemonstrasiController;
 
 
 Route::get('/pembuatan/{id_pembuatan}', [FormAsesmenController::class, 'showPembuatan'])
@@ -456,3 +457,11 @@ Route::post('/pmo/store', [PertanyaanController::class, 'storePMO'])->name('pmo.
 Route::get('/data-peserta-uji', [PertanyaanController::class, 'dataPesertaUji'])->name('data.peserta.uji');
 Route::get('/detail-jawaban/{skema}/{jenis}', [PertanyaanController::class, 'detailJawaban'])
     ->name('detail.jawaban');
+
+// Halaman mengerjakan demonstrasi
+Route::get('/demonstrasi/{id_skema}', [JawabanDemonstrasiController::class, 'show'])
+    ->name('demonstrasi.show');
+
+// Simpan jawaban demonstrasi
+Route::post('/demonstrasi/store/jawaban', [JawabanDemonstrasiController::class, 'store'])
+    ->name('demonstrasi.storeJawaban');
