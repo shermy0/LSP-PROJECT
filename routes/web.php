@@ -501,3 +501,6 @@ Route::get('/demonstrasi/{id_skema}', [JawabanDemonstrasiController::class, 'sho
 // Simpan jawaban demonstrasi
 Route::post('/demonstrasi/store/jawaban', [JawabanDemonstrasiController::class, 'store'])
     ->name('demonstrasi.storeJawaban');
+
+    Route::get('/pmo/kelompok/{id_skema}/{id_pembuatan?}', [PertanyaanController::class, 'kelompokPMO'])
+     ->name('pertanyaan.pmo.kelompok');

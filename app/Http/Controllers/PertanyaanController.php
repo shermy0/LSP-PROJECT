@@ -1099,6 +1099,8 @@ public function kelompokPMO($id_skema, Request $request)
     $id_pembuatan = $request->get('id_pembuatan');
     $timer = $request->get('timer', 30);
 
+   $id_pembuatan = $request->get('id_pembuatan');
+
     if ($id_pembuatan) {
         $pembuatan = PembuatanPertanyaan::findOrFail($id_pembuatan);
     } else {
