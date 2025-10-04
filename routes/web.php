@@ -26,6 +26,18 @@ use App\Http\Controllers\DemonstrasiController;
 use App\Http\Controllers\JawabanDemonstrasiController;
 
 
+
+
+use App\Http\Controllers\CeklisObservasiController;
+
+Route::prefix('ceklisobservasi')->group(function () {
+    Route::get('/',        [CeklisObservasiController::class, 'index'])->name('ceklisobservasi.index');
+    Route::get('/data/{skemaId}', [CeklisObservasiController::class, 'loadData'])->name('ceklisobservasi.data');
+    Route::post('/store',  [CeklisObservasiController::class, 'store'])->name('ceklisobservasi.store');
+});
+
+
+
 Route::get('/pembuatan/{id_pembuatan}', [FormAsesmenController::class, 'showPembuatan'])
     ->name('pembuatan.show');
 
