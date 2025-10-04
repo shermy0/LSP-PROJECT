@@ -11,19 +11,30 @@ class Asesi extends Model
 
     protected $table = 'asesi';
     protected $primaryKey = 'id_asesi';
-    protected $fillable = [
-        'user_id', 'asesor_id', 'nik', 'nama_lengkap', 'tempat_lahir', 'tgl_lahir',
-        'jenis_kelamin', 'kebangsaan', 'alamat', 'telepon', 'email', 'pendidikan_terakhir',
-        'institusi', 'jabatan', 'alamat_kantor', 'telepon_kantor'
-    ];
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+    protected $fillable = [
+        'user_id',
+        'asesor_id',
+        'nik',
+        'nama_lengkap',
+        'tempat_lahir',
+        'tgl_lahir',
+        'jenis_kelamin',
+        'kebangsaan',
+        'alamat',
+        'telepon',
+        'email',
+        'kelas',
+        'bidang_keahlian',
+        'pendidikan_terakhir',
+        'institusi',
+        'jabatan',
+        'alamat_kantor',
+        'telepon_kantor',
+    ];
 
     public function asesor()
     {
-        return $this->belongsTo(Asesor::class, 'id_asesor');
-    }
+        return $this->belongsTo(Asesor::class, 'asesor_id', 'id_asesor');
+    }  
 }

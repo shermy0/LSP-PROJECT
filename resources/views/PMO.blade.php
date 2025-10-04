@@ -102,10 +102,12 @@
 
             <div class="modal-body text-center">
                 <!-- Input Soal -->
-                <a href="{{ route('pertanyaan.pmo.kelompok', ['id_skema' => $skema->id_skema]) }}" 
-                   class="btn w-100 mb-2 text-white fw-bold" style="background-color:#041562;">
-                    Input Soal
-                </a>
+                    <a href="{{ route('pertanyaan.pmo.kelompok', [
+                    'id_skema' => $skema->id_skema,
+                    ]) }}?timer={{ request('timer') ?? 30 }}" 
+                    class="btn w-100 mb-2 text-white fw-bold" style="background-color:#041562;">
+                        Input Soal
+                    </a>
 
                 <!-- Jawaban Asesi PMO -->
                 @php
@@ -152,7 +154,7 @@
                     <button type="submit" class="btn w-100 text-white fw-bold" style="background-color:#041562;">
                         Simpan
                     </button>
-                </div>
+                </div>x
             </form>
         </div>
     </div>

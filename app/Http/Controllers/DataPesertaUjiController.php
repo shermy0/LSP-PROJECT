@@ -3,56 +3,56 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Peserta;
+use App\Models\Asesi;
+use App\Models\Asesor;
+use Illuminate\Support\Facades\Auth;
 
 class DataPesertaUjiController extends Controller
 {
+    // Tampilkan semua peserta
     public function index(Request $request)
     {
-        $query = Peserta::query();
+        $userId = Auth::id(); // dari tabel users
+        $asesorId = Asesor::where('user_id', $userId)->value('id_asesor');
+              
+        // Query peserta uji yang hanya dimiliki asesor ini
+        $query = Asesi::with('asesor')
+            ->where('asesor_id', $asesorId);
 
-        // Filter Search Nama
+        // Filter nama
         if ($request->filled('search')) {
-            $query->where('nama', 'LIKE', '%' . $request->search . '%');
+            $query->where('nama_lengkap', 'LIKE', '%' . $request->search . '%');
         }
 
-        // Filter Kelas
+        // Filter kelas
         if ($request->filled('kelas')) {
             $query->where('kelas', $request->kelas);
         }
 
-        // Filter Status
-        if ($request->filled('status')) {
-            if ($request->status === 'lengkap') {
-                $query->where('status', 'Lengkap');
-            } elseif ($request->status === 'belum') {
-                $query->where('status', 'Belum Lengkap');
-            }
-        }
-
-        // Ambil data peserta (pagination)
+        // Ambil data peserta + pagination
         $peserta = $query->paginate(10)->withQueryString();
 
-        // Hitung total peserta
-        $totalPeserta = Peserta::count();
-        $pesertaLengkap = Peserta::where('status', 'Lengkap')->count();
-        $pesertaBelumLengkap = Peserta::where('status', 'Belum Lengkap')->count();
+        // Ambil daftar kelas unik hanya untuk asesor ini
+        $kelasList = Asesi::where('asesor_id', $asesorId)
+            ->whereNotNull('kelas')
+            ->select('kelas')
+            ->distinct()
+            ->orderBy('kelas')
+            ->pluck('kelas');
 
-        // Ambil daftar kelas unik dari tabel untuk dropdown
-        $kelasList = Peserta::select('kelas')->distinct()->orderBy('kelas')->pluck('kelas') ?? collect([]);
-
-        return view('datapesertauji', compact(
-            'peserta',
-            'totalPeserta',
-            'pesertaLengkap',
-            'pesertaBelumLengkap',
-            'kelasList'
-        ));
+        return view('datapesertauji', compact('peserta', 'kelasList'));
     }
 
+    // Detail peserta
     public function show($id)
     {
-        $peserta = Peserta::findOrFail($id);
+        $userId = Auth::id(); // dari tabel users
+        $asesorId = Asesor::where('user_id', $userId)->value('id_asesor');
+
+        $peserta = Asesi::with('asesor')
+            ->where('asesor_id', $asesorId) // Hanya peserta milik asesor ini
+            ->findOrFail($id);
+
         return view('detailpesertauji', compact('peserta'));
     }
 }
