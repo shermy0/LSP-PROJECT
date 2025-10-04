@@ -83,22 +83,50 @@
         </div>
     </div>
 
-    {{-- Validator (hanya info) --}}
-    <div class="container mt-4">
-        <div class="card-box">
-            <div class="judul-header">Validator</div>
+{{-- Validator (hanya info) --}}
+<div class="container mt-4">
+    <div class="card-box">
+        <div class="judul-header d-flex justify-content-between align-items-center">
+            <span>Validator</span>
+        </div>
+
+        <div class="table-responsive mt-3">
             <table class="table table-bordered custom-table">
-                <tr>
-                    <td><input type="text" class="form-control validator-field" placeholder="Nama Validator" readonly></td>
-                    <td><input type="text" class="form-control validator-field" placeholder="No Met" readonly></td>
-                    <td><input type="date" class="form-control validator-field" readonly></td>
-                    <td>
-                        <canvas class="signature-preview validator-field" width="120" height="50" style="border:1px solid #ccc;background:#f1f1f1;"></canvas>
-                    </td>
-                </tr>
+                <thead class="table-title">
+                    <tr>
+                        <th>Nama Validator</th>
+                        <th>No Met</th>
+                        <th>Tanggal</th>
+                        <th>Tanda Tangan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($validators as $v)
+                        <tr>
+                            <td>{{ $v->nama_validator }}</td>
+                            <td>{{ $v->no_met }}</td>
+                            <td>{{ \Carbon\Carbon::parse($v->tanggal)->format('d/m/Y') }}</td>
+                            <td class="text-center">
+                                @if($v->ttd)
+                                    <img src="{{ $v->ttd }}" alt="TTD Validator" width="120">
+                                @else
+                                    <span class="text-muted">Belum ada tanda tangan</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">
+                                Belum ada data validator untuk skema ini
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
             </table>
         </div>
     </div>
+</div>
+
 
     <div class="mt-4">
         <button type="submit" class="simpan-btn">Simpan</button>

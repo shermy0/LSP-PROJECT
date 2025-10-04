@@ -121,12 +121,17 @@ public function showMapa02Asesor($id_skema)
         ->where('role', 'penyusun')
         ->get();
 
+        $validators = DB::table('validasi_validator')
+        ->where('skema_id', $id_skema)
+        ->get();
+
         
 
     return view('form_perencanaan.form_mapa_02.mapa02_asesor', compact(
         'skema',
         'asesors',
-        'penyusun'
+        'penyusun',
+        'validators'
     ));
 }
 
