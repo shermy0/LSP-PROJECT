@@ -401,13 +401,22 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // === Delete tujuan ===
-        if (e.target.classList.contains("delete-tujuan")) {
-            if (!confirm("Yakin ingin menghapus tujuan ini?")) return;
+if (e.target.classList.contains("delete-tujuan")) {
+    const url = e.target.getAttribute("data-url");
 
-            const url = e.target.getAttribute("data-url");
-
+    Swal.fire({
+        title: "Hapus Tujuan?",
+        text: "Apakah kamu yakin ingin menghapus tujuan ini?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Ya, hapus",
+        cancelButtonText: "Batal"
+    }).then((result) => {
+        if (result.isConfirmed) {
             if (url) {
-                // tujuan dari DB → hapus pakai fetch
+                // Tujuan dari database
                 fetch(url, {
                     method: "DELETE",
                     headers: {
@@ -418,17 +427,44 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Berhasil",
+                            text: "Tujuan berhasil dihapus!",
+                            timer: 1200,
+                            showConfirmButton: false
+                        });
                         item.remove();
                     } else {
-                        alert("Gagal menghapus tujuan: " + data.message);
+                        Swal.fire({
+                            icon: "error",
+                            title: "Gagal",
+                            text: data.message || "Terjadi kesalahan saat menghapus tujuan.",
+                        });
                     }
                 })
-                .catch(() => alert("Terjadi error koneksi"));
+                .catch(() => {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Kesalahan",
+                        text: "Terjadi error koneksi saat menghapus tujuan.",
+                    });
+                });
             } else {
-                // tujuan baru (JS-only)
+                // Tujuan baru (belum di DB)
                 item.remove();
+                Swal.fire({
+                    icon: "success",
+                    title: "Berhasil",
+                    text: "Tujuan berhasil dihapus!",
+                    timer: 1200,
+                    showConfirmButton: false
+                });
             }
         }
+    });
+}
+
     });
 
 // Simpan perubahan edit tujuan
