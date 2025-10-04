@@ -15,10 +15,14 @@ public function showNinjauAsesmen($id_skema)
 {
     $skema = Skema::findOrFail($id_skema);
 
-    return view('form_perencanaan.meninjau_asesmen.ninjau_asesmen', compact('skema'));
+    $asesors = DB::table('asesor_skema')
+        ->join('asesor', 'asesor_skema.asesor_id', '=', 'asesor.id_asesor')
+        ->where('asesor_skema.skema_id', $id_skema)
+        ->select('asesor.id_asesor', 'asesor.nama_asesor')
+        ->get();
+
+    return view('form_perencanaan.meninjau_asesmen.ninjau_asesmen', compact('skema', 'asesors'));
 }
-
-
 
     // Halaman per skema (tampilkan daftar asesor di skema tersebut)
 public function ninjauAsesmenAsesor($id_skema)
@@ -27,12 +31,12 @@ public function ninjauAsesmenAsesor($id_skema)
     $asesors = DB::table('asesor_skema')
         ->join('asesor', 'asesor_skema.asesor_id', '=', 'asesor.id_asesor')
         ->where('asesor_skema.skema_id', $id_skema)
-        ->select('asesor.id_asesor', 'asesor.nama_asesor')
+        ->select('asesor.id_asesor', 'asesor.nama_asesor', 'asesor.no_registrasi')
         ->get();
-
-    return view('form_perencanaan.meninjau_asesmen.ninjau_asesmen_skema', compact('skema', 'asesors'));
+    $asesor_terpilih = $asesors->first()->id_asesor ?? null;
+    $no_registrasi_terpilih = $asesors->first()->no_registrasi ?? null;
+    return view('form_perencanaan.meninjau_asesmen.ninjau_asesmen_asesor', compact('skema', 'asesors', 'asesor_terpilih', 'no_registrasi_terpilih'));
 }
-
     // Ambil asesor berdasarkan skema (AJAX)
     public function getAsesor($skema_id)
     {
@@ -45,18 +49,13 @@ public function ninjauAsesmenAsesor($id_skema)
         return response()->json($asesors);
     }
 
-    // Tampilkan detail asesmen untuk asesor tertentu
-    public function showAsesor($asesor_id)
-    {
-        $asesor = DB::table('asesor')->where('id_asesor', $asesor_id)->first();
-return view('form_perencanaan.meninjau_asesmen.ninjau_asesmen_asesor', compact('asesor'));
-    }
-
     // Simpan hasil review asesmen
-    public function store(Request $request)
+    public function store(Request $request, $id_skema)
     {
+        $data = $request->all();
         MeninjauAsesmen::create([
             'id_asesmen' => $request->id_asesmen ?? 1,
+            'skema_id' => $request->id_skema,  
             'asesor_id' => $request->asesor_id,
             // Rencana Asesmen
             'rencana_valid' => $request->has('rencana_valid'),
@@ -100,17 +99,17 @@ return view('form_perencanaan.meninjau_asesmen.ninjau_asesmen_asesor', compact('
             // Rekomendasi 2
             'rekomendasi2' => $request->rekomendasi2,
         ]);
-
         return redirect()
-            ->route('form_perencanaan.ninjau_asesemen.asesor', ['asesor_id' => $request->asesor_id])
+            ->route('form_perencanaan.ninjau_asesmen.store')
             ->with('success', 'Data berhasil disimpan!');
+
     }
 
     // Simpan lalu langsung lanjut ke halaman asesor
-    public function simpanLanjut(Request $request)
+    public function simpanLanjut(Request $request, $id_skema)
     {
         return redirect()
-            ->route('form_perencanaan.ninjau_asesemen.asesor', ['asesor_id' => $request->asesor_id])
+            ->route('form_perencanaan.ninjau_asesmen_asesor', ['id_skema' => $id_skema])
             ->with('success', 'Data berhasil disimpan dan dilanjutkan!');
     }
 
@@ -119,7 +118,7 @@ return view('form_perencanaan.meninjau_asesmen.ninjau_asesmen_asesor', compact('
     {
         // logika simpan persetujuan di sini
         return redirect()
-            ->route('form_perencanaan.ninjau_asesemen.asesor', ['asesor_id' => $asesor_id])
+            ->route('form_perencanaan.ninjau_asesmen_asesor.simpan', ['asesor_id' => $asesor_id])
             ->with('success', 'Persetujuan berhasil disimpan!');
     }
 }

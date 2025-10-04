@@ -432,11 +432,28 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 // Simpan perubahan edit tujuan
+// Simpan perubahan edit tujuan
 document.getElementById("btnUpdateTujuan").addEventListener("click", function () {
     const newName = document.getElementById("editNamaTujuan").value.trim();
     if (!newName || !currentEditId) return;
 
-    // Kirim ke backend pakai fetch
+    const editBtn = document.querySelector(`.edit-tujuan[data-id="${currentEditId}"]`);
+    const item = editBtn?.closest(".tujuan-item");
+    const checkbox = item?.querySelector("input[type=checkbox]");
+    const label = item?.querySelector("label");
+
+    // Kalau id bukan angka (belum di DB) → edit di client aja
+    if (isNaN(currentEditId)) {
+        if (checkbox) checkbox.value = newName;
+        if (label) label.textContent = newName;
+        editBtn.setAttribute("data-nama", newName);
+
+        bootstrap.Modal.getInstance(document.getElementById("modalEditTujuan")).hide();
+        currentEditId = null;
+        return; // ⛔ stop di sini, jangan fetch ke server
+    }
+
+    // kalau id valid (dari DB), baru fetch
     fetch(`/form-perencanaan/mapa01/{{ $skema->id_skema }}/tujuan/${currentEditId}/update`, {
         method: "POST",
         headers: {
@@ -449,19 +466,9 @@ document.getElementById("btnUpdateTujuan").addEventListener("click", function ()
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            // Update label & value checkbox di DOM
-            const checkbox = document.querySelector(`.edit-tujuan[data-id="${currentEditId}"]`)
-                .closest(".tujuan-item").querySelector("input[type=checkbox]");
-            
             if (checkbox) checkbox.value = newName;
-
-            const label = checkbox.closest(".tujuan-item").querySelector("label");
             if (label) label.textContent = newName;
-
-            const editBtn = checkbox.closest(".tujuan-item").querySelector(".edit-tujuan");
-            if (editBtn) editBtn.setAttribute("data-nama", newName);
-
-            // Tutup modal
+            editBtn.setAttribute("data-nama", newName);
             bootstrap.Modal.getInstance(document.getElementById("modalEditTujuan")).hide();
             currentEditId = null;
         } else {
@@ -470,6 +477,7 @@ document.getElementById("btnUpdateTujuan").addEventListener("click", function ()
     })
     .catch(() => alert("Terjadi error koneksi"));
 });
+
 
 });
 </script>

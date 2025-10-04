@@ -17,6 +17,8 @@
     </nav>
 </div>
 
+<div class="judul-header">Mempersiapkan rencana asesmen</div>
+
 {{-- Looping kelompok pekerjaan --}}
 @foreach ($kelompokPekerjaan as $index => $kelompok)
 <div class="mapa-card mb-4">
@@ -34,6 +36,7 @@
     <table class="mapa-table">
         <thead>
             <tr>
+                <th>No</th>
                 <th>Kode Unit</th>
                 <th>Unit Kompetensi</th>
                 <th>Bukti-Bukti</th>
@@ -45,6 +48,7 @@
         <tbody>
             @forelse ($kelompok->hasilAsesmen as $hasil)
                 <tr>
+                    <td>{{ $loop->iteration }}</td>
                     <td>{{ $hasil->unit->kode_unit ?? '-' }}</td>
                     <td>{{ $hasil->unit->judul_unit ?? '-' }}</td>
                     <td>{{ $hasil->catatan }}</td>

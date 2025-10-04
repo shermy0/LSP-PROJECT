@@ -11,8 +11,11 @@
             </li>
             <li class="breadcrumb-item">
                 <a href="{{ route('formperencanaan.show', $skema->id_skema) }}">Form Perencanaan</a>
+            <li class="breadcrumb-item">
+                <a href="{{ route('form_perencanaan.ninjau_asesmen_asesor', $skema->id_skema) }}">
+                    FR.AK.06 – Ninjau Asesmen Asesor
+                </a>
             </li>
-            <li class="breadcrumb-item active" aria-current="page">FR.AK.06</li>
         </ol>
     </nav>
 
@@ -32,10 +35,12 @@
         </div>
     </div>
 
-    <!-- FORM UTAMA -->
 <!-- FORM UTAMA -->
-<form action="{{ route('meninjau_asesmen.store') }}" method="POST">
+<form action="{{ route('form_perencanaan.ninjau_asesmen', ['id_skema' => $skema->id_skema]) }}" method="POST">
     @csrf
+    <input type="hidden" name="skema_id" value="{{ $skema->id_skema }}">
+    <input type="hidden" name="id_asesmen" value="{{ $skema->id_skema }}-{{ date('YmdHis') }}">
+    <input type="hidden" name="asesor_id" id="asesor_id_hidden">
     <div class="row g-3 mb-4">
         <!-- Baris 1: Skema Sertifikasi & Nomor Skema -->
         <div class="col-md-6">
@@ -63,13 +68,17 @@
         </div>
     </div>
 
-    <div class="row g-3 mb-4">
-        <!-- Baris 2: Nama Asesor & Tanggal Asesmen -->
+    <div class="row g-3">
         <div class="col-md-6">
             <div class="mapa-box">
                 <label for="namaAsesor" class="form-label">Nama Asesor</label>
-                <select id="namaAsesor" name="asesor_id" class="form-control">
+                <select class="form-control" id="namaAsesor" name="asesor_id">
                     <option value="">-- Pilih Asesor --</option>
+                    @foreach($asesors as $asesor)
+                        <option value="{{ $asesor->id_asesor }}">
+                            {{ $asesor->nama_asesor }}
+                        </option>
+                    @endforeach
                 </select>
             </div>
         </div>
@@ -77,11 +86,10 @@
         <div class="col-md-6">
             <div class="mapa-box">
                 <label for="tanggalAsesmen" class="form-label">Tanggal Asesmen</label>
-                <input type="date" class="form-control" id="tanggalAsesmen" name="tanggal_asesmen">
+                <input type="date" class="form-control" id="tanggalAsesmen">
             </div>
         </div>
     </div>
-
     <!-- TUK -->
     <div class="col-12 text-center mt-3">
         <label class="form-label fw-semibold d-block mb-2">TUK (Tempat Uji Kompetensi) SMKN 11 Bandung:</label>
@@ -230,23 +238,30 @@
         <div class="card-box">
             <textarea name="rekomendasi2" class="form-control mt-2" rows="3" placeholder="Masukkan teks"></textarea>
         </div>
-
-        <!-- Simpan dan Lanjut -->
-        <button type="submit" class="simpan-btn">
-            <span>Simpan dan Lanjut</span>
-        </button>
     </form>
+    <!-- Simpan dan Lanjut -->
+    <form action="{{ route('form_perencanaan.ninjau_asesmen_asesor.store', ['id_skema' => $skema->id_skema]) }}" method="POST">
+            @csrf
+            ...
+            <button type="submit" class="simpan-btn mt-3">
+                <span>Simpan dan Lanjut</span>
+            </button>
+        </form>
 </div>
 
 <script>
-    document.getElementById('skema_id').addEventListener('change', function() {
+        document.getElementById('skema_id').addEventListener('change', function() {
         let selected = this.options[this.selectedIndex];
         let kode = selected.getAttribute('data-kode');
         let jenjang = selected.getAttribute('data-jenjang');
         let skemaId = this.value;
-
+        document.getElementById("namaAsesor").addEventListener("change", function(){
+        document.getElementById("asesor_id_hidden").value = this.value;
+        });
+        // isi nomor otomatis
         document.getElementById('nomor').value = kode || '';
 
+        // pilih radio otomatis sesuai skemanya
         if (jenjang) {
             if (jenjang.toLowerCase().includes("kkni")) {
                 document.getElementById('skema1').checked = true;
@@ -255,6 +270,7 @@
             }
         }
 
+        // Ambil asesor berdasarkan skema
         if(skemaId) {
             fetch(`/get-asesor/${skemaId}`)
                 .then(response => response.json())

@@ -78,14 +78,7 @@
 /* Subsection (misalnya: Asesi) */
 .mapa-subsection {
     margin-top: 8px;
-}
-
-/* Header subsection (biru tua) */
-.mapa-subsection-header {
-    background-color: #001f60;
-    color: #fff;
-    border-radius: 6px 6px 0 0;
-    font-weight: 600;
+    
 }
 
 /* Kotak opsi */
@@ -161,7 +154,7 @@
 .mapa-subsection-header {
     background: #001f66;
     color: #fff;
-    padding: 14px 20px;
+    padding: 8px 16px;
     border-radius: 8px 8px 0 0;
     font-weight: 600;
     display: flex;
