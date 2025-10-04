@@ -18,6 +18,11 @@ class FormPerencanaanController extends Controller
     public function show($id_skema)
     {
         $skema = Skema::findOrFail($id_skema);
-        return view('formperencanaan', compact('skema'));
+
+        // kirim juga id_skema ke view
+        return view('formperencanaan', [
+            'skema' => $skema,
+            'id_skema' => $id_skema,
+        ]);
     }
 }

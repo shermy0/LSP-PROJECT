@@ -16,8 +16,6 @@ use App\Models\UnitKompetensi;
 use App\Http\Controllers\InstrumenController;
 use App\Http\Controllers\FormPerencanaanController;
 
-
-
 // ============================
 // Halaman Utama
 // ============================
@@ -167,7 +165,19 @@ Route::delete('mapa01/konfirmasi/penyusun/{id}/delete',
 // ============================
 // Route::get('/mapa02', [PerencanaanController::class, 'mapa02'])->name('form.mapa02');
 
+// ============================
+// FR VA
+// ============================
+Route::get('/fr-va/{periode}/{skema_id?}', [PerencanaanController::class, 'frVa'])
+    ->name('form_perencanaan.fr_va');
 
+Route::get('/fr-va-asesor/{periode}/{skema_id?}', [PerencanaanController::class, 'frVaAsesor'])
+    ->name('form_perencanaan.fr_va_asesor');
+
+Route::post('/fr-va-asesor/simpan', [PerencanaanController::class, 'simpanLanjutfrVa'])
+    ->name('form_perencanaan.fr_va_asesor.simpan');
+
+Route::post('/formperencanaan/simpan-semua', [PerencanaanController::class, 'simpanSemua'])->name('formperencanaan.simpan_semua');
 });
 // ============================
 // MAPA 02 (lama, sementara dikomentari)
@@ -237,13 +247,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 // Ajax ambil asesor & asesi
 Route::get('/get-asesor/{skemaId}', [SkemaController::class, 'getAsesor']);
 Route::get('/get-asesi/{skemaId}/{asesorId}', [SkemaController::class, 'getAsesi']);
-
-// ============================
-// FR VA
-// ============================
-Route::get('/fr-va/{periode}', [PerencanaanController::class, 'frVa'])->name('fr_va');
-Route::get('/fr-va-asesor', [PerencanaanController::class, 'frVaAsesor'])->name('fr_va_asesor');
-Route::post('/fr-va-asesor/simpan', [PerencanaanController::class, 'simpanLanjutfrVa'])->name('fr_va_asesor.simpan');
 
 // ============================
 // Logout

@@ -56,9 +56,9 @@
                 <i class="fa-solid fa-stop me-2"></i>FR.VA - MEMBERIKAN KONTRIBUSI DALAM VALIDASI ASESMEN
             </a>
             <ul class="dropdown-menu w-100 custom-dropdown-menu">
-                <li><a href="{{ route('fr_va', 'sebelum') }}" class="dropdown-item">FR.VA - Sebelum Asesmen</a></li>
-                <li><a href="{{ route('fr_va', 'saat') }}" class="dropdown-item">FR.VA - Pada Saat Asesmen</a></li>
-                <li><a href="{{ route('fr_va', 'sesudah') }}" class="dropdown-item">FR.VA - Setelah Asesmen</a></li>
+                <li><a href="{{ route('form_perencanaan.fr_va', ['periode' => 'sebelum', 'skema_id' => $skema->id_skema]) }}" class="dropdown-item">FR.VA - Sebelum Asesmen</a></li>
+                <li><a href="{{ route('form_perencanaan.fr_va', ['periode' => 'saat', 'skema_id' => $skema->id_skema]) }}" class="dropdown-item">FR.VA - Pada Saat Asesmen</a></li>
+                <li><a href="{{ route('form_perencanaan.fr_va', ['periode' => 'sesudah', 'skema_id' => $skema->id_skema]) }}" class="dropdown-item">FR.VA - Setelah Asesmen</a></li>
             </ul>
         </div>
     </div>
