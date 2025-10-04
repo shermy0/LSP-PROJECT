@@ -7,6 +7,14 @@ body {
     background-color: #f4f4f4;
 }
 
+.disabled-link {
+    pointer-events: auto; /* JS event tetap bisa jalan */
+    color: gray;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+
 /* =========================
    SIDEBAR
 ========================= */

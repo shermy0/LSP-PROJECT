@@ -564,6 +564,10 @@ Route::prefix('pmo')->name('pmo.')->group(function () {
 // Halaman utama PMO
 Route::get('/form-asesmen/{id_skema}/pmo', 
     [FormAsesmenController::class, 'pertanyaanPMO']
+)->name('formasesmen.pertanyaanPMO');
+
+Route::get('/form-asesmen/{id_skema}/pmo', 
+    [FormAsesmenController::class, 'pertanyaanPMO']
 )->name('formasesmen.pmo');
 
 // Kelompok Pekerjaan PMO
