@@ -11,6 +11,60 @@
     margin-left: 8px;
 }
 
+    .hubungan-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .hubungan-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 10px 14px;
+        transition: background 0.2s ease;
+    }
+
+    .hubungan-item:hover {
+        background: #f1f9ff;
+    }
+
+    .hubungan-text {
+        font-weight: 500;
+    }
+
+    .emoji-group {
+        display: flex;
+        gap: 1rem;
+    }
+
+    
+    /* Saat belum dicentang */
+    .emoji-group.disabled {
+        opacity: 0.3;
+        pointer-events: none;
+        transform: scale(0.9);
+    }
+
+    .emoji-option {
+        font-size: 1.7rem;
+        cursor: pointer;
+        transition: transform 0.2s, filter 0.2s;
+        user-select: none;
+    }
+
+    .emoji-option:hover {
+        transform: scale(1.2);
+        filter: brightness(1.2);
+    }
+
+    .emoji-option.active {
+        transform: scale(1.3);
+        filter: drop-shadow(0 0 3px #2196f3);
+    }
 
 .mapa-card {
     border: none;

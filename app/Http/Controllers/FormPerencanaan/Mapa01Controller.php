@@ -47,8 +47,11 @@ $konteks = (object)[
     'lingkungan' => $konteksRow->lingkungan ?? '',
     'peluang'    => $konteksRow->peluang ?? '',
     'hubungan'   => $konteksRow && $konteksRow->hubungan ? json_decode($konteksRow->hubungan, true) : [],
+    'hubungan_rating' => $konteksRow && isset($konteksRow->hubungan_rating)
+        ? json_decode($konteksRow->hubungan_rating, true) : [],
     'pelaksana'  => $konteksRow && $konteksRow->pelaksana ? json_decode($konteksRow->pelaksana, true) : [],
 ];
+
 
     $konfirmasi = DB::table('mapa01_konfirmasi')->where('id_skema', $id_skema)->first();
 $standarRow = DB::table('mapa01_standar_industri')
@@ -116,6 +119,7 @@ public function storeMapa01(Request $request, $id_skema)
         $peluang    = $request->input('peluang', '');     // string
         $hubungan   = $request->input('hubungan', []);    // array
         $pelaksana  = $request->input('pelaksana', []);   // array
+        $hubungan_rating = $request->input('hubungan_rating', []); // array
 
         DB::table('mapa01_konteks')->updateOrInsert(
             ['id_skema' => $id_skema],
@@ -123,11 +127,13 @@ public function storeMapa01(Request $request, $id_skema)
                 'lingkungan' => $lingkungan,
                 'peluang'    => $peluang,
                 'hubungan'   => json_encode(array_values($hubungan)),
+                'hubungan_rating' => json_encode($hubungan_rating),
                 'pelaksana'  => json_encode(array_values($pelaksana)),
                 'updated_at' => now(),
                 'created_at' => now(),
             ]
         );
+
 
         // === Konfirmasi (sama seperti sebelumnya) ===
         DB::table('mapa01_konfirmasi')->updateOrInsert(

@@ -215,35 +215,40 @@
         </div>
 
         <!-- HUBUNGAN -->
-        <div class="form-group mb-3">
-            <label class="form-label d-block">Hubungan antara standar kompetensi dan:</label>
-            @foreach(['Bukti untuk mendukung asesmen','Aktivitas kerja di tempat kerja Asesi','Kegiatan Pembelajaran'] as $h)
-            <div>
-                <label>
-                    <input type="checkbox" name="hubungan[]" value="{{ $h }}"
-                           class="form-check-input me-1"
-                           {{ in_array($h, $konteks->hubungan) ? 'checked' : '' }}>
-                    {{ $h }}
-                </label>
-            </div>
-            @endforeach
-        </div>
+<div class="form-group mb-3">
+    <label class="form-label d-block mb-2">Hubungan antara standar kompetensi dan:</label>
 
-        <!-- PELAKSANA -->
-        <div class="form-group mb-3">
-            <label class="form-label d-block">Siapa yang melakukan asesmen / RPL</label>
-            @foreach(['Lembaga Sertifikasi','Organisasi Pelatihan','Asesor Perusahaan'] as $p)
-            <div>
-                <label>
-                    <input type="checkbox" name="pelaksana[]" value="{{ $p }}"
-                           class="form-check-input me-1"
-                           {{ in_array($p, $konteks->pelaksana) ? 'checked' : '' }}>
-                    {{ $p }}
-                </label>
-            </div>
-            @endforeach
-        </div>
+    <div class="hubungan-list">
+        @foreach(['Bukti untuk mendukung asesmen','Aktivitas kerja di tempat kerja Asesi','Kegiatan Pembelajaran'] as $h)
+        @php
+            $selected = $konteks->hubungan_rating[$h] ?? '';
+            $checked = in_array($h, $konteks->hubungan);
+        @endphp
+        <div class="hubungan-item">
+            <label class="d-flex align-items-center flex-grow-1">
+                <input type="checkbox" 
+                       name="hubungan[]" 
+                       value="{{ $h }}" 
+                       class="form-check-input me-2 hubungan-checkbox"
+                       {{ $checked ? 'checked' : '' }}
+                       data-name="{{ $h }}">
+                <span class="hubungan-text">{{ $h }}</span>
+            </label>
 
+            <div class="emoji-group ms-3 {{ $checked ? '' : 'disabled' }}">
+                <div class="emoji-option {{ $selected === 'senang' ? 'active' : '' }}" data-value="senang" data-name="{{ $h }}">😊</div>
+                <div class="emoji-option {{ $selected === 'datar' ? 'active' : '' }}" data-value="datar" data-name="{{ $h }}">😐</div>
+                <div class="emoji-option {{ $selected === 'sedih' ? 'active' : '' }}" data-value="sedih" data-name="{{ $h }}">☹️</div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+
+    {{-- Hidden inputs untuk backend --}}
+    <div id="emoji-hidden-inputs">
+        @foreach($konteks->hubungan_rating ?? [] as $key => $val)
+            <input type="hidden" name="hubungan_rating[{{ $key }}]" value="{{ $val }}">
+        @endforeach
     </div>
 </div>
 
@@ -514,7 +519,45 @@ document.getElementById("btnUpdateTujuan").addEventListener("click", function ()
     .catch(() => alert("Terjadi error koneksi"));
 });
 
+ // klik emoji
+    document.querySelectorAll(".emoji-option").forEach(el => {
+        el.addEventListener("click", () => {
+            const name = el.getAttribute("data-name");
+            const value = el.getAttribute("data-value");
 
+            // hapus active dari emoji lain di baris yang sama
+            el.parentElement.querySelectorAll(".emoji-option").forEach(e => e.classList.remove("active"));
+            el.classList.add("active");
+
+            // cari atau buat hidden input
+            let hiddenInput = document.querySelector(`#emoji-hidden-inputs input[name="hubungan_rating[${name}]"]`);
+            if (!hiddenInput) {
+                hiddenInput = document.createElement("input");
+                hiddenInput.type = "hidden";
+                hiddenInput.name = `hubungan_rating[${name}]`;
+                document.getElementById("emoji-hidden-inputs").appendChild(hiddenInput);
+            }
+            hiddenInput.value = value;
+        });
+    });
+
+    // kontrol munculnya emoji berdasar checkbox
+    document.querySelectorAll(".hubungan-checkbox").forEach(checkbox => {
+        checkbox.addEventListener("change", function() {
+            const name = this.getAttribute("data-name");
+            const emojiGroup = this.closest(".hubungan-item").querySelector(".emoji-group");
+
+            if (this.checked) {
+                emojiGroup.classList.remove("disabled");
+            } else {
+                emojiGroup.classList.add("disabled");
+                // hapus pilihan emoji & nilai hidden input kalau uncheck
+                emojiGroup.querySelectorAll(".emoji-option").forEach(e => e.classList.remove("active"));
+                const hiddenInput = document.querySelector(`#emoji-hidden-inputs input[name="hubungan_rating[${name}]"]`);
+                if (hiddenInput) hiddenInput.remove();
+            }
+        });
+    });
 });
 </script>
 @endsection
