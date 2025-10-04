@@ -25,16 +25,18 @@
             {{ $unitList->firstWhere('id_unit', $id_unit)->judul_unit ?? 'Unit tidak ditemukan' }}
         </h6>
 
-        @foreach($list as $p)
+        @foreach($list as $index => $p)
             <div class="card mb-3">
                 <div class="card-body">
-                    <p>{{ $p->pertanyaan }}</p>
+                    <p><strong>{{ $index + 1 }}. Pertanyaan:</strong> {{ $p->pertanyaan }}</p>
+
                     @if($p->deskripsi_pertanyaan)
-                        <p class="text-muted">{{ $p->deskripsi_pertanyaan }}</p>
+                        <p class="text-success"><strong>Deskripsi:</strong> {{ $p->deskripsi_pertanyaan }}</p>
                     @endif
 
                     <div class="d-flex gap-2">
                         <a href="{{ route('pmo.pertanyaan.edit', [$pmo->id_pmo, $p->id_pmo_pertanyaan]) }}" class="btn btn-sm btn-warning">Edit</a>
+
                         <form action="{{ route('pmo.pertanyaan.destroy', [$pmo->id_pmo, $p->id_pmo_pertanyaan]) }}" method="POST" onsubmit="return confirm('Yakin mau hapus pertanyaan ini?')">
                             @csrf
                             @method('DELETE')
@@ -48,4 +50,14 @@
         <p class="text-muted">Belum ada pertanyaan pada PMO ini.</p>
     @endforelse
 </div>
+
+{{-- Tombol Kembali floating kanan bawah --}}
+<a href="{{ route('pertanyaan.pmo.kelompok', ['id_skema' => $pmo->id_skema]) }}" 
+   class="btn btn-secondary fw-bold" 
+   style="position: fixed; bottom: 20px; right: 20px; z-index: 999;">
+   &laquo; Kembali ke Kelompok Pekerjaan
+</a>
+
+
+
 @endsection

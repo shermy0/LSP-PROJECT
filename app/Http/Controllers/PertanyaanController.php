@@ -784,36 +784,17 @@ public function createPMO(Request $request)
 public function crudPMO($id_pmo)
 {
     $pmo = DB::table('pmo')->where('id_pmo', $id_pmo)->first();
-    if (!$pmo) {
-        return redirect()->back()->with('error', 'Data PMO tidak ditemukan.');
-    }
-
-    // Ambil pertanyaan PMO
+    $skema = DB::table('skema_sertifikasi')->where('id_skema', $pmo->id_skema)->first();
+    
     $pertanyaanList = DB::table('pmo_pertanyaan')
         ->where('id_pmo', $id_pmo)
         ->get()
         ->groupBy('id_unit');
 
-    // Ambil unit sesuai id_unit yang dipakai
-    $unitList = DB::table('unit_kompetensi')
-        ->whereIn('id_unit', $pertanyaanList->keys()->all())
-        ->get();
+    $unitList = DB::table('unit_kompetensi')->get();
 
-    // Tambahkan dummy unit kalau ada orphan
-    $missingUnitIds = collect($pertanyaanList->keys())
-        ->diff($unitList->pluck('id_unit'));
-
-    foreach ($missingUnitIds as $unitId) {
-        $unitList->push((object)[
-            'id_unit' => $unitId,
-            'judul_unit' => 'Unit tidak ditemukan',
-            'kode_unit' => 'UNKNOWN',
-        ]);
-    }
-
-    return view('PMO_crud', compact('pmo', 'unitList', 'pertanyaanList'));
+    return view('PMO_crud', compact('pmo', 'skema', 'pertanyaanList', 'unitList'));
 }
-
 
 // Edit pertanyaan PMO
 public function editPertanyaanPMO($id_pmo, $id)
@@ -1015,34 +996,27 @@ public function storePertanyaanPMO(Request $request, $id_pmo)
     // ================================
     // Simpan Jawaban PMO
     // ================================
-    public function simpanJawabanPMO(Request $request, $id_skema, $id_pembuatan)
-    {
-        $request->validate([
-            'jawaban.*' => 'required|string',
-        ]);
+public function simpanJawabanPMO(Request $request, $id_skema, $id_pembuatan)
+{
+    $jawaban = $request->input('jawaban', []);
 
-        foreach ($request->jawaban as $id_pertanyaan => $isiJawaban) {
-            JawabanPMO::updateOrCreate(
-                [
-                    'id_pembuatan_pertanyaan' => $id_pembuatan,
-                    'id_pertanyaan' => $id_pertanyaan,
-                    'id_asesi' => auth()->user()->id ?? null,
-                ],
-                [
-                    'jawaban' => $isiJawaban,
-                ]
-            );
-        }
-
-        return redirect()->route('jawaban.pmo', [
-            'id_skema' => $id_skema,
-            'id_pembuatan' => $id_pembuatan
-        ])->with('success', 'Jawaban PMO berhasil disimpan');
+    foreach($jawaban as $id_pmo_pertanyaan => $isi) {
+        // Bisa pakai updateOrInsert supaya jika sudah ada jawaban, update
+        DB::table('pmo_tanggapan')->updateOrInsert(
+            ['id_pmo_pertanyaan' => $id_pmo_pertanyaan],
+            [
+                'jawaban' => $isi,
+                'updated_at' => now(),  // kalau tabel ada timestamp
+            ]
+        );
     }
+
+    return redirect()->back()->with('success', 'Jawaban berhasil disimpan.');
+}
+
 
        public function tampilJawabanPMO($id_skema, $id_pembuatan)
     {
-        dd($id_skema, $id_pembuatan); // cek apakah param diterima
         $skema = Skema::findOrFail($id_skema); // pastikan id_skema valid
         $pembuatan = PembuatanPertanyaan::findOrFail($id_pembuatan); // pastikan id_pembuatan valid
         $kelompok = KelompokPekerjaan::with('unitKompetensi')->where('id_skema', $id_skema)->get();
