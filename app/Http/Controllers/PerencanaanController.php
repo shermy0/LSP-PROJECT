@@ -129,8 +129,8 @@ class PerencanaanController extends Controller
     public function frva(Request $request, $periode, $skema_id)
     {
         // validasi urutan isi
-        $sebelum = DB::table('proses_validasi')->where('skema_id',$skema_id)->where('periode','sebelum')->exists();
-        $saat    = DB::table('proses_validasi')->where('skema_id',$skema_id)->where('periode','saat')->exists();
+        $sebelum = DB::table('proses_validasi')->where('skema_id', $skema_id)->where('periode','sebelum')->exists();
+        $saat    = DB::table('proses_validasi')->where('skema_id', $skema_id)->where('periode','saat')->exists();
 
         if ($periode === 'saat' && !$sebelum) {
             return redirect()->back()->with('error', 'Harap isi dulu bagian Sebelum Asesmen.');
@@ -143,7 +143,38 @@ class PerencanaanController extends Controller
         $skema  = Skema::find($skema_id);
         $skemas = Skema::all();
 
-        return view('form_perencanaan.fr_va.fr_va', compact('periode','periodeText','skema_id','skemas','skema'));
+        // Ambil data sebelumnya jika ada (untuk checked di form)
+        $prosesValidasi = DB::table('proses_validasi')
+                            ->where('skema_id', $skema_id)
+                            ->where('periode', $periode)
+                            ->first();
+
+        $tujuanSelected     = $prosesValidasi && $prosesValidasi->tujuan ? explode(', ', $prosesValidasi->tujuan) : [];
+        $konteksSelected    = $prosesValidasi && $prosesValidasi->konteks ? explode(', ', $prosesValidasi->konteks) : [];
+        $pendekatanSelected = $prosesValidasi && $prosesValidasi->pendekatan ? explode(', ', $prosesValidasi->pendekatan) : [];
+
+        // Variabel "lainnya"
+        $tujuanLain     = $prosesValidasi->tujuan_lain ?? '';
+        $konteksLain    = $prosesValidasi->konteks_lain ?? '';
+        $konteksLain2   = $prosesValidasi->konteks_lain2 ?? '';
+        $dokumenLain1   = $prosesValidasi->dokumen_lain1 ?? '';
+        $dokumenLain2   = $prosesValidasi->dokumen_lain2 ?? '';
+
+        return view('form_perencanaan.fr_va.fr_va', compact(
+            'periode',
+            'periodeText',
+            'skema_id',
+            'skemas',
+            'skema',
+            'tujuanSelected',
+            'konteksSelected',
+            'pendekatanSelected',
+            'tujuanLain',
+            'konteksLain',
+            'konteksLain2',
+            'dokumenLain1',
+            'dokumenLain2'
+        ));
     }
 
     // 5.1️⃣ FR VA Asesor (Form Asesor)
@@ -276,11 +307,12 @@ class PerencanaanController extends Controller
                 DB::table('hasil_validasi')->insert([
                     'id_validasi'     => $id_validasi,
                     'skema_id'        => $skema_id,
+                    'user_id'         => auth()->id(), 
                     'keterangan'      => $index === 0 ? $keterampilanJson : null,
                     'aspek'           => $aspekList[$index] ?? null,
                     'aturan_bukti'    => !empty($aturan) ? implode(", ", $aturan) : null,
                     'prinsip_asesmen' => !empty($prinsip) ? implode(", ", $prinsip) : null,
-                ]);
+                ]);                
             }
         }
 
