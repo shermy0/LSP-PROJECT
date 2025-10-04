@@ -9,6 +9,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link rel="stylesheet" href="{{ asset('assets/css/master.css')}}">
+    <link rel="stylesheet" href="{{ asset('assets/css/pesertauji.css')}}">
+    <link rel="stylesheet" href="{{ asset('assets/css/detailjawaban.css')}}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
@@ -42,7 +44,7 @@
             @if(Auth::user()->role == 'asesor')
                 <li><i class="bi bi-house-door-fill"></i><a href="{{ route('dashboard.asesor') }}">Dashboard</a></li>
                 <li><i class="bi bi-journal-album"></i><a href="{{ route('formasesmen') }}">Form Asesmen</a></li>
-                <li><i class="bi bi-people-fill"></i><a href="#">Data Peserta Uji</a></li>
+                <li><i class="bi bi-people-fill"></i><a href="{{ route('datapesertauji') }}">Data Peserta Uji</a></li>
                 <li><i class="bi bi-pencil-square"></i><a href="{{ route('formperencanaan') }}">Form Perencanaan</a></li>
                 <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
             @endif
@@ -51,6 +53,7 @@
                 <li><i class="bi bi-house-door-fill"></i><a href="#">Dashboard</a></li>
                 <li><i class="bi bi-pencil-square"></i><a href="#">Form Asesmen </a></li>
                 <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
+                <li><i class="bi bi-clipboard-check"></i><a href="{{route('data.peserta.uji')}}">Hasil Asesmen</a></li>
             @endif
         </ul>
     </div>

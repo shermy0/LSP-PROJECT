@@ -2,114 +2,26 @@
 
 @section('konten')
 
-<style>
-    /* =========================
-       Gaya Custom Form Ceklis
-       ========================= */
-    .content-card-custom {
-        background-color: #FFFFFF;
-        border: 1px solid #DEE2E6; 
-        border-radius: 0.25rem;
-        box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
-        overflow: hidden;
-    }
-    .header-group-blue-custom {
-        background-color: #4C6EF5;
-        color: white;
-        padding: 0.75rem 1rem;
-        font-weight: bold;
-        font-size: 1.125rem;
-    }
-    .header-unit-light-blue-custom {
-        background-color: #E6F0FF;
-        border-left: 5px solid #4C6EF5;
-        padding: 0.75rem 1rem;
-        margin-bottom: 1rem;
-        font-weight: 600;
-        color: #212529;
-    }
-    .kuk-table-custom {
-        border-collapse: collapse;
-        font-size: 0.875rem;
-        width: 100%;
-    }
-    .kuk-table-custom th, .kuk-table-custom td {
-        border: 1px solid #DEE2E6;
-        padding: 0.5rem 0.75rem;
-        vertical-align: middle;
-    }
-    .kuk-table-custom thead th {
-        background-color: #F8F9FA;
-        font-weight: 600;
-        color: #495057;
-        text-align: left;
-    }
-    .kuk-table-custom tbody td:nth-child(1) {
-        background-color: #F8F9FA;
-        text-align: center;
-        font-weight: 500;
-    }
-    .custom-radio {
-        appearance: none;
-        width: 1.15em;
-        height: 1.15em;
-        border: 2px solid #ADB5BD; 
-        border-radius: 50%;
-        display: block;
-        margin: auto;
-        cursor: pointer;
-        transition: all 0.1s ease-in-out;
-    }
-    .custom-radio::before {
-        content: "";
-        display: block;
-        width: 0.65em;
-        height: 0.65em;
-        border-radius: 50%;
-        transform: scale(0);
-        transition: transform 0.1s ease-in-out;
-        margin: 0.15em;
-    }
-    .custom-radio[value="Ya"]:checked {
-        border-color: #28A745;
-        background-color: #28A745;
-    }
-    .custom-radio[value="Tidak"]:checked {
-        border-color: #DC3545;
-        background-color: #DC3545;
-    }
-    .custom-radio:checked::before {
-        transform: scale(1);
-        background-color: white;
-    }
-    .input-catatan-custom {
-        border: 1px solid #CED4DA;
-        padding: 0.375rem 0.5rem;
-        border-radius: 0.2rem;
-        font-size: 0.8rem;
-        color: #495057;
-    }
-    .input-catatan-custom:focus {
-        border-color: #80BDFF;
-        box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-        outline: none;
-    }
-</style>
-
 <div class="container mt-4">
-    <h1 class="text-2xl font-bold mb-4 text-gray-800">Form Ceklis Observasi</h1>
+    <h1 class="fw-bold mb-4 text-dark">Form Ceklis Observasi</h1>
 
     @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
-    <form action="{{ route('ceklisobservasi.store') }}" method="POST" class="content-card-custom p-6">
+    <form action="{{ route('ceklisobservasi.store') }}" method="POST" class="card shadow-sm p-4">
         @csrf
-        <div class="mb-5">
-            <label for="id_asesi" class="font-semibold block mb-2 text-gray-700">Pilih Asesi</label>
-            <select name="id_asesi" id="id_asesi" class="border border-gray-300 p-2.5 w-full rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800" required>
+
+        <input type="hidden" name="id_skema" value="{{ request('id_skema') }}">
+        <input type="hidden" name="id_asesmen" value="{{ $asesmen->id_asesmen ?? '' }}">
+
+        <!-- Pilih Asesi -->
+        <div class="mb-4">
+            <label for="id_asesi" class="form-label fw-semibold">Pilih Asesi</label>
+            <select name="id_asesi" id="id_asesi" class="form-select" required>
                 <option value="">-- pilih asesi --</option>
                 @foreach($asesi as $a)
                     <option value="{{ $a->id_asesi }}">{{ $a->nama_lengkap }}</option>
@@ -117,17 +29,59 @@
             </select>
         </div>
 
-        <h3 class="font-semibold mb-6 text-lg text-gray-800" id="nama-skema"></h3>
+        <!-- Nama skema -->
+        <h3 class="fw-semibold mb-4 text-primary" id="nama-skema">Skema: -</h3>
 
-        <div id="kuk-container" class="space-y-8">
-            <p class="text-gray-500 text-center">Pilih Asesi atau Skema untuk melihat daftar Kriteria Unjuk Kerja.</p>
+        <!-- Container dinamis -->
+        <div id="kuk-container" class="text-center text-muted">
+            Pilih Asesi atau Skema untuk melihat daftar Kriteria Unjuk Kerja.
         </div>
 
-        <button type="submit" class="mt-8 bg-blue-600 text-white px-7 py-3 rounded-lg hover:bg-blue-700 transition duration-150 ease-in-out text-lg font-medium shadow-md">
+        <!-- Field tambahan (UMPAN BALIK & REKOMENDASI pindah ke bawah KUK) -->
+        <div class="mb-4 mt-4">
+            <label for="umpan_balik" class="form-label fw-semibold">Umpan Balik</label>
+            <textarea name="umpan_balik" id="umpan_balik" class="form-control"></textarea>
+        </div>
+        <div class="mb-4">
+            <label for="rekomendasi" class="form-label fw-semibold">Rekomendasi</label>
+            <select name="rekomendasi" id="rekomendasi" class="form-select" required>
+                <option value="">-- pilih rekomendasi --</option>
+                <option value="Kompeten">Kompeten</option>
+                <option value="Belum Kompeten">Belum Kompeten</option>
+            </select>
+        </div>
+
+        <!-- Tombol Simpan -->
+        <button type="submit" class="btn btn-primary btn-lg mt-4">
             Simpan Penilaian
         </button>
     </form>
 </div>
+
+<style>
+    .header-group {
+        background-color: #4C6EF5;
+        color: #fff;
+        padding: .75rem 1rem;
+        font-weight: 600;
+        border-radius: .25rem .25rem 0 0;
+    }
+    .header-unit {
+        background-color: #E6F0FF;
+        border-left: 5px solid #4C6EF5;
+        padding: .75rem 1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    .form-check-input:checked[value="Ya"] {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+    .form-check-input:checked[value="Tidak"] {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+</style>
 
 <script>
 function loadKuk(skemaId) {
@@ -137,101 +91,116 @@ function loadKuk(skemaId) {
     namaSkemaEl.innerHTML = '';
 
     if (!skemaId) {
-        container.innerHTML = '<p class="text-gray-500 text-center">Pilih Asesi atau Skema untuk melihat daftar Kriteria Unjuk Kerja.</p>';
+        container.innerHTML = '<p class="text-muted">Pilih Asesi atau Skema untuk melihat daftar Kriteria Unjuk Kerja.</p>';
         return;
     }
 
     fetch(`/ceklisobservasi/data/${skemaId}`)
-        .then(res => res.json())
-        .then(data => {
-            if (!data.kelompok || data.kelompok.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 text-center">Belum ada kelompok/unit untuk skema ini.</p>';
-                return;
-            }
+    .then(res => res.json())
+    .then(data => {
+        namaSkemaEl.innerHTML = "Skema: " + (data.skema_nama ?? 'Tidak tersedia');
 
-            // Nama skema
-            namaSkemaEl.innerHTML = data.kelompok?.[0]?.unit_kompetensi?.[0]?.skema_nama ?? 'Skema: Tidak tersedia';
+        if (!data.kelompok || data.kelompok.length === 0) {
+            container.innerHTML = '<p class="text-muted">Belum ada kelompok/unit untuk skema ini.</p>';
+            return;
+        }
 
-            let html = '';
+        let html = '';
+        data.kelompok.forEach((kel, kIndex) => {
+            const namaKelompok = kel.nama_kelompok ?? 'Tidak ada nama kelompok';
+            const idKelompok = kel.id_kelompok ?? 0;
 
-            data.kelompok.forEach((kel, kIndex) => {
-                const namaKelompok = kel.nama_kelompok ?? 'Tidak ada nama kelompok';
-                const idKelompok = kel.id_kelompok ?? 0;
+            html += `
+            <div class="card mb-4 shadow-sm">
+                <div class="header-group">Kelompok Pekerjaan ${kIndex + 1}: ${namaKelompok}</div>
+                <div class="card-body">`;
 
+            (kel.unit_kompetensi ?? []).forEach(unit => {
                 html += `
-                <div class="content-card-custom mb-6">
-                    <div class="header-group-blue-custom">
-                        Kelompok Pekerjaan ${kIndex + 1}: ${namaKelompok}
-                    </div>
-                    <div class="p-5 space-y-4">`;
+                <div class="header-unit mb-3">
+                    ${unit.kode_unit ?? 'Kode Unit'} - ${unit.judul_unit ?? 'Judul Unit'}
+                </div>`;
 
-                (kel.unit_kompetensi ?? []).forEach(unit => {
-                    const kodeUnit = unit.kode_unit ?? 'Kode Unit';
-                    const judulUnit = unit.judul_unit ?? 'Judul Unit';
-
+                (unit.elemen ?? []).forEach(ele => {
                     html += `
-                    <div class="header-unit-light-blue-custom rounded-md">
-                        <h2 class="font-semibold text-base">${kodeUnit} - ${judulUnit}</h2>
-                    </div>`;
-
-                    (unit.elemen ?? []).forEach(ele => {
-                        const eleNomor = ele.nomor_elemen ?? '0';
-                        const eleNama = ele.nama_elemen ?? 'Tidak ada nama elemen';
-                        html += `
-                        <div class="mb-5">
-                            <h3 class="font-bold text-sm mb-3 text-gray-800">${eleNomor}. ${eleNama}</h3>
-                            <table class="kuk-table-custom">
-                                <thead>
-                                    <tr>
-                                        <th class="w-[5%] text-center">No.</th>
-                                        <th class="w-[45%]">Kriteria Unjuk Kerja</th>
-                                        <th class="w-[15%] text-center">Standar Industri</th>
-                                        <th class="w-[8%] text-center">Ya</th>
-                                        <th class="w-[8%] text-center">Tidak</th>
-                                        <th class="w-[19%]">Penilaian Lanjut</th>
-                                    </tr>
-                                </thead>
-                                <tbody>`;
-
-                        (ele.kuk ?? []).forEach((kuk, kukIndex) => {
-                            const kukNo = `${eleNomor}.${kukIndex + 1}`;
-                            const deskripsiKuk = kuk.deskripsi_kuk ?? 'Deskripsi KUK belum tersedia';
-                            const kukId = kuk.id_kuk ?? 0;
-
-                            html += `
+                    <h6 class="fw-bold mb-3">${ele.nomor_elemen ?? '0'}. ${ele.nama_elemen ?? '-'}</h6>
+                    <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
                             <tr>
-                                <td>${kukNo}</td>
-                                <td>${deskripsiKuk}</td>
-                                <td class="text-center text-xs font-medium text-gray-600">Modul Praktek</td>
-                                <td class="text-center">
-                                    <input type="radio" name="kuk[${kukId}][status]" value="Ya" class="custom-radio" required>
-                                </td>
-                                <td class="text-center">
-                                    <input type="radio" name="kuk[${kukId}][status]" value="Tidak" class="custom-radio">
-                                </td>
-                                <td>
-                                    <input type="hidden" name="kuk[${kukId}][id_kelompok]" value="${idKelompok}">
-                                    <input type="text" name="kuk[${kukId}][catatan]" placeholder="Catatan Penilaian" class="w-full input-catatan-custom">
-                                </td>
-                            </tr>`;
-                        });
+                                <th style="width:5%">No.</th>
+                                <th style="width:35%">Kriteria Unjuk Kerja</th>
+                                <th style="width:20%">Standar Industri</th>
+                                <th style="width:8%">Ya</th>
+                                <th style="width:8%">Tidak</th>
+                                <th style="width:24%">Penilaian Lanjut</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
 
-                        html += `</tbody></table></div>`;
+                    (ele.kuk ?? []).forEach((kuk, kukIndex) => {
+                        const kukNo = `${ele.nomor_elemen || kIndex + 1}.${kukIndex + 1}`;
+                        const kukId = kuk.id_kuk ?? 0;
+                        const elemenId = ele.id_elemen ?? '';
+                        const unitId = unit.id_unit ?? '';
+
+                        html += `
+                        <tr>
+                            <td>${kukNo}</td>
+                            <td>${kuk.deskripsi_kuk ?? '-'}</td>
+                            <td>
+                                <select class="form-select form-select-sm standar-industri" 
+                                        name="kuk[${kukId}][standar]" 
+                                        onchange="toggleLainnya(this, ${kukId})">
+                                        <option value="Modul Praktek">Modul Praktek</option>
+                                    <option value="SOP">SOP</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                                <input type="text" 
+                                       class="form-control form-control-sm mt-2 d-none" 
+                                       name="kuk[${kukId}][standar_lainnya]" 
+                                       placeholder="Tulis standar lainnya">
+                            </td>
+                            <td class="text-center">
+                                <input class="form-check-input" type="radio" name="kuk[${kukId}][status]" value="Ya" required>
+                            </td>
+                            <td class="text-center">
+                                <input class="form-check-input" type="radio" name="kuk[${kukId}][status]" value="Tidak">
+                            </td>
+                            <td>
+                                <input type="hidden" name="kuk[${kukId}][id_kelompok]" value="${idKelompok}">
+                                <input type="hidden" name="kuk[${kukId}][id_elemen]" value="${elemenId}">
+                                <input type="hidden" name="kuk[${kukId}][id_unit]" value="${unitId}">
+                                <input type="text" name="kuk[${kukId}][catatan]" class="form-control form-control-sm" placeholder="Catatan Penilaian">
+                            </td>
+                        </tr>`;
                     });
-                });
 
-                html += `</div></div>`;
+                    html += `</tbody></table></div>`;
+                });
             });
 
-            container.innerHTML = html;
-        })
-        .catch(err => {
-            console.error("Error loading KUK data:", err);
-            container.innerHTML = '<p class="text-red-600 text-center">Gagal memuat data. Coba refresh halaman.</p>';
+            html += `</div></div>`;
         });
+
+        container.innerHTML = html;
+    })
+    .catch(err => {
+        console.error("Error loading KUK data:", err);
+        container.innerHTML = '<p class="text-danger">Gagal memuat data. Coba refresh halaman.</p>';
+    });
 }
 
-// Load otomatis dari query string ?id_skema=...
+function toggleLainnya(selectEl, kukId) {
+    const inputLainnya = selectEl.parentElement.querySelector('input[name="kuk['+kukId+'][standar_lainnya]"]');
+    if (selectEl.value === "Lainnya") {
+        inputLainnya.classList.remove("d-none");
+    } else {
+        inputLainnya.classList.add("d-none");
+        inputLainnya.value = "";
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const urlParams = new URLSearchParams(window.location.search);
     const skemaId = urlParams.get('id_skema');
@@ -240,5 +209,4 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
-
 @endsection

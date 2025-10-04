@@ -20,15 +20,21 @@ class CeklisObservasiController extends Controller
     }
 
     public function loadData($skemaId)
-    {
-        // Ambil semua KelompokPekerjaan beserta Unit → Elemen → KUK
-        $kelompok = KelompokPekerjaan::with(['unitKompetensi.elemen.kuk'])
-            ->where('id_skema', $skemaId)
-            ->get();
-;
+{
+    // Ambil nama skema
+    $skema = SkemaSertifikasi::find($skemaId);
 
-        return response()->json(['kelompok' => $kelompok]);
-    }
+    // Ambil semua kelompok + relasi unit → elemen → kuk
+    $kelompok = KelompokPekerjaan::with(['unitKompetensi.elemen.kuk'])
+        ->where('id_skema', $skemaId)
+        ->get();
+
+    return response()->json([
+        'skema_nama' => $skema ? $skema->nama_skema : null,
+        'kelompok'   => $kelompok,
+    ]);
+}
+
 
     public function store(Request $request)
     {

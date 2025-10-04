@@ -20,4 +20,9 @@ class Asesor extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function asesi()
+    {
+        return $this->hasMany(Asesi::class, 'asesor_id', 'id_asesor');
+    }
 }

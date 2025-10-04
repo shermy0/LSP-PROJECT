@@ -40,6 +40,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        'asesor' => [ // <-- tambahin ini
+            'driver' => 'session',
+            'provider' => 'asesors',
+        ],
     ],
 
     /*
@@ -63,6 +68,11 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
+        ],
+
+        'asesors' => [ // <-- tambahin ini
+            'driver' => 'eloquent',
+            'model' => App\Models\Asesor::class,
         ],
 
         // 'users' => [
