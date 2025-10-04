@@ -168,7 +168,7 @@ Route::delete('mapa01/konfirmasi/penyusun/{id}/delete',
 // ============================
 // FR VA
 // ============================
-Route::get('/fr-va/{periode}/{skema_id?}', [PerencanaanController::class, 'frVa'])
+Route::get('/fr-va/{periode}/{skema_id?}', [PerencanaanController::class, 'frva'])
     ->name('form_perencanaan.fr_va');
 
 Route::get('/fr-va-asesor/{periode}/{skema_id?}', [PerencanaanController::class, 'frVaAsesor'])

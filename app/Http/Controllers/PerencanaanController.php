@@ -35,14 +35,6 @@ class PerencanaanController extends Controller
         $skema = $skema_id ? Skema::find($skema_id) : null;
         $skemas = Skema::all();
 
-        // Ambil data hasil_validasi
-        $hasilValidasi = DB::table('hasil_validasi')
-                            ->where('skema_id', $skema_id)
-                            ->get();
-
-        $keterampilan = $hasilValidasi->whereNotNull('keterampilan')->first();
-        $aspekList = $hasilValidasi->whereNotNull('aspek');
-
         return view('form_perencanaan.fr_va.fr_va_asesor', compact('periode', 'periodeText', 'skema_id', 'skemas', 'skema'));
     }
 
@@ -133,38 +125,206 @@ class PerencanaanController extends Controller
                          ->with('success', 'Skema berhasil disimpan ke MAPA02');
     }
 
-    // 5️⃣ FR VA
-    public function frVa(Request $request, $periode, $skema_id = null)
+    // 5️⃣ FR VA (Form)
+    public function frva(Request $request, $periode, $skema_id)
     {
-        $validPeriode = [
-            'sebelum' => 'Sebelum Asesmen',
-            'saat'    => 'Pada Saat Asesmen',
-            'sesudah' => 'Setelah Asesmen'
-        ];
+        // validasi urutan isi
+        $sebelum = DB::table('proses_validasi')->where('skema_id',$skema_id)->where('periode','sebelum')->exists();
+        $saat    = DB::table('proses_validasi')->where('skema_id',$skema_id)->where('periode','saat')->exists();
 
-        if (!array_key_exists($periode, $validPeriode)) {
-            abort(404);
+        if ($periode === 'saat' && !$sebelum) {
+            return redirect()->back()->with('error', 'Harap isi dulu bagian Sebelum Asesmen.');
+        }
+        if ($periode === 'sesudah' && !$saat) {
+            return redirect()->back()->with('error', 'Harap isi dulu bagian Saat Asesmen.');
         }
 
-        $periodeText = $validPeriode[$periode];
-        $skema_id = $skema_id ?? $request->query('skema_id');
-        $skema = $skema_id ? Skema::find($skema_id) : null;
+        $periodeText = $periode === 'sebelum' ? 'Sebelum' : ($periode === 'saat' ? 'Saat' : 'Sesudah');
+        $skema  = Skema::find($skema_id);
         $skemas = Skema::all();
 
-        return view('form_perencanaan.fr_va.fr_va', compact('periode', 'periodeText', 'skema_id', 'skemas', 'skema'));
+        return view('form_perencanaan.fr_va.fr_va', compact('periode','periodeText','skema_id','skemas','skema'));
     }
 
+    // 5.1️⃣ FR VA Asesor (Form Asesor)
     public function frVaAsesor(Request $request, $periode, $skema_id = null)
     {
         $skema  = Skema::find($skema_id);
         $skemas = Skema::all();
     
-        if ($periode == 'sebelum') $periodeText = 'Sebelum';
-        elseif ($periode == 'sesudah') $periodeText = 'Sesudah';
-        else $periodeText = ucfirst($periode);
+        $periodeText = $periode == 'sebelum' ? 'Sebelum' : ($periode == 'sesudah' ? 'Sesudah' : ucfirst($periode));
     
         return view('form_perencanaan.fr_va.fr_va_asesor', compact('periode','periodeText','skema','skemas','skema_id'));
     }     
+
+    public function simpanLanjutfrVa(Request $request)
+    {
+        $request->validate([
+            'skema_id' => 'required|exists:skema_sertifikasi,id_skema',
+        ]);
+
+        $skema_id = $request->input('skema_id');
+
+        // 🔹 Tentukan periode berikutnya secara otomatis
+        $urutanPeriode = ['sebelum', 'saat', 'sesudah'];
+
+        $lastPeriode = DB::table('proses_validasi')
+                        ->where('skema_id', $skema_id)
+                        ->orderByRaw("FIELD(periode, 'sebelum','saat','sesudah') DESC")
+                        ->value('periode');
+
+        $nextPeriode = 'sebelum'; // default jika belum ada
+        if ($lastPeriode) {
+            $index = array_search($lastPeriode, $urutanPeriode);
+            $nextPeriode = $urutanPeriode[$index + 1] ?? null;
+        }
+
+        if (!$nextPeriode) {
+            return redirect()->back()->with('error', 'Semua periode sudah diisi.');
+        }
+
+        // 🔹 Simpan proses_validasi
+        $id_validasi = DB::table('proses_validasi')->insertGetId([
+            'skema_id'       => $skema_id,
+            'periode'        => $nextPeriode, // otomatis
+            'tujuan'         => is_array($request->tujuan) ? implode(", ", $request->tujuan) : $request->tujuan,
+            'tujuan_lain'    => $request->tujuan_lain ?? null,
+            'konteks'        => is_array($request->konteks) ? implode(", ", $request->konteks) : $request->konteks,
+            'konteks_lain'   => $request->konteks_lain ?? null,
+            'pendekatan'     => is_array($request->pendekatan) ? implode(", ", $request->pendekatan) : $request->pendekatan,
+            'pendekatan_lain'=> $request->pendekatan_lain ?? null,
+        ]);
+
+        // 🔹 Simpan orang relevan
+        $orangRelevan = $request->input('orangRelevan', []);
+        $jabatanMap = [
+            'asesorCheckbox'      => 'Asesor Kompetensi (wajib)',
+            'leadCheckbox'        => 'Lead Asesor [Ketua TUK]',
+            'managerCheckbox'     => 'Manager, Supervisor',
+            'ahliCheckbox'        => 'Tenaga Ahli di bidangnya',
+            'koordinatorCheckbox' => 'Koordinator Pelatihan',
+            'anggotaCheckbox'     => 'Anggota Asosiasi Industry Profesi'
+        ];
+
+        foreach ($orangRelevan as $idCheckbox) {
+            $namaArray  = (array) $request->input($idCheckbox.'_nama', []);
+            $hasilArray = (array) $request->input($idCheckbox.'_diskusi', []);
+
+            $namaGabung  = [];
+            $hasilGabung = [];
+
+            foreach ($namaArray as $index => $nama) {
+                if (!empty($nama)) {
+                    $namaGabung[]  = $nama;
+                    $hasilGabung[] = $hasilArray[$index] ?? '';
+                }
+            }
+
+            if (!empty($namaGabung)) {
+                DB::table('diskusi')->insert([
+                    'skema_id'      => $skema_id,
+                    'nama_asesor'   => implode(", ", $namaGabung),
+                    'jabatan'       => $jabatanMap[$idCheckbox] ?? '-',
+                    'hasil_diskusi' => implode(" | ", $hasilGabung),
+                    'id_validasi'   => $id_validasi,
+                ]);
+            }
+        }
+
+        // 🔹 Simpan acuan pembanding
+        $acuanArray   = $request->input('acuan', []);
+        $dokumenArray = $request->input('dokumen', []);
+        DB::table('acuan_pembanding')->insert([
+            'id_validasi' => $id_validasi,
+            'skema_id'    => $skema_id,
+            'acuan'       => !empty($acuanArray) ? implode(", ", $acuanArray) : null,
+            'dokumen'     => !empty($dokumenArray) ? implode(", ", $dokumenArray) : null,
+        ]);
+
+        // 🔹 Simpan keterampilan komunikasi
+        $skills = $request->input('keterampilan', []);
+        $keterampilanJson = !empty($skills) ? json_encode($skills) : '[]';
+
+        // 🔹 Simpan aspek kegiatan dengan aturan & prinsip
+        if ($request->has('aspek')) {
+            $aspekList = [
+                0 => 'Keterampilan komunikasi yang digunakan dalam kegiatan validasi',
+                1 => 'Rencana Asesmen',
+                2 => 'Interpretasi Standar Kompetensi',
+                3 => 'Interpretasi Acuan Pembanding lainnya',
+                4 => 'Proses Asesmen',
+                5 => 'Penyeleksian dan Penerapan Metode Asesmen',
+                6 => 'Penyeleksian dan Penerapan Perangkat Asesmen',
+                7 => 'Bukti-bukti yang Dikumpulkan',
+                8 => 'Pengambilan Keputusan'
+            ];
+
+            $aturanMap  = [1 => 'V', 2 => 'A', 3 => 'T', 4 => 'M'];
+            $prinsipMap = [5 => 'F', 6 => 'R', 7 => 'F', 8 => 'F'];
+
+            foreach ($request->aspek as $index => $checks) {
+                $aturan = [];
+                $prinsip = [];
+
+                foreach ($checks as $pos => $val) {
+                    if ($val === "on") {
+                        if (isset($aturanMap[$pos])) $aturan[] = $aturanMap[$pos];
+                        if (isset($prinsipMap[$pos])) $prinsip[] = $prinsipMap[$pos];
+                    }
+                }
+
+                DB::table('hasil_validasi')->insert([
+                    'id_validasi'     => $id_validasi,
+                    'skema_id'        => $skema_id,
+                    'keterangan'      => $index === 0 ? $keterampilanJson : null,
+                    'aspek'           => $aspekList[$index] ?? null,
+                    'aturan_bukti'    => !empty($aturan) ? implode(", ", $aturan) : null,
+                    'prinsip_asesmen' => !empty($prinsip) ? implode(", ", $prinsip) : null,
+                ]);
+            }
+        }
+
+        return redirect()->route('form_perencanaan.fr_va_asesor', [
+            'periode' => $nextPeriode,
+            'skema_id' => $skema_id
+        ])->with('success', "Data periode '{$nextPeriode}' berhasil disimpan!");        
+    }  
+
+    // 5.2️⃣ Simpan FR VA + Asesor
+    public function simpanFrVa(Request $request)
+    {
+        $request->validate([
+            'skema_id' => 'required|exists:skema_sertifikasi,id_skema',
+            'nama'     => 'required|string|max:100',
+            'keterangan' => 'nullable|string',
+            'asesor.*.nama_asesor' => 'required|string|max:100',
+            'asesor.*.jabatan' => 'nullable|string|max:100',
+        ]);
+
+        // simpan FR VA utama
+        $frvaId = DB::table('fr_va')->insertGetId([
+            'skema_id'   => $request->skema_id,
+            'nama'       => $request->nama,
+            'keterangan' => $request->keterangan,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // simpan asesor
+        if ($request->has('asesor')) {
+            foreach ($request->asesor as $asesor) {
+                DB::table('fr_va_asesor')->insert([
+                    'fr_va_id'     => $frvaId,
+                    'nama_asesor'  => $asesor['nama_asesor'],
+                    'jabatan'      => $asesor['jabatan'] ?? null,
+                    'created_at'   => now(),
+                    'updated_at'   => now(),
+                ]);
+            }
+        }
+
+        return redirect()->back()->with('success','FR VA berhasil disimpan!');
+    }
 
     // 6️⃣ Simpan semua kontribusi, perbaikan, validator
     public function simpanSemua(Request $request)
@@ -173,8 +333,8 @@ class PerencanaanController extends Controller
 
         // 1️⃣ Simpan Kontribusi
         foreach ($request->temuan as $index => $temuan) {
-            $temuan = trim($temuan); // hapus spasi
-            if(empty($temuan)) continue; // skip jika kosong
+            $temuan = trim($temuan);
+            if(empty($temuan)) continue;
         
             $rekomendasi = $request->rekomendasi[$index] ?? '';
             DB::table('kontribusi')->insert([
@@ -190,8 +350,6 @@ class PerencanaanController extends Controller
                 $waktu = $request->waktu[$index] ?? null;
                 $penanggung = $request->penanggung[$index] ?? '';
                 $ttdBase64 = $request->tanda_tangan[$index] ?? null;
-
-                // Pastikan data base64 disimpan ke LONGTEXT
                 $ttd = $ttdBase64 ? $ttdBase64 : 'Tidak ada';
 
                 DB::table('rencana_perbaikan')->insert([
@@ -206,12 +364,12 @@ class PerencanaanController extends Controller
 
         // 3️⃣ Simpan Validator
         $nama_validators = $request->nama_validator ?? [];
-        $no_registrasi = $request->no_registrasi ?? [];
-        $tanggal = $request->tanggal_validator ?? [];
-        $ttd = $request->tanda_tangan_validator ?? [];
+        $no_registrasi   = $request->no_registrasi ?? [];
+        $tanggal         = $request->tanggal_validator ?? [];
+        $ttd             = $request->tanda_tangan_validator ?? [];
 
         foreach ($nama_validators as $index => $nama) {
-            if(empty($nama)) continue; // skip yang tidak dipilih
+            if(empty($nama)) continue;
             DB::table('validasi_validator')->insert([
                 'skema_id' => $skema_id,
                 'nama_validator' => $nama,
@@ -221,10 +379,11 @@ class PerencanaanController extends Controller
             ]);
         }
 
-        return redirect()->route('formperencanaan.show', ['id_skema' => $skema_id])->with('success', 'Semua data berhasil disimpan!');
+        return redirect()->route('formperencanaan.show', ['id_skema' => $skema_id])
+                         ->with('success', 'Semua data berhasil disimpan!');
     }
 
-    // 7️⃣ Laporan Asesmen
+    // 7️⃣ Laporan Asesmen (store manual)
     public function store(Request $request)
     {
         LaporanAsesmen::create([
@@ -256,3 +415,4 @@ class PerencanaanController extends Controller
         return response()->json($asesi);
     }
 }
+

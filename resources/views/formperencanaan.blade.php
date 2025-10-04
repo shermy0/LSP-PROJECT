@@ -56,9 +56,23 @@
                 <i class="fa-solid fa-stop me-2"></i>FR.VA - MEMBERIKAN KONTRIBUSI DALAM VALIDASI ASESMEN
             </a>
             <ul class="dropdown-menu w-100 custom-dropdown-menu">
-                <li><a href="{{ route('form_perencanaan.fr_va', ['periode' => 'sebelum', 'skema_id' => $skema->id_skema]) }}" class="dropdown-item">FR.VA - Sebelum Asesmen</a></li>
-                <li><a href="{{ route('form_perencanaan.fr_va', ['periode' => 'saat', 'skema_id' => $skema->id_skema]) }}" class="dropdown-item">FR.VA - Pada Saat Asesmen</a></li>
-                <li><a href="{{ route('form_perencanaan.fr_va', ['periode' => 'sesudah', 'skema_id' => $skema->id_skema]) }}" class="dropdown-item">FR.VA - Setelah Asesmen</a></li>
+            <?php
+            $sebelumFilled = DB::table('proses_validasi')->where('skema_id', $skema->id_skema)->where('periode','sebelum')->exists();
+            $saatFilled = DB::table('proses_validasi')->where('skema_id', $skema->id_skema)->where('periode','saat')->exists();
+            ?>
+
+            <li>
+                <a href="{{ route('form_perencanaan.fr_va', ['periode' => 'sebelum', 'skema_id' => $skema->id_skema]) }}" 
+                class="dropdown-item">FR.VA - Sebelum Asesmen</a>
+            </li>
+            <li>
+                <a href="{{ $sebelumFilled ? route('form_perencanaan.fr_va', ['periode' => 'saat', 'skema_id' => $skema->id_skema]) : '#' }}" 
+                class="dropdown-item {{ !$sebelumFilled ? 'disabled' : '' }}">FR.VA - Pada Saat Asesmen</a>
+            </li>
+            <li>
+                <a href="{{ $saatFilled ? route('form_perencanaan.fr_va', ['periode' => 'sesudah', 'skema_id' => $skema->id_skema]) : '#' }}" 
+                class="dropdown-item {{ !$saatFilled ? 'disabled' : '' }}">FR.VA - Setelah Asesmen</a>
+            </li>
             </ul>
         </div>
     </div>
