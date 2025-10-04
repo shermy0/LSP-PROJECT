@@ -2,7 +2,6 @@
 
 @section('konten')
 <div class="container mt-4">
-
     <div class="text-center mb-4">
         <h4 class="fw-bold text-dark">Kelompok Pekerjaan & Unit Kompetensi</h4>
         <p class="text-muted">
@@ -17,10 +16,15 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <span>Kelompok {{ $index+1 }}: {{ $k->nama_kelompok }}</span>
                     <button 
-                        class="btn btn-light btn-sm"
-                        onclick="popupJumlahPertanyaan({{ $skema->id_skema }}, '{{ $timer ?? '' }}', {{ $k->id_kelompok }})">
-                        <i class="bi bi-plus-circle"></i> Tambahkan Pertanyaan PMO
-                    </button>
+                    class="btn btn-light btn-sm"
+                    onclick="popupJumlahPertanyaan(
+                        {{ $skema->id_skema }}, 
+                        '{{ $timer ?? '' }}', 
+                        {{ $k->id_kelompok }},
+                        '{{ addslashes($k->nama_kelompok) }}'
+                    )">
+                    <i class="bi bi-plus-circle"></i> Tambahkan Pertanyaan PMO
+                     </button>
                 </div>
             </div>
             <div class="card-body p-0">
@@ -61,17 +65,16 @@
             Belum ada kelompok pekerjaan untuk skema ini.
         </div>
     @endforelse
-
 </div>
 
 {{-- Script SweetAlert --}}
+
 <script>
-function popupJumlahPertanyaan(id_skema, timer, kelompok_id) {
+function popupJumlahPertanyaan(id_skema, timer, kelompok_id, nama_kelompok) {
     Swal.fire({
-        title: '<h6 class="fw-bold mb-3">Masukkan Jumlah Tugas Demonstrasi</h6>',
+        title: `Masukkan Jumlah Pertanyaan ${nama_kelompok}`,
         html: `
             <input id="jumlahPertanyaan" type="number" class="form-control mb-2 text-center border-primary" 
-                   style="border:2px solid #041562; border-radius:8px;" 
                    min="1" max="15" value="1">
             <small class="text-danger d-block mb-3">note: maksimal 15 tugas</small>
         `,
@@ -85,28 +88,18 @@ function popupJumlahPertanyaan(id_skema, timer, kelompok_id) {
             cancelButton: 'swal2-cancel btn fw-bold px-4'
         },
         didRender: () => {
-            const confirmBtn = document.querySelector('.swal2-confirm');
-            confirmBtn.style.backgroundColor = '#041562';
-            confirmBtn.style.color = '#fff';
-            confirmBtn.style.borderRadius = '8px';
-            const cancelBtn = document.querySelector('.swal2-cancel');
-            cancelBtn.style.backgroundColor = '#6c757d';
-            cancelBtn.style.color = '#fff';
-            cancelBtn.style.borderRadius = '8px';
+            // Styling tombol
+            document.querySelector('.swal2-confirm').style.cssText = 'background:#041562; color:#fff; border-radius:8px;';
+            document.querySelector('.swal2-cancel').style.cssText = 'background:#6c757d; color:#fff; border-radius:8px;';
         }
     }).then((result) => {
         if (result.isConfirmed) {
             let jumlah = parseInt(document.getElementById('jumlahPertanyaan').value);
-            if (isNaN(jumlah) || jumlah < 1) {
-                Swal.fire('Error', 'Minimal 1 tugas', 'error');
-                return;
-            }
-            if (jumlah > 15) {
-                Swal.fire('Error', 'Maksimal 15 tugas', 'error');
-                return;
-            }
+            if (isNaN(jumlah) || jumlah < 1) jumlah = 1;
+            if (jumlah > 15) jumlah = 15;
 
-           let url = `/input_PMO?id_skema=${id_skema}&timer=${timer}&kelompok_id=${kelompok_id}&jumlah=${jumlah}`;
+            // Redirect ke input PMO
+            let url = `/form-asesmen/${id_skema}/input-pmo?timer=${timer}&kelompok_id=${kelompok_id}&jumlah=${jumlah}`;
             window.location.href = url;
         }
     });

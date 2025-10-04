@@ -101,15 +101,22 @@
             </div>
 
             <div class="modal-body text-center">
-                <!-- Input Soal -->
-                <a href="{{ route('pertanyaan.pmo.kelompok', ['id_skema' => $skema->id_skema]) }}" 
-                   class="btn w-100 mb-2 text-white fw-bold" style="background-color:#041562;">
+              @php
+                $pembuatanPMO = $pembuatanList->firstWhere('jenis_pertanyaan', 'pmo');
+              @endphp
+
+                <a href="{{ $pembuatanPMO 
+                        ? route('pertanyaan.pmo.kelompok', ['id_skema' => $skema->id_skema, 'id_pembuatan' => $pembuatanPMO->id_pembuatan_pertanyaan])
+                        : route('pertanyaan.pmo.kelompok', ['id_skema' => $skema->id_skema])
+                    }}?timer={{ request('timer') ?? 30 }}" 
+                class="btn w-100 mb-2 text-white fw-bold" 
+                style="background-color:#041562;">
                     Input Soal
                 </a>
 
                 <!-- Jawaban Asesi PMO -->
                 @php
-                    $pembuatanPMO = $pembuatanList->firstWhere('jenis_pertanyaan', 'pmo');
+                $pembuatanPMO = $pembuatanList->firstWhere('jenis_pertanyaan', 'pmo');
                 @endphp
 
                 @if($pembuatanPMO)
@@ -152,7 +159,7 @@
                     <button type="submit" class="btn w-100 text-white fw-bold" style="background-color:#041562;">
                         Simpan
                     </button>
-                </div>
+                </div>x
             </form>
         </div>
     </div>

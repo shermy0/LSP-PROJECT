@@ -16,18 +16,17 @@
             <div class="card-header" style="background-color:#041562; color:white; font-weight:bold;">
                 <div class="d-flex justify-content-between align-items-center">
                     <span>Kelompok {{ $index+1 }}: {{ $k->nama_kelompok }}</span>
-                   @php
-                    $pembuatan = $pembuatanList->first(); // ambil pembuatan pertama
-                    @endphp
-                    @if($pembuatan)
-                    <a href="{{ route('jawaban_pmo.form', [
-                        'id_skema' => $skema->id_skema,
-                        'id_pembuatan' => $pembuatan->id_pembuatan_pertanyaan
-                    ]) }}" 
-                    class="btn btn-light btn-sm">
-                        <i class="bi bi-pencil-square"></i> Input Jawaban
-                    </a>
-                    @endif
+                 @php
+                 $pembuatan = $pembuatanList->first();
+                 @endphp
+                @if($pembuatan)
+                        <a href="{{ route('jawaban_pmo.form', [
+                            'id_skema' => $skema->id_skema,
+                            'id_pembuatan' => $pembuatan->id_pembuatan_pertanyaan
+                        ]) }}" class="btn btn-light btn-sm">
+                            <i class="bi bi-pencil-square"></i> Input Jawaban
+                        </a>
+                @endif
                 </div>
             </div>
 
