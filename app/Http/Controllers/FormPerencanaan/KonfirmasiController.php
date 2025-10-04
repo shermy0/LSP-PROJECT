@@ -56,13 +56,21 @@ class KonfirmasiController extends Controller
             ->where('role', 'penyusun')
             ->get();
 
-        return view('form_perencanaan.form_mapa_01.mapa01_konfirmasi', compact(
-            'skema',
-            'asesors',
-            'konfirmasi',
-            'activeRoles',
-            'penyusun'
-        ));
+        // Tambahkan di dalam function konfirmasi($skema_id)
+$validators = DB::table('validasi_validator')
+    ->where('skema_id', $skema_id)
+    ->get();
+
+
+return view('form_perencanaan.form_mapa_01.mapa01_konfirmasi', compact(
+    'skema',
+    'asesors',
+    'konfirmasi',
+    'activeRoles',
+    'penyusun',
+    'validators' // <--- tambahkan ini
+));
+
     }
 
 public function storeLaporanAsesor(Request $request, $skema_id)

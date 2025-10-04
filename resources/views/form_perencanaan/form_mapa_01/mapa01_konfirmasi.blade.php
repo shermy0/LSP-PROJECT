@@ -151,23 +151,45 @@
       </div>
     </div>
 
-    {{-- Validator --}}
-    <div class="container mt-4">
-        <div class="card-box">
-            <div class="judul-header">Validator</div>
+{{-- Validator --}}
+<div class="container mt-4">
+    <div class="card-box">
+        <div class="judul-header">Validator</div>
+        <div class="table-responsive mt-3">
             <table class="table table-bordered custom-table">
-                <tr>
-                    <td><input type="text" name="nama[]" class="form-control" placeholder="Nama Validator"></td>
-                    <td><input type="text" name="nomet[]" class="form-control" placeholder="No Met"></td>
-                    <td><input type="date" name="tanggal[]" class="form-control"></td>
-                    <td>
-                        <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc;cursor:pointer;"></canvas>
-                        <input type="hidden" name="tanda_tangan[]" class="tanda_tangan">
-                    </td>
-                </tr>
+                <thead class="table-title">
+                    <tr>
+                        <th>Nama Validator</th>
+                        <th>No Registrasi</th>
+                        <th>Tanggal</th>
+                        <th>Tanda Tangan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($validators as $v)
+                        <tr>
+                            <td>{{ $v->nama_validator }}</td>
+                            <td>{{ $v->no_registrasi }}</td>
+                            <td>{{ \Carbon\Carbon::parse($v->tanggal)->format('d/m/Y') }}</td>
+                            <td class="text-center">
+                                @if($v->ttd)
+                                    <img src="{{ $v->ttd }}" width="120" alt="TTD Validator">
+                                @else
+                                    <span class="text-muted">Belum ada tanda tangan</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">Belum ada data validator</td>
+                        </tr>
+                    @endforelse
+                </tbody>
             </table>
         </div>
     </div>
+</div>
+
 
     <div class="mt-4">
         <button type="submit" class="simpan-btn">Simpan</button>
