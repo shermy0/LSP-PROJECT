@@ -15,32 +15,32 @@
 <form action="{{ route('form.mapa02.penyusun.store', $skema->id_skema) }}" method="POST" id="mapa02-asesor-form">
     @csrf
 
-    {{-- Penyusun --}}
-    <div class="container mt-4">
-        <div class="card-box">
-            <div class="judul-header">Penyusun</div>
-            <div class="table-responsive mt-4">
-                <table class="table table-bordered custom-table" id="penyusun-table">
-                    <thead class="table-title">
-                        <tr>
-                            <th>Nama Asesor</th>
-                            <th>No Met</th>
-                            <th>Tanggal</th>
-                            <th>Tanda Tangan</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+{{-- Penyusun MAPA.02 --}}
+<div class="container mt-4">
+    <div class="card-box">
+        <div class="judul-header">Penyusun</div>
+        <div class="table-responsive mt-4">
+            <table class="table table-bordered custom-table" id="penyusun-table">
+                <thead class="table-title">
+                    <tr>
+                        <th>Nama Asesor</th>
+                        <th>No Met</th>
+                        <th>Tanggal</th>
+                        <th>Tanda Tangan</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
                     @foreach($penyusun as $i => $item)
                         <tr>
-                           <td>
+                            <td>
                                 <input type="hidden" name="penyusun_id[{{ $i }}]" value="{{ $item->id }}">
                                 <select name="nama_asesor[{{ $i }}]" class="form-select asesor-select">
                                     <option value="">-- Pilih Asesor --</option>
                                     @foreach($asesors as $asesor)
-                                        <option value="{{ $asesor->id_asesor }}"
-                                            data-nomet="{{ $asesor->no_met ?? '' }}"
-                                            {{ $item->id_asesor == $asesor->id_asesor ? 'selected' : '' }}>
+                                        <option value="{{ $asesor->id_asesor }}" 
+                                                data-nomet="{{ $asesor->no_met ?? '' }}"
+                                                {{ $item->id_asesor == $asesor->id_asesor ? 'selected' : '' }}>
                                             {{ $asesor->nama_asesor }}
                                         </option>
                                     @endforeach
@@ -48,7 +48,7 @@
                             </td>
                             <td>
                                 <input type="text" name="nomet[{{ $i }}]" class="form-control nomet-input" readonly
-                                    value="{{ $item->no_met ?? ($asesors->firstWhere('id_asesor', $item->id_asesor)->no_met ?? '') }}">
+                                       value="{{ $item->no_met ?? ($asesors->firstWhere('id_asesor', $item->id_asesor)->no_met ?? '') }}">
                             </td>
                             <td>
                                 <input type="date" name="tanggal[{{ $i }}]" class="form-control" value="{{ $item->tanggal ?? '' }}">
@@ -57,31 +57,23 @@
                                 @if($item->tanda_tangan)
                                     <img src="{{ $item->tanda_tangan }}" width="120"><br>
                                     <a href="{{ route('form.mapa02.penyusun.downloadTtd', $item->id) }}" class="btn btn-sm btn-primary mt-1">Download</a>
-<button type="button" 
-            class="btn btn-danger btn-sm delete-ttd" 
-            data-id="{{ $item->id }}">
-        Hapus TTD
-    </button>
+                                    <button type="button" class="btn btn-danger btn-sm delete-ttd" data-id="{{ $item->id }}">Hapus TTD</button>
                                 @else
                                     <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc;cursor:pointer;"></canvas>
                                     <input type="hidden" name="tanda_tangan[{{ $i }}]" class="tanda_tangan">
                                 @endif
                             </td>
-<td>
-    <button type="button" 
-            class="btn btn-danger btn-sm delete-row" 
-            data-id="{{ $item->id }}">
-        Hapus
-    </button>
-</td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm delete-row" data-id="{{ $item->id }}">Hapus</button>
+                            </td>
                         </tr>
                     @endforeach
-                    </tbody>
-                </table>
-                <button type="button" id="add-row" class="btn btn-success mt-2">+ Tambah Penyusun</button>
-            </div>
+                </tbody>
+            </table>
+            <button type="button" id="add-row" class="btn btn-success mt-2">+ Tambah Penyusun</button>
         </div>
     </div>
+</div>
 
 {{-- Validator (hanya info) --}}
 <div class="container mt-4">
@@ -193,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // Tambah baris penyusun baru
+    // Tambah row baru
     document.getElementById("add-row").onclick = () => {
         const i = document.querySelectorAll("#penyusun-table tbody tr").length;
         const options = `@foreach($asesors as $asesor)<option value="{{ $asesor->id_asesor }}" data-nomet="{{ $asesor->no_met ?? '' }}">{{ $asesor->nama_asesor }}</option>@endforeach`;
@@ -208,11 +200,11 @@ document.addEventListener("DOMContentLoaded", () => {
         `);
     };
 
+
     // Update No Met otomatis
     document.addEventListener("change", e => {
         if (e.target.classList.contains("asesor-select")) {
-            const selected = e.target.selectedOptions[0];
-            const noMet = selected.dataset.nomet || '';
+            const noMet = e.target.selectedOptions[0].dataset.nomet || '';
             e.target.closest("tr").querySelector(".nomet-input").value = noMet;
         }
     });
@@ -270,11 +262,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Hapus data penyusun lama (dari DB)
+    // Hapus row lama (sudah tersimpan)
     document.addEventListener("click", e => {
         if (e.target.classList.contains("delete-row") && e.target.dataset.id) {
-            e.preventDefault();
-            let id = e.target.dataset.id;
+            const id = e.target.dataset.id;
             Swal.fire({
                 title: "Hapus Penyusun?",
                 text: "Data penyusun ini akan dihapus permanen.",
@@ -285,8 +276,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 confirmButtonText: "Ya, hapus!"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    let url = "{{ route('form.mapa02.penyusun.delete', ':id') }}".replace(':id', id);
-                    fetch(url, {
+                    fetch(`{{ route('form.mapa02.penyusun.delete', ':id') }}`.replace(':id', id), {
                         method: "DELETE",
                         headers: {
                             "X-CSRF-TOKEN": "{{ csrf_token() }}",
@@ -294,16 +284,14 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
                     }).then(res => res.json())
                     .then(data => {
-                        if (data.success) {
-                            Swal.fire("Terhapus!", data.message, "success").then(() => location.reload());
-                        } else {
-                            Swal.fire("Gagal", data.message, "error");
-                        }
+                        if(data.success) location.reload();
+                        else Swal.fire("Gagal", data.message, "error");
                     }).catch(() => Swal.fire("Error", "Terjadi kesalahan server.", "error"));
                 }
             });
         }
     });
+
 
     // SweetAlert simpan
     document.getElementById("mapa02-asesor-form").addEventListener("submit", function(e){

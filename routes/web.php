@@ -288,10 +288,10 @@ Route::get('/mapa02/{id_skema}', [Mapa02Controller::class, 'showMapa02'])->name(
 Route::post('/mapa02/instrumen/simpan-potensi', [Mapa02Controller::class, 'simpanInstrumen'])
     ->name('mapa02.simpanInstrumen');
 // ✅ Penyusun MAPA.02 (pakai KonfirmasiController)
-Route::post('/mapa02/{skema_id}/penyusun/simpan', [KonfirmasiController::class, 'store'])
+Route::post('/mapa02/{skema_id}/penyusun/simpan', [Mapa02Controller::class, 'storePenyusun'])
     ->name('form.mapa02.penyusun.store');
 
-Route::delete('/mapa02/penyusun/{id}', [KonfirmasiController::class, 'deletePenyusun'])
+Route::delete('/mapa02/penyusun/{id}', [Mapa02Controller::class, 'deletePenyusun'])
     ->name('form.mapa02.penyusun.delete');
 
 Route::delete('/mapa02/penyusun/{id}/delete-ttd', [KonfirmasiController::class, 'deleteTtd'])
