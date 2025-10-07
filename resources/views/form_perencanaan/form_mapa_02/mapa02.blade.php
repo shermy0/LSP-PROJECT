@@ -84,7 +84,7 @@
     {{-- LOOP KELOMPOK PEKERJAAN --}}
     @forelse ($kelompokPekerjaan as $index => $kelompok)
     <div class="mapa-card mt-4">
-        <div class="judul-header">Kelompok Pekerjaan {{ $index + 1 }}: {{ $kelompok->nama_kelompok }}</div>
+        <div class="judul-header">Kelompok Pekerjaan {{ $index + 1 }}</div>
         <input type="hidden" name="id_kelompok[]" value="{{ $kelompok->id_kelompok }}">
 
         {{-- Tabel Unit Kompetensi --}}

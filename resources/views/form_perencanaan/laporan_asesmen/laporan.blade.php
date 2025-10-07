@@ -36,7 +36,29 @@
         </div>
     </div>
     
+        <!-- TUK -->
+    <div class="col-12 mb-3">
+                    <div class="mapa-box">
+        <label class="form-label fw-semibold text-center d-block mb-2">TUK (Tempat Uji Kompetensi) SMKN 11 Bandung:</label>
+        <div class="d-flex justify-content-center gap-4">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="tuk" id="tukSewaktu" value="Sewaktu" disabled>
+                <label class="form-check-label" for="tukSewaktu">Sewaktu</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="tuk" id="tukTempatKerja" value="Tempat Kerja" disabled>
+                <label class="form-check-label" for="tukTempatKerja">Tempat Kerja</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="tuk" id="tukMandiri" value="Mandiri" checked>
+                <label class="form-check-label" for="tukMandiri">Mandiri</label>
+            </div>
+        </div>
+    </div>
+    </div>
+
     <div class="row g-3">
+        
         <div class="col-md-6">
             <div class="mapa-box">
                 <label class="fw-semibold d-block mb-2">Skema Sertifikasi</label>
@@ -87,25 +109,7 @@
         </div>
     </div>
 
-    <!-- TUK -->
-    <div class="col-12 text-center mt-3">
-                    <div class="mapa-box">
-        <label class="form-label fw-semibold d-block mb-2">TUK (Tempat Uji Kompetensi) SMKN 11 Bandung:</label>
-        <div class="d-flex justify-content-center gap-4">
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="tuk" id="tukSewaktu" value="Sewaktu" disabled>
-                <label class="form-check-label" for="tukSewaktu">Sewaktu</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="tuk" id="tukTempatKerja" value="Tempat Kerja" disabled>
-                <label class="form-check-label" for="tukTempatKerja">Tempat Kerja</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="tuk" id="tukMandiri" value="Mandiri" checked>
-                <label class="form-check-label" for="tukMandiri">Mandiri</label>
-            </div>
-        </div>
-    </div>
+
     </div>
     </div>
 </div>
