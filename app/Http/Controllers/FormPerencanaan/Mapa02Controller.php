@@ -96,22 +96,23 @@ public function deletePenyusun($id)
 
     // Halaman MAPA02 berdasarkan skema
     public function showMapa02($skema_id)
-    {
-        $skema = Skema::findOrFail($skema_id);
+{
+    $skema = Skema::findOrFail($skema_id);
 
-        $kelompokPekerjaan = KelompokPekerjaan::with([
-                'hasilAsesmen.unit',
-            ])
-            ->where('id_skema', $skema_id)
-            ->get();
+    $kelompokPekerjaan = KelompokPekerjaan::with([
+        'hasilAsesmen.unit',
+    ])->where('id_skema', $skema_id)->get();
 
-        // ambil data instrumen asesmen
-        $instrumen = DB::table('instrumen_asesmen')
-            ->where('id_skema', $skema_id)
-            ->first();
+    // ambil instrumen per kelompok
+    $instrumenPerKelompok = InstrumenAsesmen::where('id_skema', $skema_id)
+        ->get()
+        ->keyBy('id_kelompok'); // biar nanti gampang diakses di Blade
 
-        return view('form_perencanaan.form_mapa_02.mapa02', compact('skema', 'kelompokPekerjaan', 'instrumen'));
-    }
+    return view('form_perencanaan.form_mapa_02.mapa02', compact(
+        'skema', 'kelompokPekerjaan', 'instrumenPerKelompok'
+    ));
+}
+
 
 
     // Ambil data asesor berdasarkan skema (AJAX)
@@ -140,37 +141,38 @@ public function deletePenyusun($id)
     }
 
     public function simpanInstrumen(Request $request)
-    {
-        $skemaId = $request->input('skema_id');
+{
+    $skemaId = $request->input('skema_id');
+    $kelompokIds = $request->input('id_kelompok', []);
 
-        // mapping sesuai nama kolom di tabel
-        $fields = [
-            'cek_observasi',
-            'tugas_praktik',
-            'tanya_observasi',
-            'instruksi_tertulis',
-            'soal_pg',
-            'soal_esai',
-            'soal_uraian',
-            'cek_portofolio',
-            'tanya_wawancara',
-            'verifikasi_pihak3',
-            'cek_produk',
-        ];
+    $fields = [
+        'cek_observasi',
+        'tugas_praktik',
+        'tanya_observasi',
+        'instruksi_tertulis',
+        'soal_pg',
+        'soal_esai',
+        'soal_uraian',
+        'cek_portofolio',
+        'tanya_wawancara',
+        'verifikasi_pihak3',
+        'cek_produk',
+    ];
 
-        $data = [];
+    foreach ($kelompokIds as $idKelompok) {
+        $data = ['id_skema' => $skemaId, 'id_kelompok' => $idKelompok];
         foreach ($fields as $field) {
-            $data[$field] = $request->input($field, null);
+            $data[$field] = $request->input("{$field}_{$idKelompok}", null);
         }
 
         DB::table('instrumen_asesmen')->updateOrInsert(
-            ['id_skema' => $skemaId], // key pencarian
-            $data // data yang diupdate/insert
+            ['id_skema' => $skemaId, 'id_kelompok' => $idKelompok],
+            $data
         );
-
-        return redirect()->route('form.mapa02.asesor', $skemaId)
-                        ->with('success', 'Instrumen asesmen berhasil disimpan/diupdate.');
     }
+
+return redirect()->route('form.mapa02.asesor', $skemaId)
+                        ->with('success', 'Instrumen asesmen berhasil disimpan/diupdate.');}
 
 
 
