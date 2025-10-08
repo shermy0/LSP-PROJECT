@@ -15,13 +15,22 @@ class PembuatanPertanyaan extends Model
 
     protected $fillable = [
         'id_skema',
+        'judul',
         'jenis_pertanyaan',
         'timer',
-        'timescap'
+        'aktif',
+        'timescap',
     ];
 
+    // Relasi ke tabel skema sertifikasi
     public function skema()
     {
         return $this->belongsTo(SkemaSertifikasi::class, 'id_skema', 'id_skema');
+    }
+
+    // Relasi ke tabel pertanyaan (jika ada)
+    public function pertanyaan()
+    {
+        return $this->hasMany(Pertanyaan::class, 'id_pembuatan_pertanyaan', 'id_pembuatan_pertanyaan');
     }
 }

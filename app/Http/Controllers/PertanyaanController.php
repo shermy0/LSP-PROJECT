@@ -749,10 +749,12 @@ public function createPMO(Request $request)
 
     // simpan record baru
     $pembuatan = PembuatanPertanyaan::create([
-        'id_skema' => $id_skema,
-        'timer'    => $request->query('timer', 0),
-        'timescap' => now(),
+        'id_skema'         => $id_skema,
+        'timer'            => $request->query('timer', 0),
+        'jenis_pertanyaan' => 'pmo', // ✅ ini wajib string
+        'timescap'         => now(),
     ]);
+    
 
     // ambil kelompok pertama (atau sesuai logic kamu)
     $idKelompok = KelompokPekerjaan::where('id_skema', $id_skema)->value('id_kelompok');
@@ -1030,19 +1032,16 @@ public function storePMO(Request $request, $id_pmo)
         'deskripsi_pertanyaan' => 'nullable|array',
     ]);
 
-    // cek apakah id_pmo sudah ada atau perlu buat baru
-    $pmo = DB::table('pmo')->where('id_pmo', $id_pmo)->first();
+    // Ambil id_tuk dari user login (pastikan kolomnya ada di tabel users/petugas)
+    $idTuk = Auth::user()->id_tuk ?? 1; // kalau null isi default 1
 
-    if (!$pmo) {
-        $id_pmo = DB::table('pmo')->insertGetId([
-            'id_skema'   => $request->id_skema,
-            'id_asesmen' => 7, // contoh fix
-            //'created_at' => now(),
-            //'updated_at' => now(),
-        ]);
-    }
+    // Buat data PMO baru
+    $id_pmo = DB::table('pmo')->insertGetId([
+        'id_skema' => $request->id_skema,
+        'id_tuk'   => $idTuk,
+    ]);
 
-    // Loop unit → pertanyaan
+    // Simpan pertanyaan
     foreach ($request->pertanyaan as $unitId => $pertanyaanArr) {
         foreach ($pertanyaanArr as $i => $isi) {
             if (!empty($isi)) {
@@ -1060,6 +1059,8 @@ public function storePMO(Request $request, $id_pmo)
                      ->with('success', 'Semua pertanyaan PMO berhasil disimpan!');
 }
 
+
+
 public function inputPMO($id_skema, Request $request)
 {
     $skema = Skema::findOrFail($id_skema);
@@ -1072,10 +1073,11 @@ public function inputPMO($id_skema, Request $request)
     // kalau id_pmo kosong → bikin baru
     if (!$id_pmo) {
         $pembuatan = PembuatanPertanyaan::create([
-            'id_skema' => $id_skema,
-            'timer'    => $timer,
-            'timescap' => now(),
-        ]);
+            'id_skema'         => $id_skema,
+            'timer'            => $request->query('timer', 0),
+            'jenis_pertanyaan' => 'pmo', // ✅ ini wajib string
+            'timescap'         => now(),
+        ]);        
         $id_pmo = $pembuatan->id_pembuatan_pertanyaan;
     }
 
@@ -1105,11 +1107,11 @@ public function kelompokPMO($id_skema, Request $request)
         $pembuatan = PembuatanPertanyaan::findOrFail($id_pembuatan);
     } else {
         $pembuatan = PembuatanPertanyaan::create([
-            'id_skema' => $id_skema,
-            'timer' => $timer,
-            'jenis_pertanyaan' => 'pmo',
-            'timescap' => now(),
-        ]);
+            'id_skema'         => $id_skema,
+            'timer'            => $request->query('timer', 0),
+            'jenis_pertanyaan' => 'pmo', // ✅ ini wajib string
+            'timescap'         => now(),
+        ]);        
     }
 
    $kelompok = KelompokPekerjaan::where('id_skema', $id_skema)->get();
