@@ -117,8 +117,7 @@ Route::delete('/laporan_asesor/ttd/{id}', [KonfirmasiController::class, 'deleteT
 Route::get('/laporan_asesor/ttd/{id}/download', [KonfirmasiController::class, 'downloadTtd'])
     ->name('form_perencanaan.laporan_asesmen.ttd.download');
 
-
-// ============================
+    // ============================
 // Meninjau Asesmen
 // ============================
 Route::get('/ninjau_asesmen/{id_skema}', [MeninjauAsesmenController::class, 'showNinjauAsesmen'])
@@ -129,15 +128,14 @@ Route::get('/ninjau-asesmen-asesor/{id_skema}', [MeninjauAsesmenController::clas
 
 // web.php
 Route::post('/meninjau-asesmen/store/{id_skema}', [MeninjauAsesmenController::class, 'store'])
-    ->name('form_perencanaan.ninjau_asesmen.store');
-
+    ->name('form_perencanaan.meninjau_asesmen.ninjau_asesmen_asesor.store');
+    
 Route::post('/ninjau-asesmen-asesor/{asesor_id}/simpan-persetujuan', [MeninjauAsesmenController::class, 'simpanPersetujuan'])
-    ->name('form_perencanaan.ninjau_asesmen_asesor.simpan');
+    ->name('form_perencanaan.meninjau_asesmen.ninjau_asesmen_asesor.simpan');
 
 // Simpan & lanjut asesmen
 Route::post('/ninjau-asesmen-asesor/{id_skema}/simpan', [MeninjauAsesmenController::class, 'simpanLanjut'])
     ->name('form_perencanaan.ninjau_asesmen_asesor.store');
-
 //Route::post('/ninjau_asesemen/ninjau-asesmen-asesor', [MeninjauAsesmenController::class, 'simpanLanjut'])
   // ->name('ninjau_asesmen_asesor.store');
 
