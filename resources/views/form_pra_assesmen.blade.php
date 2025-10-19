@@ -5,25 +5,31 @@
 @section('konten')
 <div class="container mt-4">
 
+    {{-- HEADER --}}
     <div class="form-header text-center mb-4">
         <h2 class="fw-bold">Form Pra Asesmen</h2>
         <p class="text-muted">Sistem Manajemen Asesmen Siswa - AsesKom</p>
         <div class="line"></div>
     </div>
 
-    <!-- Card Pra Asesmen -->
+    {{-- CARD PRA ASESMEN --}}
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-light fw-semibold">
             Pra Asesmen
         </div>
         <div class="card-body">
 
-            {{-- Jika role Asesi --}}
-            @if(Auth::user()->role == 'asesi')
-                @php $status = $permohonan->status ?? null; @endphp
+            {{-- ====================== --}}
+            {{-- ROLE: ASESI --}}
+            {{-- ====================== --}}
+            @if(Auth::user()->role === 'asesi')
+                @php
+                    $status = $permohonan->status ?? null;
+                @endphp
 
-                {{-- FR.APL.01 Permohonan Sertifikasi --}}
+                {{-- FR.APL.01 - PERMOHONAN SERTIFIKASI --}}
                 @if(!$permohonan)
+                    {{-- Belum diisi --}}
                     <a href="{{ route('asesi.permohonan.form1') }}"
                        class="pra-item d-flex justify-content-between align-items-center mb-3 p-3 text-decoration-none">
                         <div class="d-flex align-items-start">
@@ -35,7 +41,8 @@
                         </div>
                         <div class="text-end"><span class="badge bg-secondary">Belum diisi</span></div>
                     </a>
-                @elseif($status == 'Diajukan')
+                @elseif($status === 'Diajukan')
+                    {{-- Status Diajukan --}}
                     <a href="{{ route('asesi.permohonan.menunggu') }}"
                        class="pra-item d-flex justify-content-between align-items-center mb-3 p-3 text-decoration-none">
                         <div class="d-flex align-items-start">
@@ -47,8 +54,8 @@
                         </div>
                         <div class="text-end"><span class="badge bg-warning text-dark">Diajukan</span></div>
                     </a>
-                @elseif($status == 'Diterima')
-                    <!-- Diterima modal -->
+                @elseif($status === 'Diterima')
+                    {{-- Status Diterima --}}
                     <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#infoPermohonanModal"
                        class="pra-item d-flex justify-content-between align-items-center mb-3 p-3 text-decoration-none">
                         <div class="d-flex align-items-start">
@@ -61,7 +68,8 @@
                         <div class="text-end"><span class="badge bg-success">Diterima</span></div>
                     </a>
 
-                    <div class="modal fade" id="infoPermohonanModal" tabindex="-1">
+                    {{-- Modal Informasi Permohonan --}}
+                    <div class="modal fade" id="infoPermohonanModal" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -79,8 +87,8 @@
                             </div>
                         </div>
                     </div>
-                @elseif($status == 'Ditolak')
-                    <!-- Ditolak modal -->
+                @elseif($status === 'Ditolak')
+                    {{-- Status Ditolak --}}
                     <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#permohonanDitolakModal"
                        class="pra-item d-flex justify-content-between align-items-center mb-3 p-3 text-decoration-none">
                         <div class="d-flex align-items-start">
@@ -93,7 +101,8 @@
                         <div class="text-end"><span class="badge bg-danger">Ditolak</span></div>
                     </a>
 
-                    <div class="modal fade" id="permohonanDitolakModal" tabindex="-1">
+                    {{-- Modal Penolakan --}}
+                    <div class="modal fade" id="permohonanDitolakModal" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog modal-lg modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header bg-danger text-white">
@@ -109,8 +118,10 @@
                                     <ul>
                                         @forelse($dokumenTidakMemenuhi as $dok)
                                             <li>
-                                                {{ $dok->jenis->nama_dokumen ?? 'Dokumen #' . $dok->id_jenis_dokumen }}
-                                                (<a href="{{ asset('storage/' . $dok->file_path) }}" target="_blank">Lihat</a>)
+                                                {{ $dok->jenis->nama_dokumen ?? 'Dokumen #' . $dok->jenis_dokumen_id }}
+                                                @if($dok->file_path)
+                                                    (<a href="{{ asset('storage/' . $dok->file_path) }}" target="_blank">Lihat</a>)
+                                                @endif
                                             </li>
                                         @empty
                                             <li>Tidak ada data dokumen.</li>
@@ -126,8 +137,8 @@
                     </div>
                 @endif
 
-                {{-- FR.APL.02 Asesmen Mandiri (hanya jika permohonan diterima) --}}
-                @if($status == 'Diterima')
+                {{-- FR.APL.02 - ASESMEN MANDIRI --}}
+                @if($status === 'Diterima')
                     @php
                         $asesmenExists = !empty($asesmenMandiri);
                         $rekom = $asesmenExists ? ($asesmenMandiri->rekomendasi ?? null) : null;
@@ -171,8 +182,10 @@
                 @endif
             @endif
 
-            {{-- Jika role Asesor --}}
-            @if(Auth::user()->role == 'asesor')
+            {{-- ====================== --}}
+            {{-- ROLE: ASESOR --}}
+            {{-- ====================== --}}
+            @if(Auth::user()->role === 'asesor')
                 <a href="{{ route('asesor.asesmen_mandiri.index') }}"
                    class="pra-item d-flex justify-content-between align-items-center mb-3 p-3 text-decoration-none">
                     <div class="d-flex align-items-start">
@@ -185,20 +198,18 @@
                     <div class="text-end"><span class="badge bg-primary">Akses</span></div>
                 </a>
 
-                <a href="#"
-                   class="pra-item d-flex justify-content-between align-items-center mb-3 p-3 text-decoration-none">
+                <a href="#" class="pra-item d-flex justify-content-between align-items-center mb-3 p-3 text-decoration-none">
                     <div class="d-flex align-items-start">
                         <div class="icon-wrap me-3">📝</div>
                         <div>
-                            <h6 class="mb-1 fw-semibold text-dark">FR.AK.01 Persetujuan Asesmen dan Kerahasiaan</h6>
+                            <h6 class="mb-1 fw-semibold text-dark">FR.AK.01 Persetujuan Asesmen & Kerahasiaan</h6>
                             <small class="text-muted">Dokumen persetujuan antara asesor & asesi</small>
                         </div>
                     </div>
                     <div class="text-end"><span class="badge bg-primary">Akses</span></div>
                 </a>
 
-                <a href="#"
-                   class="pra-item d-flex justify-content-between align-items-center mb-3 p-3 text-decoration-none">
+                <a href="#" class="pra-item d-flex justify-content-between align-items-center mb-3 p-3 text-decoration-none">
                     <div class="d-flex align-items-start">
                         <div class="icon-wrap me-3">📋</div>
                         <div>
@@ -214,7 +225,7 @@
     </div>
 </div>
 
-{{-- Style --}}
+{{-- STYLE --}}
 <style>
     .form-header h2 { color: #041562; }
     .form-header .line {

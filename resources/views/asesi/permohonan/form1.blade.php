@@ -3,204 +3,373 @@
 @section('title', 'FR.APL.01 - Permohonan Sertifikasi Kompetensi')
 
 @section('konten')
-<div class="container">
-    <form id="formApl01" action="{{ route('asesi.permohonan.store') }}" method="POST">
-        @csrf
+    <div class="container-fluid px-4 py-3">
+        <form id="formApl01" action="{{ route('asesi.permohonan.store') }}" method="POST" novalidate>
+            @csrf
 
-        <!-- Header -->
-        <div class="text-center mb-4">
-            <div class="rounded mx-auto mb-3" style="width:40px; height:40px; background-color:#041562;"></div>
-            <h1 class="h5 fw-bold">Permohonan Sertifikasi Kompetensi</h1>
-            <p class="small text-muted">Form Asesmen &gt; FR.APL.01</p>
-        </div>
-
-        <!-- Data Pribadi -->
-        <div class="unit-header">
-            <p class="mb-1 fw-semibold">Data Pribadi</p>
-            <p class="mb-0">Lengkapi data pribadi peserta sertifikasi</p>
-        </div>
-
-        <div class="question-box">
-            <!-- Nama Lengkap -->
-            <div class="mb-3">
-                <label class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
-                <input type="text" name="nama_lengkap"
-                       class="form-control"
-                       value="{{ old('nama_lengkap', $asesi->nama_lengkap ?? '') }}"
-                       placeholder="Masukkan nama lengkap"
-                       required {{ !empty($asesi->nama_lengkap) ? 'readonly' : '' }}>
-                <div class="invalid-feedback">Nama lengkap wajib diisi.</div>
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <div class="rounded mx-auto mb-3" style="width:40px; height:40px; background-color:#041562;"></div>
+                <h1 class="h4 fw-bold">Permohonan Sertifikasi Kompetensi</h1>
+                <p class="text-muted">Form Asesmen &gt; FR.APL.01</p>
             </div>
 
-            <!-- NIK -->
-            <div class="mb-3">
-                <label class="form-label">No. KTP/NIK/Paspor <span class="text-danger">*</span></label>
-                <input type="text" name="nik"
-                       class="form-control"
-                       value="{{ old('nik', $asesi->nik ?? '') }}"
-                       placeholder="Masukkan nomor identitas"
-                       required {{ !empty($asesi->nik) ? 'readonly' : '' }}>
-                <div class="invalid-feedback">Nomor identitas wajib diisi.</div>
+            <!-- Data Pribadi -->
+            <div class="unit-header">
+                <p class="mb-1 fw-semibold">Data Pribadi</p>
+                <p class="mb-0">Cantumkan data pribadi, pendidikan formal, serta data pekerjaan saat ini.</p>
             </div>
 
-            <!-- Tanggal Lahir -->
-            <div class="mb-3">
-                <label class="form-label">Tanggal Lahir <span class="text-danger">*</span></label>
-                <input type="{{ empty($asesi->tgl_lahir) ? 'date' : 'text' }}" name="tgl_lahir"
-                       class="form-control"
-                       value="{{ old('tgl_lahir', $asesi->tgl_lahir ?? '') }}"
-                       required {{ !empty($asesi->tgl_lahir) ? 'readonly' : '' }}>
-                <div class="invalid-feedback">Tanggal lahir wajib diisi.</div>
-            </div>
+            <div class="question-box">
+                <!-- Nama Lengkap -->
+                <div class="mb-3">
+                    <label class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
+                    <input type="text" name="nama_lengkap" class="form-control"
+                        value="{{ old('nama_lengkap', $asesi->nama_lengkap ?? '') }}" placeholder="Masukkan nama lengkap"
+                        required>
+                    <div class="invalid-feedback">Nama lengkap wajib diisi.</div>
+                </div>
 
-            <!-- Jenis Kelamin -->
-            <div class="mb-3">
-                <label class="form-label">Jenis Kelamin <span class="text-danger">*</span></label>
-                @if(!empty($asesi->jenis_kelamin))
-                    <input type="text" class="form-control"
-                           value="{{ $asesi->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}" readonly>
-                    <input type="hidden" name="jenis_kelamin" value="{{ $asesi->jenis_kelamin }}">
-                @else
+                <!-- NIK -->
+                <div class="mb-3">
+                    <label class="form-label">No. KTP / NIK / Paspor <span class="text-danger">*</span></label>
+                    <input type="text" name="nik" class="form-control" value="{{ old('nik', $asesi->nik ?? '') }}"
+                        placeholder="Masukkan nomor identitas" required>
+                    <div class="invalid-feedback">Nomor identitas wajib diisi.</div>
+                </div>
+
+                <!-- Tempat Lahir -->
+                <div class="mb-3">
+                    <label class="form-label">Tempat Lahir <span class="text-danger">*</span></label>
+                    <input type="text" name="tempat_lahir" class="form-control"
+                        value="{{ old('tempat_lahir', $asesi->tempat_lahir ?? '') }}" placeholder="Masukkan tempat lahir"
+                        required>
+                    <div class="invalid-feedback">Tempat lahir wajib diisi.</div>
+                </div>
+
+                <!-- Tanggal Lahir -->
+                <div class="mb-3">
+                    <label class="form-label">Tanggal Lahir <span class="text-danger">*</span></label>
+                    <input type="date" name="tgl_lahir" class="form-control"
+                        value="{{ old('tgl_lahir', isset($asesi->tgl_lahir) ? \Carbon\Carbon::parse($asesi->tgl_lahir)->format('Y-m-d') : '') }}"
+                        required>
+                    <div class="invalid-feedback">Tanggal lahir wajib diisi.</div>
+                </div>
+
+                <!-- Jenis Kelamin -->
+                <div class="mb-3">
+                    <label class="form-label">Jenis Kelamin <span class="text-danger">*</span></label>
                     <select name="jenis_kelamin" class="form-select" required>
                         <option value="">Pilih</option>
-                        <option value="L" {{ old('jenis_kelamin')=='L' ? 'selected' : '' }}>Laki-laki</option>
-                        <option value="P" {{ old('jenis_kelamin')=='P' ? 'selected' : '' }}>Perempuan</option>
+                        <option value="L" {{ old('jenis_kelamin', $asesi->jenis_kelamin ?? '') == 'L' ? 'selected' : '' }}>
+                            Laki-laki</option>
+                        <option value="P" {{ old('jenis_kelamin', $asesi->jenis_kelamin ?? '') == 'P' ? 'selected' : '' }}>
+                            Perempuan</option>
                     </select>
                     <div class="invalid-feedback">Jenis kelamin wajib dipilih.</div>
-                @endif
+                </div>
+
+                <!-- Kebangsaan -->
+                <div class="mb-3">
+                    <label class="form-label">Kebangsaan <span class="text-danger">*</span></label>
+                    <input type="text" name="kebangsaan" class="form-control"
+                        value="{{ old('kebangsaan', $asesi->kebangsaan ?? 'Indonesia') }}" placeholder="Masukkan kebangsaan"
+                        required>
+                    <div class="invalid-feedback">Kebangsaan wajib diisi.</div>
+                </div>
+
+                <!-- Alamat Rumah -->
+                <div class="mb-3">
+                    <label class="form-label">Alamat Rumah <span class="text-danger">*</span></label>
+                    <input type="text" name="alamat_rumah" class="form-control"
+                        value="{{ old('alamat_rumah', $asesi->alamat_rumah ?? '') }}" placeholder="Masukkan alamat rumah"
+                        required>
+                    <div class="invalid-feedback">Alamat rumah wajib diisi.</div>
+                </div>
+
+                <!-- Kode Pos Rumah -->
+                <div class="mb-3">
+                    <label class="form-label">Kode Pos Rumah <span class="text-danger">*</span></label>
+                    <input type="text" name="kode_pos_rumah" class="form-control"
+                        value="{{ old('kode_pos_rumah', $asesi->kode_pos_rumah ?? '') }}" placeholder="Kode pos" required>
+                    <div class="invalid-feedback">Kode pos rumah wajib diisi.</div>
+                </div>
+
+                <!-- Telepon Rumah -->
+                <div class="mb-3">
+                    <label class="form-label">Telp. Rumah <span class="text-danger">*</span></label>
+                    <input type="text" name="telepon_rumah" class="form-control"
+                        value="{{ old('telepon_rumah', $asesi->telepon_rumah ?? '') }}" placeholder="Telp. rumah" required>
+                    <div class="invalid-feedback">Telp. rumah wajib diisi.</div>
+                </div>
+
+                <!-- HP -->
+                <div class="mb-3">
+                    <label class="form-label">HP <span class="text-danger">*</span></label>
+                    <input type="text" name="telepon_hp" class="form-control"
+                        value="{{ old('telepon_hp', $asesi->telepon_hp ?? auth()->user()->phone ?? '') }}"
+                        placeholder="Masukkan nomor HP" required>
+                    <div class="invalid-feedback">Nomor HP wajib diisi.</div>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label class="form-label">E-mail <span class="text-danger">*</span></label>
+                    <input type="email" name="email" class="form-control"
+                        value="{{ old('email', $asesi->email ?? auth()->user()->email ?? '') }}"
+                        placeholder="Masukkan email" required>
+                    <div class="invalid-feedback">Email wajib diisi.</div>
+                </div>
+
+                <!-- Kualifikasi Pendidikan -->
+                <div class="mb-3">
+                    <label class="form-label">Kualifikasi Pendidikan <span class="text-danger">*</span></label>
+                    <input type="text" name="kualifikasi_pendidikan" class="form-control"
+                        value="{{ old('kualifikasi_pendidikan', $asesi->kualifikasi_pendidikan ?? $asesi->pendidikan_terakhir ?? '') }}"
+                        placeholder="Contoh: SMK - Desain Komunikasi Visual" required>
+                    <div class="invalid-feedback">Kualifikasi pendidikan wajib diisi.</div>
+                </div>
             </div>
 
-            <!-- Alamat -->
-            <div class="mb-3">
-                <label class="form-label">Alamat Rumah <span class="text-danger">*</span></label>
-                <input type="text" name="alamat"
-                       class="form-control"
-                       value="{{ old('alamat', $asesi->alamat ?? '') }}"
-                       placeholder="Masukkan alamat"
-                       required {{ !empty($asesi->alamat) ? 'readonly' : '' }}>
-                <div class="invalid-feedback">Alamat wajib diisi.</div>
+            <!-- Data Pekerjaan Sekarang -->
+            <div class="unit-header mt-3">
+                <p class="mb-1 fw-semibold">Data Pekerjaan Sekarang</p>
+                <p class="mb-0">Isi data pekerjaan atau sekolah tempat peserta saat ini.</p>
             </div>
 
-            <!-- Telepon -->
-            <div class="mb-3">
-                <label class="form-label">No Telepon <span class="text-danger">*</span></label>
-                <input type="text" name="telepon"
-                       class="form-control"
-                       value="{{ old('telepon', $asesi->telepon ?? '') }}"
-                       placeholder="Masukkan nomor telepon"
-                       required {{ !empty($asesi->telepon) ? 'readonly' : '' }}>
-                <div class="invalid-feedback">Nomor telepon wajib diisi.</div>
+            <div class="question-box">
+                <!-- Nama Institusi / Sekolah -->
+                <div class="mb-3">
+                    <label class="form-label">Nama Institusi / Perusahaan <span class="text-danger">*</span></label>
+                    <input type="text" name="nama_institusi" class="form-control"
+                        value="{{ old('nama_institusi', $asesi->nama_institusi ?? '') }}"
+                        placeholder="Nama sekolah atau perusahaan" required>
+                    <div class="invalid-feedback">Nama institusi wajib diisi.</div>
+                </div>
+
+                <!-- Jabatan -->
+                <div class="mb-3">
+                    <label class="form-label">Jabatan <span class="text-danger">*</span></label>
+                    <input type="text" name="jabatan" class="form-control"
+                        value="{{ old('jabatan', $asesi->jabatan ?? '') }}"
+                        placeholder="Jabatan / status (mis. Siswa, Staff, Freelancer)" required>
+                    <div class="invalid-feedback">Jabatan wajib diisi.</div>
+                </div>
+
+                <!-- Alamat Kantor -->
+                <div class="mb-3">
+                    <label class="form-label">Alamat Kantor / Sekolah <span class="text-danger">*</span></label>
+                    <input type="text" name="alamat_kantor" class="form-control"
+                        value="{{ old('alamat_kantor', $asesi->alamat_kantor ?? '') }}"
+                        placeholder="Alamat institusi/perusahaan" required>
+                    <div class="invalid-feedback">Alamat kantor wajib diisi.</div>
+                </div>
+
+                <!-- Kode Pos Kantor -->
+                <div class="mb-3">
+                    <label class="form-label">Kode Pos Kantor <span class="text-danger">*</span></label>
+                    <input type="text" name="kode_pos_kantor" class="form-control"
+                        value="{{ old('kode_pos_kantor', $asesi->kode_pos_kantor ?? '') }}" placeholder="Kode pos" required>
+                    <div class="invalid-feedback">Kode pos kantor wajib diisi.</div>
+                </div>
+
+                <!-- Telepon Kantor -->
+                <div class="mb-3">
+                    <label class="form-label">Telp. Kantor <span class="text-danger">*</span></label>
+                    <input type="text" name="telepon_kantor" class="form-control"
+                        value="{{ old('telepon_kantor', $asesi->telepon_kantor ?? '') }}" placeholder="Telp. kantor"
+                        required>
+                    <div class="invalid-feedback">Telp. kantor wajib diisi.</div>
+                </div>
+
+                <!-- Fax Kantor -->
+                <div class="mb-3">
+                    <label class="form-label">Fax Kantor <span class="text-danger">*</span></label>
+                    <input type="text" name="fax_kantor" class="form-control"
+                        value="{{ old('fax_kantor', $asesi->fax_kantor ?? '') }}" placeholder="Fax kantor" required>
+                    <div class="invalid-feedback">Fax kantor wajib diisi.</div>
+                </div>
+
+                <!-- Email Kantor -->
+                <div class="mb-3">
+                    <label class="form-label">E-mail Kantor <span class="text-danger">*</span></label>
+                    <input type="email" name="email_kantor" class="form-control"
+                        value="{{ old('email_kantor', $asesi->email_kantor ?? '') }}" placeholder="Email kantor / sekolah"
+                        required>
+                    <div class="invalid-feedback">Email kantor wajib diisi.</div>
+                </div>
             </div>
 
-            <!-- Email -->
-            <div class="mb-3">
-                <label class="form-label">Email <span class="text-danger">*</span></label>
-                <input type="email" name="email"
-                       class="form-control"
-                       value="{{ old('email', $asesi->email ?? auth()->user()->email ?? '') }}"
-                       placeholder="Masukkan email"
-                       required {{ !empty($asesi->email) ? 'readonly' : '' }}>
-                <div class="invalid-feedback">Email wajib diisi.</div>
+            <!-- Tombol -->
+            <div class="button-group mt-4">
+                <a href="{{ route('dashboard') }}" class="btn-back">Kembali</a>
+                <button type="submit" class="btn-next">Selanjutnya</button>
             </div>
+        </form>
+    </div>
 
-            <!-- Pendidikan -->
-            <div class="mb-0">
-                <label class="form-label">Kualifikasi Pendidikan <span class="text-danger">*</span></label>
-                <input type="text" name="pendidikan_terakhir"
-                       class="form-control"
-                       value="{{ old('pendidikan_terakhir', $asesi->pendidikan_terakhir ?? '') }}"
-                       placeholder="Masukkan pendidikan terakhir"
-                       required {{ !empty($asesi->pendidikan_terakhir) ? 'readonly' : '' }}>
-                <div class="invalid-feedback">Pendidikan terakhir wajib diisi.</div>
-            </div>
-        </div>
 
-        <!-- Data Pekerjaan -->
-        <div class="unit-header">
-            <p class="mb-1 fw-semibold">Data Pekerjaan</p>
-            <p class="mb-0">Informasi pekerjaan atau lembaga tempat peserta</p>
-        </div>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f9f9fb;
+        }
 
-        <div class="question-box">
-            <p><strong>Nama Sekolah:</strong> {{ $tuk->nama_tuk }}</p>
-            <p><strong>Jabatan:</strong> {{ $tuk->jabatan }}</p>
-            <p><strong>Alamat:</strong> {{ $tuk->alamat_tuk }}</p>
-            <p><strong>Telepon:</strong> <a href="tel:{{ $tuk->telepon }}" class="text-primary">{{ $tuk->telepon }}</a></p>
-            <p><strong>Fax:</strong> {{ $tuk->fax ?? '-' }}</p>
-            <p><strong>Email:</strong> {{ $tuk->email }}</p>
-        </div>
+        .container-fluid {
+            width: 100%;
+        }
 
-        <!-- Tombol -->
-        <div class="button-group mt-4">
-            <a href="{{ route('dashboard') }}" class="btn-back">Kembali</a>
-            <button type="submit" class="btn-next">Selanjutnya</button>
-        </div>
-    </form>
-</div>
+        .unit-header {
+            background: #E9F1FF;
+            border-left: 6px solid #007BFF;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .question-box {
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #fff;
+        }
+
+        .form-control.is-invalid,
+        .form-select.is-invalid {
+            border: 2px solid #d9534f !important;
+            background: #fff8f8 !important;
+        }
+
+        .invalid-feedback {
+            font-size: 12px;
+            display: block;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn-back {
+            background: #d9534f;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .btn-next {
+            background: #041562;
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+        }
+
+        .btn-back:hover {
+            background: #c9302c;
+        }
+
+        .btn-next:hover {
+            background: #06208a;
+        }
+
+        .unit-header {
+            background: #E9F1FF;
+            border-left: 6px solid #007BFF;
+            border-radius: 8px;
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            font-size: 1.125rem;
+            line-height: 1.3;
+            font-weight: 700;
+            color: #041562;
+        }
+
+        .unit-header p.mb-0 {
+            font-size: 0.95rem;
+            color: #334155;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        label.form-label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            /* 15px */
+            color: #0f172a;
+        }
+
+        .question-box .mb-3 {
+            margin-bottom: 14px;
+        }
+
+        @media (max-width: 576px) {
+            .unit-header {
+                font-size: 1rem;
+            }
+
+            label.form-label {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('formApl01');
+
+            form.addEventListener('submit', function (e) {
+                let valid = true;
+                let firstInvalid = null;
+
+                form.querySelectorAll('[required]').forEach(field => {
+                    if (field.tagName.toLowerCase() === 'select') {
+                        if (!field.value || field.value === '') {
+                            field.classList.add('is-invalid');
+                            valid = false;
+                            if (!firstInvalid) firstInvalid = field;
+                        } else {
+                            field.classList.remove('is-invalid');
+                        }
+                        return;
+                    }
+
+                    if (!field.value || !field.value.toString().trim()) {
+                        field.classList.add('is-invalid');
+                        valid = false;
+                        if (!firstInvalid) firstInvalid = field;
+                    } else {
+                        field.classList.remove('is-invalid');
+                    }
+                });
+
+                if (!valid) {
+                    e.preventDefault();
+                    if (firstInvalid) {
+                        firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" });
+                        firstInvalid.focus();
+                    }
+                }
+            });
+
+            form.querySelectorAll('[required]').forEach(field => {
+                field.addEventListener('input', function () {
+                    if (this.value && this.value.toString().trim()) {
+                        this.classList.remove('is-invalid');
+                    }
+                });
+                if (field.tagName.toLowerCase() === 'select') {
+                    field.addEventListener('change', function () {
+                        if (this.value) this.classList.remove('is-invalid');
+                    });
+                }
+            });
+        });
+    </script>
 @endsection
-
-<style>
-    body { font-family: 'Poppins', sans-serif; background: #f9f9fb; }
-    .container { max-width: 850px; margin: 20px auto; }
-    .unit-header {
-        background: #E9F1FF;
-        border-left: 6px solid #007BFF;
-        border-radius: 8px;
-        padding: 15px 20px;
-        margin-bottom: 20px;
-        font-size: 14px;
-    }
-    .question-box {
-        border: 1px solid #ddd;
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 25px;
-        background: #fff;
-    }
-    .form-control.is-invalid, .form-select.is-invalid {
-        border: 2px solid #d9534f !important;
-        background: #fff8f8 !important;
-    }
-    .invalid-feedback {
-        font-size: 12px;
-    }
-    .button-group { display: flex; justify-content: flex-end; gap: 12px; }
-    .btn-back { background: #d9534f; color: #fff; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; }
-    .btn-next { background: #041562; color: #fff; padding: 10px 24px; border-radius: 8px; font-weight: 600; border: none; }
-    .btn-back:hover { background: #c9302c; }
-    .btn-next:hover { background: #06208a; }
-</style>
-
-<script>
-document.getElementById('formApl01').addEventListener('submit', function (e) {
-    let valid = true;
-    let firstInvalid = null;
-
-    this.querySelectorAll('[required]').forEach(field => {
-        if (!field.value.trim()) {
-            field.classList.add('is-invalid');
-            valid = false;
-            if (!firstInvalid) firstInvalid = field;
-        } else {
-            field.classList.remove('is-invalid');
-        }
-    });
-
-    if (!valid) {
-        e.preventDefault();
-        if (firstInvalid) {
-            firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" });
-            firstInvalid.focus();
-        }
-    }
-});
-
-// Hilangkan merah saat user isi
-document.querySelectorAll('[required]').forEach(field => {
-    field.addEventListener('input', function () {
-        if (this.value.trim()) {
-            this.classList.remove('is-invalid');
-        }
-    });
-});
-</script>
