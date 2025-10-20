@@ -13,10 +13,13 @@
         <!-- Item 1 -->
         <div class="accordion-item">
             <h2 class="accordion-header">
-                <a href="{{ route('form.mapa01', ['id_skema' => $skema->id_skema]) }}" 
-                   class="text-decoration-none text-dark">
-                    <i class="fa-solid fa-stop me-2"></i> FR.MAPA.01 - MERENCANAKAN AKTIVITAS DAN PROSES ASESMEN
-                </a>
+                <a href="{{ Auth::user()->role === 'admin' 
+    ? route('admin.mapa01.admin', ['id_skema' => $skema->id_skema]) 
+    : route('form.mapa01', ['id_skema' => $skema->id_skema]) }}" 
+   class="text-decoration-none text-dark">
+   <i class="fa-solid fa-stop me-2"></i> FR.MAPA.01 - MERENCANAKAN AKTIVITAS DAN PROSES ASESMEN
+</a>
+
             </h2>
         </div>
 

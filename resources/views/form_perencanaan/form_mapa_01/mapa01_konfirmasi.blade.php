@@ -172,6 +172,37 @@
     </div>
 </div>
 
+@if(auth()->check() && auth()->user()->role === 'admin')
+    <div class="text-center mt-4">
+        <button id="btnDownloadMapa" class="btn btn-success">
+            <i class="bi bi-download"></i> Download Semua MAPA.01 (ZIP)
+        </button>
+    </div>
+
+    {{-- SweetAlert2 --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.getElementById('btnDownloadMapa').addEventListener('click', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Download Semua MAPA.01?',
+                text: "File akan dikompresi ke dalam ZIP dan diunduh.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Download Sekarang',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirect ke route download
+                    window.location.href = "{{ route('form.mapa01.downloadAll', $skema->id_skema) }}";
+                }
+            });
+        });
+    </script>
+@endif
+
 
     <div class="mt-4">
         <button type="submit" class="simpan-btn">Simpan</button>

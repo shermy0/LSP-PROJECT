@@ -257,6 +257,17 @@ Route::post('/register/asesor', [RegisterController::class, 'storeAsesor'])->nam
 
 // Admin
 // form perencanaan mapa 01
+Route::get('/form/mapa01/{id_skema}/download-all', [Mapa01Controller::class, 'downloadAll'])
+    ->name('form.mapa01.downloadAll')
+    ->middleware('role:admin'); // ✅ hanya admin
+Route::get('admin/form-perencanaan/mapa01/{id_skema}/pdf', [Mapa01Controller::class, 'downloadPdfAdmin'])
+    ->name('form.mapa01.admin.pdf')
+    ->middleware('auth'); // dan cek role admin di method sudah ada
+// Untuk admin lihat versi PDF MAPA.01
+Route::get('/admin/formperencanaan/mapa01/{id_skema}', [Mapa01Controller::class, 'showMapa01Admin'])
+    ->name('admin.mapa01.admin');
+Route::get('/admin/formperencanaan/mapa01/pdf/{id_skema}', [Mapa01Controller::class, 'downloadPdfAdmin'])
+    ->name('admin.mapa01.pdf');
 
 // ============================
 // Form Perencanaan (Asesor)
@@ -326,22 +337,6 @@ Route::delete('/laporan_asesor/ttd/{id}', [KonfirmasiController::class, 'deleteT
 Route::get('/laporan_asesor/ttd/{id}/download', [KonfirmasiController::class, 'downloadTtd'])
     ->name('form_perencanaan.laporan_asesmen.ttd.download');
 
-
-// ============================
-// Meninjau Asesmen
-// ============================
-// Route::get('/ninjau_asesemen/{id_skema}', [MeninjauAsesmenController::class, 'showNinjauAsesmen'])
-//     ->name('form_perencanaan.ninjau_asesemen');
-
-// Route::get('/ninjau-asesmen-asesor/{id_skema}', [MeninjauAsesmenController::class, 'showAsesor'])
-//     ->name('form_perencanaan.ninjau_asesmen_asesor.view');
-
-// Route::post('/meninjau-asesmen/store', [MeninjauAsesmenController::class, 'store'])
-//     ->name('meninjau_asesmen.store');
-
-// Route::post('/ninjau-asesmen-asesor/{asesor_id}/simpan-persetujuan', [MeninjauAsesmenController::class, 'simpanPersetujuan'])
-//     ->name('ninjau_asesmen_asesor.simpan');
-
     // ============================
 // Meninjau Asesmen
 // ============================
@@ -362,20 +357,6 @@ Route::post('/ninjau-asesmen-asesor/{asesor_id}/simpan-persetujuan', [MeninjauAs
 Route::post('/ninjau-asesmen-asesor/{id_skema}/simpan', [MeninjauAsesmenController::class, 'simpanLanjut'])
     ->name('form_perencanaan.ninjau_asesmen_asesor.store');
 
-// simpan dan lanjut
-// Route::post('/ninjau-asesmen-asesor', [MeninjauAsesmenController::class, 'simpanLanjut'])
-//     ->name('ninjau_asesmen_asesor');
-
-// Route::get('/ninjau-asesmen-asesor/{asesor_id}', [MeninjauAsesmenController::class, 'showAsesor'])
-//     ->name('ninjau_asesmen_asesor.view');
-
-// Route::get('/get-asesor/{skema_id}', [MeninjauAsesmenController::class, 'getAsesor']);
-
-// Route::get('/ninjau_asesemen/ninjau-asesmen-asesor', [MeninjauAsesmenController::class, 'showAsesor'])
-//     ->name('ninjau_asesmen_asesor.show');
-
-// Route::post('/ninjau_asesemen/ninjau-asesmen-asesor', [MeninjauAsesmenController::class, 'simpanLanjut'])
-//     ->name('ninjau_asesmen_asesor.store');
 
     //MODIFIKASI
     Route::get('/mapa01/modifikasi/{skema_id}', [ModifikasiController::class, 'index'])->name('form.mapa01.modifikasi');
