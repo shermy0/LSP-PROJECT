@@ -1,242 +1,363 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <title>FR.MAPA.01 - Perencanaan Asesmen</title>
-
 <style>
-    /* A4 portrait */
-    @page { size: A4 portrait; margin: 20mm 12mm; }
-    body {
-        font-family: "DejaVu Sans", "Arial", sans-serif;
-        font-size: 12px;
-        color: #000;
-        line-height: 1.25;
-    }
+@page { margin: 15mm 12mm; }
+body {
+    font-family: DejaVu Sans, sans-serif;
+    font-size: 12px;
+    color: #000;
+}
 
-    .header {
-        text-align: center;
-        margin-bottom: 8px;
-    }
-    .title {
-        font-weight: 700;
-        font-size: 16px;
-        margin-bottom: 2px;
-    }
-    .subtitle {
-        font-size: 12px;
-        color: #333;
-        margin-bottom: 10px;
-    }
+h3 { 
+    text-align: left; 
+    font-size: 13px; 
+    font-weight: bold; 
+    margin-bottom: 5px; 
+}
 
-    .skema-row {
-        display:flex;
-        justify-content:space-between;
-        margin-bottom: 8px;
-    }
-    .skema-label { font-weight:600; }
-    .box { border: 1px solid #222; padding:8px; border-radius:4px; }
+/* === TABEL UMUM === */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+    font-size: 12px;
+}
 
-    .section { margin-bottom: 14px; }
-    .section .heading { font-weight:700; margin-bottom:6px; background:#f0f0f0; padding:6px; display:block; }
+.table th, .table td {
+    border: 1px solid #000;
+    padding: 6px 8px; /* ✅ kembalikan padding default biar teks gak nempel garis */
+    vertical-align: top;
+}
 
-    table { width:100%; border-collapse: collapse; margin-bottom: 8px; }
-    table th, table td { border: 1px solid #666; padding:6px; vertical-align: top; }
-    table th { background:#efefef; font-weight:700; }
+.table th {
+    text-align: center;
+}
 
-    .label-inline { display:inline-block; margin-right:10px; }
-    .checkbox { display:inline-block; width:14px; height:14px; border:1px solid #222; text-align:center; line-height:12px; font-size:10px; margin-right:6px; vertical-align:middle; }
-    .checked { background:#222; color:#fff; }
+/* === HAPUS PADDING KHUSUS UNTUK CHECKLIST === */
+.no-padding {
+    padding: 0 !important;
+}
 
-    .small { font-size:11px; color:#333; }
-    .muted { color:#666; font-size:11px; }
+/* === CHECKLIST STYLE (Full Edge-to-Edge Lines) === */
+.checklist-group {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
 
-    .signature-img { max-width:140px; max-height:80px; display:block; }
+.checklist-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    border-bottom: 1px solid #000;
+    margin: 0;
+    padding: 5px 0; /* hanya padding vertikal agar garis mentok kiri-kanan */
+    box-sizing: border-box;
+}
 
-    .page-break { page-break-after: always; }
+.checklist-box:first-child {
+    margin-top: -1px;
+}
 
-    /* make tables look good on PDF */
-    .no-border td, .no-border th { border: none; padding: 4px; }
-    .compact td { padding:4px; }
+.checklist-box:last-child {
+    border-bottom: none;
+}
 
-    /* for consistent spacing */
-    .gap { height:8px; }
+.checklist-box input[type=checkbox],
+.checklist-box input[type=radio] {
+    width: 18px;
+    height: 18px;
+    accent-color: #000;
+    margin-left: 4px;
+    margin-right: 8px;
+}
+
+/* === KELAS TAMBAHAN UNTUK HILANGKAN PADDING === */
+.no-padding {
+    padding: 0 !important;
+}
+
+/* === JUDUL UTAMA === */
+.judul {
+    text-align: center;
+    font-weight: bold;
+    font-size: 13px;
+    background-color: #f9d7aa;
+    border: 1px solid #000;
+    padding: 6px 0;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+
+/* === HEADER BAGIAN === */
+.section-title {
+    font-weight: bold;
+    background-color: #fff2cc;
+    padding: 6px 8px;
+    border: 1px solid #000;
+    margin-top: 12px;
+}
+/* === EMOJI STYLE === */
+.emoji-group {
+    display: flex;
+    align-items: center; /* biar sejajar vertikal */
+    gap: 6px;
+    margin-right: 4px;
+}
+
+.emoji {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle; /* bantu sejajarkan kalau ada inline item */
+    transform: translateY(1px); /* sedikit turunin emoji biar gak “numpuk” */
+        transform: translateX(100px);
+    border-radius: 4px;
+    padding: 2px;
+    box-sizing: content-box;
+}
+
+.emoji.active {
+    background-color: #47ec3f;
+    box-shadow: 0 0 4px #6cff6c;
+}
+
+/* === LAINNYA === */
+.center { text-align: center; }
+.signature-img { max-width: 60px; max-height: 40px; }
+.muted { color: #777; font-style: italic; }
+.strike { text-decoration: line-through; }
 
 </style>
 </head>
 <body>
 
-<!-- Header -->
-<div class="header">
-    <div class="title">FR.MAPA.01 – Perencanaan Asesmen</div>
-    <div class="subtitle">Merencanakan Aktivitas dan Proses — Peninjauan Proses Asesmen</div>
-</div>
+<h3>FR.MAPA.01 - MERENCANAKAN AKTIVITAS DAN PROSES ASESMEN</h3>
 
-<!-- SKEMA -->
-<div class="section">
-    <div class="box">
-        <table class="no-border">
-            <tr>
-                <td style="width:65%">
-                    <strong>Nama Skema:</strong><br>
-                    {{ $skema->nama_skema ?? '-' }}
-                </td>
-                <td style="width:35%">
-                    <strong>Nomor Skema:</strong><br>
-                    {{ $skema->kode_skema ?? '-' }}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <strong>Jenjang:</strong><br>
-                    {{ $skema->jenjang ?? '-' }}
-                </td>
-                <td>
-                    <strong>Unit Kompetensi (terdaftar):</strong><br>
-                    {{ count($standarKompetensi) }} item
-                </td>
-            </tr>
-        </table>
-    </div>
-</div>
+<table class="table" style="margin-bottom: 8px;">
+    <tr>
+        <td style="width: 50%; border-right: 1px solid #000; vertical-align: top; padding: 6px 8px;">
+            <strong>Skema Sertifikasi</strong><br>
+            (<span class="strike">KKNI</span> / <span>Okupasi</span> / <span class="strike">Klaster</span>)
+        </td>
+        <td style="width: 50%; vertical-align: top; padding: 0;">
+            <div style="display: flex; flex-direction: column; width: 100%; margin: 0;">
+                <div style="padding: 6px 8px 6px 8px;">
+                    <strong>Judul:</strong> {{ $skema->nama_skema }}
+                </div>
+                <div style="border-bottom: 1px solid #000; width: 100%; margin: 0;"></div>
+                <div style="padding: 4px 8px 6px 8px;">
+                    <strong>Nomor:</strong> {{ $skema->kode_skema }}
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
 
-<!-- 1. Menentukan Pendekatan -->
-<div class="section">
-    <div class="heading">1. Menentukan Pendekatan Asesmen</div>
 
-    <div style="margin-bottom:6px;"><strong>Asesi — Pendekatan yang dipilih:</strong></div>
-    <div>
-        <span class="label-inline">
-            <span class="checkbox {{ ($pendekatan && $pendekatan->pelatihan_standar) ? 'checked' : '' }}">{{ ($pendekatan && $pendekatan->pelatihan_standar) ? '✓' : '' }}</span>
-            Hasil pelatihan dan/atau pendidikan (Kurikulum & fasilitas telusur)
-        </span>
-        <span class="label-inline">
-            <span class="checkbox {{ ($pendekatan && $pendekatan->pelatihan_nonstandar) ? 'checked' : '' }}">{{ ($pendekatan && $pendekatan->pelatihan_nonstandar) ? '✓' : '' }}</span>
-            Hasil pelatihan/pendidikan (kurikulum belum berbasis kompetensi)
-        </span>
-    </div>
 
-    <div style="margin-top:6px;">
-        <span class="label-inline">
-            <span class="checkbox {{ ($pendekatan && $pendekatan->pengalaman_standar) ? 'checked' : '' }}">{{ ($pendekatan && $pendekatan->pengalaman_standar) ? '✓' : '' }}</span>
-            Pekerja berpengalaman (tempat kerja telusur)
-        </span>
-        <span class="label-inline">
-            <span class="checkbox {{ ($pendekatan && $pendekatan->pengalaman_nonstandar) ? 'checked' : '' }}">{{ ($pendekatan && $pendekatan->pengalaman_nonstandar) ? '✓' : '' }}</span>
-            Pekerja berpengalaman (tempat kerja belum berbasis kompetensi)
-        </span>
-        <span class="label-inline">
-            <span class="checkbox {{ ($pendekatan && $pendekatan->otodidak) ? 'checked' : '' }}">{{ ($pendekatan && $pendekatan->otodidak) ? '✓' : '' }}</span>
-            Otodidak / pembelajaran mandiri
-        </span>
-    </div>
+<!-- BAGIAN PENDEKATAN ASESMEN -->
+<div class="section-title">1. Menentukan Pendekatan Asesmen</div>
 
-    <div class="gap"></div>
+<table class="table">
+    <!-- 1.1 Asesi -->
+    <tr>
+        <td class="center">1.1</td>
+        <td><strong>Asesi</strong></td>
+        <td class="no-padding">
+            <div class="checklist-group">
+                <label class="checklist-box">
+                    <input type="checkbox" checked disabled> Hasil pelatihan dengan kurikulum standar
+                </label>
+                <label class="checklist-box">
+                    <input type="checkbox" disabled> Pekerja berpengalaman
+                </label>
+                <label class="checklist-box">
+                    <input type="checkbox" disabled> Belajar mandiri (otodidak)
+                </label>
+            </div>
+        </td>
+    </tr>
 
-    <div><strong>Tujuan Asesmen:</strong></div>
-    <table class="compact">
-        <tbody>
-            @foreach($defaultTujuan as $nama)
-            <tr>
-                <td style="width:6%"><span class="checkbox {{ in_array($nama, $tujuanDipilih ?? []) ? 'checked' : '' }}">{{ in_array($nama, $tujuanDipilih ?? []) ? '✓' : '' }}</span></td>
-                <td>{{ $nama }}</td>
-            </tr>
-            @endforeach
+    <!-- 1.2 Tujuan Asesmen -->
+    <tr>
+        <td></td>
+        <td><strong>Tujuan Asesmen</strong></td>
+        <td class="no-padding">
+            <div class="checklist-group">
+                <label class="checklist-box">
+                    <input type="checkbox" checked disabled> Sertifikasi
+                </label>
+                <label class="checklist-box">
+                    <input type="checkbox" disabled> Pengakuan Kompetensi Terkini (PKT)
+                </label>
+                <label class="checklist-box">
+                    <input type="checkbox" disabled> Rekognisi Pembelajaran Lampau (RPL)
+                </label>
+            </div>
+        </td>
+    </tr>
 
-            @foreach($customTujuan as $nama)
-            <tr>
-                <td><span class="checkbox {{ in_array($nama, $tujuanDipilih ?? []) ? 'checked' : '' }}">{{ in_array($nama, $tujuanDipilih ?? []) ? '✓' : '' }}</span></td>
-                <td>{{ $nama }}</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-
-</div>
-
-<div class="page-break"></div>
-
-<!-- 2. Konteks Asesmen -->
-<div class="section">
-    <div class="heading">2. Konteks Asesmen</div>
-
-    <div style="margin-bottom:8px;">
-        <strong>Lingkungan:</strong>
-        <span class="label-inline"><span class="checkbox {{ $konteks->lingkungan == 'Tempat kerja nyata' ? 'checked' : '' }}">{{ $konteks->lingkungan == 'Tempat kerja nyata' ? '✓' : '' }}</span> Tempat kerja nyata</span>
-        <span class="label-inline"><span class="checkbox {{ $konteks->lingkungan == 'Tempat kerja simulasi' ? 'checked' : '' }}">{{ $konteks->lingkungan == 'Tempat kerja simulasi' ? '✓' : '' }}</span> Tempat kerja simulasi</span>
-    </div>
-
-    <div style="margin-bottom:8px;">
-        <strong>Peluang:</strong>
-        <span class="label-inline"><span class="checkbox {{ $konteks->peluang == 'Tersedia' ? 'checked' : '' }}">{{ $konteks->peluang == 'Tersedia' ? '✓' : '' }}</span> Tersedia</span>
-        <span class="label-inline"><span class="checkbox {{ $konteks->peluang == 'Terbatas' ? 'checked' : '' }}">{{ $konteks->peluang == 'Terbatas' ? '✓' : '' }}</span> Terbatas</span>
-    </div>
-
-    <div style="margin-top:8px;">
-        <strong>Hubungan antar standar kompetensi dan:</strong>
-        <table>
-            <thead>
-                <tr><th>Aspek</th><th>Status</th><th>Rating</th></tr>
-            </thead>
-            <tbody>
-                @php
-                    $hubItems = ['Bukti untuk mendukung asesmen','Aktivitas kerja di tempat kerja Asesi','Kegiatan Pembelajaran'];
-                @endphp
-                @foreach($hubItems as $h)
-                @php
-                    $checked = in_array($h, $konteks->hubungan ?? []);
-                    $rating = $konteks->hubungan_rating[$h] ?? '';
-                    $ratingText = $rating ? ucfirst($rating) : '-';
-                @endphp
+    <!-- 1.3 Konteks Asesmen -->
+    <tr>
+        <td class="center">1.3</td>
+        <td><strong>Konteks Asesmen</strong></td>
+        <td class="no-padding">
+            <table class="table" style="margin:0; border:none; width:100%;">
                 <tr>
-                    <td>{{ $h }}</td>
-                    <td style="width:10%"><span class="checkbox {{ $checked ? 'checked' : '' }}">{{ $checked ? '✓' : '' }}</span></td>
-                    <td>{{ $ratingText }}</td>
+                    <td style="width:35%; border-right:1px solid #000; vertical-align:top;">Lingkungan</td>
+                    <td class="no-padding" style="width:65%; vertical-align:top;">
+                        <div class="checklist-group">
+                            <label class="checklist-box">
+                                <input type="radio" checked disabled> Tempat kerja nyata
+                            </label>
+                            <label class="checklist-box">
+                                <input type="radio" disabled> Tempat kerja simulasi
+                            </label>
+                        </div>
+                    </td>
                 </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
+                <tr>
+                    <td style="border-right:1px solid #000; vertical-align:top;">Peluang bukti dalam sejumlah situasi</td>
+                    <td class="no-padding" style="vertical-align:top;">
+                        <div class="checklist-group">
+                            <label class="checklist-box">
+                                <input type="radio" checked disabled> Tersedia
+                            </label>
+                            <label class="checklist-box">
+                                <input type="radio" disabled> Terbatas
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+<tr>
+    <td style="border-right:1px solid #000; vertical-align:top;">Hubungan antara standar kompetensi dan</td>
+    <td class="no-padding" style="vertical-align:top;">
+        <div class="checklist-group">
+            @php
+                // === Lokasi file emoji (letakkan di: public/images/emojis/)
+                $emojiPaths = [
+                    'senang' => public_path('images/emojis/senang.png'),
+                    'datar'  => public_path('images/emojis/datar.png'),
+                    'sedih'  => public_path('images/emojis/sedih.png'),
+                ];
 
-</div>
+                // === Daftar hubungan
+                $hubunganList = [
+                    'Bukti untuk mendukung asesmen',
+                    'Aktivitas kerja di tempat kerja Asesi',
+                    'Kegiatan Pembelajaran',
+                ];
 
-<div class="page-break"></div>
+                $hubunganRating = $konteks->hubungan_rating ?? [];
+                $hubunganChecked = $konteks->hubungan ?? [];
+            @endphp
 
-<!-- 3. Standar Industri / Tempat Kerja -->
-<div class="section">
-    <div class="heading">3. Standar Industri / Tempat Kerja</div>
+            @foreach($hubunganList as $label)
+                @php
+                    $selectedEmoji = $hubunganRating[$label] ?? '';
+                    $isChecked = in_array($label, $hubunganChecked);
+                @endphp
 
-    <div style="margin-bottom:8px;">
-        <strong>Standar Kompetensi yang terkait:</strong>
-        <ul>
-            @foreach($standarKompetensi as $sk)
-                <li>{{ $sk }}</li>
+                <div class="checklist-box" style="display:flex; align-items:center; justify-content:space-between;">
+                    <label style="display:flex; align-items:center; flex:1;">
+                        <input type="checkbox" {{ $isChecked ? 'checked' : '' }} disabled>
+                        <span style="margin-left:4px;">{{ $label }}</span>
+                    </label>
+
+                    <div class="emoji-group" style="display:flex; gap:6px; margin-right:4px;">
+                        @foreach(['senang','datar','sedih'] as $e)
+                            @php
+                                $emojiData = base64_encode(file_get_contents($emojiPaths[$e]));
+                            @endphp
+                            <img src="data:image/png;base64,{{ $emojiData }}"
+                                 alt="{{ $e }}"
+                                 class="emoji {{ $selectedEmoji === $e ? 'active' : '' }}"
+                                 style="width:16px; height:16px; border-radius:4px; padding:2px;">
+                        @endforeach
+                    </div>
+                </div>
             @endforeach
-        </ul>
-    </div>
+        </div>
+    </td>
+</tr>
 
-    <div style="margin-bottom:8px;">
-        <strong>Kriteria asesmen dari kurikulum pelatihan:</strong>
-        <span class="label-inline"><span class="checkbox {{ isset($standar) && $standar->standar_kriteria_asesmen ? 'checked' : '' }}">{{ isset($standar) && $standar->standar_kriteria_asesmen ? '✓' : '' }}</span></span>
-    </div>
 
-    <div style="margin-bottom:6px;">
-        <strong>Spesifikasi kinerja perusahaan:</strong><br>
-        <div class="box small">{{ $standar->standar_kinerja_perusahaan ?? '-' }}</div>
-    </div>
+                <tr>
+                    <td style="border-right:1px solid #000; vertical-align:top;">Pelaksana Asesmen / RPL</td>
+                    <td class="no-padding" style="vertical-align:top;">
+                        <div class="checklist-group">
+                            <label class="checklist-box">
+                                <input type="checkbox" checked disabled> Lembaga Sertifikasi
+                            </label>
+                            <label class="checklist-box">
+                                <input type="checkbox" disabled> Organisasi Pelatihan
+                            </label>
+                            <label class="checklist-box">
+                                <input type="checkbox" disabled> Asesor Perusahaan
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
 
-    <div style="margin-bottom:6px;">
-        <strong>Spesifikasi produk:</strong><br>
-        <div class="box small">{{ $standar->standar_spesifikasi_produk ?? '-' }}</div>
-    </div>
+    <!-- 1.4 Standar Industri / Tempat Kerja -->
+    <tr>
+        <td class="center">1.4</td>
+        <td><strong>Standar Industri / Tempat Kerja</strong></td>
+        <td class="no-padding">
+            <div class="checklist-group">
+                @foreach($standarKompetensi as $sk)
+                    <label class="checklist-box">
+                        <input type="checkbox" checked disabled> Standar Kompetensi: {{ $sk }}
+                    </label>
+                @endforeach
+                <label class="checklist-box">
+    <input type="checkbox" {{ $standar->standar_kriteria_asesmen ? 'checked' : '' }} disabled>
+    Kriteria asesmen dari kurikulum pelatihan
+</label>
 
-    <div style="margin-bottom:6px;">
-        <strong>Pedoman khusus:</strong><br>
-        <div class="box small">{{ $standar->standar_pedoman_khusus ?? '-' }}</div>
-    </div>
-</div>
+<label class="checklist-box">
+    <input type="checkbox" {{ $standar->standar_kinerja_perusahaan ? 'checked' : '' }} disabled>
+    Spesifikasi kinerja perusahaan:
+    @if(!empty($standar->standar_kinerja_perusahaan) && !is_numeric($standar->standar_kinerja_perusahaan))
+        <div style="margin-left:28px; font-style:italic;">
+            {{ $standar->standar_kinerja_perusahaan }}
+        </div>
+    @endif
+</label>
 
-<div class="page-break"></div>
+<label class="checklist-box">
+    <input type="checkbox" {{ $standar->standar_spesifikasi_produk ? 'checked' : '' }} disabled>
+    Spesifikasi Produk:
+    @if(!empty($standar->standar_spesifikasi_produk) && !is_numeric($standar->standar_spesifikasi_produk))
+        <div style="margin-left:28px; font-style:italic;">
+            {{ $standar->standar_spesifikasi_produk }}
+        </div>
+    @endif
+</label>
+
+<label class="checklist-box">
+    <input type="checkbox" {{ $standar->standar_pedoman_khusus ? 'checked' : '' }} disabled>
+    Pedoman Khusus:
+    @if(!empty($standar->standar_pedoman_khusus) && !is_numeric($standar->standar_pedoman_khusus))
+        <div style="margin-left:28px; font-style:italic;">
+            {{ $standar->standar_pedoman_khusus }}
+        </div>
+    @endif
+</label>
+
+            </div>
+        </td>
+    </tr>
+</table>
 
 <!-- 4. Modifikasi & Kontekstualisasi -->
 <div class="section">
@@ -273,8 +394,6 @@
         </tbody>
     </table>
 </div>
-
-<div class="page-break"></div>
 
 <!-- 5. Rencana Asesmen (Kelompok Pekerjaan & Unit) -->
 <div class="section">
@@ -321,8 +440,6 @@
     @endforeach
 
 </div>
-
-<div class="page-break"></div>
 
 <!-- 6. Konfirmasi dengan Orang Relevan, Penyusun, Validator (Readonly) -->
 <div class="section">

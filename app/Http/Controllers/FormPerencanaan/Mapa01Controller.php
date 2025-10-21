@@ -21,113 +21,6 @@ use Illuminate\Support\Facades\File;
 
 class Mapa01Controller extends Controller
 {
-
-    /**
- * Tampilkan FR.MAPA.01 versi admin (readonly)
- */
-public function showMapa01Admin($id_skema)
-{
-    if (Auth::user()->role !== 'admin') {
-        abort(403, 'Akses ditolak');
-    }
-
-    // === Ambil semua data sama seperti di downloadPdfAdmin ===
-    $skema = DB::table('skema_sertifikasi')->where('id_skema', $id_skema)->first();
-    if (!$skema) abort(404, 'Skema tidak ditemukan.');
-
-    $defaultTujuan = ['Sertifikasi', 'Pengakuan Kompetensi Terkini (PKT)', 'Rekognisi Pembelajaran Lampau (RPL)'];
-    $allTujuan = DB::table('tujuan_asesmen')->pluck('nama_tujuan')->toArray();
-    $customTujuan = array_diff($allTujuan, $defaultTujuan);
-
-    $tujuanDipilih = DB::table('skema_tujuan')
-        ->join('tujuan_asesmen', 'skema_tujuan.tujuan_id', '=', 'tujuan_asesmen.id_tujuan')
-        ->where('skema_tujuan.skema_id', $id_skema)
-        ->pluck('tujuan_asesmen.nama_tujuan')
-        ->toArray();
-
-    $pendekatan = DB::table('mapa01_pendekatan')->where('id_skema', $id_skema)->first();
-
-    $konteksRow = DB::table('mapa01_konteks')->where('id_skema', $id_skema)->first();
-    $konteks = (object)[
-        'lingkungan' => $konteksRow->lingkungan ?? '',
-        'peluang' => $konteksRow->peluang ?? '',
-        'hubungan' => $konteksRow && $konteksRow->hubungan ? json_decode($konteksRow->hubungan, true) : [],
-        'hubungan_rating' => $konteksRow && isset($konteksRow->hubungan_rating)
-            ? json_decode($konteksRow->hubungan_rating, true) : [],
-        'pelaksana' => $konteksRow && $konteksRow->pelaksana ? json_decode($konteksRow->pelaksana, true) : [],
-    ];
-
-    $konfirmasi = DB::table('mapa01_konfirmasi')->where('id_skema', $id_skema)->first();
-
-    $standarRow = DB::table('mapa01_standar_industri')->where('id_skema', $id_skema)->first();
-    $standar = (object)[
-        'standar_kriteria_asesmen' => $standarRow->standar_kriteria_asesmen ?? 0,
-        'standar_kinerja_perusahaan' => $standarRow->standar_kinerja_perusahaan ?? null,
-        'standar_spesifikasi_produk' => $standarRow->standar_spesifikasi_produk ?? null,
-        'standar_pedoman_khusus' => $standarRow->standar_pedoman_khusus ?? null,
-    ];
-
-    $standarKompetensi = DB::table('unit_kompetensi')
-        ->where('id_skema', $id_skema)
-        ->pluck('standar_kompetensi')
-        ->unique()
-        ->toArray();
-
-    $kelompokPekerjaan = KelompokPekerjaan::with([
-        'hasilAsesmen.unit',
-        'hasilAsesmen.bukti.jenisBukti',
-        'hasilAsesmen.perangkat.perangkat'
-    ])->where('id_skema', $id_skema)->get();
-
-    $modifikasi = DB::table('persyaratan_modifikasi')->where('skema_id', $id_skema)->first();
-
-    $penyusun = DB::table('penyusun_persetujuan')
-        ->where('id_skema', $id_skema)
-        ->where('role', 'penyusun')
-        ->where('form_type', 'mapa01')
-        ->get();
-
-    $validators = DB::table('penyusun_persetujuan')
-        ->where('id_skema', $id_skema)
-        ->where('role', 'validator')
-        ->where('form_type', 'mapa01')
-        ->get();
-
-    $asesors = DB::table('asesor')->select('id_asesor', 'nama_asesor', 'no_registrasi')->get();
-
-    $rolesNeeded = ['manajer_lsp','master_asesor','manajer_pelatihan','supervisor'];
-    $rolesData = DB::table('penyusun_persetujuan')
-        ->where('id_skema', $id_skema)
-        ->whereIn('role', $rolesNeeded)
-        ->get();
-
-    $roleLabels = [
-        'manajer_lsp'       => 'Manajer Sertifikasi LSP',
-        'master_asesor'     => 'Master Asesor / Lead Asesor',
-        'manajer_pelatihan' => 'Manajer Pelatihan',
-        'supervisor'        => 'Supervisor di Tempat Kerja',
-    ];
-
-    $activeRoles = [];
-    foreach ($roleLabels as $role => $label) {
-        $dataRole = $rolesData->firstWhere('role', $role);
-        $activeRoles[$role] = [
-            'label' => $label,
-            'data'  => $dataRole,
-        ];
-    }
-
-    // 🔹 Return tampilan Blade readonly admin
-    return view('form_perencanaan.admin_formperencanaan.mapa01-admin', compact(
-        'skema','defaultTujuan','customTujuan','tujuanDipilih','pendekatan','konteks',
-        'konfirmasi','standar','standarKompetensi','kelompokPekerjaan','modifikasi',
-        'penyusun','validators','asesors','activeRoles'
-    ));
-}
-
-    /**
-     * Download semua bagian MAPA.01 jadi satu ZIP
-     */
 public function downloadPdfAdmin($id_skema)
 {
     if (Auth::user()->role !== 'admin') {
@@ -241,17 +134,111 @@ public function downloadPdfAdmin($id_skema)
 
     // set portrait A4, sedikit margin supaya mirip dokumen Word
     $pdf->setPaper('a4', 'portrait');
-    $pdf->setOption('dpi', 150);
-    $pdf->setOption('margin-top', '10mm');
-    $pdf->setOption('margin-bottom', '10mm');
-    $pdf->setOption('margin-left', '12mm');
-    $pdf->setOption('margin-right', '12mm');
-
     $fileName = "FR_MAPA01_{$skema->id_skema}.pdf";
     return $pdf->download($fileName);
 }
+    /**
+ * Tampilkan FR.MAPA.01 versi admin (readonly)
+ */
+public function showMapa01Admin($id_skema)
+{
+    if (Auth::user()->role !== 'admin') {
+        abort(403, 'Akses ditolak');
+    }
 
+    // === Ambil semua data sama seperti di downloadPdfAdmin ===
+    $skema = DB::table('skema_sertifikasi')->where('id_skema', $id_skema)->first();
+    if (!$skema) abort(404, 'Skema tidak ditemukan.');
 
+    $defaultTujuan = ['Sertifikasi', 'Pengakuan Kompetensi Terkini (PKT)', 'Rekognisi Pembelajaran Lampau (RPL)'];
+    $allTujuan = DB::table('tujuan_asesmen')->pluck('nama_tujuan')->toArray();
+    $customTujuan = array_diff($allTujuan, $defaultTujuan);
+
+    $tujuanDipilih = DB::table('skema_tujuan')
+        ->join('tujuan_asesmen', 'skema_tujuan.tujuan_id', '=', 'tujuan_asesmen.id_tujuan')
+        ->where('skema_tujuan.skema_id', $id_skema)
+        ->pluck('tujuan_asesmen.nama_tujuan')
+        ->toArray();
+
+    $pendekatan = DB::table('mapa01_pendekatan')->where('id_skema', $id_skema)->first();
+
+    $konteksRow = DB::table('mapa01_konteks')->where('id_skema', $id_skema)->first();
+    $konteks = (object)[
+        'lingkungan' => $konteksRow->lingkungan ?? '',
+        'peluang' => $konteksRow->peluang ?? '',
+        'hubungan' => $konteksRow && $konteksRow->hubungan ? json_decode($konteksRow->hubungan, true) : [],
+        'hubungan_rating' => $konteksRow && isset($konteksRow->hubungan_rating)
+            ? json_decode($konteksRow->hubungan_rating, true) : [],
+        'pelaksana' => $konteksRow && $konteksRow->pelaksana ? json_decode($konteksRow->pelaksana, true) : [],
+    ];
+
+    $konfirmasi = DB::table('mapa01_konfirmasi')->where('id_skema', $id_skema)->first();
+
+    $standarRow = DB::table('mapa01_standar_industri')->where('id_skema', $id_skema)->first();
+    $standar = (object)[
+        'standar_kriteria_asesmen' => $standarRow->standar_kriteria_asesmen ?? 0,
+        'standar_kinerja_perusahaan' => $standarRow->standar_kinerja_perusahaan ?? null,
+        'standar_spesifikasi_produk' => $standarRow->standar_spesifikasi_produk ?? null,
+        'standar_pedoman_khusus' => $standarRow->standar_pedoman_khusus ?? null,
+    ];
+
+    $standarKompetensi = DB::table('unit_kompetensi')
+        ->where('id_skema', $id_skema)
+        ->pluck('standar_kompetensi')
+        ->unique()
+        ->toArray();
+
+    $kelompokPekerjaan = KelompokPekerjaan::with([
+        'hasilAsesmen.unit',
+        'hasilAsesmen.bukti.jenisBukti',
+        'hasilAsesmen.perangkat.perangkat'
+    ])->where('id_skema', $id_skema)->get();
+
+    $modifikasi = DB::table('persyaratan_modifikasi')->where('skema_id', $id_skema)->first();
+
+    $penyusun = DB::table('penyusun_persetujuan')
+        ->where('id_skema', $id_skema)
+        ->where('role', 'penyusun')
+        ->where('form_type', 'mapa01')
+        ->get();
+
+    $validators = DB::table('penyusun_persetujuan')
+        ->where('id_skema', $id_skema)
+        ->where('role', 'validator')
+        ->where('form_type', 'mapa01')
+        ->get();
+
+    $asesors = DB::table('asesor')->select('id_asesor', 'nama_asesor', 'no_registrasi')->get();
+
+    $rolesNeeded = ['manajer_lsp','master_asesor','manajer_pelatihan','supervisor'];
+    $rolesData = DB::table('penyusun_persetujuan')
+        ->where('id_skema', $id_skema)
+        ->whereIn('role', $rolesNeeded)
+        ->get();
+
+    $roleLabels = [
+        'manajer_lsp'       => 'Manajer Sertifikasi LSP',
+        'master_asesor'     => 'Master Asesor / Lead Asesor',
+        'manajer_pelatihan' => 'Manajer Pelatihan',
+        'supervisor'        => 'Supervisor di Tempat Kerja',
+    ];
+
+    $activeRoles = [];
+    foreach ($roleLabels as $role => $label) {
+        $dataRole = $rolesData->firstWhere('role', $role);
+        $activeRoles[$role] = [
+            'label' => $label,
+            'data'  => $dataRole,
+        ];
+    }
+
+    // 🔹 Return tampilan Blade readonly admin
+    return view('form_perencanaan.admin_formperencanaan.mapa01-admin', compact(
+        'skema','defaultTujuan','customTujuan','tujuanDipilih','pendekatan','konteks',
+        'konfirmasi','standar','standarKompetensi','kelompokPekerjaan','modifikasi',
+        'penyusun','validators','asesors','activeRoles'
+    ));
+}
 
 public function showMapa01($id_skema)
 {
