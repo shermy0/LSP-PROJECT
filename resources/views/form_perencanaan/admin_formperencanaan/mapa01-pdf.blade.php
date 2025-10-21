@@ -98,7 +98,7 @@ h3 {
 /* === HEADER BAGIAN === */
 .section-title {
     font-weight: bold;
-    background-color: #fff2cc;
+    background-color: #f9d7aa;
     padding: 6px 8px;
     border: 1px solid #000;
     margin-top: 12px;

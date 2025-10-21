@@ -268,6 +268,10 @@ Route::get('/admin/formperencanaan/mapa01/{id_skema}', [Mapa01Controller::class,
     ->name('admin.mapa01.admin');
 Route::get('/admin/formperencanaan/mapa01/pdf/{id_skema}', [Mapa01Controller::class, 'downloadPdfAdmin'])
     ->name('admin.mapa01.pdf');
+// 🔹 Admin melihat form MAPA.02
+Route::get('/admin/formperencanaan/mapa02/{id_skema}', [Mapa02Controller::class, 'showMapa02Admin'])
+    ->name('admin.mapa02.admin')
+    ->middleware('auth');
 
 // ============================
 // Form Perencanaan (Asesor)

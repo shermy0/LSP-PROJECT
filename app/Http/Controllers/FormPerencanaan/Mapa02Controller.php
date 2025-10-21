@@ -17,6 +17,70 @@ use Illuminate\Support\Facades\DB;
 
 class Mapa02Controller extends Controller
 {
+public function showMapa02Admin($id_skema)
+{
+    // Ambil data skema
+    $skema = DB::table('skema_sertifikasi')
+        ->where('id_skema', $id_skema)
+        ->first();
+
+    if (!$skema) {
+        abort(404, 'Skema tidak ditemukan');
+    }
+
+    // Ambil data kelompok pekerjaan
+    $kelompokPekerjaan = DB::table('kelompok_pekerjaan')
+        ->where('id_skema', $id_skema)
+        ->get();
+
+    // Ambil hasil asesmen per kelompok
+    foreach ($kelompokPekerjaan as $kelompok) {
+        $kelompok->hasilAsesmen = DB::table('hasil_asesmen')
+            ->where('id_kelompok', $kelompok->id_kelompok)
+            ->get();
+
+        // Ambil unit kompetensi tiap hasil asesmen (kalau ada kolom unit_id)
+        foreach ($kelompok->hasilAsesmen as $hasil) {
+            $hasil->unit = DB::table('unit_kompetensi')
+                ->where('id_unit', $hasil->unit_id ?? null)
+                ->first();
+        }
+    }
+
+    // Ambil instrumen asesmen per kelompok
+    $instrumenPerKelompok = DB::table('instrumen_asesmen')
+        ->where('id_skema', $id_skema)
+        ->get()
+        ->keyBy('id_kelompok');
+
+    // Ambil penyusun (MAPA.02)
+    $penyusun = DB::table('penyusun_persetujuan')
+        ->where('id_skema', $id_skema)
+        ->where('form_type', 'mapa02')
+        ->where('role', 'penyusun')
+        ->get();
+
+    // Ambil validator MAPA.02
+    $validators = DB::table('validasi_validator')
+        ->where('skema_id', $id_skema)
+        ->get();
+
+    // Ambil daftar asesor untuk dropdown atau referensi
+    $asesors = DB::table('asesor')
+        ->select('id_asesor', 'nama_asesor', 'no_registrasi as no_met')
+        ->get();
+
+    return view('form_perencanaan.admin_formperencanaan.mapa02-admin', compact(
+        'skema',
+        'kelompokPekerjaan',
+        'instrumenPerKelompok',
+        'penyusun',
+        'validators',
+        'asesors'
+    ));
+}
+
+    
        public function storePenyusun(Request $request, $skema_id)
 {
     if ($request->has('nama_asesor')) {
