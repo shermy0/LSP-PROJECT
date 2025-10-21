@@ -165,11 +165,12 @@ h3 {
 <div class="section-title">1. Menentukan Pendekatan Asesmen</div>
 
 <table class="table">
-    <!-- 1.1 Asesi -->
+
+    <!-- === 1.1 Asesi, Tujuan, dan Konteks === -->
     <tr>
-        <td class="center">1.1</td>
-        <td><strong>Asesi</strong></td>
-        <td class="no-padding">
+        <td class="center" style="width: 5%; vertical-align: top;">1.1</td>
+        <td style="width: 40%; vertical-align: top;"><strong>Asesi</strong></td>
+        <td class="no-padding" style="width: 100%; vertical-align: top;">
             <div class="checklist-group">
                 <label class="checklist-box">
                     <input type="checkbox" checked disabled> Hasil pelatihan dengan kurikulum standar
@@ -184,7 +185,6 @@ h3 {
         </td>
     </tr>
 
-    <!-- 1.2 Tujuan Asesmen -->
     <tr>
         <td></td>
         <td><strong>Tujuan Asesmen</strong></td>
@@ -203,14 +203,13 @@ h3 {
         </td>
     </tr>
 
-    <!-- 1.3 Konteks Asesmen -->
     <tr>
-        <td class="center">1.3</td>
+        <td></td>
         <td><strong>Konteks Asesmen</strong></td>
         <td class="no-padding">
             <table class="table" style="margin:0; border:none; width:100%;">
                 <tr>
-                    <td style="width:35%; border-right:1px solid #000; vertical-align:top;">Lingkungan</td>
+                    <td style="width:35%; vertical-align:top;">Lingkungan</td>
                     <td class="no-padding" style="width:65%; vertical-align:top;">
                         <div class="checklist-group">
                             <label class="checklist-box">
@@ -223,7 +222,7 @@ h3 {
                     </td>
                 </tr>
                 <tr>
-                    <td style="border-right:1px solid #000; vertical-align:top;">Peluang bukti dalam sejumlah situasi</td>
+                    <td style="vertical-align:top;">Peluang bukti dalam sejumlah situasi</td>
                     <td class="no-padding" style="vertical-align:top;">
                         <div class="checklist-group">
                             <label class="checklist-box">
@@ -235,61 +234,54 @@ h3 {
                         </div>
                     </td>
                 </tr>
-<tr>
-    <td style="border-right:1px solid #000; vertical-align:top;">Hubungan antara standar kompetensi dan</td>
-    <td class="no-padding" style="vertical-align:top;">
-        <div class="checklist-group">
-            @php
-                // === Lokasi file emoji (letakkan di: public/images/emojis/)
-                $emojiPaths = [
-                    'senang' => public_path('images/emojis/senang.png'),
-                    'datar'  => public_path('images/emojis/datar.png'),
-                    'sedih'  => public_path('images/emojis/sedih.png'),
-                ];
-
-                // === Daftar hubungan
-                $hubunganList = [
-                    'Bukti untuk mendukung asesmen',
-                    'Aktivitas kerja di tempat kerja Asesi',
-                    'Kegiatan Pembelajaran',
-                ];
-
-                $hubunganRating = $konteks->hubungan_rating ?? [];
-                $hubunganChecked = $konteks->hubungan ?? [];
-            @endphp
-
-            @foreach($hubunganList as $label)
-                @php
-                    $selectedEmoji = $hubunganRating[$label] ?? '';
-                    $isChecked = in_array($label, $hubunganChecked);
-                @endphp
-
-                <div class="checklist-box" style="display:flex; align-items:center; justify-content:space-between;">
-                    <label style="display:flex; align-items:center; flex:1;">
-                        <input type="checkbox" {{ $isChecked ? 'checked' : '' }} disabled>
-                        <span style="margin-left:4px;">{{ $label }}</span>
-                    </label>
-
-                    <div class="emoji-group" style="display:flex; gap:6px; margin-right:4px;">
-                        @foreach(['senang','datar','sedih'] as $e)
-                            @php
-                                $emojiData = base64_encode(file_get_contents($emojiPaths[$e]));
-                            @endphp
-                            <img src="data:image/png;base64,{{ $emojiData }}"
-                                 alt="{{ $e }}"
-                                 class="emoji {{ $selectedEmoji === $e ? 'active' : '' }}"
-                                 style="width:16px; height:16px; border-radius:4px; padding:2px;">
-                        @endforeach
-                    </div>
-                </div>
-            @endforeach
-        </div>
-    </td>
-</tr>
-
-
                 <tr>
-                    <td style="border-right:1px solid #000; vertical-align:top;">Pelaksana Asesmen / RPL</td>
+                    <td style="vertical-align:top;">Hubungan antara standar kompetensi dan</td>
+                    <td class="no-padding" style="vertical-align:top;">
+                        <div class="checklist-group">
+                            @php
+                                $emojiPaths = [
+                                    'senang' => public_path('images/emojis/senang.png'),
+                                    'datar'  => public_path('images/emojis/datar.png'),
+                                    'sedih'  => public_path('images/emojis/sedih.png'),
+                                ];
+                                $hubunganList = [
+                                    'Bukti untuk mendukung asesmen',
+                                    'Aktivitas kerja di tempat kerja Asesi',
+                                    'Kegiatan Pembelajaran',
+                                ];
+                                $hubunganRating = $konteks->hubungan_rating ?? [];
+                                $hubunganChecked = $konteks->hubungan ?? [];
+                            @endphp
+
+                            @foreach($hubunganList as $label)
+                                @php
+                                    $selectedEmoji = $hubunganRating[$label] ?? '';
+                                    $isChecked = in_array($label, $hubunganChecked);
+                                @endphp
+
+                                <div class="checklist-box" style="display:flex; align-items:center; justify-content:space-between;">
+                                    <label style="display:flex; align-items:center; flex:1;">
+                                        <input type="checkbox" {{ $isChecked ? 'checked' : '' }} disabled>
+                                        <span style="margin-left:4px;">{{ $label }}</span>
+                                    </label>
+                                    <div class="emoji-group" style="display:flex; gap:6px; margin-right:4px;">
+                                        @foreach(['senang','datar','sedih'] as $e)
+                                            @php
+                                                $emojiData = base64_encode(file_get_contents($emojiPaths[$e]));
+                                            @endphp
+                                            <img src="data:image/png;base64,{{ $emojiData }}"
+                                                 alt="{{ $e }}"
+                                                 class="emoji {{ $selectedEmoji === $e ? 'active' : '' }}"
+                                                 style="width:16px; height:16px; border-radius:4px; padding:2px;">
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="vertical-align:top;">Pelaksana Asesmen / RPL</td>
                     <td class="no-padding" style="vertical-align:top;">
                         <div class="checklist-group">
                             <label class="checklist-box">
@@ -308,57 +300,82 @@ h3 {
         </td>
     </tr>
 
-    <!-- 1.4 Standar Industri / Tempat Kerja -->
+        <!-- === 1.1 Konfirmasi dengan Orang Relevan === -->
     <tr>
-        <td class="center">1.4</td>
-        <td><strong>Standar Industri / Tempat Kerja</strong></td>
+        <td></td>
+        <td><strong>Konfirmasi dengan Orang Lain yang Relevan</strong></td>
         <td class="no-padding">
+            <div class="checklist-group">
+                <label class="checklist-box">
+                    <input type="checkbox" {{ $konfirmasi && $konfirmasi->konfirmasi_manajer_lsp ? 'checked' : '' }} disabled>
+                    Manajer Sertifikasi LSP P1 SMKN 11 Bandung
+                </label>
+                <label class="checklist-box">
+                    <input type="checkbox" {{ $konfirmasi && $konfirmasi->konfirmasi_master_asesor ? 'checked' : '' }} disabled>
+                    Master Asesor / Master Trainer / Lead Asesor Kompetensi
+                </label>
+                <label class="checklist-box">
+                    <input type="checkbox" {{ $konfirmasi && $konfirmasi->konfirmasi_manajer_pelatihan ? 'checked' : '' }} disabled>
+                    Manajer Pelatihan Lembaga Training
+                </label>
+                <label class="checklist-box">
+                    <input type="checkbox" {{ $konfirmasi && $konfirmasi->konfirmasi_supervisor ? 'checked' : '' }} disabled>
+                    Manajer atau Supervisor di Tempat Kerja
+                </label>
+            </div>
+        </td>
+    </tr>
+
+    <!-- === 1.2 Standar Industri / Tempat Kerja === -->
+    <tr>
+        <td class="center" style="border-top:1px solid #000;">1.2</td>
+        <td style="border-top:1px solid #000;"><strong>Standar Industri / Tempat Kerja</strong></td>
+        <td class="no-padding" style="border-top:1px solid #000;">
             <div class="checklist-group">
                 @foreach($standarKompetensi as $sk)
                     <label class="checklist-box">
                         <input type="checkbox" checked disabled> Standar Kompetensi: {{ $sk }}
                     </label>
                 @endforeach
+
                 <label class="checklist-box">
-    <input type="checkbox" {{ $standar->standar_kriteria_asesmen ? 'checked' : '' }} disabled>
-    Kriteria asesmen dari kurikulum pelatihan
-</label>
+                    <input type="checkbox" {{ $standar->standar_kriteria_asesmen ? 'checked' : '' }} disabled>
+                    Kriteria asesmen dari kurikulum pelatihan
+                </label>
 
-<label class="checklist-box">
-    <input type="checkbox" {{ $standar->standar_kinerja_perusahaan ? 'checked' : '' }} disabled>
-    Spesifikasi kinerja perusahaan:
-    @if(!empty($standar->standar_kinerja_perusahaan) && !is_numeric($standar->standar_kinerja_perusahaan))
-        <div style="margin-left:28px; font-style:italic;">
-            {{ $standar->standar_kinerja_perusahaan }}
-        </div>
-    @endif
-</label>
+                <label class="checklist-box">
+                    <input type="checkbox" {{ $standar->standar_kinerja_perusahaan ? 'checked' : '' }} disabled>
+                    Spesifikasi kinerja perusahaan:
+                    @if(!empty($standar->standar_kinerja_perusahaan) && !is_numeric($standar->standar_kinerja_perusahaan))
+                        <div style="margin-left:28px; font-style:italic;">
+                            {{ $standar->standar_kinerja_perusahaan }}
+                        </div>
+                    @endif
+                </label>
 
-<label class="checklist-box">
-    <input type="checkbox" {{ $standar->standar_spesifikasi_produk ? 'checked' : '' }} disabled>
-    Spesifikasi Produk:
-    @if(!empty($standar->standar_spesifikasi_produk) && !is_numeric($standar->standar_spesifikasi_produk))
-        <div style="margin-left:28px; font-style:italic;">
-            {{ $standar->standar_spesifikasi_produk }}
-        </div>
-    @endif
-</label>
+                <label class="checklist-box">
+                    <input type="checkbox" {{ $standar->standar_spesifikasi_produk ? 'checked' : '' }} disabled>
+                    Spesifikasi Produk:
+                    @if(!empty($standar->standar_spesifikasi_produk) && !is_numeric($standar->standar_spesifikasi_produk))
+                        <div style="margin-left:28px; font-style:italic;">
+                            {{ $standar->standar_spesifikasi_produk }}
+                        </div>
+                    @endif
+                </label>
 
-<label class="checklist-box">
-    <input type="checkbox" {{ $standar->standar_pedoman_khusus ? 'checked' : '' }} disabled>
-    Pedoman Khusus:
-    @if(!empty($standar->standar_pedoman_khusus) && !is_numeric($standar->standar_pedoman_khusus))
-        <div style="margin-left:28px; font-style:italic;">
-            {{ $standar->standar_pedoman_khusus }}
-        </div>
-    @endif
-</label>
-
+                <label class="checklist-box">
+                    <input type="checkbox" {{ $standar->standar_pedoman_khusus ? 'checked' : '' }} disabled>
+                    Pedoman Khusus:
+                    @if(!empty($standar->standar_pedoman_khusus) && !is_numeric($standar->standar_pedoman_khusus))
+                        <div style="margin-left:28px; font-style:italic;">
+                            {{ $standar->standar_pedoman_khusus }}
+                        </div>
+                    @endif
+                </label>
             </div>
         </td>
     </tr>
 </table>
-
 <!-- 4. Modifikasi & Kontekstualisasi -->
 <div class="section">
     <div class="heading">4. Persyaratan Modifikasi & Kontekstualisasi</div>
