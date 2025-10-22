@@ -376,6 +376,122 @@ h3 {
         </td>
     </tr>
 </table>
+
+
+@foreach($kelompokPekerjaan as $kelompok)
+    {{-- ====== TABEL INFO KELOMPOK ====== --}}
+    <table border="1" cellspacing="0" cellpadding="4" width="100%"
+        style="border-collapse: collapse; font-size: 11px; margin-top: 10px;">
+        <tr style="background-color:#f0f0f0; font-weight:bold;">
+            <td style="width:30%;">Kelompok Pekerjaan</td>
+            <td style="width:10%;">No.</td>
+            <td style="width:20%;">Kode Unit</td>
+            <td style="width:40%;">Judul Unit</td>
+        </tr>
+
+        @php 
+            $no = 1; 
+            $totalUnit = count($kelompok->hasilAsesmen);
+        @endphp
+
+        @foreach($kelompok->hasilAsesmen as $index => $hasil)
+            <tr>
+                {{-- Kolom Kelompok Pekerjaan hanya muncul di baris pertama --}}
+                @if($index === 0)
+                    <td rowspan="{{ $totalUnit }}" style="vertical-align: middle;">
+                        {{ $kelompok->nama_kelompok ?? '-' }}
+                    </td>
+                @endif
+
+                <td style="text-align:center;">{{ $no++ }}</td>
+                <td>{{ $hasil->unit->kode_unit ?? '-' }}</td>
+                <td>{{ $hasil->unit->judul_unit ?? '-' }}</td>
+            </tr>
+        @endforeach
+    </table>
+
+    {{-- ====== TABEL METODE & PERANGKAT ASESMEN ====== --}}
+    <table border="1" cellspacing="0" cellpadding="4" width="100%" 
+        style="border-collapse: collapse; font-size: 11px; margin-top:6px;">
+        <thead style="text-align:center; font-weight:bold;">
+            <tr>
+                <td rowspan="2" style="width:18%;">Unit Kompetensi</td>
+                <td rowspan="2" style="width:25%;">
+                    Bukti-Bukti<br>
+                    <i>(Kinerja, Produk, Portofolio, dan/atau Pengetahuan)</i>
+                </td>
+                <td colspan="3" style="width:15%;">Jenis Bukti</td>
+                <td colspan="6" style="width:42%;">
+                    <b><i>Metode dan Perangkat Asesmen</i></b><br>
+                    <span style="font-style:italic; font-weight:normal;">
+                        CL (Ceklis Observasi), DIT (Daftar Instruksi Terstruktur),
+                        DPL (Daftar Pertanyaan Lisan), DPT (Daftar Pertanyaan Tertulis),
+                        VPK (Verifikasi Pihak Ketiga), CVP (Ceklis Verifikasi Portofolio),
+                        CRP (Ceklis Reviu Produk), PW (Pertanyaan Wawancara)
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:5%;">L</td>
+                <td style="width:5%;">TL</td>
+                <td style="width:5%;">T</td>
+
+                <td style="width:7%;"><b><i>Observasi Langsung</i></b><br>
+                    <span style="font-style:italic; font-weight:normal;">
+                        (kerja nyata/aktivitas waktu nyata di tempat kerja atau lingkungan kerja yang disimulasikan)
+                    </span>
+                </td>
+                <td style="width:7%;"><b><i>Kegiatan Terstruktur</i></b><br>
+                    <span style="font-style:italic; font-weight:normal;">
+                        (latihan simulasi, bermain peran, proyek, presentasi, lembar kegiatan)
+                    </span>
+                </td>
+                <td style="width:7%;"><b><i>Tanya Jawab</i></b><br>
+                    <span style="font-style:italic; font-weight:normal;">
+                        (tertulis, wawancara, asesmen diri, tanya jawab lisan, angket)
+                    </span>
+                </td>
+                <td style="width:7%;"><b><i>Verifikasi Portofolio &amp; Pihak Ketiga</i></b><br>
+                    <span style="font-style:italic; font-weight:normal;">
+                        (sampel pekerjaan, produk dengan bukti pendukung, testimoni atasan)
+                    </span>
+                </td>
+                <td style="width:7%;"><b><i>Reviu Produk</i></b><br>
+                    <span style="font-style:italic; font-weight:normal;">
+                        (produk hasil proyek, contoh hasil kerja/produk)
+                    </span>
+                </td>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach($kelompok->hasilAsesmen as $hasil)
+                @php
+                    $unit = $hasil->unit;
+                    $jenisBuktiList = $hasil->bukti->pluck('jenisBukti.nama_bukti')->toArray();
+                    $perangkatList = $hasil->perangkat->pluck('perangkat.jenis_bukti')->toArray();
+                @endphp
+
+                <tr>
+                    <td>{{ $unit->judul_unit ?? '-' }}</td>
+                    <td>{{ $hasil->catatan ?? '-' }}</td>
+
+                    <td style="text-align:center;">{{ in_array('L', $jenisBuktiList) ? 'L' : '' }}</td>
+                    <td style="text-align:center;">{{ in_array('TL', $jenisBuktiList) ? 'TL' : '' }}</td>
+                    <td style="text-align:center;">{{ in_array('T', $jenisBuktiList) ? 'T' : '' }}</td>
+
+                    <td style="text-align:center;">{{ in_array('CL', $perangkatList) ? 'CL' : '' }}</td>
+                    <td style="text-align:center;">{{ in_array('DIT', $perangkatList) ? 'DIT' : '' }}</td>
+                    <td style="text-align:center;">{{ implode(', ', array_intersect(['DPL','DPT'], $perangkatList)) }}</td>
+                    <td style="text-align:center;">{{ implode(', ', array_intersect(['VPK','PW','CVP'], $perangkatList)) }}</td>
+                    <td style="text-align:center;">{{ in_array('CRP', $perangkatList) ? 'CRP' : '' }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+@endforeach
+
+
 <!-- 3. Modifikasi & Kontekstualisasi -->
 <div class="section">
     <div class="section-title">3. Persyaratan Modifikasi & Kontekstualisasi</div>
@@ -463,51 +579,6 @@ h3 {
     </table>
 </div>
 
-<!-- 5. Rencana Asesmen (Kelompok Pekerjaan & Unit) -->
-<div class="section">
-    <div class="heading">5. Rencana Asesmen — Kelompok Pekerjaan & Unit</div>
-
-    @foreach($kelompokPekerjaan as $index => $kelompok)
-        <div style="margin-bottom:8px;">
-            <strong>Kelompok Pekerjaan {{ $index + 1 }} — {{ $kelompok->nama_kelompok ?? '' }}</strong>
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width:5%">No</th>
-                        <th style="width:18%">Kode Unit</th>
-                        <th>Unit Kompetensi</th>
-                        <th>Bukti / Catatan</th>
-                        <th>Jenis Bukti</th>
-                        <th>Metode / Perangkat</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($kelompok->hasilAsesmen as $i => $hasil)
-                    <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $hasil->unit->kode_unit ?? '-' }}</td>
-                        <td>{{ $hasil->unit->judul_unit ?? '-' }}</td>
-                        <td>{{ $hasil->catatan ?? '-' }}</td>
-                        <td>
-                            @foreach($hasil->bukti as $b)
-                                {{ $b->jenisBukti->nama_bukti ?? '-' }}<br>
-                            @endforeach
-                        </td>
-                        <td>
-                            @foreach($hasil->perangkat as $p)
-                                {{ $p->perangkat->catatan_penerapan ?? '-' }}<br>
-                            @endforeach
-                        </td>
-                    </tr>
-                    @empty
-                    <tr><td colspan="6" class="muted">Belum ada unit ditambahkan</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    @endforeach
-
-</div>
 
 <!-- Konfirmasi dengan Orang Lain yang Relevan -->
 <div class="section">

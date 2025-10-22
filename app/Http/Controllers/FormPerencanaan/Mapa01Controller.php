@@ -126,6 +126,7 @@ public function downloadPdfAdmin($id_skema)
     // render blade tunggal (portrait A4)
     $view = 'form_perencanaan.admin_formperencanaan.mapa01-pdf';
 
+    
     $pdf = Pdf::loadView($view, compact(
         'skema','defaultTujuan','customTujuan','tujuanDipilih','pendekatan','konteks',
         'konfirmasi','standar','standarKompetensi','kelompokPekerjaan','units','hasilAsesmen',

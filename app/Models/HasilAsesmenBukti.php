@@ -19,10 +19,11 @@ class HasilAsesmenBukti extends Model
         return $this->belongsTo(HasilAsesmen::class, 'id_hasil');
     }
 
-    public function jenisBukti()
-    {
-        return $this->belongsTo(MasterJenisBukti::class, 'id_jenis_bukti');
-    }
+public function jenisBukti()
+{
+    return $this->belongsTo(MasterJenisBukti::class, 'id_jenis_bukti', 'id_jenis_bukti');
+}
+
 
     public function kelompok()
     {
