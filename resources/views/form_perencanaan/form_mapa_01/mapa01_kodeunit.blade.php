@@ -57,11 +57,12 @@
                             {{ $bukti->jenisBukti->nama_bukti ?? '-' }}<br>
                         @endforeach
                     </td>
-                    <td>
-                        @foreach ($hasil->perangkat as $perangkat)
-                            {{ $perangkat->perangkat->catatan_penerapan ?? '-' }}<br>
-                        @endforeach
-                    </td>
+<td>
+    @foreach ($hasil->perangkat as $p)
+        {{ $p->perangkat->jenis_bukti }} ({{ $p->perangkat->catatan_penerapan }})<br>
+    @endforeach
+</td>
+
                     <td class="text-center">
                         <div class="d-inline-flex">
                             <!-- Tombol Edit -->

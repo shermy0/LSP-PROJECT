@@ -27,7 +27,7 @@
             <h2 class="accordion-header">
                 <a href="{{ Auth::user()->role === 'admin' 
                     ? route('admin.mapa02.admin', ['id_skema' => $skema->id_skema]) 
-                    : route('form.mapa01', ['id_skema' => $skema->id_skema]) }}" 
+                    : route('form.mapa02', ['id_skema' => $skema->id_skema]) }}" 
                     class="text-decoration-none text-dark">
                     <i class="fa-solid fa-stop me-2"></i> FR.MAPA.02 - PETA INSTRUMEN ASESMEN HASIL PENDEKATAN ASESMEN DAN PERENCANAAN ASESMEN
                 </a>

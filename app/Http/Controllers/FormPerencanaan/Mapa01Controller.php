@@ -416,27 +416,6 @@ public function deleteTujuan($id_skema, $id_tujuan)
     return back()->with('success', 'Tujuan berhasil dihapus!');
 }
 
-
-// public function konfirmasi($idSkema)
-// {
-//     $skema = Skema::findOrFail($idSkema);
-
-//     // Ambil role/jabatan yang sudah di-checklist di MAPA01
-//     $roles = Mapa01OrangRelevan::where('skema_id', $skema->id_skema)->pluck('jabatan');
-
-//     // Ambil asesor per skema
-//     $asesors = DB::table('asesor')
-//         ->join('asesor_skema', 'asesor.id_asesor', '=', 'asesor_skema.asesor_id')
-//         ->where('asesor_skema.skema_id', $skema->id_skema)
-//         ->select('asesor.id_asesor', 'asesor.nama_asesor', 'asesor.jabatan')
-//         ->get();
-
-//     return view('form_perencanaan.form_mapa_01.mapa01_konfirmasi', compact('skema', 'roles', 'asesors'));
-// }
-
-
-
-
 public function showSkema($id_skema)
 {
     $skema = Skema::findOrFail($id_skema);

@@ -69,14 +69,14 @@
 {{-- Metode & Perangkat Asesmen --}}
 <div class="mb-3">
     <label>Metode dan Perangkat Asesmen</label><br>
-@foreach ($perangkat as $p)
-    <label>
-        <input type="checkbox" class="form-check-input me-2" name="metode[]" value="{{ $p->id_perangkat }}">
-        {{ $p->jenisBukti->nama_bukti ?? '' }} ({{ $p->catatan_penerapan }})
-    </label><br>
-@endforeach
-
+    @foreach ($perangkat as $p)
+        <label>
+            <input type="checkbox" class="form-check-input me-2" name="metode[]" value="{{ $p->id_perangkat }}">
+            {{ $p->jenis_bukti }} ({{ $p->catatan_penerapan }})
+        </label><br>
+    @endforeach
 </div>
+
 
     </div>
     
