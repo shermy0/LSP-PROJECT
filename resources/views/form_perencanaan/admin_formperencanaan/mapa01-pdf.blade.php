@@ -9,6 +9,8 @@ body {
     font-family: DejaVu Sans, sans-serif;
     font-size: 12px;
     color: #000;
+    line-height: 1.4;
+    padding: 5px;
 }
 
 h3 { 
@@ -28,11 +30,12 @@ h3 {
 
 .table th, .table td {
     border: 1px solid #000;
-    padding: 6px 8px; /* ✅ kembalikan padding default biar teks gak nempel garis */
+    padding: 6px 8px;
     vertical-align: top;
 }
 
 .table th {
+    background-color:#fff2cc;
     text-align: center;
 }
 
@@ -41,7 +44,7 @@ h3 {
     padding: 0 !important;
 }
 
-/* === CHECKLIST STYLE (Full Edge-to-Edge Lines) === */
+/* === CHECKLIST STYLE === */
 .checklist-group {
     display: flex;
     flex-direction: column;
@@ -57,17 +60,12 @@ h3 {
     width: 100%;
     border-bottom: 1px solid #000;
     margin: 0;
-    padding: 5px 0; /* hanya padding vertikal agar garis mentok kiri-kanan */
+    padding: 5px 0;
     box-sizing: border-box;
 }
 
-.checklist-box:first-child {
-    margin-top: -1px;
-}
-
-.checklist-box:last-child {
-    border-bottom: none;
-}
+.checklist-box:first-child { margin-top: -1px; }
+.checklist-box:last-child { border-bottom: none; }
 
 .checklist-box input[type=checkbox],
 .checklist-box input[type=radio] {
@@ -78,9 +76,10 @@ h3 {
     margin-right: 8px;
 }
 
-/* === KELAS TAMBAHAN UNTUK HILANGKAN PADDING === */
-.no-padding {
-    padding: 0 !important;
+/* === KHUSUS UNTUK KONTEKS ASESMEN (tanpa garis bawah) === */
+.no-border .checklist-box {
+    border: none !important;
+    padding: 4px 0;
 }
 
 /* === JUDUL UTAMA === */
@@ -103,6 +102,7 @@ h3 {
     border: 1px solid #000;
     margin-top: 12px;
 }
+
 /* === EMOJI STYLE === */
 .emoji-group {
     display: flex;
@@ -159,8 +159,6 @@ h3 {
     </tr>
 </table>
 
-
-
 <!-- BAGIAN PENDEKATAN ASESMEN -->
 <div class="section-title">1. Menentukan Pendekatan Asesmen</div>
 
@@ -185,24 +183,29 @@ h3 {
         </td>
     </tr>
 
+    <!-- === 1.2 Tujuan Asesmen === -->
     <tr>
-        <td></td>
-        <td><strong>Tujuan Asesmen</strong></td>
-        <td class="no-padding">
+        <td class="center" style="width: 5%; vertical-align: top;">1.2</td>
+        <td style="width: 40%; vertical-align: top;"><strong>Tujuan Asesmen</strong></td>
+        <td class="no-padding" style="vertical-align: top;">
             <div class="checklist-group">
-                <label class="checklist-box">
-                    <input type="checkbox" checked disabled> Sertifikasi
-                </label>
-                <label class="checklist-box">
-                    <input type="checkbox" disabled> Pengakuan Kompetensi Terkini (PKT)
-                </label>
-                <label class="checklist-box">
-                    <input type="checkbox" disabled> Rekognisi Pembelajaran Lampau (RPL)
-                </label>
+                @foreach($defaultTujuan as $nama)
+                    <label class="checklist-box">
+                        <input type="checkbox" disabled {{ in_array($nama, $tujuanDipilih ?? []) ? 'checked' : '' }}>
+                        {{ $nama }}
+                    </label>
+                @endforeach
+                @foreach($customTujuan as $nama)
+                    <label class="checklist-box">
+                        <input type="checkbox" disabled {{ in_array($nama, $tujuanDipilih ?? []) ? 'checked' : '' }}>
+                        {{ $nama }}
+                    </label>
+                @endforeach
             </div>
         </td>
     </tr>
 
+    <!-- === Konteks Asesmen (Revisi: Checkbox + tanpa garis pemisah) === -->
     <tr>
         <td></td>
         <td><strong>Konteks Asesmen</strong></td>
@@ -211,12 +214,12 @@ h3 {
                 <tr>
                     <td style="width:35%; vertical-align:top;">Lingkungan</td>
                     <td class="no-padding" style="width:65%; vertical-align:top;">
-                        <div class="checklist-group">
+                        <div class="checklist-group no-border">
                             <label class="checklist-box">
-                                <input type="radio" checked disabled> Tempat kerja nyata
+                                <input type="checkbox" checked disabled> Tempat kerja nyata
                             </label>
                             <label class="checklist-box">
-                                <input type="radio" disabled> Tempat kerja simulasi
+                                <input type="checkbox" disabled> Tempat kerja simulasi
                             </label>
                         </div>
                     </td>
@@ -224,16 +227,18 @@ h3 {
                 <tr>
                     <td style="vertical-align:top;">Peluang bukti dalam sejumlah situasi</td>
                     <td class="no-padding" style="vertical-align:top;">
-                        <div class="checklist-group">
+                        <div class="checklist-group no-border">
                             <label class="checklist-box">
-                                <input type="radio" checked disabled> Tersedia
+                                <input type="checkbox" checked disabled> Tersedia
                             </label>
                             <label class="checklist-box">
-                                <input type="radio" disabled> Terbatas
+                                <input type="checkbox" disabled> Terbatas
                             </label>
                         </div>
                     </td>
                 </tr>
+                <tr>
+
                 <tr>
                     <td style="vertical-align:top;">Hubungan antara standar kompetensi dan</td>
                     <td class="no-padding" style="vertical-align:top;">
@@ -375,121 +380,119 @@ h3 {
             </div>
         </td>
     </tr>
+            </table>
+        </td>
+    </tr>
 </table>
 
+<div class="section-title">2. Mempersiapkan Rencana Asesmen</div>
 
 @foreach($kelompokPekerjaan as $kelompok)
-    {{-- ====== TABEL INFO KELOMPOK ====== --}}
+    @php 
+        $no = 1; 
+        $totalUnit = count($kelompok->hasilAsesmen);
+    @endphp
+
     <table border="1" cellspacing="0" cellpadding="4" width="100%"
-        style="border-collapse: collapse; font-size: 11px; margin-top: 10px;">
-        <tr style="background-color:#f0f0f0; font-weight:bold;">
-            <td style="width:30%;">Kelompok Pekerjaan</td>
-            <td style="width:10%;">No.</td>
-            <td style="width:20%;">Kode Unit</td>
-            <td style="width:40%;">Judul Unit</td>
+        style="border-collapse: collapse; font-size: 11px; margin-top: 10px; table-layout: fixed;">
+        <tr style="background-color:#fff2cc; font-weight:bold;">
+            {{-- Kolom "Kelompok Pekerjaan" akan digabung dengan isi di bawahnya --}}
+            <td rowspan="{{ $totalUnit + 1 }}" 
+                style="width:30%; border:1px solid #000; vertical-align: middle; text-align:center;">
+                {{ $kelompok->nama_kelompok ?? '-' }}
+            </td>
+            <td style="width:10%; border:1px solid #000;">No.</td>
+            <td style="width:20%; border:1px solid #000;">Kode Unit</td>
+            <td style="width:40%; border:1px solid #000;">Judul Unit</td>
         </tr>
 
-        @php 
-            $no = 1; 
-            $totalUnit = count($kelompok->hasilAsesmen);
-        @endphp
-
-        @foreach($kelompok->hasilAsesmen as $index => $hasil)
+        @foreach($kelompok->hasilAsesmen as $hasil)
             <tr>
-                {{-- Kolom Kelompok Pekerjaan hanya muncul di baris pertama --}}
-                @if($index === 0)
-                    <td rowspan="{{ $totalUnit }}" style="vertical-align: middle;">
-                        {{ $kelompok->nama_kelompok ?? '-' }}
-                    </td>
-                @endif
-
-                <td style="text-align:center;">{{ $no++ }}</td>
-                <td>{{ $hasil->unit->kode_unit ?? '-' }}</td>
-                <td>{{ $hasil->unit->judul_unit ?? '-' }}</td>
+                <td style="text-align:center; border:1px solid #000;">{{ $no++ }}</td>
+                <td style="border:1px solid #000;">{{ $hasil->unit->kode_unit ?? '-' }}</td>
+                <td style="border:1px solid #000;">{{ $hasil->unit->judul_unit ?? '-' }}</td>
             </tr>
         @endforeach
     </table>
 
-    {{-- ====== TABEL METODE & PERANGKAT ASESMEN ====== --}}
-    <table border="1" cellspacing="0" cellpadding="4" width="100%" 
-        style="border-collapse: collapse; font-size: 11px; margin-top:6px;">
-        <thead style="text-align:center; font-weight:bold;">
+{{-- ====== TABEL METODE & PERANGKAT ASESMEN ====== --}}
+<table border="1" cellspacing="0" cellpadding="4" width="100%" 
+    style="border-collapse: collapse; font-size: 11px; margin-top:6px;">
+    <thead style="text-align:center; font-weight:bold;background-color:#fff2cc;">
+        <tr>
+            <td rowspan="2" style="width:15%; border:1px solid #000;">Unit Kompetensi</td>
+            <td rowspan="2" style="width:20%; border:1px solid #000;">
+                Bukti-Bukti<br>
+                <i>(Kinerja, Produk, Portofolio, dan/atau Pengetahuan)</i>
+            </td>
+            <td colspan="3" style="border:1px solid #000; width:9%;">Jenis Bukti</td>
+            <td colspan="5" style="border:1px solid #000; width:56%;">
+                <b><i>Metode dan Perangkat Asesmen</i></b><br>
+                <span style="font-style:italic; font-weight:normal;">
+                    CL (Ceklis Observasi), DIT (Daftar Instruksi Terstruktur),
+                    DPL (Daftar Pertanyaan Lisan), DPT (Daftar Pertanyaan Tertulis),
+                    VPK (Verifikasi Pihak Ketiga), CVP (Ceklis Verifikasi Portofolio),
+                    CRP (Ceklis Reviu Produk), PW (Pertanyaan Wawancara)
+                </span>
+            </td>
+        </tr>
+        <tr>
+            {{-- Kolom Jenis Bukti (lebih sempit) --}}
+            <td style="width:3%; border:1px solid #000;">L</td>
+            <td style="width:3%; border:1px solid #000;">TL</td>
+            <td style="width:3%; border:1px solid #000;">T</td>
+
+            {{-- Kolom Metode (dibuat lebih lebar dan teks horizontal) --}}
+            <td style="width:12%; border:1px solid #000; vertical-align:top;">
+                <b><i>Observasi Langsung</i></b><br>
+                <span style="font-style:italic; font-weight:normal;">(aktivitas nyata di tempat kerja atau simulasi)</span>
+            </td>
+            <td style="width:12%; border:1px solid #000; vertical-align:top;">
+                <b><i>Kegiatan Terstruktur</i></b><br>
+                <span style="font-style:italic; font-weight:normal;">(latihan simulasi, proyek, presentasi, lembar kegiatan)</span>
+            </td>
+            <td style="width:12%; border:1px solid #000; vertical-align:top;">
+                <b><i>Tanya Jawab</i></b><br>
+                <span style="font-style:italic; font-weight:normal;">(tertulis, wawancara, asesmen diri, angket)</span>
+            </td>
+            <td style="width:12%; border:1px solid #000; vertical-align:top;">
+                <b><i>Verifikasi Portofolio &amp; Pihak Ketiga</i></b><br>
+                <span style="font-style:italic; font-weight:normal;">(sampel pekerjaan, testimoni atasan, bukti pendukung)</span>
+            </td>
+            <td style="width:12%; border:1px solid #000; vertical-align:top;">
+                <b><i>Reviu Produk</i></b><br>
+                <span style="font-style:italic; font-weight:normal;">(hasil proyek, contoh hasil kerja/produk)</span>
+            </td>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach($kelompok->hasilAsesmen as $hasil)
+            @php
+                $unit = $hasil->unit;
+                $jenisBuktiList = $hasil->bukti->pluck('jenisBukti.nama_bukti')->toArray();
+                $perangkatList = $hasil->perangkat->pluck('perangkat.jenis_bukti')->toArray();
+            @endphp
+
             <tr>
-                <td rowspan="2" style="width:18%;">Unit Kompetensi</td>
-                <td rowspan="2" style="width:25%;">
-                    Bukti-Bukti<br>
-                    <i>(Kinerja, Produk, Portofolio, dan/atau Pengetahuan)</i>
-                </td>
-                <td colspan="3" style="width:15%;">Jenis Bukti</td>
-                <td colspan="6" style="width:42%;">
-                    <b><i>Metode dan Perangkat Asesmen</i></b><br>
-                    <span style="font-style:italic; font-weight:normal;">
-                        CL (Ceklis Observasi), DIT (Daftar Instruksi Terstruktur),
-                        DPL (Daftar Pertanyaan Lisan), DPT (Daftar Pertanyaan Tertulis),
-                        VPK (Verifikasi Pihak Ketiga), CVP (Ceklis Verifikasi Portofolio),
-                        CRP (Ceklis Reviu Produk), PW (Pertanyaan Wawancara)
-                    </span>
-                </td>
+                <td style="border:1px solid #000;">{{ $unit->judul_unit ?? '-' }}</td>
+                <td style="border:1px solid #000;">{{ $hasil->catatan ?? '-' }}</td>
+
+                <td style="text-align:center; border:1px solid #000;">{{ in_array('L', $jenisBuktiList) ? 'L' : '' }}</td>
+                <td style="text-align:center; border:1px solid #000;">{{ in_array('TL', $jenisBuktiList) ? 'TL' : '' }}</td>
+                <td style="text-align:center; border:1px solid #000;">{{ in_array('T', $jenisBuktiList) ? 'T' : '' }}</td>
+
+                <td style="text-align:center; border:1px solid #000;">{{ in_array('CL', $perangkatList) ? 'CL' : '' }}</td>
+                <td style="text-align:center; border:1px solid #000;">{{ in_array('DIT', $perangkatList) ? 'DIT' : '' }}</td>
+                <td style="text-align:center; border:1px solid #000;">{{ implode(', ', array_intersect(['DPL','DPT'], $perangkatList)) }}</td>
+                <td style="text-align:center; border:1px solid #000;">{{ implode(', ', array_intersect(['VPK','PW','CVP'], $perangkatList)) }}</td>
+                <td style="text-align:center; border:1px solid #000;">{{ in_array('CRP', $perangkatList) ? 'CRP' : '' }}</td>
             </tr>
-            <tr>
-                <td style="width:5%;">L</td>
-                <td style="width:5%;">TL</td>
-                <td style="width:5%;">T</td>
-
-                <td style="width:7%;"><b><i>Observasi Langsung</i></b><br>
-                    <span style="font-style:italic; font-weight:normal;">
-                        (kerja nyata/aktivitas waktu nyata di tempat kerja atau lingkungan kerja yang disimulasikan)
-                    </span>
-                </td>
-                <td style="width:7%;"><b><i>Kegiatan Terstruktur</i></b><br>
-                    <span style="font-style:italic; font-weight:normal;">
-                        (latihan simulasi, bermain peran, proyek, presentasi, lembar kegiatan)
-                    </span>
-                </td>
-                <td style="width:7%;"><b><i>Tanya Jawab</i></b><br>
-                    <span style="font-style:italic; font-weight:normal;">
-                        (tertulis, wawancara, asesmen diri, tanya jawab lisan, angket)
-                    </span>
-                </td>
-                <td style="width:7%;"><b><i>Verifikasi Portofolio &amp; Pihak Ketiga</i></b><br>
-                    <span style="font-style:italic; font-weight:normal;">
-                        (sampel pekerjaan, produk dengan bukti pendukung, testimoni atasan)
-                    </span>
-                </td>
-                <td style="width:7%;"><b><i>Reviu Produk</i></b><br>
-                    <span style="font-style:italic; font-weight:normal;">
-                        (produk hasil proyek, contoh hasil kerja/produk)
-                    </span>
-                </td>
-            </tr>
-        </thead>
-
-        <tbody>
-            @foreach($kelompok->hasilAsesmen as $hasil)
-                @php
-                    $unit = $hasil->unit;
-                    $jenisBuktiList = $hasil->bukti->pluck('jenisBukti.nama_bukti')->toArray();
-                    $perangkatList = $hasil->perangkat->pluck('perangkat.jenis_bukti')->toArray();
-                @endphp
-
-                <tr>
-                    <td>{{ $unit->judul_unit ?? '-' }}</td>
-                    <td>{{ $hasil->catatan ?? '-' }}</td>
-
-                    <td style="text-align:center;">{{ in_array('L', $jenisBuktiList) ? 'L' : '' }}</td>
-                    <td style="text-align:center;">{{ in_array('TL', $jenisBuktiList) ? 'TL' : '' }}</td>
-                    <td style="text-align:center;">{{ in_array('T', $jenisBuktiList) ? 'T' : '' }}</td>
-
-                    <td style="text-align:center;">{{ in_array('CL', $perangkatList) ? 'CL' : '' }}</td>
-                    <td style="text-align:center;">{{ in_array('DIT', $perangkatList) ? 'DIT' : '' }}</td>
-                    <td style="text-align:center;">{{ implode(', ', array_intersect(['DPL','DPT'], $perangkatList)) }}</td>
-                    <td style="text-align:center;">{{ implode(', ', array_intersect(['VPK','PW','CVP'], $perangkatList)) }}</td>
-                    <td style="text-align:center;">{{ in_array('CRP', $perangkatList) ? 'CRP' : '' }}</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+        @endforeach
+    </tbody>
+</table>
 @endforeach
+
 
 
 <!-- 3. Modifikasi & Kontekstualisasi -->
