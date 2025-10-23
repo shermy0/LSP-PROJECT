@@ -156,7 +156,7 @@
 
                 @if(Auth::user()->role == 'asesor')
                     <li><i class="bi bi-house-door-fill"></i><a href="{{ route('asesor.dashboard') }}">Dashboard</a></li>
-                    <li><i class="bi bi-file-earmark-text-fill"></i><a href="">Form Pra Asesmen </a></li>
+                    <li><i class="bi bi-file-earmark-text-fill"></i><a href="{{ route('form_pra_assesmen') }}">Form Pra Asesmen </a></li>
                     <li><i class="bi bi-journal-album"></i><a href="{{ route('formasesmen') }}">Form Asesmen</a></li>
                     <li><i class="bi bi-people-fill"></i><a href="#">Data Peserta Uji</a></li>
                     <li><i class="bi bi-pencil-square"></i><a href="{{ route('formperencanaan') }}">Form Perencanaan</a>
@@ -166,7 +166,7 @@
 
                 @if(Auth::user()->role == 'asesi')
                     <li><i class="bi bi-house-door-fill"></i><a href="{{ route('asesi.dashboard') }}">Dashboard</a></li>
-                    <li><i class="bi bi-file-earmark-text-fill"></i><a href="{{ route('asesi.form_pra_asesmen') }}">Form Pra Asesmen </a></li>
+                    <li><i class="bi bi-file-earmark-text-fill"></i><a href="{{ route('form_pra_assesmen') }}">Form Pra Asesmen </a></li>
                     <li><i class="bi bi-pencil-square"></i><a href="#">Form Asesmen </a></li>
                     <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
                 @endif

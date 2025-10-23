@@ -3,369 +3,456 @@
 @section('title', 'FR.APL.02 - Permohonan Sertifikasi Kompetensi')
 
 @section('konten')
-    <div class="container mt-2 my-5">
-        <div class="bg-white border rounded-3 shadow-sm p-4">
+<div class="container-fluid px-4 py-3">
+    <form id="permohonanForm" action="{{ route('asesi.permohonan.storeDokumen') }}" method="POST"
+          enctype="multipart/form-data" class="needs-validation" novalidate>
+        @csrf
 
-            <!-- Header -->
-            <div class="mb-4">
-                <p class="small text-muted mb-1">Form Asesmen &gt; <span class="fw-semibold">FR.APL.02</span></p>
-                <div class="d-flex flex-column align-items-center text-center">
-                    <div class="rounded mb-3" style="width:40px; height:40px; background-color:#041562;"></div>
-                    <h1 class="h5 fw-bold">Permohonan Sertifikasi Kompetensi</h1>
-                    <span class="badge bg-light text-dark mt-2 px-3 py-2 rounded-pill">Rincian Data Pemohon
-                        Sertifikasi</span>
-                </div>
-            </div>
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <div class="rounded mx-auto mb-3" style="width:40px; height:40px; background-color:#041562;"></div>
+            <h1 class="h5 fw-bold">Permohonan Sertifikasi Kompetensi</h1>
+            <p class="small text-muted">Form Asesmen &gt; FR.APL.02</p>
+        </div>
 
-            <!-- Form -->
-            <form id="permohonanForm" action="{{ route('asesi.permohonan.storeDokumen') }}" method="POST"
-                enctype="multipart/form-data" novalidate>
-                @csrf
+        <!-- Data Sertifikasi -->
+        <div class="unit-header">
+            <p class="mb-1 fw-semibold">Data Sertifikasi</p>
+            <p class="mb-0">Pilih skema sertifikasi dan tujuan asesmen</p>
+        </div>
 
-                <!-- Data Sertifikasi -->
-                <div class="border rounded-3 p-3 mb-4">
-                    <div class="bg-light position-relative mb-3 px-3 py-2 fw-semibold text-dark rounded">
-                        <span class="position-absolute top-0 start-0 h-100 bg-primary rounded-start"
-                            style="width:8px;"></span>
-                        &nbsp;&nbsp;Data Sertifikasi
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Skema Sertifikasi <span class="text-danger">*</span></label>
-                        <select id="skemaSelect" name="id_skema" class="form-select rounded-3" required>
-                            <option value="" disabled selected>Pilih Skema Sertifikasi</option>
-                            @foreach($skema as $s)
-                                <option value="{{ $s->id_skema }}">{{ $s->nama_skema }}</option>
-                            @endforeach
-                        </select>
-                        <div class="invalid-feedback">Silakan pilih skema sertifikasi.</div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Judul Sertifikasi</label>
-                        <input type="text" id="judulSertifikasi" class="form-control rounded-3" readonly>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Nomor Skema</label>
-                        <input type="text" id="nomorSkema" class="form-control rounded-3" readonly>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Tujuan Asesmen <span class="text-danger">*</span></label>
-                        <select id="tujuanAsesmen" name="id_tujuan" class="form-select rounded-3" required>
-                            <option value="" disabled selected>Pilih Tujuan Asesmen</option>
-                            @foreach($tujuanAsesmen as $t)
-                                <option value="{{ $t->id_tujuan }}">{{ $t->nama_tujuan }}</option>
-                            @endforeach
-                        </select>
-
-                        <div class="invalid-feedback">Silakan pilih tujuan asesmen.</div>
-                    </div>
-                </div>
-
-                <!-- Daftar Unit Kompetensi -->
-                <div class="border rounded-3 p-3 mb-4">
-                    <div class="bg-light position-relative mb-3 px-3 py-2 fw-semibold text-dark rounded">
-                        <span class="position-absolute top-0 start-0 h-100 bg-primary rounded-start"
-                            style="width:8px;"></span>
-                        &nbsp;&nbsp;Daftar Unit Kompetensi
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-bordered align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>No</th>
-                                    <th>Kode Unit</th>
-                                    <th>Judul Unit</th>
-                                    <th>Standar Kompetensi Kerja</th>
-                                </tr>
-                            </thead>
-                            <tbody id="unitTable">
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted">Pilih skema sertifikasi terlebih dahulu
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Bukti Kelengkapan -->
-                <div class="border rounded-3 p-3 mb-4">
-                    <div class="bg-light position-relative mb-3 px-3 py-2 fw-semibold text-dark rounded">
-                        <span class="position-absolute top-0 start-0 h-100 bg-primary rounded-start"
-                            style="width:8px;"></span>
-                        &nbsp;&nbsp;Bagian 3 : Bukti Kelengkapan Pemohon
-                    </div>
-                    @foreach($jenisDokumen as $jd)
-                        <div class="mb-3">
-                            <label class="form-label">{{ $loop->iteration }}. {{ $jd->nama_jenis }} <span
-                                    class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <input type="file" name="dokumen[{{ $jd->id_jenis_dokumen }}]"
-                                    class="form-control dokumen-input" accept=".jpg,.jpeg,.png,.pdf" required
-                                    onchange="showFileActions(this)">
-                                <button type="button" class="btn btn-outline-danger" onclick="removeFile(this)">Hapus</button>
-                            </div>
-                            <div class="invalid-feedback">Silakan unggah dokumen ini.</div>
-                            <!-- Tempat tombol lihat -->
-                            <div class="file-preview mt-2"></div>
-                        </div>
+        <div class="question-box">
+            <div class="mb-3">
+                <label class="form-label">Skema Sertifikasi <span class="text-danger">*</span></label>
+                <select id="skemaSelect" name="id_skema" class="form-select" required>
+                    <option value="" disabled selected>Pilih Skema Sertifikasi</option>
+                    @foreach($skema as $s)
+                        <option value="{{ $s->id_skema }}">{{ $s->nama_skema }}</option>
                     @endforeach
-                </div>
+                </select>
+                <div class="invalid-feedback">Silakan pilih skema sertifikasi.</div>
+            </div>
 
-                <!-- Tanda Tangan Asesi -->
-                <div class="border rounded-3 p-3 mb-4 bg-white shadow-sm">
-                    <div class="bg-light position-relative mb-3 px-3 py-2 fw-semibold text-dark rounded">
-                        <span class="position-absolute top-0 start-0 h-100 bg-primary rounded-start"
-                            style="width:8px;"></span>
-                        &nbsp;&nbsp;Tanda Tangan Asesi
-                    </div>
+            <div class="mb-3">
+                <label class="form-label">Judul Sertifikasi</label>
+                <input type="text" id="judulSertifikasi" class="form-control" readonly required>
+                <div class="invalid-feedback">Judul sertifikasi wajib terisi.</div>
+            </div>
 
-                    <div class="card">
-                        <div class="card-title">Asesi</div>
-                        <div class="mb-2">
-                            <label for="nama-asesi">Nama Lengkap</label>
-                            <input type="text" id="nama-asesi" class="form-control" value="{{ $asesi->nama_lengkap ?? '' }}"
-                                readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label for="tanggal-asesi">Tanggal</label>
-                            <input type="date" id="tanggal-asesi" name="tanggal" class="form-control"
-                                value="{{ date('Y-m-d') }}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="ttd-asesi">Tanda Tangan</label>
-                            <canvas id="ttd-asesi" width="400" height="150"></canvas>
-                            <input type="hidden" name="ttd_asesi" id="ttd_asesi_data">
-                        </div>
-                        <div class="btns">
-                            <button type="button" class="btn clear" onclick="clearCanvas()">Hapus</button>
-                            <button type="button" class="btn download" onclick="downloadTTD()">Unduh</button>
-                        </div>
-                    </div>
-                </div>
+            <div class="mb-3">
+                <label class="form-label">Nomor Skema</label>
+                <input type="text" id="nomorSkema" class="form-control" readonly required>
+                <div class="invalid-feedback">Nomor skema wajib terisi.</div>
+            </div>
 
-                <!-- Buttons -->
-                <div class="d-flex justify-content-end gap-2">
-                    <a href="{{ route('asesi.permohonan.form1') }}" class="btn btn-danger">Kembali</a>
-                    <button type="submit" class="btn btn-primary">Simpan dan Kirim</button>
-                </div>
-            </form>
+            <div class="mb-0">
+                <label class="form-label">Tujuan Asesmen <span class="text-danger">*</span></label>
+                <select id="tujuanAsesmen" name="id_tujuan" class="form-select" required>
+                    <option value="" disabled selected>Pilih Tujuan Asesmen</option>
+                    @foreach($tujuanAsesmen as $t)
+                        <option value="{{ $t->id_tujuan }}">{{ $t->nama_tujuan }}</option>
+                    @endforeach
+                </select>
+                <div class="invalid-feedback">Silakan pilih tujuan asesmen.</div>
+            </div>
         </div>
-    </div>
 
-    <!-- Modal Preview Dokumen -->
-    <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="previewModalLabel">Preview Dokumen</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+        <!-- Daftar Unit Kompetensi -->
+        <div class="unit-header">
+            <p class="mb-1 fw-semibold">Daftar Unit Kompetensi</p>
+            <p class="mb-0">Unit kompetensi yang diujikan sesuai skema</p>
+        </div>
+        <div class="question-box">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>No</th>
+                            <th>Kode Unit</th>
+                            <th>Judul Unit</th>
+                            <th>Standar Kompetensi Kerja</th>
+                        </tr>
+                    </thead>
+                    <tbody id="unitTable">
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">Pilih skema sertifikasi terlebih dahulu</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Bukti Kelengkapan -->
+        <div class="unit-header">
+            <p class="mb-1 fw-semibold">Bagian 3: Bukti Kelengkapan Pemohon</p>
+            <p class="mb-0">Unggah dokumen yang diperlukan</p>
+        </div>
+        <div class="question-box">
+            @foreach($jenisDokumen as $jd)
+                <div class="mb-3">
+                    <label class="form-label">{{ $loop->iteration }}. {{ $jd->nama_jenis }} <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="file" name="dokumen[{{ $jd->id_jenis_dokumen }}]" class="form-control dokumen-input"
+                               accept=".jpg,.jpeg,.png,.pdf" onchange="previewFile(this)" required>
+                        <button type="button" class="btn btn-outline-primary" onclick="lihatFile(this)" disabled>Lihat</button>
+                        <button type="button" class="btn btn-outline-danger" onclick="hapusFile(this)">Hapus</button>
+                        <div class="invalid-feedback">Silakan unggah dokumen ini.</div>
+                    </div>
+                    <div class="file-preview mt-2 text-muted small">Belum ada file dipilih</div>
                 </div>
-                <div class="modal-body text-center" id="previewContent">
-                    <!-- konten preview file -->
+            @endforeach
+        </div>
+
+        <!-- Tanda Tangan Asesi -->
+        <div class="unit-header">
+            <p class="mb-1 fw-semibold">Tanda Tangan Asesi</p>
+            <p class="mb-0">Isi nama, tanggal, dan tanda tangan digital</p>
+        </div>
+        <div class="question-box">
+            <div class="mb-3">
+                <label for="nama-asesi" class="form-label">Nama Lengkap</label>
+                <input type="text" id="nama-asesi" class="form-control" value="{{ $asesi->nama_lengkap ?? Auth::user()->name }}" readonly required>
+                <div class="invalid-feedback">Nama wajib terisi.</div>
+            </div>
+            <div class="mb-3">
+                <label for="tanggal-asesi" class="form-label">Tanggal</label>
+                <input type="date" id="tanggal-asesi" name="tanggal" class="form-control" value="{{ date('Y-m-d') }}" readonly required>
+                <div class="invalid-feedback">Tanggal wajib diisi.</div>
+            </div>
+            <div class="mb-3">
+                <label for="ttd-asesi" class="form-label">Tanda Tangan <span class="text-danger">*</span></label>
+                <div class="canvas-wrapper">
+                    <canvas id="ttd-asesi"></canvas>
+                    <span class="canvas-placeholder">Tanda tangan di sini</span>
+                </div>
+                <input type="hidden" name="ttd_asesi" id="ttd_asesi_data" required>
+                <div class="invalid-feedback">Tanda tangan wajib diisi.</div>
+            </div>
+            <div class="button-group">
+                <button type="button" class="btn-back" onclick="clearCanvas()">Hapus</button>
+                <button type="button" class="btn-next" onclick="downloadTTD()">Unduh</button>
+            </div>
+        </div>
+
+        <!-- Modal Preview -->
+        <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Preview Dokumen</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+                    <div class="modal-body text-center" id="previewContent"></div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Script Preview File & Hapus -->
-    <script>
-        function showFileActions(input) {
-            const file = input.files[0];
-            const previewContainer = input.closest('.mb-3').querySelector('.file-preview');
-            previewContainer.innerHTML = '';
+        <!-- Tombol -->
+        <div class="button-group mt-4">
+            <a href="{{ route('asesi.permohonan.form1') }}" class="btn-back">Kembali</a>
+            <button type="submit" class="btn-next">Simpan dan Kirim</button>
+        </div>
+    </form>
+</div>
 
-            if (file) {
-                const fileURL = URL.createObjectURL(file);
-                previewContainer.innerHTML = `
-                <button type="button" class="btn btn-sm btn-info" onclick="openPreview('${fileURL}', '${file.type}')">
-                    Lihat Dokumen
-                </button>
-            `;
+{{-- === STYLE === --}}
+<style>
+    body { font-family: 'Poppins', sans-serif; background: #f9f9fb; }
+    .container-fluid { width: 100%; }
+    .unit-header {
+        background: #E9F1FF; border-left: 6px solid #007BFF; border-radius: 8px;
+        padding: 15px 20px; margin-bottom: 20px; font-size: 14px;
+    }
+    .question-box {
+        border: 1px solid #ddd; border-radius: 12px;
+        padding: 20px; margin-bottom: 25px; background: #fff;
+    }
+    .form-control.is-invalid, .form-select.is-invalid {
+        border: 2px solid #d9534f !important; background: #fff8f8 !important;
+    }
+    .invalid-feedback { font-size: 12px; }
+    .button-group { display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
+    .btn-back {
+        background: #d9534f; color: #fff; padding: 10px 20px; border-radius: 8px;
+        font-weight: 600; text-decoration: none; border: none;
+    }
+    .btn-next {
+        background: #041562; color: #fff; padding: 10px 24px;
+        border-radius: 8px; font-weight: 600; border: none;
+    }
+    .btn-back:hover { background: #c9302c; }
+    .btn-next:hover { background: #06208a; }
+
+    /* canvas responsive but keep internal pixel ratio */
+    .canvas-wrapper { position: relative; width: 100%; max-width: 700px; margin: 0 auto; }
+    #ttd-asesi {
+        display: block;
+        width: 100%;
+        height: 200px;          /* visible height */
+        border: 2px dashed #ccc;
+        border-radius: 6px;
+        background-color: #fff;
+        cursor: crosshair;
+    }
+    .canvas-placeholder {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        color: #aaa; font-size: 14px; pointer-events: none;
+    }
+
+    .file-preview { font-size: 13px; }
+    .modal-body img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 6px; }
+    .modal-body iframe { width: 100%; height: 600px; border: none; }
+</style>
+
+{{-- === SCRIPT Bukti Kelengkapan === --}}
+<script>
+function previewFile(input) {
+    const file = input.files[0];
+    const previewDiv = input.closest('.mb-3').querySelector('.file-preview');
+    const lihatBtn = input.closest('.input-group').querySelector('button.btn-outline-primary');
+    if (file) {
+        previewDiv.textContent = `File dipilih: ${file.name}`;
+        lihatBtn.disabled = false;
+    } else {
+        previewDiv.textContent = "Belum ada file dipilih";
+        lihatBtn.disabled = true;
+    }
+}
+function lihatFile(btn) {
+    const input = btn.closest('.input-group').querySelector('input[type="file"]');
+    const file = input.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const modalBody = document.getElementById('previewContent');
+        modalBody.innerHTML = "";
+        if (file.type === "application/pdf") {
+            modalBody.innerHTML = `<iframe src="${e.target.result}"></iframe>`;
+        } else if (file.type.startsWith("image/")) {
+            modalBody.innerHTML = `<img src="${e.target.result}" alt="Preview Gambar">`;
+        } else {
+            modalBody.innerHTML = `<p>Tipe file tidak didukung untuk preview</p>`;
+        }
+        new bootstrap.Modal(document.getElementById('previewModal')).show();
+    };
+    reader.readAsDataURL(file);
+}
+function hapusFile(btn) {
+    const input = btn.closest('.input-group').querySelector('input[type="file"]');
+    const lihatBtn = btn.closest('.input-group').querySelector('button.btn-outline-primary');
+    const previewDiv = btn.closest('.mb-3').querySelector('.file-preview');
+    input.value = "";
+    previewDiv.textContent = "Belum ada file dipilih";
+    lihatBtn.disabled = true;
+}
+</script>
+
+{{-- === SCRIPT VALIDASI BOOTSTRAP + TTD (Garis guide dihapus) === --}}
+<script>
+(function () {
+    'use strict'
+    const form = document.getElementById('permohonanForm')
+    form.addEventListener('submit', function (event) {
+        // saveTTD akan memvalidasi apakah tanda tangan sudah diisi dan mengisi input hidden
+        if (!saveTTD()) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        }
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+            const firstInvalid = form.querySelector(':invalid');
+            if (firstInvalid) {
+                firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstInvalid.focus();
             }
         }
+        form.classList.add('was-validated')
+    }, false)
+})()
 
-        function openPreview(url, type) {
-            let content = '';
-            if (type.startsWith("image/")) {
-                content = `<img src="${url}" class="img-fluid" style="max-height:70vh;">`;
-            } else if (type === "application/pdf") {
-                content = `<embed src="${url}" type="application/pdf" width="100%" height="600px">`;
-            } else {
-                content = `<a href="${url}" target="_blank">Download File</a>`;
-            }
-            document.getElementById('previewContent').innerHTML = content;
-            let modal = new bootstrap.Modal(document.getElementById('previewModal'));
-            modal.show();
-        }
-
-        function removeFile(btn) {
-            const input = btn.closest('.input-group').querySelector('input[type="file"]');
-            input.value = ''; // reset file
-            const previewContainer = btn.closest('.mb-3').querySelector('.file-preview');
-            previewContainer.innerHTML = ''; // hapus tombol lihat
-        }
-    </script>
-
-    <!-- Script Skema + Validasi -->
-    <script>
-        document.getElementById('skemaSelect').addEventListener('change', function () {
-            let skemaId = this.value;
-            fetch(`/get-skema/${skemaId}`)
-                .then(res => res.json())
-                .then(data => {
-                    document.getElementById('judulSertifikasi').value = data.skema?.judul_skema ?? '';
-                    document.getElementById('nomorSkema').value = data.skema?.kode_skema ?? '';
-                    let tbody = document.getElementById('unitTable');
-                    tbody.innerHTML = '';
-                    if (data.units && data.units.length > 0) {
-                        data.units.forEach((u, i) => {
-                            tbody.innerHTML += `
-                            <tr>
-                                <td>${i + 1}</td>
-                                <td>${u.kode_unit}</td>
-                                <td>${u.judul_unit}</td>
-                                <td>${u.standar_kompetensi}</td>
-                            </tr>`;
-                        });
-                    } else {
-                        tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">Unit kompetensi belum tersedia</td></tr>`;
-                    }
+// === SKEMA AJAX LOADER ===
+document.getElementById('skemaSelect').addEventListener('change', function () {
+    let id = this.value;
+    if (!id) return;
+    let url = "{{ route('get.skema', ':id') }}".replace(':id', id);
+    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('judulSertifikasi').value = data.skema.judul_skema ?? data.skema.nama_skema;
+            document.getElementById('nomorSkema').value = data.skema.kode_skema ?? '';
+            let tbody = document.getElementById('unitTable');
+            tbody.innerHTML = '';
+            if (data.units.length > 0) {
+                data.units.forEach((u, i) => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>${u.kode_unit}</td>
+                            <td>${u.judul_unit}</td>
+                            <td>${u.standar_kompetensi ?? '-'}</td>
+                        </tr>`;
                 });
-        });
-
-        document.getElementById('permohonanForm').addEventListener('submit', function (e) {
-            let valid = true;
-            let firstInvalid = null;
-
-            const requiredFields = this.querySelectorAll('[required]');
-            requiredFields.forEach(field => {
-                if (!field.value || (field.type === "file" && !field.files.length)) {
-                    field.classList.add('is-invalid');
-                    valid = false;
-                    if (!firstInvalid) firstInvalid = field;
-                } else {
-                    field.classList.remove('is-invalid');
-                }
-            });
-
-            if (!valid) {
-                e.preventDefault();
-                if (firstInvalid) {
-                    firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" });
-                    firstInvalid.focus();
-                }
+            } else {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">Tidak ada unit kompetensi</td></tr>`;
             }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Gagal memuat data skema');
         });
-    </script>
+});
 
-    <!-- Script Tanda Tangan -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const canvas = document.getElementById('ttd-asesi');
-            const ctx = canvas.getContext('2d');
-            let isDrawing = false, lastX = 0, lastY = 0;
+// === TTD Canvas (responsive, high-DPI aware, blank-detection using white background) ===
+const canvas = document.getElementById("ttd-asesi");
+const ctx = canvas.getContext("2d");
+const placeholder = document.querySelector(".canvas-placeholder");
+let drawing = false;
+let blankDataURL = null;   // akan berisi dataURL canvas saat hanya background putih
+const VISIBLE_HEIGHT = 200; // px, sesuai CSS height
 
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+// set up size and scale for high-DPI screens; fill white background then set blankDataURL
+function resizeCanvasAndPrepareBlank() {
+    const cssWidth = canvas.clientWidth;
+    const cssHeight = VISIBLE_HEIGHT;
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
 
-            ctx.lineWidth = 2;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-            ctx.strokeStyle = '#000';
+    canvas.width = Math.round(cssWidth * ratio);
+    canvas.height = Math.round(cssHeight * ratio);
 
-            function startDrawing(e) { isDrawing = true;[lastX, lastY] = [e.offsetX, e.offsetY]; }
-            function draw(e) {
-                if (!isDrawing) return;
-                ctx.beginPath();
-                ctx.moveTo(lastX, lastY);
-                ctx.lineTo(e.offsetX, e.offsetY);
-                ctx.stroke();
-                [lastX, lastY] = [e.offsetX, e.offsetY];
-            }
-            function stopDrawing() { isDrawing = false; }
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(ratio, ratio);
 
-            canvas.addEventListener('mousedown', startDrawing);
-            canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('mouseup', stopDrawing);
-            canvas.addEventListener('mouseout', stopDrawing);
+    // isi background putih agar dataURL konsisten (tidak transparan)
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, cssWidth, cssHeight);
 
-            document.getElementById('permohonanForm').addEventListener('submit', function () {
-                document.getElementById('ttd_asesi_data').value = canvas.toDataURL();
-            });
-        });
+    // simpan state blank (hanya putih)
+    blankDataURL = canvas.toDataURL();
+}
 
-        function clearCanvas() {
-            const canvas = document.getElementById('ttd-asesi');
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-        function downloadTTD() {
-            const canvas = document.getElementById('ttd-asesi');
-            const nama = document.getElementById('nama-asesi').value || 'User';
-            const tanggal = document.getElementById('tanggal-asesi').value || new Date().toISOString().split('T')[0];
-            const link = document.createElement('a');
-            link.download = `${nama}_${tanggal}_tanda_tangan.png`;
-            link.href = canvas.toDataURL();
-            link.click();
-        }
-    </script>
+// helper untuk mendapatkan posisi mouse/touch relatif ke canvas (CSS px)
+function getPointerPos(evt) {
+    const rect = canvas.getBoundingClientRect();
+    let clientX, clientY;
+    if (evt.touches && evt.touches.length > 0) {
+        clientX = evt.touches[0].clientX;
+        clientY = evt.touches[0].clientY;
+    } else {
+        clientX = evt.clientX;
+        clientY = evt.clientY;
+    }
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+    return { x, y };
+}
 
-    <!-- Style -->
-    <style>
-        .card {
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-            padding: 25px;
-            max-width: 500px;
-            margin: 20px auto;
-        }
+// event handlers (mouse + touch)
+function startDrawing(evt) {
+    evt.preventDefault();
+    drawing = true;
+    const pos = getPointerPos(evt);
+    ctx.beginPath();
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#000";
+    ctx.moveTo(pos.x, pos.y);
+    placeholder.style.display = "none";
+}
+function drawMove(evt) {
+    if (!drawing) return;
+    evt.preventDefault();
+    const pos = getPointerPos(evt);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+}
+function stopDrawing(evt) {
+    if (!drawing) return;
+    evt.preventDefault();
+    drawing = false;
+    ctx.beginPath();
+}
 
-        .card-title {
-            font-weight: bold;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-            color: #333;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
+// clear canvas (kembali ke white background)
+function clearCanvas() {
+    const cssWidth = canvas.clientWidth;
+    const cssHeight = VISIBLE_HEIGHT;
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
 
-        .card canvas {
-            border: 1px solid #999;
-            border-radius: 6px;
-            width: 100%;
-            height: 150px;
-            background-color: #ffffff;
-            cursor: crosshair;
-        }
+    // reset transform and scale again
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(ratio, ratio);
 
-        .btns {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-        }
+    // fill white
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, cssWidth, cssHeight);
 
-        .btns .clear {
-            background: #dc3545;
-            color: white;
-        }
+    blankDataURL = canvas.toDataURL(); // update blank state
+    document.getElementById("ttd_asesi_data").value = "";
+    placeholder.style.display = "block";
+}
 
-        .btns .download {
-            background: #0d6efd;
-            color: white;
-        }
+// check apakah canvas masih blank (hanya putih)
+function isCanvasBlank() {
+    return canvas.toDataURL() === blankDataURL;
+}
 
-        .btns button:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-            transition: all 0.2s;
-        }
-    </style>
+// saveTTD dipanggil saat form submit; jika kosong -> false (blok submit)
+function saveTTD() {
+    if (isCanvasBlank()) {
+        alert("Silakan tanda tangan terlebih dahulu sebelum lanjut.");
+        canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return false;
+    }
+    // isi hidden input dengan dataURL actual
+    document.getElementById("ttd_asesi_data").value = canvas.toDataURL("image/png");
+    return true;
+}
+
+// download fungsi
+function downloadTTD() {
+    if (isCanvasBlank()) {
+        alert("Belum ada tanda tangan untuk diunduh.");
+        return;
+    }
+    const link = document.createElement("a");
+    link.download = "tanda_tangan_asesi.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+}
+
+// attach events (mouse & touch)
+function attachCanvasEvents() {
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', drawMove);
+    window.addEventListener('mouseup', stopDrawing);
+
+    canvas.addEventListener('touchstart', startDrawing, { passive: false });
+    canvas.addEventListener('touchmove', drawMove, { passive: false });
+    window.addEventListener('touchend', stopDrawing);
+}
+
+// responsive: resize canvas when window size changes, preserve signature if any
+window.addEventListener('resize', function () {
+    const prevData = canvas.toDataURL();
+    resizeCanvasAndPrepareBlank();
+
+    // jika sebelumnya ada coretan (bukan blank), redraw scaled image
+    if (prevData && prevData !== blankDataURL) {
+        const img = new Image();
+        img.onload = function () {
+            // pastikan konteks sudah diset ke skala ratio
+            ctx.drawImage(img, 0, 0, canvas.clientWidth, VISIBLE_HEIGHT);
+        };
+        img.src = prevData;
+    }
+});
+
+// inisialisasi awal
+resizeCanvasAndPrepareBlank();
+attachCanvasEvents();
+
+</script>
 @endsection

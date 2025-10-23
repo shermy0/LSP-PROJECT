@@ -45,6 +45,6 @@ class Pertanyaan extends Model
 
     public function opsiJawaban()
     {
-        return $this->hasMany(OpsiJawaban::class, 'id_pertanyaan');
+        return $this->hasMany(OpsiJawaban::class, 'id_pertanyaan', 'id_pertanyaan');
     }
 }

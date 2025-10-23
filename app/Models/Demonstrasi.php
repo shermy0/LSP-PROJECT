@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -8,17 +9,18 @@ class Demonstrasi extends Model
     protected $table = 'demonstrasi';
     protected $primaryKey = 'id_demonstrasi';
     public $timestamps = false;
+
     protected $fillable = [
-        'id_asesmen', 'id_tuk', 'id_kuk', 'id_asesor'
+        'id_asesmen','id_skema','timer','timescap'
     ];
 
-    public function Asesor()
+    public function skema()
     {
-        return $this->belongsTo(Asesor::class, 'id_asesor');
+        return $this->belongsTo(Skema::class, 'id_skema', 'id_skema');
     }
 
-    public function kuk()
+    public function tugas()
     {
-        return $this->belongsTo(Kuk::class, 'id_kuk');
+        return $this->hasMany(MasterTugasDemonstrasi::class, 'id_demonstrasi', 'id_demonstrasi');
     }
 }

@@ -10,31 +10,17 @@ return new class extends Migration
     {
         Schema::create('permohonan', function (Blueprint $table) {
             $table->id('id_permohonan');
-
             $table->unsignedBigInteger('id_asesi');
-            $table->unsignedBigInteger('id_admin')->nullable(); // boleh kosong
+            $table->unsignedBigInteger('id_admin');
             $table->unsignedBigInteger('id_skema');
-
             $table->date('tgl_permohonan')->nullable();
             $table->enum('tujuan_asesmen', ['Sertifikasi', 'PKT', 'RPL', 'Lainnya'])->nullable();
-            $table->enum('status', ['Diajukan', 'Diterima', 'Ditolak'])->default('Diajukan');
+            $table->enum('status', ['Diajukan', 'Diterima', 'Ditolak'])->nullable();
             $table->text('catatan')->nullable();
 
-            // timestamps biar bisa pakai created_at & updated_at
-            $table->timestamps();
-
-            // foreign key
-            $table->foreign('id_asesi')
-                ->references('id_asesi')->on('asesi')
-                ->onUpdate('cascade')->onDelete('cascade');
-
-            $table->foreign('id_admin')
-                ->references('id_admin')->on('admin')
-                ->onUpdate('cascade')->onDelete('set null');
-
-            $table->foreign('id_skema')
-                ->references('id_skema')->on('skema_sertifikasi')
-                ->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('id_asesi')->references('id_asesi')->on('asesi')->onDelete('cascade');
+            $table->foreign('id_admin')->references('id_admin')->on('admin')->onDelete('cascade');
+            $table->foreign('id_skema')->references('id_skema')->on('skema_sertifikasi')->onDelete('cascade');
         });
     }
 
