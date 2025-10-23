@@ -2,7 +2,30 @@
 
 @section('konten')
 <link rel="stylesheet" href="{{ asset('assets/css/mapa01.css') }}">
+<style>
+        .floating-download-btn {
+        position: fixed;
+        bottom: 40px;
+        right: 40px;
+        z-index: 1000;
+        background-color: #198754;
+        color: #fff;
+        border-radius: 50%;
+        width: 65px;
+        height: 65px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        font-size: 1.8rem;
+        transition: 0.3s ease;
+    }
 
+    .floating-download-btn:hover {
+        background-color: #157347;
+        transform: scale(1.05);
+    }
+</style>
 <div class="card mapa-card">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
@@ -156,69 +179,104 @@ $instrumenMap = [
 </div>
 @endforelse
 
-{{-- PENYUSUN DAN VALIDATOR --}}
-<div class="section mt-5">
-    <div class="section-title">Penyusun dan Validator</div>
-    <table class="table table-bordered custom-table">
-        <thead class="table-title">
-            <tr>
-                <th>Status</th>
-                <th>No.</th>
-                <th>Nama</th>
-                <th>No. MET / Registrasi</th>
-                <th>Tanda Tangan &amp; Tanggal</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{-- Penyusun --}}
-            @php $no=1; @endphp
-            @forelse($penyusun as $p)
-            <tr>
-                <td>Penyusun</td>
-                <td class="text-center">{{ $no++ }}</td>
-                <td>{{ $p->id_asesor ? ($asesors->firstWhere('id_asesor', $p->id_asesor)->nama_asesor ?? '-') : '-' }}</td>
-                <td>{{ $p->no_met ?? ($asesors->firstWhere('id_asesor',$p->id_asesor)->no_met ?? '-') }}</td>
-                <td class="text-center">
-                    @if(!empty($p->tanda_tangan))
-                        <img src="{{ $p->tanda_tangan }}" class="signature-img"><br>
-                        <span class="date-text">{{ $p->tanggal ?? '-' }}</span>
-                    @else
-                        <span class="muted">Belum ada tanda tangan</span><br>
-                        <span class="date-text">{{ $p->tanggal ?? '-' }}</span>
-                    @endif
-                </td>
-            </tr>
-            @empty
-            <tr><td colspan="5" class="text-center text-muted">Belum ada penyusun</td></tr>
-            @endforelse
+{{-- Penyusun MAPA.02 --}}
+<div class="container mt-4">
+    <div class="card-box">
+        <div class="judul-header d-flex justify-content-between align-items-center">
+            <span>Penyusun</span>
+        </div>
 
-            {{-- Validator --}}
-            @php $no=1; @endphp
-            @forelse($validators as $v)
-            <tr>
-                <td>Validator</td>
-                <td class="text-center">{{ $no++ }}</td>
-                <td>{{ $v->nama_validator ?? $v->nama_asesor ?? '-' }}</td>
-                <td>{{ $v->no_registrasi ?? $v->no_met ?? '-' }}</td>
-                <td class="text-center">
-                    @if(!empty($v->tanda_tangan) || !empty($v->ttd))
-                        <img src="{{ $v->tanda_tangan ?? $v->ttd }}" class="signature-img"><br>
-                        <span class="date-text">
-                            {{ isset($v->tanggal) ? \Carbon\Carbon::parse($v->tanggal)->format('d/m/Y') : '-' }}
-                        </span>
-                    @else
-                        <span class="muted">Belum ada tanda tangan</span><br>
-                        <span class="date-text">
-                            {{ isset($v->tanggal) ? \Carbon\Carbon::parse($v->tanggal)->format('d/m/Y') : '-' }}
-                        </span>
-                    @endif
-                </td>
-            </tr>
-            @empty
-            <tr><td colspan="5" class="text-center text-muted">Belum ada validator</td></tr>
-            @endforelse
-        </tbody>
-    </table>
+        <div class="table-responsive mt-3">
+            <table class="table table-bordered custom-table">
+                <thead class="table-title">
+                    <tr>
+                        <th>Nama Asesor</th>
+                        <th>No Met</th>
+                        <th>Tanggal</th>
+                        <th>Tanda Tangan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($penyusun as $p)
+                        <tr>
+                            <td>
+                                {{ $p->id_asesor 
+                                    ? ($asesors->firstWhere('id_asesor', $p->id_asesor)->nama_asesor ?? '-') 
+                                    : '-' }}
+                            </td>
+                            <td>
+                                {{ $p->no_met ?? ($asesors->firstWhere('id_asesor', $p->id_asesor)->no_met ?? '-') }}
+                            </td>
+                            <td>
+                                {{ isset($p->tanggal) ? \Carbon\Carbon::parse($p->tanggal)->format('d/m/Y') : '-' }}
+                            </td>
+                            <td class="text-center">
+                                @if(!empty($p->tanda_tangan))
+                                    <img src="{{ $p->tanda_tangan }}" width="120" alt="TTD Penyusun">
+                                @else
+                                    <span class="text-muted">Belum ada tanda tangan</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">
+                                Belum ada data penyusun untuk skema ini
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
+{{-- Validator MAPA.02 --}}
+<div class="container mt-4">
+    <div class="card-box">
+        <div class="judul-header d-flex justify-content-between align-items-center">
+            <span>Validator</span>
+        </div>
+
+        <div class="table-responsive mt-3">
+            <table class="table table-bordered custom-table">
+                <thead class="table-title">
+                    <tr>
+                        <th>Nama Validator</th>
+                        <th>No Met</th>
+                        <th>Tanggal</th>
+                        <th>Tanda Tangan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($validators as $v)
+                        <tr>
+                            <td>{{ $v->nama_validator ?? $v->nama_asesor ?? '-' }}</td>
+                            <td>{{ $v->no_registrasi ?? $v->no_met ?? '-' }}</td>
+                            <td>{{ isset($v->tanggal) ? \Carbon\Carbon::parse($v->tanggal)->format('d/m/Y') : '-' }}</td>
+                            <td class="text-center">
+                                @if(!empty($v->tanda_tangan) || !empty($v->ttd))
+                                    <img src="{{ $v->tanda_tangan ?? $v->ttd }}" width="120" alt="TTD Validator">
+                                @else
+                                    <span class="text-muted">Belum ada tanda tangan</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">
+                                Belum ada data validator untuk skema ini
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- Floating Download Button -->
+<a href="{{ route('admin.mapa02.pdf', $skema->id_skema) }}" class="floating-download-btn" title="Download FR.MAPA.01 PDF">
+    <i class="bi bi-download"></i>
+</a>
 
 @endsection

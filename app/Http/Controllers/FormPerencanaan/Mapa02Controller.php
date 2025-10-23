@@ -17,55 +17,71 @@ use Illuminate\Support\Facades\DB;
 
 class Mapa02Controller extends Controller
 {
-public function showMapa02Admin($id_skema)
+
+    public function downloadPdfAdmin($id_skema)
 {
-    // Ambil data skema
-    $skema = DB::table('skema_sertifikasi')
-        ->where('id_skema', $id_skema)
-        ->first();
+    $skema = Skema::findOrFail($id_skema);
 
-    if (!$skema) {
-        abort(404, 'Skema tidak ditemukan');
-    }
-
-    // Ambil data kelompok pekerjaan
-    $kelompokPekerjaan = DB::table('kelompok_pekerjaan')
+    $kelompokPekerjaan = KelompokPekerjaan::with(['hasilAsesmen.unit'])
         ->where('id_skema', $id_skema)
         ->get();
 
-    // Ambil hasil asesmen per kelompok
-    foreach ($kelompokPekerjaan as $kelompok) {
-        $kelompok->hasilAsesmen = DB::table('hasil_asesmen')
-            ->where('id_kelompok', $kelompok->id_kelompok)
-            ->get();
-
-        // Ambil unit kompetensi tiap hasil asesmen (kalau ada kolom unit_id)
-        foreach ($kelompok->hasilAsesmen as $hasil) {
-            $hasil->unit = DB::table('unit_kompetensi')
-                ->where('id_unit', $hasil->unit_id ?? null)
-                ->first();
-        }
-    }
-
-    // Ambil instrumen asesmen per kelompok
-    $instrumenPerKelompok = DB::table('instrumen_asesmen')
-        ->where('id_skema', $id_skema)
+    $instrumenPerKelompok = InstrumenAsesmen::where('id_skema', $id_skema)
         ->get()
         ->keyBy('id_kelompok');
 
-    // Ambil penyusun (MAPA.02)
     $penyusun = DB::table('penyusun_persetujuan')
         ->where('id_skema', $id_skema)
         ->where('form_type', 'mapa02')
         ->where('role', 'penyusun')
         ->get();
 
-    // Ambil validator MAPA.02
     $validators = DB::table('validasi_validator')
         ->where('skema_id', $id_skema)
         ->get();
 
-    // Ambil daftar asesor untuk dropdown atau referensi
+    $asesors = DB::table('asesor')
+        ->select('id_asesor', 'nama_asesor', 'no_registrasi as no_met')
+        ->get();
+
+    // 🔹 View untuk versi PDF (buat file baru di resources/views/pdf/)
+    $pdf = \PDF::loadView('form_perencanaan.admin_formperencanaan.mapa02-pdf', compact(
+        'skema',
+        'kelompokPekerjaan',
+        'instrumenPerKelompok',
+        'penyusun',
+        'validators',
+        'asesors'
+    ));
+
+    $pdf->setPaper('A4', 'portrait');
+
+    return $pdf->stream('FR.MAPA.02 - ' . $skema->nama_skema . '.pdf');
+}
+
+
+public function showMapa02Admin($id_skema)
+{
+    $skema = Skema::findOrFail($id_skema);
+
+    $kelompokPekerjaan = KelompokPekerjaan::with(['hasilAsesmen.unit'])
+        ->where('id_skema', $id_skema)
+        ->get();
+
+    $instrumenPerKelompok = InstrumenAsesmen::where('id_skema', $id_skema)
+        ->get()
+        ->keyBy('id_kelompok');
+
+    $penyusun = DB::table('penyusun_persetujuan')
+        ->where('id_skema', $id_skema)
+        ->where('form_type', 'mapa02')
+        ->where('role', 'penyusun')
+        ->get();
+
+    $validators = DB::table('validasi_validator')
+        ->where('skema_id', $id_skema)
+        ->get();
+
     $asesors = DB::table('asesor')
         ->select('id_asesor', 'nama_asesor', 'no_registrasi as no_met')
         ->get();
@@ -79,6 +95,7 @@ public function showMapa02Admin($id_skema)
         'asesors'
     ));
 }
+
 
     
        public function storePenyusun(Request $request, $skema_id)
@@ -160,22 +177,30 @@ public function deletePenyusun($id)
 
     // Halaman MAPA02 berdasarkan skema
     public function showMapa02($skema_id)
-{
-    $skema = Skema::findOrFail($skema_id);
+    {
+        $skema = Skema::findOrFail($skema_id);
 
-    $kelompokPekerjaan = KelompokPekerjaan::with([
-        'hasilAsesmen.unit',
-    ])->where('id_skema', $skema_id)->get();
+        $kelompokPekerjaan = KelompokPekerjaan::with(['hasilAsesmen.unit'])
+            ->where('id_skema', $skema_id)
+            ->get();
 
-    // ambil instrumen per kelompok
-    $instrumenPerKelompok = InstrumenAsesmen::where('id_skema', $skema_id)
-        ->get()
-        ->keyBy('id_kelompok'); // biar nanti gampang diakses di Blade
+        // Ambil instrumen per kelompok
+        $instrumenPerKelompok = InstrumenAsesmen::where('id_skema', $skema_id)
+            ->get()
+            ->keyBy('id_kelompok');
 
-    return view('form_perencanaan.form_mapa_02.mapa02', compact(
-        'skema', 'kelompokPekerjaan', 'instrumenPerKelompok'
-    ));
-}
+        // 🔹 Ambil pendekatan asesmen dari MAPA01
+        $pendekatan = DB::table('mapa01_pendekatan')
+            ->where('id_skema', $skema_id)
+            ->first();
+
+        return view('form_perencanaan.form_mapa_02.mapa02', compact(
+            'skema',
+            'kelompokPekerjaan',
+            'instrumenPerKelompok',
+            'pendekatan'
+        ));
+    }
 
 
 
@@ -204,41 +229,41 @@ public function deletePenyusun($id)
         return response()->json($asesi);
     }
 
-    public function simpanInstrumen(Request $request)
-{
-    $skemaId = $request->input('skema_id');
-    $kelompokIds = $request->input('id_kelompok', []);
+ public function simpanInstrumen(Request $request)
+    {
+        $skemaId = $request->input('skema_id');
+        $kelompokIds = $request->input('id_kelompok', []);
 
-    $fields = [
-        'cek_observasi',
-        'tugas_praktik',
-        'tanya_observasi',
-        'instruksi_tertulis',
-        'soal_pg',
-        'soal_esai',
-        'soal_uraian',
-        'cek_portofolio',
-        'tanya_wawancara',
-        'verifikasi_pihak3',
-        'cek_produk',
-    ];
+        $fields = [
+            'cek_observasi',
+            'tugas_praktik',
+            'tanya_observasi',
+            'instruksi_tertulis',
+            'soal_pg',
+            'soal_esai',
+            'soal_uraian',
+            'cek_portofolio',
+            'tanya_wawancara',
+            'verifikasi_pihak3',
+            'cek_produk',
+        ];
 
-    foreach ($kelompokIds as $idKelompok) {
-        $data = ['id_skema' => $skemaId, 'id_kelompok' => $idKelompok];
-        foreach ($fields as $field) {
-            $data[$field] = $request->input("{$field}_{$idKelompok}", null);
+        foreach ($kelompokIds as $idKelompok) {
+            $data = ['id_skema' => $skemaId, 'id_kelompok' => $idKelompok];
+            foreach ($fields as $field) {
+                $data[$field] = $request->input("{$field}_{$idKelompok}", null);
+            }
+
+            DB::table('instrumen_asesmen')->updateOrInsert(
+                ['id_skema' => $skemaId, 'id_kelompok' => $idKelompok],
+                $data
+            );
         }
 
-        DB::table('instrumen_asesmen')->updateOrInsert(
-            ['id_skema' => $skemaId, 'id_kelompok' => $idKelompok],
-            $data
-        );
+        return redirect()
+            ->route('form.mapa02.asesor', $skemaId)
+            ->with('success', 'Instrumen asesmen berhasil disimpan/diupdate.');
     }
-
-return redirect()->route('form.mapa02.asesor', $skemaId)
-                        ->with('success', 'Instrumen asesmen berhasil disimpan/diupdate.');}
-
-
 
     
 public function showMapa02Asesor($id_skema)

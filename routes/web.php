@@ -260,17 +260,25 @@ Route::post('/register/asesor', [RegisterController::class, 'storeAsesor'])->nam
 Route::get('/form/mapa01/{id_skema}/download-all', [Mapa01Controller::class, 'downloadAll'])
     ->name('form.mapa01.downloadAll')
     ->middleware('role:admin'); // ✅ hanya admin
+    
 Route::get('admin/form-perencanaan/mapa01/{id_skema}/pdf', [Mapa01Controller::class, 'downloadPdfAdmin'])
     ->name('form.mapa01.admin.pdf')
     ->middleware('auth'); // dan cek role admin di method sudah ada
+
 // Untuk admin lihat versi PDF MAPA.01
 Route::get('/admin/formperencanaan/mapa01/{id_skema}', [Mapa01Controller::class, 'showMapa01Admin'])
     ->name('admin.mapa01.admin');
 Route::get('/admin/formperencanaan/mapa01/pdf/{id_skema}', [Mapa01Controller::class, 'downloadPdfAdmin'])
     ->name('admin.mapa01.pdf');
+
 // 🔹 Admin melihat form MAPA.02
 Route::get('/admin/formperencanaan/mapa02/{id_skema}', [Mapa02Controller::class, 'showMapa02Admin'])
     ->name('admin.mapa02.admin')
+    ->middleware('auth');
+
+    // 🔹 Admin download versi PDF MAPA.02
+Route::get('/admin/formperencanaan/mapa02/pdf/{id_skema}', [Mapa02Controller::class, 'downloadPdfAdmin'])
+    ->name('admin.mapa02.pdf')
     ->middleware('auth');
 
 // ============================
