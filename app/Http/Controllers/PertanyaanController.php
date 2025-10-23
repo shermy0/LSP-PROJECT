@@ -1081,12 +1081,16 @@ public function inputPMO($id_skema, Request $request)
 
     $kelompok = KelompokPekerjaan::with('unitKompetensi')->findOrFail($kelompok_id);
 
+    // 🔥 ambil semua unit kompetensi untuk dropdown multiple
+    $unitList = \App\Models\UnitKompetensi::all();
+
     return view('input_PMO', [
         'id_pmo'   => $id_pmo,
         'skema'    => $skema,
         'kelompok' => $kelompok,
         'timer'    => $timer,
         'jumlah'   => $jumlah,
+        'unitList' => $unitList, // ✅ kirim ke view
     ]);
 }
 

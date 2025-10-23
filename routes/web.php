@@ -450,8 +450,9 @@ Route::prefix('pmo')->name('pmo.')->group(function () {
         ->name('persetujuan');
 
     // Simpan semua pertanyaan per unit (storePMO)
-    Route::post('/{id_pmo}/store', [PertanyaanController::class, 'storePMO'])
-        ->name('store');
+Route::post('/pmo/{id_pmo}/store', [PertanyaanController::class, 'storePMO'])
+    ->name('pertanyaan.pmo.store');
+
 });
 
 
