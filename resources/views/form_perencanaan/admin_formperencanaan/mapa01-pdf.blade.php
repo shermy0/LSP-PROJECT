@@ -1,139 +1,11 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<link rel="stylesheet" href="{{ public_path('assets/css/pdfmapa.css') }}">
+
 <meta charset="UTF-8">
 <title>FR.MAPA.01 - Perencanaan Asesmen</title>
-<style>
-@page { margin: 15mm 12mm; }
-body {
-    font-family: DejaVu Sans, sans-serif;
-    font-size: 12px;
-    color: #000;
-    line-height: 1.4;
-    padding: 5px;
-}
 
-h3 { 
-    text-align: left; 
-    font-size: 13px; 
-    font-weight: bold; 
-    margin-bottom: 5px; 
-}
-
-/* === TABEL UMUM === */
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 10px;
-    font-size: 12px;
-}
-
-.table th, .table td {
-    border: 1px solid #000;
-    padding: 6px 8px;
-    vertical-align: top;
-}
-
-.table th {
-    background-color:#fff2cc;
-    text-align: center;
-}
-
-/* === HAPUS PADDING KHUSUS UNTUK CHECKLIST === */
-.no-padding {
-    padding: 0 !important;
-}
-
-/* === CHECKLIST STYLE === */
-.checklist-group {
-    display: flex;
-    flex-direction: column;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-}
-
-.checklist-box {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    border-bottom: 1px solid #000;
-    margin: 0;
-    padding: 5px 0;
-    box-sizing: border-box;
-}
-
-.checklist-box:first-child { margin-top: -1px; }
-.checklist-box:last-child { border-bottom: none; }
-
-.checklist-box input[type=checkbox],
-.checklist-box input[type=radio] {
-    width: 18px;
-    height: 18px;
-    accent-color: #000;
-    margin-left: 4px;
-    margin-right: 8px;
-}
-
-/* === KHUSUS UNTUK KONTEKS ASESMEN (tanpa garis bawah) === */
-.no-border .checklist-box {
-    border: none !important;
-    padding: 4px 0;
-}
-
-/* === JUDUL UTAMA === */
-.judul {
-    text-align: center;
-    font-weight: bold;
-    font-size: 13px;
-    background-color: #f9d7aa;
-    border: 1px solid #000;
-    padding: 6px 0;
-    margin-bottom: 12px;
-    text-transform: uppercase;
-}
-
-/* === HEADER BAGIAN === */
-.section-title {
-    font-weight: bold;
-    background-color: #f9d7aa;
-    padding: 6px 8px;
-    border: 1px solid #000;
-    margin-top: 12px;
-}
-
-/* === EMOJI STYLE === */
-.emoji-group {
-    display: flex;
-    align-items: center; /* biar sejajar vertikal */
-    gap: 6px;
-    margin-right: 4px;
-}
-
-.emoji {
-    width: 16px;
-    height: 16px;
-    vertical-align: middle; /* bantu sejajarkan kalau ada inline item */
-    transform: translateY(1px); /* sedikit turunin emoji biar gak “numpuk” */
-        transform: translateX(100px);
-    border-radius: 4px;
-    padding: 2px;
-    box-sizing: content-box;
-}
-
-.emoji.active {
-    background-color: #47ec3f;
-    box-shadow: 0 0 4px #6cff6c;
-}
-
-/* === LAINNYA === */
-.center { text-align: center; }
-.signature-img { max-width: 120px; max-height: 80px; }
-.muted { color: #777; font-style: italic; }
-.strike { text-decoration: line-through; }
-
-</style>
 </head>
 <body>
 
@@ -416,7 +288,7 @@ h3 {
     </table>
 
 {{-- ====== TABEL METODE & PERANGKAT ASESMEN ====== --}}
-<table border="1" cellspacing="0" cellpadding="4" width="100%" 
+<table  class="table-break" border="1" cellspacing="0" cellpadding="4" width="100%" 
     style="border-collapse: collapse; font-size: 11px; margin-top:6px;">
     <thead style="text-align:center; font-weight:bold;background-color:#fff2cc;">
         <tr>
@@ -642,14 +514,18 @@ h3 {
         </thead>
         <tbody>
             {{-- === PENYUSUN === --}}
-            @php $no = 1; @endphp
-            @forelse($penyusun as $p)
+            @php $jumlahPenyusun = count($penyusun); $no = 1; @endphp
+            @forelse($penyusun as $i => $p)
             <tr>
-                <td>Penyusun</td>
+                {{-- kolom status hanya muncul sekali --}}
+                @if($i === 0)
+                    <td rowspan="{{ $jumlahPenyusun }}" style="vertical-align: middle; text-align: left;">Penyusun</td>
+                @endif
+
                 <td class="center">{{ $no++ }}</td>
                 <td>
                     {{ $p->id_asesor
-                        ? ($asesors->firstWhere('id_asesor', $p->id_asesor)->nama_asesor ?? '-')
+                        ? ($asesors->firstWhere('id_asesor', $p->id_asesor)->nama_asesor ?? '-') 
                         : '-' }}
                 </td>
                 <td>
@@ -657,11 +533,15 @@ h3 {
                 </td>
                 <td style="text-align:center;">
                     @if(!empty($p->tanda_tangan))
-                        <img src="{{ $p->tanda_tangan }}" class="signature-img" alt="ttd-penyusun"><br>
-                        <span class="date-text">{{ $p->tanggal ?? '-' }}</span>
+                        <img src="{{ $p->tanda_tangan }}" class="signature-img" alt="ttd-penyusun" width="120"><br>
+                        <span class="date-text">
+                            {{ isset($p->tanggal) ? \Carbon\Carbon::parse($p->tanggal)->format('d/m/Y') : '-' }}
+                        </span>
                     @else
                         <span class="muted">Belum ada tanda tangan</span><br>
-                        <span class="date-text">{{ $p->tanggal ?? '-' }}</span>
+                        <span class="date-text">
+                            {{ isset($p->tanggal) ? \Carbon\Carbon::parse($p->tanggal)->format('d/m/Y') : '-' }}
+                        </span>
                     @endif
                 </td>
             </tr>
@@ -670,16 +550,20 @@ h3 {
             @endforelse
 
             {{-- === VALIDATOR === --}}
-            @php $no = 1; @endphp
-            @forelse($validators as $v)
+            @php $jumlahValidator = count($validators); $no = 1; @endphp
+            @forelse($validators as $i => $v)
             <tr>
-                <td>Validator</td>
+                {{-- kolom status hanya muncul sekali --}}
+                @if($i === 0)
+                    <td rowspan="{{ $jumlahValidator }}" style="vertical-align: middle; text-align: left;">Validator</td>
+                @endif
+
                 <td class="center">{{ $no++ }}</td>
                 <td>{{ $v->nama_asesor ?? $v->nama_validator ?? '-' }}</td>
                 <td>{{ $v->no_registrasi ?? $v->no_met ?? '-' }}</td>
                 <td style="text-align:center;">
                     @if(!empty($v->tanda_tangan) || !empty($v->ttd))
-                        <img src="{{ $v->tanda_tangan ?? $v->ttd }}" class="signature-img" alt="ttd-validator"><br>
+                        <img src="{{ $v->tanda_tangan ?? $v->ttd }}" class="signature-img" alt="ttd-validator" width="120"><br>
                         <span class="date-text">
                             {{ isset($v->tanggal) ? \Carbon\Carbon::parse($v->tanggal)->format('d/m/Y') : '-' }}
                         </span>

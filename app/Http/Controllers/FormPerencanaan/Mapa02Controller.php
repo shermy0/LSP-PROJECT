@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 class Mapa02Controller extends Controller
 {
 
-    public function downloadPdfAdmin($id_skema)
+public function downloadPdfAdmin($id_skema)
 {
     $skema = Skema::findOrFail($id_skema);
 
@@ -44,7 +44,7 @@ class Mapa02Controller extends Controller
         ->select('id_asesor', 'nama_asesor', 'no_registrasi as no_met')
         ->get();
 
-    // 🔹 View untuk versi PDF (buat file baru di resources/views/pdf/)
+    // 🔹 Generate PDF
     $pdf = \PDF::loadView('form_perencanaan.admin_formperencanaan.mapa02-pdf', compact(
         'skema',
         'kelompokPekerjaan',
@@ -56,8 +56,13 @@ class Mapa02Controller extends Controller
 
     $pdf->setPaper('A4', 'portrait');
 
-    return $pdf->stream('FR.MAPA.02 - ' . $skema->nama_skema . '.pdf');
+    // 🔹 Simpan nama file supaya rapi
+    $fileName = "FR_MAPA02_{$skema->id_skema}.pdf";
+
+    // 🔹 Ubah ke download, bukan stream
+    return $pdf->download($fileName);
 }
+
 
 
 public function showMapa02Admin($id_skema)

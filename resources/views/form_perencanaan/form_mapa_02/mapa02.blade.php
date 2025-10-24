@@ -36,10 +36,11 @@
                 <div class="mapa-box">
                     <label class="fw-semibold d-block mb-2">Skema Sertifikasi</label>
                     <div class="jenis-skema">
-                        <input type="radio" id="kkni" name="skema" value="KKNI"
-                            class="form-check-input me-2"
-                            @if($skema->jenjang == 'KKNI') checked @endif disabled>
-                        <label for="kkni">KKNI</label>
+<input type="radio" id="kkni" name="skema" class="form-check-input me-2"
+       value="KKNI"
+       @if(\Illuminate\Support\Str::contains($skema->jenjang, 'KKNI')) checked @endif disabled>
+<label for="kkni">KKNI</label>
+
 
                         <input type="radio" id="okupasi" name="skema" value="Okupasi"
                             class="form-check-input me-2"
