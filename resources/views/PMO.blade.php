@@ -105,14 +105,24 @@
                 $pembuatanPMO = $pembuatanList->firstWhere('jenis_pertanyaan', 'pmo');
               @endphp
 
+<<<<<<< HEAD
                 <a href="{{ $pembuatanPMO 
                     ? route('pertanyaan.pmo.kelompok', ['id_skema' => $skema->id_skema, 'id_pembuatan' => $pembuatanPMO->id_pembuatan_pertanyaan])
                     : route('pertanyaan.pmo.kelompok', ['id_skema' => $skema->id_skema])
+=======
+                    <a href="{{ $pembuatanPMO 
+                    ? route('pertanyaan.pmo.kelompok', ['id_skema' => $skema->id_skema, 'id_pembuatan' => $pembuatanPMO->id_pembuatan_pertanyaan, 'id_tuk' => $id_tuk ?? Auth::user()->id_tuk])
+                    : route('pertanyaan.pmo.kelompok', ['id_skema' => $skema->id_skema, 'id_tuk' => $id_tuk ?? Auth::user()->id_tuk])
+>>>>>>> 683117dae755d3616520f1c9bdd7086ea44cc527
                     }}?timer={{ request('timer') ?? 30 }}" 
                     class="btn w-100 mb-2 text-white fw-bold" 
                     style="background-color:#041562;">
                         Input Soal
+<<<<<<< HEAD
                 </a>
+=======
+                    </a>
+>>>>>>> 683117dae755d3616520f1c9bdd7086ea44cc527
 
                 <!-- Jawaban Asesi PMO -->
                 @php
@@ -159,7 +169,7 @@
                     <button type="submit" class="btn w-100 text-white fw-bold" style="background-color:#041562;">
                         Simpan
                     </button>
-                </div>x
+                </div>
             </form>
         </div>
     </div>

@@ -771,10 +771,12 @@ public function createPMO(Request $request)
 
     // simpan record baru
     $pembuatan = PembuatanPertanyaan::create([
-        'id_skema' => $id_skema,
-        'timer'    => $request->query('timer', 0),
-        'timescap' => now(),
+        'id_skema'         => $id_skema,
+        'timer'            => $request->query('timer', 0),
+        'jenis_pertanyaan' => 'pmo', // ✅ ini wajib string
+        'timescap'         => now(),
     ]);
+    
 
     // ambil kelompok pertama (atau sesuai logic kamu)
     $idKelompok = KelompokPekerjaan::where('id_skema', $id_skema)->value('id_kelompok');

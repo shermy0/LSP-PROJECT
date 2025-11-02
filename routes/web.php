@@ -13,6 +13,7 @@ use App\Http\Controllers\JawabanController;
 use App\Http\Controllers\FormPerencanaan\MapaController;
 use App\Http\Controllers\SkemaController;
 use App\Models\UnitKompetensi;
+use App\Http\Controllers\RekamanAsesmenController;
 use App\Http\Controllers\ModifikasiController;
 use App\Http\Controllers\FormAsesmenController;
 use App\Http\Controllers\Asesi\PermohonanController;
@@ -54,6 +55,19 @@ Route::put('/pertanyaan/esai/{id}', [PertanyaanController::class, 'updateEsai'])
 
 // Hapus
 Route::delete('/pertanyaan/esai/{id}', [PertanyaanController::class, 'destroyEsai'])->name('pertanyaan.esai.destroy');
+
+
+
+// tambah ini
+Route::get('/rekap-asesmen/{id_skema?}', [RekamanAsesmenController::class, 'index'])
+    ->name('rekap.asesmen');
+Route::get('/rekaman/create/{id_skema}', [RekamanAsesmenController::class, 'create'])
+    ->name('rekaman.create');
+
+Route::get('/rekaman/create/{id_skema}', [RekamanAsesmenController::class, 'create'])->name('rekaman.create');
+Route::post('/rekaman/store', [RekamanAsesmenController::class, 'store'])->name('rekaman.store');
+Route::get('/rekaman/show/{id}', [RekamanAsesmenController::class, 'show'])->name('rekaman.show');
+
 
 
 // CRUD Lisan
