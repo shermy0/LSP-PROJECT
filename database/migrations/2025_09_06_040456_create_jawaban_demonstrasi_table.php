@@ -14,7 +14,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_skema');
             $table->unsignedBigInteger('id_tugas');
             $table->text('jawaban_text')->nullable();
-            $table->text('jawaban_file')->nullable();
+            $table->unsignedBigInteger('jawaban_file')->nullable();
             $table->text('pencapaian')->nullable();
 
             $table->foreign('id_asesi')->references('id_asesi')->on('asesi')->onDelete('cascade');

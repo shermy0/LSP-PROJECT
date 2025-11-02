@@ -38,39 +38,29 @@
     <div class="menu">
         <ul>
             @if(Auth::user()->role == 'admin')
-                <li><i class="bi bi-house-door-fill"></i><a href="#">Dashboard</a></li>
+                <li><i class="bi bi-house-door-fill"></i><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                <li><i class="bi bi-person-lines-fill"></i><a href="{{ route('admin.permohonan.index') }}">Daftar Permohonan</a></li>
             @endif
 
             @if(Auth::user()->role == 'asesor')
-                <li><i class="bi bi-house-door-fill"></i><a href="{{ route('dashboard.asesor') }}">Dashboard</a></li>
+                <li><i class="bi bi-house-door-fill"></i><a href="{{ route('asesor.dashboard') }}">Dashboard</a></li>
+                <li><i class="bi bi-file-earmark-text-fill"></i><a href="{{ route('form_pra_assesmen') }}">Form Pra Asesmen</a></li>
                 <li><i class="bi bi-journal-album"></i><a href="{{ route('formasesmen') }}">Form Asesmen</a></li>
-                <li><i class="bi bi-people-fill"></i><a href="{{ route('datapesertauji') }}">Data Peserta Uji</a></li>
+                <li><i class="bi bi-people-fill"></i><a href="#">Data Peserta Uji</a></li>
                 <li><i class="bi bi-pencil-square"></i><a href="{{ route('formperencanaan') }}">Form Perencanaan</a></li>
                 <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
             @endif
 
             @if(Auth::user()->role == 'asesi')
-                <li><i class="bi bi-house-door-fill"></i><a href="#">Dashboard</a></li>
-                <li><i class="bi bi-pencil-square"></i><a href="#">Form Asesmen </a></li>
+                <li><i class="bi bi-house-door-fill"></i><a href="{{ route('asesi.dashboard') }}">Dashboard</a></li>
+                <li><i class="bi bi-file-earmark-text-fill"></i><a href="{{ route('form_pra_assesmen') }}">Form Pra Asesmen</a></li>
+                <li><i class="bi bi-pencil-square"></i><a href="#">Form Asesmen</a></li>
                 <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
-                <li><i class="bi bi-clipboard-check"></i><a href="{{route('data.peserta.uji')}}">Hasil Asesmen</a></li>
             @endif
         </ul>
     </div>
-<div class="sidebar-footer">
-    @if(Auth::user()->role == 'asesor')
-        <a href="{{ route('profile.show') }}" style="text-decoration: none; color: inherit;">
-            <div class="avatar">
-                <div class="avatar-img">
-                    <img src="{{ asset('assets/poto/potta.png') }}" alt="Potta" class="img-fluid">
-                </div>
-                <div class="user-info">
-                    <span class="username">{{ Auth::user()->name }}</span>
-                    <span class="role">{{ ucfirst(Auth::user()->role) }}</span>
-                </div>
-            </div>
-        </a>
-    @else
+
+    <div class="sidebar-footer">
         <div class="avatar">
             <div class="avatar-img">
                 <img src="{{ asset('assets/poto/potta.png') }}" alt="Potta" class="img-fluid">
@@ -80,16 +70,15 @@
                 <span class="role">{{ ucfirst(Auth::user()->role) }}</span>
             </div>
         </div>
-    @endif
 
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="logout-form">
-        @csrf
-        <button type="button" id="logout-btn" class="logout-btn">
-            <i class="fa-solid fa-right-from-bracket"></i>
-            <span>Logout</span>
-        </button>
-    </form>
-</div>
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="logout-form">
+            @csrf
+            <button type="button" id="logout-btn" class="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </button>
+        </form>
+    </div>
 </div>
 
 <!-- Main content -->

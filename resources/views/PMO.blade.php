@@ -106,12 +106,12 @@
               @endphp
 
                 <a href="{{ $pembuatanPMO 
-                        ? route('pertanyaan.pmo.kelompok', ['id_skema' => $skema->id_skema, 'id_pembuatan' => $pembuatanPMO->id_pembuatan_pertanyaan])
-                        : route('pertanyaan.pmo.kelompok', ['id_skema' => $skema->id_skema])
+                    ? route('pertanyaan.pmo.kelompok', ['id_skema' => $skema->id_skema, 'id_pembuatan' => $pembuatanPMO->id_pembuatan_pertanyaan])
+                    : route('pertanyaan.pmo.kelompok', ['id_skema' => $skema->id_skema])
                     }}?timer={{ request('timer') ?? 30 }}" 
-                class="btn w-100 mb-2 text-white fw-bold" 
-                style="background-color:#041562;">
-                    Input Soal
+                    class="btn w-100 mb-2 text-white fw-bold" 
+                    style="background-color:#041562;">
+                        Input Soal
                 </a>
 
                 <!-- Jawaban Asesi PMO -->
