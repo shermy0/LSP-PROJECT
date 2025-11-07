@@ -281,6 +281,15 @@ Route::get('/admin/formperencanaan/mapa02/pdf/{id_skema}', [Mapa02Controller::cl
     ->name('admin.mapa02.pdf')
     ->middleware('auth');
 
+Route::get('/admin/laporan-asesmen/{id_skema}', [LaporanController::class, 'showAdminLaporan'])
+    ->name('admin.laporan.admin');
+
+    // 🔹 Admin download versi PDF LAPORAN
+Route::get('/admin/formperencanaan/laporan-asesmen/pdf/{id_skema}', [LaporanController::class, 'downloadPdfAdmin'])
+    ->name('admin.laporan.pdf')
+    ->middleware('auth');
+
+
 // ============================
 // Form Perencanaan (Asesor)
 // ============================

@@ -10,6 +10,19 @@ use App\Models\Asesi;
 
 class LaporanController extends Controller
 {
+    public function showAdminLaporan($skema_id)
+{
+    $skema = \App\Models\Skema::findOrFail($skema_id);
+
+    $asesors = \DB::table('asesor')
+        ->join('asesor_skema', 'asesor.id_asesor', '=', 'asesor_skema.asesor_id')
+        ->where('asesor_skema.skema_id', $skema_id)
+        ->select('asesor.id_asesor', 'asesor.nama_asesor', 'asesor.no_registrasi')
+        ->get();
+
+    return view('form_perencanaan.admin_formperencanaan.laporan-admin', compact('skema', 'asesors'));
+}
+
     // tampilkan laporan per skema
     public function showLaporan($skema_id)
     {
@@ -76,10 +89,21 @@ public function getAsesiByAsesor($skema_id, $asesor_id)
         )
         ->get();
 
-    $catatan = DB::table('laporan_asesmen')
-        ->where('skema_id', $skema_id)
-        ->where('asesor_id', $asesor_id)
-        ->first();
+$catatan = DB::table('laporan_asesmen')
+    ->leftJoin('penyusun_persetujuan', function ($join) use ($asesor_id, $skema_id) {
+        $join->on('laporan_asesmen.asesor_id', '=', 'penyusun_persetujuan.id_asesor')
+             ->where('penyusun_persetujuan.id_skema', '=', $skema_id)
+             ->where('penyusun_persetujuan.role', '=', 'asesor');
+    })
+    ->where('laporan_asesmen.skema_id', $skema_id)
+    ->where('laporan_asesmen.asesor_id', $asesor_id)
+    ->select(
+        'laporan_asesmen.*',
+        'penyusun_persetujuan.tanda_tangan',
+        'penyusun_persetujuan.catatan as catatan'
+    )
+    ->first();
+
 
     return response()->json([
         'asesis'  => $asesis,

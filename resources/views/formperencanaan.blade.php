@@ -47,10 +47,13 @@
         <!-- Item 3 -->
 <div class="accordion-item">
     <h2 class="accordion-header d-flex align-items-center justify-content-between">
-        <a href="{{ $laporanBisaDibuka ? route('laporan.show', $skema->id_skema) : '#' }}" 
-           class="text-decoration-none text-dark {{ $laporanBisaDibuka ? '' : 'disabled-link' }}">
-            <i class="fa-solid fa-stop me-2"></i> FR.AK.05 - LAPORAN ASESMEN
-        </a>
+        
+<a href="{{ Auth::user()->role === 'admin' 
+            ? route('admin.laporan.admin', $skema->id_skema)
+            : ($laporanBisaDibuka ? route('laporan.show', $skema->id_skema) : '#') }}"
+   class="text-decoration-none text-dark {{ (!$laporanBisaDibuka && Auth::user()->role !== 'admin') ? 'disabled-link' : '' }}">
+    <i class="fa-solid fa-stop me-2"></i> FR.AK.05 - LAPORAN ASESMEN
+</a>
 
         @if(!$laporanBisaDibuka)
             <span class="badge bg-secondary">DISABLED</span>
