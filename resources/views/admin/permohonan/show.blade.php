@@ -8,11 +8,10 @@
         <!-- Header -->
         <div class="text-center mb-4">
             <div class="rounded mx-auto mb-3" style="width:40px; height:40px; background-color:#041562;"></div>
-            <h1 class="h5 fw-bold">Detail Permohonan Sertifikasi (FR.APL.02)</h1>
-            <p class="small text-muted">Rincian Data Pemohon</p>
+            <h1 class="h4 fw-bold">Detail Permohonan Sertifikasi (FR.APL.02)</h1>
+            <p class="text-muted">Rincian Data Pemohon</p>
         </div>
 
-        <!-- NOTE: tambah novalidate & class needs-validation -->
         <form id="permohonanForm" action="{{ route('admin.permohonan.update', $permohonan->id_permohonan) }}" method="POST" class="needs-validation" novalidate>
             @csrf
 
@@ -27,9 +26,9 @@
                     <p><strong>NIK:</strong> {{ $asesi->nik }}</p>
                     <p><strong>Tempat/Tgl Lahir:</strong> {{ $asesi->tempat_lahir }}, {{ $asesi->tgl_lahir }}</p>
                     <p><strong>Jenis Kelamin:</strong> {{ $asesi->jenis_kelamin }}</p>
-                    <p><strong>Alamat:</strong> {{ $asesi->alamat }}</p>
-                    <p><strong>Telepon/Email:</strong> {{ $asesi->telepon }} / {{ $asesi->email }}</p>
-                    <p><strong>Pendidikan Terakhir:</strong> {{ $asesi->pendidikan_terakhir }}</p>
+                    <p><strong>Alamat:</strong> {{ $asesi->alamat_rumah }}</p>
+                    <p><strong>Telepon/Email:</strong> {{ $asesi->telepon_hp }} / {{ $asesi->email }}</p>
+                    <p><strong>Pendidikan Terakhir:</strong> {{ $asesi->kualifikasi_pendidikan }}</p>
                 </div>
             </div>
 
@@ -57,7 +56,7 @@
                     <p><strong>Skema Sertifikasi:</strong> {{ $skema->nama_skema ?? '-' }}</p>
                     <p><strong>Judul Sertifikasi:</strong> {{ $skema->judul_skema ?? '-' }}</p>
                     <p><strong>Nomor Skema:</strong> {{ $skema->kode_skema ?? '-' }}</p>
-                    <p><strong>Tujuan Asesmen:</strong> {{ $permohonan->tujuan_asesmen }}</p>
+                    <p><strong>Tujuan Asesmen:</strong> {{ $permohonan->tujuan_asesmen ?? '-' }}</p>
                     <p><strong>Status:</strong>
                         <span class="badge bg-{{ $permohonan->status=='Diajukan' ? 'warning text-dark' : ($permohonan->status=='Diterima' ? 'success' : 'danger') }}">
                             {{ $permohonan->status }}
@@ -120,9 +119,9 @@
                                     <td class="text-center">{{ $i + 1 }}</td>
                                     <td>{{ $d->jenis }}</td>
                                     <td class="text-center">
-                                        @if($d->file_path)
-                                            <button type="button" class="btn btn-sm btn-info"
-                                                onclick="openPreview('{{ asset('storage/' . $d->file_path) }}', '{{ pathinfo($d->file_path, PATHINFO_EXTENSION) }}')">
+                                        @if(!empty($d->path_file))
+                                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                                onclick="openPreview('{{ asset('storage/' . $d->path_file) }}', '{{ pathinfo($d->path_file, PATHINFO_EXTENSION) }}')">
                                                 Lihat
                                             </button>
                                         @else
@@ -131,7 +130,6 @@
                                     </td>
                                     <td class="text-center">
                                         <div class="form-check form-check-inline">
-                                            <!-- required ditambahkan pada pilihan pertama tiap grup -->
                                             <input class="form-check-input" type="radio"
                                                 name="syarat[{{ $d->id_dokumen }}]" value="Ya" id="ya{{ $i }}" required>
                                             <label class="form-check-label" for="ya{{ $i }}">Memenuhi</label>
@@ -164,7 +162,8 @@
                             <p class="mb-2 fw-semibold">Asesi</p>
                             <p><strong>Tanggal:</strong> {{ $persetujuan->tgl_ttd_asesi ?? '-' }}</p>
                             @if(!empty($persetujuan->ttd_asesi))
-                                <img src="{{ asset('storage/' . $persetujuan->ttd_asesi) }}" alt="TTD Asesi" class="border rounded" style="max-width:100%; height:150px; object-fit:contain;">
+                                <img src="{{ asset('storage/' . $persetujuan->ttd_asesi) }}" alt="TTD Asesi"
+                                     class="border rounded" style="max-width:100%; height:150px; object-fit:contain;">
                             @else
                                 <p class="text-muted">Belum ada tanda tangan asesi</p>
                             @endif
@@ -177,7 +176,8 @@
                             <p class="mb-2 fw-semibold">Admin</p>
                             <div class="mb-2">
                                 <label for="tanggal-admin" class="form-label">Tanggal</label>
-                                <input type="date" id="tanggal-admin" name="tanggal_admin" class="form-control" value="{{ date('Y-m-d') }}" readonly required>
+                                <input type="date" id="tanggal-admin" name="tanggal_admin" class="form-control"
+                                       value="{{ date('Y-m-d') }}" readonly required>
                                 <div class="invalid-feedback">Tanggal admin wajib diisi.</div>
                             </div>
 
@@ -209,17 +209,16 @@
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Status Keputusan</label>
                     <div class="form-check">
-                        <!-- required ditambahkan di radio pertama group -->
                         <input class="form-check-input" type="radio"
                                name="status_permohonan" id="statusDiterima" value="Diterima"
                                {{ old('status_permohonan', $permohonan->status ?? '') == 'Diterima' ? 'checked' : '' }} required>
-                        <label class="form-check-label text-success fw-semibold" for="statusDiterima">✅ Diterima</label>
+                        <label class="form-check-label text-success fw-semibold" for="statusDiterima">Diterima</label>
                     </div>
                     <div class="form-check">
                         <input class="form-check-input" type="radio"
                                name="status_permohonan" id="statusDitolak" value="Ditolak"
                                {{ old('status_permohonan', $permohonan->status ?? '') == 'Ditolak' ? 'checked' : '' }}>
-                        <label class="form-check-label text-danger fw-semibold" for="statusDitolak">❌ Ditolak</label>
+                        <label class="form-check-label text-danger fw-semibold" for="statusDitolak">Ditolak</label>
                     </div>
                     <div class="invalid-feedback">Silakan pilih status keputusan.</div>
                 </div>
@@ -227,12 +226,11 @@
                 <div class="mb-3">
                     <label for="catatan" class="form-label fw-semibold">Alasan / Keterangan</label>
                     <textarea id="catatan" name="catatan" class="form-control" rows="3">{{ old('catatan', $permohonan->catatan ?? '') }}</textarea>
-                    <!-- catatan intentionally not required -->
                 </div>
             </div>
 
             {{-- Tombol --}}
-            <div class="d-flex justify-content-end gap-2 mb-5">
+            <div class="button-group mt-3 mb-5">
                 <a href="{{ route('admin.permohonan.index') }}" class="btn-back">Kembali</a>
                 <button type="submit" class="btn-next">Simpan</button>
             </div>
@@ -255,60 +253,80 @@
     </div>
 </div>
 
-{{-- STYLE (mengikuti style kode kedua: unit-header / question-box / tombol) --}}
+{{-- STYLE (mengikuti style halaman FR.APL.02 contoh) --}}
 <style>
     body { font-family: 'Poppins', sans-serif; background: #f9f9fb; }
+
     .unit-header {
-        background: #E9F1FF; border-left: 6px solid #007BFF; border-radius: 8px;
-        padding: 12px 16px; margin-bottom: 12px; font-size: 14px;
+        background: #E9F1FF;
+        border-left: 6px solid #007BFF;
+        border-radius: 8px;
+        padding: 18px 20px;
+        margin-bottom: 12px;
+        font-size: 1.125rem;
+        line-height: 1.3;
+        font-weight: 700;
+        color: #041562;
     }
+    .unit-header p.mb-0 { font-size: 0.95rem; color: #334155; margin-top: 4px; font-weight: 500; }
+
     .question-box {
-        border: 1px solid #ddd; border-radius: 12px;
-        padding: 18px; margin-bottom: 20px; background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+        background: #fff;
     }
+
     .form-control.is-invalid, .form-select.is-invalid {
-        border: 2px solid #d9534f !important; background: #fff8f8 !important;
+        border: 2px solid #d9534f !important;
+        background: #fff8f8 !important;
     }
-    .invalid-feedback { font-size: 12px; display: block; }
+    .invalid-feedback { font-size: 12px; display:block; }
+
+    .button-group {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
 
     .btn-back {
-        background: #d9534f; color: #fff; padding: 8px 16px; border-radius: 8px;
-        font-weight: 600; text-decoration: none; border: none;
+        background: #d9534f;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        border: none;
     }
+
     .btn-next {
-        background: #041562; color: #fff; padding: 8px 18px;
-        border-radius: 8px; font-weight: 600; border: none;
+        background: #041562;
+        color: #fff;
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        border: none;
     }
+
     .btn-back:hover { background: #c9302c; }
     .btn-next:hover { background: #06208a; }
 
-    /* canvas responsive but keep internal pixel ratio */
-    .canvas-wrapper { position: relative; width: 100%; max-width: 700px; margin: 0 auto 8px auto; }
-    #ttd-admin {
-        display: block;
-        width: 100%;
-        height: 150px;          /* visible height for admin */
-        border: 2px dashed #ccc;
-        border-radius: 6px;
-        background-color: #fff;
-        cursor: crosshair;
-    }
-    .canvas-placeholder {
-        position: absolute;
-        top: 50%; left: 50%;
-        transform: translate(-50%, -50%);
-        color: #aaa; font-size: 14px; pointer-events: none;
-    }
+    .canvas-wrapper { position: relative; width: 100%; max-width: 700px; margin: 0 auto; }
+    #ttd-admin { display:block; width:100%; height:150px; border:2px dashed #ccc; border-radius:6px; background:#fff; cursor:crosshair; }
+    .canvas-placeholder { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#aaa; font-size:14px; pointer-events:none; }
 
     .table-light th { vertical-align: middle; }
 </style>
 
-{{-- SCRIPT Preview + VALIDASI + TTD Admin (wajib) --}}
+{{-- SCRIPTS: preview, TTD admin, validation (digabung & disesuaikan) --}}
 <script>
+    // Preview dokumen (image/pdf/other)
     function openPreview(url, ext) {
         let content = '';
-        ext = ext.toLowerCase();
-        if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
+        ext = (ext || '').toLowerCase();
+        if (['jpg','jpeg','png','gif','webp'].includes(ext)) {
             content = `<img src="${url}" class="img-fluid" alt="preview">`;
         } else if (ext === 'pdf') {
             content = `<embed src="${url}" type="application/pdf" width="100%" height="600px">`;
@@ -316,21 +334,19 @@
             content = `<a href="${url}" target="_blank">Download File</a>`;
         }
         document.getElementById('previewContent').innerHTML = content;
-        let modal = new bootstrap.Modal(document.getElementById('previewModal'));
-        modal.show();
+        new bootstrap.Modal(document.getElementById('previewModal')).show();
     }
 
-    // === TTD Admin: responsive, hi-dpi, blank-detection using white background, touch support (REQUIRED) ===
+    // === TTD Admin: responsive hi-dpi, blank-detection, touch support ===
     (function () {
         const canvas = document.getElementById('ttd-admin');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         const placeholder = document.querySelector('.canvas-placeholder');
-        const VISIBLE_HEIGHT = 150; // CSS px height
+        const VISIBLE_HEIGHT = 150;
         let drawing = false;
         let blankDataURL = null;
 
-        // resize & prepare blank white canvas
         function resizeCanvasAndPrepareBlankAdmin() {
             const cssWidth = canvas.clientWidth;
             const cssHeight = VISIBLE_HEIGHT;
@@ -339,25 +355,20 @@
             canvas.width = Math.round(cssWidth * ratio);
             canvas.height = Math.round(cssHeight * ratio);
 
-            // reset transform and scale to CSS px coordinates
             ctx.setTransform(1,0,0,1,0,0);
             ctx.scale(ratio, ratio);
 
-            // fill white background
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, cssWidth, cssHeight);
 
-            // set drawing style
             ctx.lineWidth = 2;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
             ctx.strokeStyle = '#000';
 
-            // store blank state (white)
             blankDataURL = canvas.toDataURL();
         }
 
-        // pointer pos (CSS px)
         function getPointerPosAdmin(evt) {
             const rect = canvas.getBoundingClientRect();
             let clientX, clientY;
@@ -368,9 +379,7 @@
                 clientX = evt.clientX;
                 clientY = evt.clientY;
             }
-            const x = clientX - rect.left;
-            const y = clientY - rect.top;
-            return { x, y };
+            return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
         function startDrawingAdmin(evt) {
@@ -406,7 +415,6 @@
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, cssWidth, cssHeight);
 
-            // update blank
             blankDataURL = canvas.toDataURL();
             document.getElementById('ttd_admin_data').value = '';
             placeholder.style.display = 'block';
@@ -417,7 +425,6 @@
         }
 
         function saveAdminTTD(required = true) {
-            // required=true => will block submit if blank (alert), else will just set hidden input (optional)
             if (isCanvasBlankAdmin()) {
                 if (required) {
                     alert("Silakan tanda tangan admin terlebih dahulu sebelum lanjut.");
@@ -444,19 +451,15 @@
             link.click();
         }
 
-        // attach handlers
-        function attachEventsAdmin() {
-            // mouse
-            canvas.addEventListener('mousedown', startDrawingAdmin);
-            canvas.addEventListener('mousemove', drawMoveAdmin);
-            window.addEventListener('mouseup', stopDrawingAdmin);
-            // touch
-            canvas.addEventListener('touchstart', function(e){ startDrawingAdmin(e); }, { passive: false });
-            canvas.addEventListener('touchmove', function(e){ drawMoveAdmin(e); }, { passive: false });
-            window.addEventListener('touchend', stopDrawingAdmin);
-        }
+        // attach events
+        canvas.addEventListener('mousedown', startDrawingAdmin);
+        canvas.addEventListener('mousemove', drawMoveAdmin);
+        window.addEventListener('mouseup', stopDrawingAdmin);
 
-        // preserve signature on resize
+        canvas.addEventListener('touchstart', function(e){ startDrawingAdmin(e); }, { passive: false });
+        canvas.addEventListener('touchmove', function(e){ drawMoveAdmin(e); }, { passive: false });
+        window.addEventListener('touchend', stopDrawingAdmin);
+
         window.addEventListener('resize', function () {
             const prev = canvas.toDataURL();
             resizeCanvasAndPrepareBlankAdmin();
@@ -469,11 +472,10 @@
             }
         });
 
-        // initialize
+        // init
         resizeCanvasAndPrepareBlankAdmin();
-        attachEventsAdmin();
 
-        // expose functions to global scope used by buttons
+        // expose
         window.clearCanvasAdmin = clearCanvasAdmin;
         window.downloadTTDAdmin = downloadTTDAdmin;
         window.saveAdminTTD = saveAdminTTD;
@@ -484,9 +486,9 @@
         'use strict';
         const form = document.getElementById('permohonanForm');
         form.addEventListener('submit', function (event) {
-            // pertama, pastikan admin TTD disimpan dan required
+            // simpan tanda tangan admin ke input hidden (wajib)
             if (typeof saveAdminTTD === 'function') {
-                const ok = saveAdminTTD(true); // pass required=true so it will alert & block if blank
+                const ok = saveAdminTTD(true);
                 if (!ok) {
                     event.preventDefault();
                     event.stopPropagation();
@@ -494,12 +496,9 @@
                 }
             }
 
-            // lalu jalankan validasi HTML5/Bootstrap
             if (!form.checkValidity()) {
                 event.preventDefault();
                 event.stopPropagation();
-
-                // cari element invalid pertama, scroll to it & focus
                 const firstInvalid = form.querySelector(':invalid');
                 if (firstInvalid) {
                     firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -510,7 +509,5 @@
             form.classList.add('was-validated');
         }, false);
     })();
-
-    // Pastikan date admin diisi (readonly logic handled by required on input) and radio groups required already set in markup
 </script>
 @endsection

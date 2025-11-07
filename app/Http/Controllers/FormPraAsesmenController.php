@@ -31,16 +31,16 @@ class FormPraAsesmenController extends Controller
                     ->leftJoin('asesmen_mandiri_persetujuan as amp', 'amm.id_asesmen_mandiri', '=', 'amp.id_asesmen_mandiri')
                     ->select(
                         'amm.*',
-                        'amm.rekomendasi',               // hasil verifikasi asesor
-                        'amp.status_persetujuan',        // tanda tangan asesmen mandiri
+                        'amm.rekomendasi',
+                        'amp.status_persetujuan',
                         'amp.catatan',
                         'amp.tgl_ttd_asesor',
                         'amp.tgl_ttd_asesi',
                         'amp.ttd_asesor',
                         'amp.ttd_asesi'
                     )
-                    ->where('amm.permohonan_id', $permohonan->id_permohonan)
-                    ->where('amm.asesi_id', $asesi->id_asesi)
+                    ->where('amm.id_permohonan', $permohonan->id_permohonan) // ✅ perbaikan di sini
+                    ->where('amm.id_asesi', $asesi->id_asesi)                // ✅ pastikan konsisten
                     ->first();
 
                 // ✅ Jika permohonan ditolak, ambil dokumen yang tidak memenuhi

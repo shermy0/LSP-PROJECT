@@ -14,8 +14,8 @@ return new class extends Migration
             // 🧾 Informasi dasar skema
             $table->string('kode_skema', 50)->unique();   // misal: J.59MTM00.010.1
             $table->string('nama_skema', 150);            // misal: Junior Operator Desain Grafis
-            $table->string('jenjang', 50)->nullable();    // misal: KKNI Level II
-            $table->string('bidang_keahlian', 100)->nullable(); // misal: Multimedia / Desain Grafis
+            $table->string('jenjang', 50)->nullable();   
+            $table->string('bidang_keahlian', 100)->nullable(); 
 
             // 🧩 Keterangan tambahan
             $table->text('deskripsi')->nullable();        // uraian singkat skema
