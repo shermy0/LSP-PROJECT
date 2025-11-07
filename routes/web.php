@@ -285,9 +285,10 @@ Route::get('/admin/laporan-asesmen/{id_skema}', [LaporanController::class, 'show
     ->name('admin.laporan.admin');
 
     // 🔹 Admin download versi PDF LAPORAN
-Route::get('/admin/formperencanaan/laporan-asesmen/pdf/{id_skema}', [LaporanController::class, 'downloadPdfAdmin'])
-    ->name('admin.laporan.pdf')
-    ->middleware('auth');
+Route::get('form-perencanaan/laporan/download/{skema_id}/{asesor_id}', 
+    [LaporanController::class, 'downloadPdfAdmin']
+)->name('admin.laporan.pdf');
+
 
 
 // ============================

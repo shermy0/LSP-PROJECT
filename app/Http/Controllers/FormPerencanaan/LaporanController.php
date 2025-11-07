@@ -6,10 +6,62 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Skema;
+use App\Models\Asesor;
 use App\Models\Asesi;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class LaporanController extends Controller
 {
+    
+public function downloadPdfAdmin($skema_id, $asesor_id)
+{
+    // Ambil data asesor
+    $asesor = DB::table('asesor')->where('id_asesor', $asesor_id)->first();
+
+    // Ambil skema
+    $skema  = DB::table('skema_sertifikasi')->where('id_skema', $skema_id)->first();
+
+    // Ambil data TUK (sementara ambil yang pertama / aktif)
+    $tuk = DB::table('tuk')->where('status_tuk', 'Aktif')->first();
+
+    // Ambil daftar asesi + hasil + unit
+    $asesis = DB::table('asesi')
+        ->leftJoin('hasil_unit_kompetensi', 'asesi.id_asesi', '=', 'hasil_unit_kompetensi.id_asesi')
+        ->leftJoin('unit_kompetensi', 'hasil_unit_kompetensi.id_unit', '=', 'unit_kompetensi.id_unit')
+        ->where('asesi.asesor_id', $asesor_id)
+        ->select(
+            'asesi.nama_lengkap',
+            'hasil_unit_kompetensi.hasil',
+            'unit_kompetensi.kode_unit',
+            'unit_kompetensi.judul_unit'
+        )
+        ->get();
+
+    // Ambil catatan laporan asesmen
+    $laporan = DB::table('laporan_asesmen')
+        ->where('asesor_id', $asesor_id)
+        ->where('skema_id', $skema_id)
+        ->first();
+
+    // Ambil data catatan & tanda tangan dari tabel penyusun_persetujuan
+$penyusun = DB::table('penyusun_persetujuan')
+    ->where('id_skema', $skema_id)
+    ->where('id_asesor', $asesor_id)
+    ->where('role', 'asesor')
+    ->first();
+
+
+    $view = 'form_perencanaan.admin_formperencanaan.laporan-pdf';
+
+    // Generate PDF
+$pdf = Pdf::loadView($view, compact('asesor', 'skema', 'tuk', 'asesis', 'laporan', 'penyusun'))
+    ->setPaper('a4', 'portrait');
+
+    $filename = 'Laporan_Asesmen_' . ($asesor->nama_asesor ?? 'unknown') . '.pdf';
+    return $pdf->download($filename);
+}
+
+
     public function showAdminLaporan($skema_id)
 {
     $skema = \App\Models\Skema::findOrFail($skema_id);
@@ -62,6 +114,8 @@ public function showLaporanAsesor($skema_id)
         ->first();
 
     $no_registrasi_terpilih = $ttd->no_met ?? optional($asesors->firstWhere('id_asesor', $asesor_terpilih))->no_met;
+
+    
 
     return view('form_perencanaan.laporan_asesmen.laporan_asesor', compact(
         'skema',

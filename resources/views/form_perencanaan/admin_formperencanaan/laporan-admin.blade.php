@@ -227,9 +227,10 @@
     </div>
 </div>
 <!-- Floating Download Button -->
-<a href="" class="floating-download-btn" title="Download FR.MAPA.01 PDF">
+<a href="#" class="floating-download-btn" title="Download FR.AK.05 PDF">
     <i class="bi bi-download"></i>
 </a>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const asesorSelect = document.getElementById('namaAsesor');
