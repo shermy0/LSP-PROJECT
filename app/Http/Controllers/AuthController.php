@@ -8,8 +8,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
-
 {
+    /* ===============================
+       LOGIN
+    =============================== */
     public function showLogin()
     {
         return view('auth.login');
@@ -17,60 +19,68 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        $request->validate([
+            'email'    => 'required|email',
+            'password' => 'required',
+        ]);
+
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
-            // Ambil user yang sedang login
+            $request->session()->regenerate();
+
             $user = Auth::user();
 
-            // Cek role dan redirect
-            if ($user->role === 'admin') {
-                return redirect()->route('admin.dashboard');
-            } elseif ($user->role === 'asesor') {
-                return redirect()->route('asesor.dashboard');
-            } elseif ($user->role === 'asesi') {
-                return redirect()->route('asesi.dashboard');
-            } else {
-                Auth::logout();
-                return redirect()->route('login')->withErrors('Role tidak dikenali.');
+            // Redirect berdasarkan role
+            switch ($user->role) {
+                case 'admin':
+                    return redirect()->route('admin.dashboard');
+                case 'asesor':
+                    return redirect()->route('asesor.dashboard');
+                case 'asesi':
+                    return redirect()->route('asesi.dashboard');
+                default:
+                    Auth::logout();
+                    return redirect()->route('login')->withErrors(['login' => 'Role pengguna tidak dikenali.']);
             }
         }
 
-        // Kalau gagal login
-        return back()->withErrors(['login' => 'Email atau password salah']);
+        return back()->withErrors(['login' => 'Email atau password salah'])->withInput();
     }
 
-    public function showRegisterRole()
+    public function logout(Request $request)
     {
-        return view('auth.register-role');
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')->with('success', 'Anda telah keluar dari sistem.');
+    }
+
+
+    /* ===============================
+       REGISTER (ASESI)
+    =============================== */
+    public function showRegister()
+    {
+        return view('auth.register');
     }
 
     public function register(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'email' => 'required|unique:users',
-            'password' => 'required|min:6',
-            'role' => 'required|in:admin,asesor,asesi',
+            'name'                  => 'required|string|max:255',
+            'email'                 => 'required|email|unique:users,email',
+            'password'              => 'required|min:6|confirmed',
         ]);
 
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
+        $user = User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $request->role,
+            'role'     => 'asesi', // otomatis jadi asesi
         ]);
 
-        return redirect()->route('login')->with('success', 'Registrasi berhasil, silakan login');
+        return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan login.');
     }
-
-   public function logout(Request $request)
-{
-    Auth::logout();
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-
-        return redirect('/login');
-    }
-
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class Form1AdminController extends Controller
 {
@@ -112,17 +113,18 @@ class Form1AdminController extends Controller
             'tanggal_admin' => 'nullable|date'
         ]);
 
+        // ✅ Ambil ID admin berdasarkan user login
         $adminId = DB::table('admin')
             ->where('user_id', Auth::id())
             ->value('id_admin');
 
-        // ✅ Update permohonan
+        // ✅ Update permohonan (pakai kolom admin_id)
         DB::table('permohonan')
             ->where('id_permohonan', $id_permohonan)
             ->update([
                 'status' => $request->status_permohonan,
                 'catatan' => $request->catatan,
-                'id_admin' => $adminId,
+                'admin_id' => $adminId,
                 'updated_at' => now(),
             ]);
 
@@ -138,13 +140,13 @@ class Form1AdminController extends Controller
             }
         }
 
-        // ✅ Update tanda tangan admin
+        // ✅ Simpan tanda tangan admin
         if ($request->filled('ttd_admin')) {
             $img = str_replace(['data:image/png;base64,', ' '], ['', '+'], $request->ttd_admin);
             $fileName = 'ttd_admin_' . time() . '.png';
             $filePath = 'tanda_tangan/' . $fileName;
 
-            \Storage::disk('public')->put($filePath, base64_decode($img));
+            Storage::disk('public')->put($filePath, base64_decode($img));
 
             DB::table('permohonan_persetujuan')
                 ->updateOrInsert(

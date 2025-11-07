@@ -14,6 +14,9 @@
                 <p class="text-muted">Form Asesmen &gt; FR.APL.01</p>
             </div>
 
+            <!-- ALERT RINGKAS ERROR -->
+            <div id="formErrors" class="alert alert-danger d-none" role="alert"></div>
+
             <!-- Data Pribadi -->
             <div class="unit-header">
                 <p class="mb-1 fw-semibold">Data Pribadi</p>
@@ -26,7 +29,7 @@
                     <label class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
                     <input type="text" name="nama_lengkap" class="form-control"
                         value="{{ old('nama_lengkap', $asesi->nama_lengkap ?? '') }}" placeholder="Masukkan nama lengkap"
-                        required>
+                        required data-msg="Nama lengkap wajib diisi.">
                     <div class="invalid-feedback">Nama lengkap wajib diisi.</div>
                 </div>
 
@@ -34,8 +37,9 @@
                 <div class="mb-3">
                     <label class="form-label">No. KTP / NIK / Paspor <span class="text-danger">*</span></label>
                     <input type="text" name="nik" class="form-control" value="{{ old('nik', $asesi->nik ?? '') }}"
-                        placeholder="Masukkan nomor identitas" required>
-                    <div class="invalid-feedback">Nomor identitas wajib diisi.</div>
+                        placeholder="Masukkan nomor identitas" required pattern="\d{16}" title="NIK harus 16 digit angka"
+                        data-msg="NIK harus 16 digit angka (hanya angka)" >
+                    <div class="invalid-feedback">NIK harus 16 digit angka.</div>
                 </div>
 
                 <!-- Tempat Lahir -->
@@ -43,7 +47,7 @@
                     <label class="form-label">Tempat Lahir <span class="text-danger">*</span></label>
                     <input type="text" name="tempat_lahir" class="form-control"
                         value="{{ old('tempat_lahir', $asesi->tempat_lahir ?? '') }}" placeholder="Masukkan tempat lahir"
-                        required>
+                        required data-msg="Tempat lahir wajib diisi.">
                     <div class="invalid-feedback">Tempat lahir wajib diisi.</div>
                 </div>
 
@@ -52,14 +56,14 @@
                     <label class="form-label">Tanggal Lahir <span class="text-danger">*</span></label>
                     <input type="date" name="tgl_lahir" class="form-control"
                         value="{{ old('tgl_lahir', isset($asesi->tgl_lahir) ? \Carbon\Carbon::parse($asesi->tgl_lahir)->format('Y-m-d') : '') }}"
-                        required>
+                        required data-msg="Tanggal lahir wajib diisi.">
                     <div class="invalid-feedback">Tanggal lahir wajib diisi.</div>
                 </div>
 
                 <!-- Jenis Kelamin -->
                 <div class="mb-3">
                     <label class="form-label">Jenis Kelamin <span class="text-danger">*</span></label>
-                    <select name="jenis_kelamin" class="form-select" required>
+                    <select name="jenis_kelamin" class="form-select" required data-msg="Jenis kelamin wajib dipilih.">
                         <option value="">Pilih</option>
                         <option value="L" {{ old('jenis_kelamin', $asesi->jenis_kelamin ?? '') == 'L' ? 'selected' : '' }}>
                             Laki-laki</option>
@@ -74,7 +78,7 @@
                     <label class="form-label">Kebangsaan <span class="text-danger">*</span></label>
                     <input type="text" name="kebangsaan" class="form-control"
                         value="{{ old('kebangsaan', $asesi->kebangsaan ?? 'Indonesia') }}" placeholder="Masukkan kebangsaan"
-                        required>
+                        required data-msg="Kebangsaan wajib diisi.">
                     <div class="invalid-feedback">Kebangsaan wajib diisi.</div>
                 </div>
 
@@ -83,7 +87,7 @@
                     <label class="form-label">Alamat Rumah <span class="text-danger">*</span></label>
                     <input type="text" name="alamat_rumah" class="form-control"
                         value="{{ old('alamat_rumah', $asesi->alamat_rumah ?? '') }}" placeholder="Masukkan alamat rumah"
-                        required>
+                        required data-msg="Alamat rumah wajib diisi.">
                     <div class="invalid-feedback">Alamat rumah wajib diisi.</div>
                 </div>
 
@@ -91,16 +95,19 @@
                 <div class="mb-3">
                     <label class="form-label">Kode Pos Rumah <span class="text-danger">*</span></label>
                     <input type="text" name="kode_pos_rumah" class="form-control"
-                        value="{{ old('kode_pos_rumah', $asesi->kode_pos_rumah ?? '') }}" placeholder="Kode pos" required>
-                    <div class="invalid-feedback">Kode pos rumah wajib diisi.</div>
+                        value="{{ old('kode_pos_rumah', $asesi->kode_pos_rumah ?? '') }}" placeholder="Kode pos"
+                        required pattern="\d{5}" title="Kode pos harus 5 digit angka" data-msg="Kode pos harus 5 digit angka.">
+                    <div class="invalid-feedback">Kode pos rumah wajib 5 digit angka.</div>
                 </div>
 
                 <!-- Telepon Rumah -->
                 <div class="mb-3">
                     <label class="form-label">Telp. Rumah <span class="text-danger">*</span></label>
                     <input type="text" name="telepon_rumah" class="form-control"
-                        value="{{ old('telepon_rumah', $asesi->telepon_rumah ?? '') }}" placeholder="Telp. rumah" required>
-                    <div class="invalid-feedback">Telp. rumah wajib diisi.</div>
+                        value="{{ old('telepon_rumah', $asesi->telepon_rumah ?? '') }}" placeholder="Telp. rumah"
+                        required pattern="^\+?\d{7,15}$" title="Masukkan nomor telepon yang valid (7-15 digit, optional +)"
+                        data-msg="Nomor telepon rumah tidak valid.">
+                    <div class="invalid-feedback">Telp. rumah wajib diisi dan format harus benar.</div>
                 </div>
 
                 <!-- HP -->
@@ -108,8 +115,9 @@
                     <label class="form-label">HP <span class="text-danger">*</span></label>
                     <input type="text" name="telepon_hp" class="form-control"
                         value="{{ old('telepon_hp', $asesi->telepon_hp ?? auth()->user()->phone ?? '') }}"
-                        placeholder="Masukkan nomor HP" required>
-                    <div class="invalid-feedback">Nomor HP wajib diisi.</div>
+                        placeholder="Masukkan nomor HP" required pattern="^\+?\d{7,15}$"
+                        title="Masukkan nomor HP yang valid (7-15 digit, optional +)" data-msg="Nomor HP tidak valid.">
+                    <div class="invalid-feedback">Nomor HP wajib diisi dan format harus benar.</div>
                 </div>
 
                 <!-- Email -->
@@ -117,8 +125,8 @@
                     <label class="form-label">E-mail <span class="text-danger">*</span></label>
                     <input type="email" name="email" class="form-control"
                         value="{{ old('email', $asesi->email ?? auth()->user()->email ?? '') }}"
-                        placeholder="Masukkan email" required>
-                    <div class="invalid-feedback">Email wajib diisi.</div>
+                        placeholder="Masukkan email" required data-msg="Masukkan alamat email yang valid.">
+                    <div class="invalid-feedback">Email wajib diisi dan harus format email.</div>
                 </div>
 
                 <!-- Kualifikasi Pendidikan -->
@@ -126,7 +134,7 @@
                     <label class="form-label">Kualifikasi Pendidikan <span class="text-danger">*</span></label>
                     <input type="text" name="kualifikasi_pendidikan" class="form-control"
                         value="{{ old('kualifikasi_pendidikan', $asesi->kualifikasi_pendidikan ?? $asesi->pendidikan_terakhir ?? '') }}"
-                        placeholder="Contoh: SMK - Desain Komunikasi Visual" required>
+                        placeholder="Contoh: SMK - Desain Komunikasi Visual" required data-msg="Kualifikasi pendidikan wajib diisi.">
                     <div class="invalid-feedback">Kualifikasi pendidikan wajib diisi.</div>
                 </div>
             </div>
@@ -143,7 +151,7 @@
                     <label class="form-label">Nama Institusi / Perusahaan <span class="text-danger">*</span></label>
                     <input type="text" name="nama_institusi" class="form-control"
                         value="{{ old('nama_institusi', $asesi->nama_institusi ?? '') }}"
-                        placeholder="Nama sekolah atau perusahaan" required>
+                        placeholder="Nama sekolah atau perusahaan" required data-msg="Nama institusi wajib diisi.">
                     <div class="invalid-feedback">Nama institusi wajib diisi.</div>
                 </div>
 
@@ -152,7 +160,7 @@
                     <label class="form-label">Jabatan <span class="text-danger">*</span></label>
                     <input type="text" name="jabatan" class="form-control"
                         value="{{ old('jabatan', $asesi->jabatan ?? '') }}"
-                        placeholder="Jabatan / status (mis. Siswa, Staff, Freelancer)" required>
+                        placeholder="Jabatan / status (mis. Siswa, Staff, Freelancer)" required data-msg="Jabatan wajib diisi.">
                     <div class="invalid-feedback">Jabatan wajib diisi.</div>
                 </div>
 
@@ -161,7 +169,7 @@
                     <label class="form-label">Alamat Kantor / Sekolah <span class="text-danger">*</span></label>
                     <input type="text" name="alamat_kantor" class="form-control"
                         value="{{ old('alamat_kantor', $asesi->alamat_kantor ?? '') }}"
-                        placeholder="Alamat institusi/perusahaan" required>
+                        placeholder="Alamat institusi/perusahaan" required data-msg="Alamat kantor wajib diisi.">
                     <div class="invalid-feedback">Alamat kantor wajib diisi.</div>
                 </div>
 
@@ -169,8 +177,9 @@
                 <div class="mb-3">
                     <label class="form-label">Kode Pos Kantor <span class="text-danger">*</span></label>
                     <input type="text" name="kode_pos_kantor" class="form-control"
-                        value="{{ old('kode_pos_kantor', $asesi->kode_pos_kantor ?? '') }}" placeholder="Kode pos" required>
-                    <div class="invalid-feedback">Kode pos kantor wajib diisi.</div>
+                        value="{{ old('kode_pos_kantor', $asesi->kode_pos_kantor ?? '') }}" placeholder="Kode pos"
+                        required pattern="\d{5}" title="Kode pos harus 5 digit angka" data-msg="Kode pos kantor harus 5 digit angka.">
+                    <div class="invalid-feedback">Kode pos kantor wajib 5 digit angka.</div>
                 </div>
 
                 <!-- Telepon Kantor -->
@@ -178,16 +187,19 @@
                     <label class="form-label">Telp. Kantor <span class="text-danger">*</span></label>
                     <input type="text" name="telepon_kantor" class="form-control"
                         value="{{ old('telepon_kantor', $asesi->telepon_kantor ?? '') }}" placeholder="Telp. kantor"
-                        required>
-                    <div class="invalid-feedback">Telp. kantor wajib diisi.</div>
+                        required pattern="^\+?\d{7,15}$" title="Masukkan nomor telepon yang valid (7-15 digit, optional +)"
+                        data-msg="Nomor telepon kantor tidak valid.">
+                    <div class="invalid-feedback">Telp. kantor wajib diisi dan format harus benar.</div>
                 </div>
 
                 <!-- Fax Kantor -->
                 <div class="mb-3">
                     <label class="form-label">Fax Kantor <span class="text-danger">*</span></label>
                     <input type="text" name="fax_kantor" class="form-control"
-                        value="{{ old('fax_kantor', $asesi->fax_kantor ?? '') }}" placeholder="Fax kantor" required>
-                    <div class="invalid-feedback">Fax kantor wajib diisi.</div>
+                        value="{{ old('fax_kantor', $asesi->fax_kantor ?? '') }}" placeholder="Fax kantor"
+                        required pattern="^\+?[\d\-]{6,20}$" title="Masukkan nomor fax yang valid"
+                        data-msg="Nomor fax tidak valid.">
+                    <div class="invalid-feedback">Fax kantor wajib diisi dan format harus benar.</div>
                 </div>
 
                 <!-- Email Kantor -->
@@ -195,8 +207,8 @@
                     <label class="form-label">E-mail Kantor <span class="text-danger">*</span></label>
                     <input type="email" name="email_kantor" class="form-control"
                         value="{{ old('email_kantor', $asesi->email_kantor ?? '') }}" placeholder="Email kantor / sekolah"
-                        required>
-                    <div class="invalid-feedback">Email kantor wajib diisi.</div>
+                        required data-msg="Masukkan alamat email kantor yang valid.">
+                    <div class="invalid-feedback">Email kantor wajib diisi dan harus format email.</div>
                 </div>
             </div>
 
@@ -210,6 +222,7 @@
 
 
     <style>
+        /* (tetap seperti style sebelumnya) */
         body {
             font-family: 'Poppins', sans-serif;
             background: #f9f9fb;
@@ -323,52 +336,98 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('formApl01');
+            const alertBox = document.getElementById('formErrors');
+
+            function showAlert(messages) {
+                if (!messages || messages.length === 0) {
+                    alertBox.classList.add('d-none');
+                    alertBox.innerHTML = '';
+                    return;
+                }
+                alertBox.classList.remove('d-none');
+                // tampilkan ringkasan error (maks 5)
+                const list = messages.slice(0, 10).map(m => `<li>${m}</li>`).join('');
+                alertBox.innerHTML = `<strong>Perhatikan:</strong><ul class="mb-0 mt-2">${list}</ul>`;
+                alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
 
             form.addEventListener('submit', function (e) {
                 let valid = true;
+                const messages = [];
                 let firstInvalid = null;
 
+                // remove previous invalid states
+                form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+                // cek required + pattern/type
                 form.querySelectorAll('[required]').forEach(field => {
-                    if (field.tagName.toLowerCase() === 'select') {
-                        if (!field.value || field.value === '') {
-                            field.classList.add('is-invalid');
-                            valid = false;
-                            if (!firstInvalid) firstInvalid = field;
-                        } else {
-                            field.classList.remove('is-invalid');
-                        }
+                    // skip fields that are hidden/disabled
+                    if (field.disabled || field.closest('fieldset[disabled]')) return;
+
+                    const value = (field.value || '').toString().trim();
+
+                    // basic required
+                    if (!value) {
+                        valid = false;
+                        field.classList.add('is-invalid');
+                        const msg = field.dataset.msg || 'Field ini wajib diisi.';
+                        messages.push(msg);
+                        if (!firstInvalid) firstInvalid = field;
                         return;
                     }
 
-                    if (!field.value || !field.value.toString().trim()) {
-                        field.classList.add('is-invalid');
+                    // use built-in validity for type/pattern checks
+                    if (!field.checkValidity()) {
                         valid = false;
+                        field.classList.add('is-invalid');
+
+                        // prefer custom message, else title, else default
+                        const msg = field.dataset.msg || field.title || field.validationMessage || 'Format tidak valid.';
+                        messages.push(msg);
                         if (!firstInvalid) firstInvalid = field;
-                    } else {
-                        field.classList.remove('is-invalid');
+                        return;
                     }
                 });
 
                 if (!valid) {
                     e.preventDefault();
+                    showAlert(messages);
+
+                    // fokus ke error pertama
                     if (firstInvalid) {
-                        firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" });
-                        firstInvalid.focus();
+                        setTimeout(() => {
+                            firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            firstInvalid.focus();
+                        }, 150);
                     }
+                } else {
+                    // semua valid, sembunyikan alert
+                    showAlert([]);
                 }
             });
 
-            form.querySelectorAll('[required]').forEach(field => {
+            // real-time clearing of errors
+            form.querySelectorAll('input, select, textarea').forEach(field => {
                 field.addEventListener('input', function () {
-                    if (this.value && this.value.toString().trim()) {
-                        this.classList.remove('is-invalid');
+                    if (this.classList.contains('is-invalid')) {
+                        // re-check validity for this field
+                        const value = (this.value || '').toString().trim();
+                        if (value && this.checkValidity()) {
+                            this.classList.remove('is-invalid');
+                            showAlert([]);
+                        }
                     }
                 });
-                if (field.tagName.toLowerCase() === 'select') {
-                    field.addEventListener('change', function () {
-                        if (this.value) this.classList.remove('is-invalid');
-                    });
-                }
+
+                field.addEventListener('change', function () {
+                    if (this.classList.contains('is-invalid')) {
+                        const value = (this.value || '').toString().trim();
+                        if (value && this.checkValidity()) {
+                            this.classList.remove('is-invalid');
+                            showAlert([]);
+                        }
+                    }
+                });
             });
         });
     </script>
