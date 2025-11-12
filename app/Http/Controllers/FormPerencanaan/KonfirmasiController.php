@@ -52,17 +52,27 @@ class KonfirmasiController extends Controller
 
         // Ambil semua penyusun
         $penyusun = DB::table('penyusun_persetujuan')
-            ->where('id_skema', $skema_id)
-            ->where('role', 'penyusun')
-            ->get();
+    ->where('id_skema', $skema_id)
+    ->where('role', 'penyusun')
+    ->where('form_type', 'mapa01') // <-- hanya MAPA.01
+    ->get();
 
-        return view('form_perencanaan.form_mapa_01.mapa01_konfirmasi', compact(
-            'skema',
-            'asesors',
-            'konfirmasi',
-            'activeRoles',
-            'penyusun'
-        ));
+
+        // Tambahkan di dalam function konfirmasi($skema_id)
+$validators = DB::table('validasi_validator')
+    ->where('skema_id', $skema_id)
+    ->get();
+
+
+return view('form_perencanaan.form_mapa_01.mapa01_konfirmasi', compact(
+    'skema',
+    'asesors',
+    'konfirmasi',
+    'activeRoles',
+    'penyusun',
+    'validators' // <--- tambahkan ini
+));
+
     }
 
 public function storeLaporanAsesor(Request $request, $skema_id)
@@ -106,8 +116,10 @@ public function storeLaporanAsesor(Request $request, $skema_id)
         $dataUpdate
     );
 
-    return redirect()->route('form_perencanaan.laporan_asesmen.laporan_asesor', $skema_id)
-        ->with('success', 'Data catatan dan tanda tangan asesor berhasil disimpan.');
+return redirect()->route('form_perencanaan.laporan_asesmen.laporan_asesor', $skema_id)
+    ->with('success', 'Data catatan dan tanda tangan asesor berhasil disimpan.')
+    ->with('asesor_terpilih', $request->asesor_id)
+    ->with('no_registrasi_terpilih', $noMet);
 }
 
 
@@ -134,35 +146,36 @@ public function store(Request $request, $skema_id)
         }
     }
 
-    // ✅ Bagian Penyusun (ada di MAPA.01 dan MAPA.02)
-    if ($request->has('nama_asesor')) {
-        foreach ($request->nama_asesor as $i => $idAsesor) {
-            if (!$idAsesor) continue;
+            // Penyusun MAPA.01
+        if ($request->has('nama_asesor')) {
+            foreach ($request->nama_asesor as $i => $idAsesor) {
+                if (!$idAsesor) continue;
 
-            $asesorData = DB::table('asesor')->where('id_asesor', $idAsesor)->first();
-            $noMet = $asesorData->no_registrasi ?? ($request->nomet[$i] ?? null);
+                $asesorData = DB::table('asesor')->where('id_asesor', $idAsesor)->first();
+                $noMet = $asesorData->no_registrasi ?? ($request->nomet[$i] ?? null);
 
-            $dataUpdate = [
-                'id_asesor' => $idAsesor,
-                'no_met'    => $noMet,
-                'tanggal'   => $request->tanggal[$i] ?? null,
-                'role'      => 'penyusun',
-            ];
+                $dataUpdate = [
+                    'id_asesor' => $idAsesor,
+                    'no_met'    => $noMet,
+                    'tanggal'   => $request->tanggal[$i] ?? null,
+                    'role'      => 'penyusun',
+                    'form_type' => 'mapa01',
+                ];
 
-            if (!empty($request->tanda_tangan[$i])) {
-                $dataUpdate['tanda_tangan'] = $request->tanda_tangan[$i];
-            }
+                if (!empty($request->tanda_tangan[$i])) {
+                    $dataUpdate['tanda_tangan'] = $request->tanda_tangan[$i];
+                }
 
-            if (!empty($request->penyusun_id[$i])) {
-                DB::table('penyusun_persetujuan')
-                    ->where('id', $request->penyusun_id[$i])
-                    ->update($dataUpdate);
-            } else {
-                $dataUpdate['id_skema'] = $skema_id;
-                DB::table('penyusun_persetujuan')->insert($dataUpdate);
+                if (!empty($request->penyusun_id[$i])) {
+                    DB::table('penyusun_persetujuan')
+                        ->where('id', $request->penyusun_id[$i])
+                        ->update($dataUpdate);
+                } else {
+                    $dataUpdate['id_skema'] = $skema_id;
+                    DB::table('penyusun_persetujuan')->insert($dataUpdate);
+                }
             }
         }
-    }
 
     return redirect()->back()->with('success', 'Data penyusun berhasil disimpan');
 }
@@ -170,14 +183,34 @@ public function store(Request $request, $skema_id)
 
 public function deletePenyusun($id)
 {
-    $deleted = DB::table('penyusun_persetujuan')->where('id', $id)->delete();
+    try {
+        $deleted = DB::table('penyusun_persetujuan')
+            ->where('id', $id)
+            ->where('form_type', 'mapa01') 
+            ->delete();
 
-    if ($deleted) {
-        // cukup balikin 204 (no content) tanpa json
-        return response(null, 204);
+        if ($deleted) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Penyusun MAPA.01 berhasil dihapus.'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Data penyusun MAPA.01 tidak ditemukan.'
+        ], 404);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Terjadi kesalahan server.',
+            'error'   => $e->getMessage()
+        ], 500);
     }
-    return response(null, 400);
 }
+
+
 
 
     // Hapus TTD

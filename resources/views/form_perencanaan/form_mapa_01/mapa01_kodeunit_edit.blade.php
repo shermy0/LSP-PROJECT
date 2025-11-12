@@ -69,17 +69,18 @@
                 @endforeach
             </div>
 
-            <div class="mb-3">
-                <label>Metode dan Perangkat Asesmen</label><br>
-                @foreach ($perangkat as $p)
-                    <label>
-                        <input type="checkbox" class="form-check-input me-2" 
-                               name="metode[]" value="{{ $p->id_perangkat }}"
-                               {{ $hasil->perangkat->pluck('id_perangkat')->contains($p->id_perangkat) ? 'checked' : '' }}>
-                        {{ $p->jenisBukti->nama_bukti ?? '' }} ({{ $p->catatan_penerapan }})
-                    </label><br>
-                @endforeach
-            </div>
+<div class="mb-3">
+    <label>Metode dan Perangkat Asesmen</label><br>
+    @foreach ($perangkat as $p)
+        <label>
+            <input type="checkbox" class="form-check-input me-2" 
+                   name="metode[]" value="{{ $p->id_perangkat }}"
+                   {{ $hasil->perangkat->pluck('id_perangkat')->contains($p->id_perangkat) ? 'checked' : '' }}>
+            {{ $p->jenis_bukti }} ({{ $p->catatan_penerapan }})
+        </label><br>
+    @endforeach
+</div>
+
 
             <div class="d-flex justify-content-between">
                 <a href="{{ route('form.mapa01.kodeunit', $skema->id_skema) }}" class="btn btn-secondary">Kembali</a>

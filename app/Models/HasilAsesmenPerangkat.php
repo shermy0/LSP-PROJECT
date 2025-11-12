@@ -14,8 +14,9 @@ class HasilAsesmenPerangkat extends Model
         return $this->belongsTo(HasilAsesmen::class, 'id_hasil');
     }
 
-    public function perangkat()
-    {
-        return $this->belongsTo(PerangkatAsesmen::class, 'id_perangkat');
-    }
+public function perangkat()
+{
+    return $this->belongsTo(PerangkatAsesmen::class, 'id_perangkat', 'id_perangkat');
+}
+
 }

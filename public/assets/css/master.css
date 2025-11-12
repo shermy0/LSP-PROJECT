@@ -7,6 +7,14 @@ body {
     background-color: #f4f4f4;
 }
 
+.disabled-link {
+    pointer-events: auto; /* JS event tetap bisa jalan */
+    color: gray;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+
 /* =========================
    SIDEBAR
 ========================= */
@@ -490,11 +498,14 @@ h3.fw-bold {
 }
 
 .judul-header {
+    margin-top: 30px;
+    margin-bottom: 30px;
     background: #e9f1ff;
     border-left: 6px solid #002b80;
     border-radius: 0.5rem;
-    padding: 0.5rem 1rem;
+    padding: 1rem 1rem;
     font-weight: bold;
+    font-size: 18px;
     margin-bottom: 0.75rem;
 }
 
