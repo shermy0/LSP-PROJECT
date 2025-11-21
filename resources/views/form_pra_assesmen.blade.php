@@ -1,15 +1,17 @@
+{{-- File: resources/views/asesi/pra_asesmen.blade.php --}}
+{{-- Data source (uploaded): /mnt/data/permohonan.sql --}}
+
 @extends('master')
 
 @section('title', 'Form Pra Asesmen')
 
 @section('konten')
-<div class="container mt-4">
-
+<div class="container-fluid px-4 py-3">
     {{-- HEADER --}}
-    <div class="form-header text-center mb-4">
-        <h2 class="fw-bold">Form Pra Asesmen</h2>
+    <div class="text-center mb-4">
+        <div class="rounded mx-auto mb-3" style="width:40px; height:40px; background-color:#041562;"></div>
+        <h1 class="h4 fw-bold">Form Pra Asesmen</h1>
         <p class="text-muted">Sistem Manajemen Asesmen Siswa - AsesKom</p>
-        <div class="line"></div>
     </div>
 
     {{-- CARD PRA ASESMEN --}}
@@ -17,11 +19,8 @@
         <div class="card-header bg-light fw-semibold">
             Pra Asesmen
         </div>
-        <div class="card-body">
 
-            {{-- ====================== --}}
-            {{-- ROLE: ASESI --}}
-            {{-- ====================== --}}
+        <div class="card-body">
             @if(Auth::user()->role === 'asesi')
                 @php
                     $status = $permohonan->status ?? null;
@@ -41,6 +40,7 @@
                         </div>
                         <span class="badge bg-secondary">Belum diisi</span>
                     </a>
+
                 @elseif($status === 'Diajukan')
                     <a href="{{ route('asesi.permohonan.menunggu') }}" class="pra-item">
                         <div class="d-flex align-items-center">
@@ -54,6 +54,7 @@
                         </div>
                         <span class="badge bg-warning text-dark">Diajukan</span>
                     </a>
+
                 @elseif($status === 'Diterima')
                     <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#infoPermohonanModal" class="pra-item">
                         <div class="d-flex align-items-center">
@@ -87,6 +88,7 @@
                             </div>
                         </div>
                     </div>
+
                 @elseif($status === 'Ditolak')
                     <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#permohonanDitolakModal" class="pra-item">
                         <div class="d-flex align-items-center">
@@ -166,7 +168,7 @@
                         }
                     @endphp
 
-                    <a href="{{ $asesmenHref }}" class="pra-item">
+                    <a href="{{ $asesmenHref }}" class="pra-item mt-3">
                         <div class="d-flex align-items-center">
                             <div class="icon-wrap me-3 {{ $icon }}">
                                 <i class="bi {{ explode(' ', $icon)[0] }}"></i>
@@ -187,9 +189,7 @@
                 @endif
             @endif
 
-            {{-- ====================== --}}
             {{-- ROLE: ASESOR --}}
-            {{-- ====================== --}}
             @if(Auth::user()->role === 'asesor')
                 <a href="{{ route('asesor.asesmen_mandiri.index') }}" class="pra-item">
                     <div class="d-flex align-items-center">
@@ -204,18 +204,17 @@
                     <span class="badge bg-primary">Akses</span>
                 </a>
             @endif
+
         </div>
     </div>
 </div>
 
-{{-- STYLE --}}
+@endsection
+
+{{-- STYLE: gunakan styling yang konsisten dengan FR.APL.02 --}}
+@push('head')
 <style>
     body { font-family: 'Poppins', sans-serif; background: #f9fafc; }
-    .form-header h2 { color: #041562; }
-    .form-header .line {
-        width: 80px; height: 3px; background: #041562;
-        margin: 10px auto; border-radius: 2px;
-    }
     .card-header {
         background: #f0f7ff !important;
         color: #041562; border-bottom: 2px solid #041562;
@@ -231,6 +230,7 @@
         transition: all .2s ease;
         text-decoration: none;
         color: inherit;
+        margin-bottom: 12px;
     }
     .pra-item:hover {
         background: #f8fafc;
@@ -242,5 +242,10 @@
         display: flex; align-items: center; justify-content: center;
         font-size: 18px; border-radius: 8px;
     }
+    .bg-secondary-subtle { background-color: rgba(108,117,125,0.08); }
+    .bg-warning-subtle { background-color: rgba(255,193,7,0.08); }
+    .bg-success-subtle { background-color: rgba(25,135,84,0.08); }
+    .bg-danger-subtle { background-color: rgba(220,53,69,0.08); }
+    .bg-primary-subtle { background-color: rgba(4,21,98,0.08); }
 </style>
-@endsection
+@endpush

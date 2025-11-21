@@ -21,11 +21,11 @@ class AsesmenMandiriController extends Controller
         }
 
         $permohonan = DB::table('permohonan')
-            ->join('skema_sertifikasi', 'permohonan.id_skema', '=', 'skema_sertifikasi.id_skema')
-            ->where('permohonan.id_asesi', $asesi->id_asesi)
+            ->join('skema_sertifikasi', 'permohonan.skema_id', '=', 'skema_sertifikasi.id_skema')
+            ->where('permohonan.asesi_id', $asesi->id_asesi)
             ->select(
                 'permohonan.id_permohonan',
-                'permohonan.id_skema',
+                'permohonan.skema_id',
                 'skema_sertifikasi.nama_skema as skema',
                 'skema_sertifikasi.kode_skema',
                 'skema_sertifikasi.judul_skema'
@@ -42,11 +42,11 @@ class AsesmenMandiriController extends Controller
         $asesi = DB::table('asesi')->where('user_id', $user->id)->first();
 
         $permohonan = DB::table('permohonan')
-            ->join('skema_sertifikasi', 'permohonan.id_skema', '=', 'skema_sertifikasi.id_skema')
-            ->where('id_asesi', $asesi->id_asesi ?? 0)
+            ->join('skema_sertifikasi', 'permohonan.skema_id', '=', 'skema_sertifikasi.id_skema')
+            ->where('permohonan.asesi_id', $asesi->id_asesi ?? 0)
             ->select(
                 'permohonan.id_permohonan',
-                'permohonan.id_skema',
+                'permohonan.skema_id',
                 'skema_sertifikasi.nama_skema',
                 'skema_sertifikasi.kode_skema',
                 'skema_sertifikasi.judul_skema'
@@ -60,7 +60,7 @@ class AsesmenMandiriController extends Controller
         }
 
         $units = DB::table('unit_kompetensi')
-            ->where('id_skema', $permohonan->id_skema)
+            ->where('id_skema', $permohonan->skema_id)
             ->get();
 
         $elemen = DB::table('elemen_kompetensi')
@@ -83,7 +83,6 @@ class AsesmenMandiriController extends Controller
             )
             ->get();
 
-        // 🔑 Ambil jawaban sebelumnya
         $asesmen = DB::table('asesmen_mandiri_master')
             ->where('id_permohonan', $permohonan->id_permohonan)
             ->first();
@@ -93,7 +92,7 @@ class AsesmenMandiriController extends Controller
             $jawaban = DB::table('asesmen_mandiri_jawaban')
                 ->where('id_asesmen_mandiri', $asesmen->id_asesmen_mandiri)
                 ->get()
-                ->keyBy('id_kuk'); // index berdasarkan id_kuk
+                ->keyBy('id_kuk');
         }
 
         return view(
@@ -102,14 +101,13 @@ class AsesmenMandiriController extends Controller
         );
     }
 
-
     public function store(Request $request)
     {
         $user = Auth::user();
         $asesi = DB::table('asesi')->where('user_id', $user->id)->first();
 
         $permohonan = DB::table('permohonan')
-            ->where('id_asesi', $asesi->id_asesi)
+            ->where('asesi_id', $asesi->id_asesi)
             ->latest('id_permohonan')
             ->first();
 
@@ -173,8 +171,7 @@ class AsesmenMandiriController extends Controller
         }
 
         $data = $request->ttd_asesi;
-        $image = str_replace('data:image/png;base64,', '', $data);
-        $image = str_replace(' ', '+', $image);
+        $image = str_replace(['data:image/png;base64,', ' '], ['', '+'], $data);
         $imageName = 'ttd_asesi_' . time() . '.png';
 
         Storage::disk('public')->put('ttd/' . $imageName, base64_decode($image));

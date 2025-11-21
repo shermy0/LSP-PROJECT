@@ -96,8 +96,8 @@
     </div>
 
     <!-- Konten utama -->
-    <div id="content">
-        @yield('content')
+    <div id="main-content">
+        @yield('konten')
     </div>
 
 
