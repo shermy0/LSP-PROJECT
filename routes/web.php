@@ -10,6 +10,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PertanyaanController;
 use App\Http\Controllers\JawabanController;
 use App\Http\Controllers\FormAsesmenController;
+use App\Http\Controllers\EvaluasiController;
 use App\Http\Controllers\Asesi\PermohonanController;
 use App\Http\Controllers\Admin\Form1AdminController;
 use App\Http\Controllers\OpsiJawabanController;
@@ -296,7 +297,7 @@ Route::get('/admin/ninjau_asesmen/{id_skema}', [MeninjauAsesmenController::class
     ->middleware('auth');
 
 // 🔹 Admin download PDF FR.AK.06 (Meninjau Proses Asesmen)
-Route::get('form-perencanaan/meninjau-proses/download/{id_skema}/{id_asesor}', [MeninjauAsesmenController::class, 'downloadPdfAdmin']
+Route::get('/form-perencanaan/meninjau-proses/download/{id_skema}/{id_asesor}', [MeninjauAsesmenController::class, 'downloadPdfAdmin']
 )->name('admin.meninjau.pdf')
   ->middleware('auth');
 
@@ -373,41 +374,46 @@ Route::delete('/laporan_asesor/ttd/{id}', [KonfirmasiController::class, 'deleteT
 Route::get('/laporan_asesor/ttd/{id}/download', [KonfirmasiController::class, 'downloadTtd'])
     ->name('form_perencanaan.laporan_asesmen.ttd.download');
 
-    // ============================
+
+//MODIFIKASI
+Route::get('/mapa01/modifikasi/{skema_id}', [ModifikasiController::class, 'index'])->name('form.mapa01.modifikasi');
+
+// ============================
 // Meninjau Asesmen
 // ============================
 
+// Halaman 1: Form isian
 Route::get('/ninjau_asesmen/{id_skema}', function($id_skema) {
     if (auth()->check() && auth()->user()->role === 'admin') {
-        return redirect()->route('admin.meninjau.admin', $id_skema);
-    }
-    return app(\App\Http\Controllers\FormPerencanaan\MeninjauAsesmenController::class)->showNinjauAsesmen($id_skema);
-})->name('form_perencanaan.ninjau_asesmen')->middleware('auth');
+        // Redirect admin ke halaman khusus admin
+        return redirect()->route('admin.meninjau.admin', $id_skema);}
+        // Asesor tetap ke halaman biasa
+        return app(MeninjauAsesmenController::class)->showNinjauAsesmen($id_skema);})
+    ->name('form_perencanaan.ninjau_asesmen')
+    ->middleware('auth');
 
-Route::get('/ninjau-asesmen-asesor/{id_skema}', [MeninjauAsesmenController::class, 'ninjauAsesmenAsesor'])
+// Halaman 2: Tanda tangan asesor
+Route::get('/ninjau-asesmen-asesor/{id_skema}', [MeninjauAsesmenController::class, 'showNinjauAsesmenAsesor'])
     ->name('form_perencanaan.ninjau_asesmen_asesor');
 
-// web.php
-Route::post('/meninjau-asesmen/store/{id_skema}', [MeninjauAsesmenController::class, 'store'])
-    ->name('form_perencanaan.ninjau_asesmen.store');
-
-// web.php
-Route::post('/meninjau-asesmen/store/{id_skema}', [MeninjauAsesmenController::class, 'store'])
-    ->name('form_perencanaan.meninjau_asesmen.ninjau_asesmen_asesor.store');
-    
-Route::get('form-perencanaan/meninjau-proses/{skema}/data/{asesor}', [MeninjauAsesmenController::class, 'getDataByAsesor'])
-    ->name('meninjau-proses.data');
-
-Route::post('/ninjau-asesmen-asesor/{asesor_id}/simpan-persetujuan', [MeninjauAsesmenController::class, 'simpanPersetujuan'])
-    ->name('form_perencanaan.meninjau_asesmen.ninjau_asesmen_asesor.simpan');
-
-// Simpan & lanjut asesmen
+// POST: Simpan data halaman 1 & redirect ke halaman 2
 Route::post('/ninjau-asesmen-asesor/{id_skema}/simpan', [MeninjauAsesmenController::class, 'simpanLanjut'])
     ->name('form_perencanaan.ninjau_asesmen_asesor.store');
 
-    //MODIFIKASI
-    Route::get('/mapa01/modifikasi/{skema_id}', [ModifikasiController::class, 'index'])->name('form.mapa01.modifikasi');
+// POST: Simpan tanda tangan asesor (halaman 2) - AJAX
+Route::post('/ninjau-asesmen-asesor/{asesor_id}/simpan-persetujuan', [MeninjauAsesmenController::class, 'storeAsesor'])
+    ->name('form_perencanaan.ninjau_asesmen_asesor.simpan');
+// AJAX: Ambil data asesmen by asesor (untuk admin)
+Route::get('/meninjau-proses/{skema}/data/{asesor}', [MeninjauAsesmenController::class, 'getDataByAsesor'])
+    ->name('meninjau-proses.data');;
 
+// Admin routes
+Route::get('/ninjau_asesmen_admin/{id_skema}', [MeninjauAsesmenController::class, 'showAdmin'])
+    ->name('admin.meninjau.admin')
+    ->middleware('auth');
+
+Route::get('/admin/meninjau-asesmen/download-pdf/{skema_id}/{asesor_id}', [MeninjauAsesmenController::class, 'downloadPdfAdmin'])
+    ->name('admin.meninjau.download');
     // ============================
 // END NAVIGASI PERFORM
 // ============================

@@ -11,10 +11,9 @@
             </li>
             <li class="breadcrumb-item">
                 <a href="{{ route('formperencanaan.show', $skema->id_skema) }}">Form Perencanaan</a>
-            <li class="breadcrumb-item">
-                <a href="{{ route('form_perencanaan.ninjau_asesmen_asesor', $skema->id_skema) }}">
-                    FR.AK.06 – Ninjau Asesmen Asesor
-                </a>
+            </li>
+            <li class="breadcrumb-item active">
+                FR.AK.06 – Ninjau Asesmen Asesor
             </li>
         </ol>
     </nav>
@@ -27,109 +26,107 @@
             <p class="text-muted">Peninjauan Proses Asesmen</p>
         </div>
 
-<!-- FORM UTAMA -->
-<form action="{{ route('form_perencanaan.ninjau_asesmen_asesor.store', ['id_skema' => $skema->id_skema]) }}" method="POST">
-    @csrf
-    <input type="hidden" name="skema_id" value="{{ $skema->id_skema }}">
-    <input type="hidden" name="id_asesmen" value="{{ $skema->id_skema }}-{{ date('YmdHis') }}">
-    <div class="row g-3 mb-4">
-        <div class="col-md-6">
-            <div class="mapa-box">
-                <label class="fw-semibold d-block mb-2">Skema Sertifikasi</label>
-                <div class="jenis-skema">
-                    <input type="radio" id="kkni" name="skema_type" class="form-check-input me-2"
-                           value="KKNI"
-                           @if($skema->jenjang == 'KKNI') checked @endif disabled>
-                    <label for="kkni">KKNI</label>
+        <!-- FORM UTAMA - SEMUA INPUT HARUS DI DALAM FORM INI -->
+        <form action="{{ route('form_perencanaan.ninjau_asesmen_asesor.store', ['id_skema' => $skema->id_skema]) }}" method="POST">            @csrf
+            <input type="hidden" name="skema_id" value="{{ $skema->id_skema }}">
+            <input type="hidden" name="id_asesmen" value="{{ $skema->id_skema }}-{{ date('YmdHis') }}">
+            
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="mapa-box">
+                        <label class="fw-semibold d-block mb-2">Skema Sertifikasi</label>
+                        <div class="jenis-skema">
+                            <input type="radio" id="kkni" name="skema_type" class="form-check-input me-2"
+                                   value="KKNI"
+                                   @if($skema->jenjang == 'KKNI') checked @endif disabled>
+                            <label for="kkni">KKNI</label>
 
-                    <input type="radio" id="okupasi" name="skema_type" class="form-check-input me-2"
-                           value="Okupasi"
-                           @if($skema->jenjang == 'Okupasi') checked @endif disabled>
-                    <label for="okupasi">Okupasi</label>
+                            <input type="radio" id="okupasi" name="skema_type" class="form-check-input me-2"
+                                   value="Okupasi"
+                                   @if($skema->jenjang == 'Okupasi') checked @endif disabled>
+                            <label for="okupasi">Okupasi</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mapa-box">
+                        <label class="fw-semibold d-block mb-2">Nomor Skema</label>
+                        <input type="text" class="form-control" value="{{ $skema->kode_skema }}" readonly>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-6">
-            <div class="mapa-box">
-                <label class="fw-semibold d-block mb-2">Nomor Skema</label>
-                <input type="text" class="form-control" value="{{ $skema->kode_skema }}" readonly>
-            </div>
-        </div>
-    </div>
-
-    <div class="row g-3">
-        <div class="col-md-6">
-            <div class="mapa-box">
-                <label for="nama_asesor" class="form-label">Nama Asesor</label>
-                <select class="form-control" id="nama_asesor" name="asesor_id">
-                    <option value="">-- Pilih Asesor --</option>
-                    @foreach($asesors as $asesor)
-                    <option value="{{ $asesor->id_asesor }}">
-                        {{ $asesor->nama_asesor }}
-                    </option>
-                    @endforeach
-                </select>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="mapa-box">
-                <label for="tanggalAsesmen" class="form-label">Tanggal Asesmen</label>
-                <input type="date" class="form-control" id="tanggalAsesmen" name="tanggal_asesmen">
-            </div>
-        </div>
-    </div>
-    <div class="container mt-4">
-        <!-- Header -->
-        <div class="text-center mb-4">
-            <div class="col-12">
-                <label class="form-label fw-semibold d-block mb-2">TUK (Tempat Uji Kompetensi) SMKN 11 Bandung:</label>
-                <div class="d-flex justify-content-start gap-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="tuk_atas" id="tukSewaktuAtas" value="Sewaktu">
-                        <label class="form-check-label" for="tukSewaktuAtas">Sewaktu</label>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="mapa-box">
+                        <label for="nama_asesor" class="form-label">Nama Asesor</label>
+                        <select class="form-control" id="nama_asesor" name="asesor_id" required>
+                            <option value="">-- Pilih Asesor --</option>
+                            @foreach($asesors as $asesor)
+                            <option value="{{ $asesor->id_asesor }}">
+                                {{ $asesor->nama_asesor }}
+                            </option>
+                            @endforeach
+                        </select>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="tuk_atas" id="tukTempatKerjaAtas" value="Tempat Kerja">
-                        <label class="form-check-label" for="tukTempatKerjaAtas">Tempat Kerja</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="tuk_atas" id="tukMandiriAtas" value="Mandiri" checked>
-                        <label class="form-check-label" for="tukMandiriAtas">Mandiri</label>
-                    </div>
-            </div>
-        </div>
-    </div> 
-</form>
-    </div>
-        <br>
+                </div>
 
-        <!-- Penjelasan -->
-        <div class="card-box">
-            <div class="penjelasan-box">
-                <div class="penjelasan-header">Penjelasan</div>
-                <ol class="penjelasan-list">
-                    <li>Peninjauan dapat dilakukan oleh lead asesor atau asesor yang melaksanakan asesmen.</li>
-                    <li>Peninjauan dapat dilakukan secara terpadu dalam skema sertifikasi dan / atau peserta kelompok yang homogen.</li>
-                    <li>Isilah pemenuhan dimensi kompetensi dengan menuliskan jenis bukti dan instrumen yang digunakan.</li>
-                </ol>
+                <div class="col-md-6">
+                    <div class="mapa-box">
+                        <label for="tanggalAsesmen" class="form-label">Tanggal Asesmen</label>
+                        <input type="date" class="form-control" id="tanggalAsesmen" name="tanggal_asesmen" required>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        @php
-            $prinsip = ['Validitas', 'Reliabel', 'Fleksibel', 'Adil'];
-            $aspek = [
-            'rencana' => [1, 1, 1, 1],
-            'persiapan' => [1, 1, 1, 1],
-            'implementasi' => [1, 1, 1, 1],
-            'keputusan' => [1, 1, 0, 1],
-            'umpan' => [1, 1, 0, 1],
-            ];
+            <div class="row g-3 mb-4">
+                <div class="col-12">
+                    <div class="mapa-box">
+                        <label class="form-label fw-semibold d-block mb-2">TUK (Tempat Uji Kompetensi) SMKN 11 Bandung:</label>
+                        <div class="d-flex justify-content-start gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="tuk_atas" id="tukSewaktuAtas" value="Sewaktu">
+                                <label class="form-check-label" for="tukSewaktuAtas">Sewaktu</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="tuk_atas" id="tukTempatKerjaAtas" value="Tempat Kerja">
+                                <label class="form-check-label" for="tukTempatKerjaAtas">Tempat Kerja</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="tuk_atas" id="tukMandiriAtas" value="Mandiri" checked>
+                                <label class="form-check-label" for="tukMandiriAtas">Mandiri</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Penjelasan -->
+            <div class="card-box mb-4">
+                <div class="penjelasan-box">
+                    <div class="penjelasan-header">Penjelasan</div>
+                    <ol class="penjelasan-list">
+                        <li>Peninjauan dapat dilakukan oleh lead asesor atau asesor yang melaksanakan asesmen.</li>
+                        <li>Peninjauan dapat dilakukan secara terpadu dalam skema sertifikasi dan / atau peserta kelompok yang homogen.</li>
+                        <li>Isilah pemenuhan dimensi kompetensi dengan menuliskan jenis bukti dan instrumen yang digunakan.</li>
+                    </ol>
+                </div>
+            </div>
+
+            @php
+                $prinsip = ['Validitas', 'Reliabel', 'Fleksibel', 'Adil'];
+                $aspek = [
+                    'rencana' => [1, 1, 1, 1],
+                    'persiapan' => [1, 1, 1, 1],
+                    'implementasi' => [1, 1, 1, 1],
+                    'keputusan' => [1, 1, 0, 1],
+                    'umpan' => [1, 1, 0, 1],
+                ];
             @endphp
 
             <!-- Kesesuaian dengan Asesmen -->
-            <div class="card-box">
+            <div class="card-box mb-4">
                 <div class="table-responsive mt-4">
                     <table class="table table-bordered custom-table">
                         <thead class="table-title">
@@ -160,21 +157,21 @@
             </div>
 
             <!-- Rekomendasi Peningkatan 1 -->
-            <div class="card-box">
+            <div class="card-box mb-4">
                 <label for="rekomendasi1" class="fw-semibold mb-1 d-block">Rekomendasi 1</label>
                 <textarea id="rekomendasi1" name="rekomendasi1" class="form-control mt-1" rows="3" placeholder="Masukkan teks"></textarea>
             </div>
 
             @php
-            $options = ['L','CL','T','DPT'];
-            $aspekDimensi = [
-            'konsistensi' => 'Konsistensi keputusan asesmen',
-            'bukti' => 'Bukti dari berbagai asesmen diperiksa untuk konsistensi dimensi kompetensi'
-            ];
+                $options = ['L','CL','T','DPT'];
+                $aspekDimensi = [
+                    'konsistensi' => 'Konsistensi keputusan asesmen',
+                    'bukti' => 'Bukti dari berbagai asesmen diperiksa untuk konsistensi dimensi kompetensi'
+                ];
             @endphp
 
             <!-- Pemenuhan Dimensi Kompetensi -->
-            <div class="card-box">
+            <div class="card-box mb-4">
                 <div class="table-responsive mt-4">
                     <table class="table table-bordered custom-table text-center align-middle">
                         <thead class="table-title">
@@ -226,77 +223,22 @@
                 </div>
             </div>
 
-        <!-- Rekomendasi Peningkatan 2 -->
-        <div class="card-box">
-            <label for="rekomendasi2" class="fw-semibold mb-1 d-block">Rekomendasi 2</label>
-            <textarea id="rekomendasi2" name="rekomendasi2" class="form-control mt-1" rows="3" placeholder="Masukkan teks"></textarea>
-        </div>
-    </form>
-    <!-- Simpan dan Lanjut -->
-    <form action="{{ route('form_perencanaan.ninjau_asesmen_asesor.store', ['id_skema' => $skema->id_skema]) }}" method="POST">
-            @csrf
+            <!-- Rekomendasi Peningkatan 2 -->
+            <div class="card-box mb-4">
+                <label for="rekomendasi2" class="fw-semibold mb-1 d-block">Rekomendasi 2</label>
+                <textarea id="rekomendasi2" name="rekomendasi2" class="form-control mt-1" rows="3" placeholder="Masukkan teks"></textarea>
+            </div>
+
+            <!-- Simpan dan Lanjut -->
             <button type="submit" class="simpan-btn mt-3">
                 <span>Simpan dan Lanjut</span>
             </button>
         </form>
+    </div>
 </div>
 
 <script>
-        document.getElementById('skema_id').addEventListener('change', function() {
-        let selected = this.options[this.selectedIndex];
-        let kode = selected.getAttribute('data-kode');
-        let jenjang = selected.getAttribute('data-jenjang');
-        let skemaId = this.value;
-        document.getElementById("namaAsesor").addEventListener("change", function(){
-        document.getElementById("asesor_id_hidden").value = this.value;
-        });
-        // isi nomor otomatis
-        document.getElementById('nomor').value = kode || '';
-
-        // pilih radio otomatis sesuai skemanya
-        if (jenjang) {
-            if (jenjang.toLowerCase().includes("kkni")) {
-                document.getElementById('skema1').checked = true;
-            } else if (jenjang.toLowerCase().includes("okupasi")) {
-                document.getElementById('skema2').checked = true;
-            }
-        }
-
-        // Ambil asesor berdasarkan skema
-        if(skemaId) {
-            fetch(/get-asesor/${skemaId})
-                .then(response => response.json())
-                .then(data => {
-                    let selectAsesor = document.getElementById('namaAsesor');
-                    selectAsesor.innerHTML = '<option value="">-- Pilih Asesor --</option>';
-                    data.forEach(asesor => {
-                        selectAsesor.innerHTML += <option value="${asesor.id_asesor}">${asesor.nama_asesor}</option>;
-                    });
-                });
-                // isi nomor otomatis
-                document.getElementById('nomor').value = kode || '';
-
-                // pilih radio otomatis sesuai skemanya
-                if (jenjang) {
-                    if (jenjang.toLowerCase().includes("kkni")) {
-                        document.getElementById('skema1').checked = true;
-                    } else if (jenjang.toLowerCase().includes("okupasi")) {
-                        document.getElementById('skema2').checked = true;
-                    }
-                }
-
-                // Ambil asesor berdasarkan skema
-                if (skemaId) {
-                    fetch(/get-asesor/${skemaId})
-                        .then(response => response.json())
-                        .then(data => {
-                            let selectAsesor = document.getElementById('nama_asesor');
-                            selectAsesor.innerHTML = '<option value="">-- Pilih Asesor --</option>';
-                            data.forEach(asesor => {
-                                selectAsesor.innerHTML += <option value="${asesor.id_asesor}">${asesor.nama_asesor}</option>;
-                            });
-                        });
-                }
-            });
-        </script>
-        @endsection
+    // Script ini tidak perlu lagi karena data sudah dari controller
+    // Jika ada kebutuhan dinamis lainnya, bisa ditambahkan di sini
+</script>
+@endsection

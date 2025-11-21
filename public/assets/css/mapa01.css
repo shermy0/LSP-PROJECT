@@ -301,3 +301,15 @@
 .btn-danger:hover {
     background: #c0392b;
 }
+/* Override default Bootstrap disabled radio & checkbox */
+.form-check-input:disabled {
+    opacity: 1 !important;
+    background-color: #fff !important;
+    border-color: #0d6efd !important;
+}
+
+/* Untuk radio: lingkaran dalam (dot) tetap biru */
+.form-check-input:disabled:checked {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+}

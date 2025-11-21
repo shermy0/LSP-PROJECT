@@ -22,7 +22,7 @@
         ->first();
 @endphp
 
-<form action="{{ route('form_perencanaan.meninjau_asesmen.ninjau_asesmen_asesor.store', $skema->id_skema) }}" method="POST" id="laporan-asesmen-form">
+<form action="{{ route('form_perencanaan.ninjau_asesmen_asesor.simpan', $asesor_terpilih) }}" method="POST" id="laporan-asesmen-form">
     @csrf
     <div class="mapa-card">
         <h5>Asesor</h5>

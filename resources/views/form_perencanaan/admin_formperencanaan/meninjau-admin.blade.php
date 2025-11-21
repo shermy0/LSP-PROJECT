@@ -10,12 +10,11 @@
         border: 1px solid #dee2e6;
         color: #212529 !important;
     }
+.disabled-checkbox,
+.disabled-radio {
+    pointer-events: none;
+}
 
-    .disabled-checkbox,
-    .disabled-radio {
-        pointer-events: none;
-        opacity: 0.7;
-    }
 
     .floating-download-btn {
         position: fixed;
@@ -39,6 +38,40 @@
         background-color: #157347;
         transform: scale(1.05);
     }
+
+    /* Custom Checkbox Style */
+    input[type="checkbox"] {
+        width: 1.25rem;
+        height: 1.25rem;
+        accent-color: #0d6efd !important;
+        border-radius: 4px;
+    }
+
+    input[type="checkbox"]:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+
+    input[type="checkbox"]:disabled:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        opacity: 1 !important;
+    }
+
+    /* Tabel styling */
+    .custom-table td {
+        vertical-align: middle;
+    }
+    input[type="checkbox"]:disabled {
+    opacity: 1 !important;
+    filter: grayscale(0) !important;
+    accent-color: #0d6efd !important;
+    }
+    input[type="checkbox"] {
+        border: none !important;
+    }
+
+
 </style>
 
 <div class="card mapa-card">
@@ -310,8 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const url = `{{ url('form-perencanaan/meninjau-proses/'.$skema->id_skema.'/data') }}/${asesorId}`;
-
+        const url = `/form-perencanaan/meninjau-proses/{{ $skema->id_skema }}/data/${asesorId}`;
         fetch(url)
             .then(res => res.json())
             .then(data => {
@@ -327,16 +359,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         <tr>
                             <td>${aspek.nama}</td>
                             <td class="text-center">
-                                <input type="checkbox" ${prinsip[prefix + '_validitas'] ? 'checked' : ''} disabled ${!aspek.validitas ? 'style="visibility:hidden"' : ''}>
+                                <input class="form-check-input" type="checkbox" ${prinsip[prefix + '_validitas'] ? 'checked' : ''} disabled ${!aspek.validitas ? 'style="visibility:hidden"' : ''}>
                             </td>
                             <td class="text-center">
-                                <input type="checkbox" ${prinsip[prefix + '_reliabel'] ? 'checked' : ''} disabled ${!aspek.reliabel ? 'style="visibility:hidden"' : ''}>
+                                <input class="form-check-input" type="checkbox" ${prinsip[prefix + '_reliabel'] ? 'checked' : ''} disabled ${!aspek.reliabel ? 'style="visibility:hidden"' : ''}>
                             </td>
                             <td class="text-center">
-                                <input type="checkbox" ${prinsip[prefix + '_fleksibel'] ? 'checked' : ''} disabled ${!aspek.fleksibel ? 'style="visibility:hidden"' : ''}>
+                                <input class="form-check-input" type="checkbox" ${prinsip[prefix + '_fleksibel'] ? 'checked' : ''} disabled ${!aspek.fleksibel ? 'style="visibility:hidden"' : ''}>
                             </td>
                             <td class="text-center">
-                                <input type="checkbox" ${prinsip[prefix + '_adil'] ? 'checked' : ''} disabled ${!aspek.adil ? 'style="visibility:hidden"' : ''}>
+                                <input class="form-check-input" type="checkbox" ${prinsip[prefix + '_adil'] ? 'checked' : ''} disabled ${!aspek.adil ? 'style="visibility:hidden"' : ''}>
                             </td>
                         </tr>
                     `;
@@ -355,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         options.forEach(opt => {
                             const isChecked = values.includes(opt);
-                            cellContent += `<label><input type="checkbox" ${isChecked ? 'checked' : ''} disabled> ${opt}</label><br>`;
+                            cellContent += `<label><input class="form-check-input" type="checkbox" ${isChecked ? 'checked' : ''} disabled> ${opt}</label><br>`;
                         });
                         
                         row += `<td>${cellContent}</td>`;
