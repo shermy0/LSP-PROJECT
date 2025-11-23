@@ -217,7 +217,13 @@ Route::get('/search-unit', [Mapa01Controller::class, 'searchUnit'])->name('form.
 
 // Dashboard Admin
 Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
+    Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('admin.dashboard');
+
+    Route::get('fr_va_pdf/preview/{skema_id}/{periode}', [PerencanaanController::class, 'preview'])
+        ->name('form_perencanaan.fr_va_pdf');
+
+    Route::get('fr_va_pdf/download/{skema_id}/{periode}', [PerencanaanController::class, 'download'])
+        ->name('form_perencanaan.pdf_frva');   
 });
 // ============================
 // Meninjau Asesmen

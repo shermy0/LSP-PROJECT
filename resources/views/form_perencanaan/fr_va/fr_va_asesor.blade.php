@@ -58,8 +58,8 @@ $validators = $asesors;
                 <tbody>
                     <tr>
                         <td class="text-center no">1</td>
-                        <td><input type="text" name="temuan[]" class="form-control"></td>
-                        <td><input type="text" name="rekomendasi[]" class="form-control"></td>
+                        <td><input type="text" name="temuan[]" class="form-control" placeholder="Masukkan Temuan Validasi"></td>
+                        <td><input type="text" name="rekomendasi[]" class="form-control" placeholder="Masukkan Rekomendasi"></td>
                         <td class="text-center">
                             <button type="button" class="btn btn-danger btn-sm delete-row"><i class="fa fa-trash"></i></button>
                         </td>
@@ -88,7 +88,7 @@ $validators = $asesors;
                 <tbody>
                     <tr>
                         <td class="text-center no">1</td>
-                        <td><input type="text" name="perbaikan[]" class="form-control" placeholder="Isi perbaikan"></td>
+                        <td><input type="text" name="perbaikan[]" class="form-control" placeholder="Masukkan Kegiatan perbaikan"></td>
                         <td><input type="date" name="waktu[]" class="form-control"></td>
                         <td>
                             <select name="penanggung[]" class="form-control penanggung">
@@ -114,6 +114,10 @@ $validators = $asesors;
     </div>
 
     {{-- 3. Validator --}}
+    @php
+        $periodeAktif = $periode ?? request('periode');
+    @endphp
+
     <div class="card-box mt-4">
         <div class="judul-header">Validator</div>
         <div class="table-responsive mt-4">
@@ -130,29 +134,88 @@ $validators = $asesors;
                 <tbody>
                     <tr>
                         <td>
-                            <select name="nama_validator[]" class="form-control nama-validator">
-                                <option value="">-- Pilih Validator --</option>
-                                @foreach($validators as $validator)
-                                    <option value="{{ $validator->nama_asesor }}" data-no="{{ $validator->no_registrasi }}">{{ $validator->nama_asesor }}</option>
-                                @endforeach
-                            </select>
+                            @if($periodeAktif === 'sebelum')
+                                {{-- pilih dari asesor sesuai skema --}}
+                                <select name="nama_validator[]" class="form-select nama-validator-sebelum">
+                                    <option value="">-- Pilih Asesor --</option>
+                                    @foreach($asesors as $asesor)
+                                        <option value="{{ $asesor->nama_asesor }}" data-no="{{ $asesor->no_registrasi }}">
+                                            {{ $asesor->nama_asesor }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            @else
+                                {{-- bisa pilih dari list atau ketik manual --}}
+                                <input list="daftar-validator" 
+                                    name="nama_validator[]" 
+                                    class="form-control nama-validator" 
+                                    placeholder="Masukkan Validator">
+                                <datalist id="daftar-validator">
+                                    @foreach($validators as $validator)
+                                        <option value="{{ $validator->nama_asesor }}" 
+                                                data-no="{{ $validator->no_registrasi }}">
+                                            {{ $validator->nama_asesor }}
+                                        </option>
+                                    @endforeach
+                                </datalist>
+                            @endif
                         </td>
-                        <td><input type="text" name="no_registrasi[]" class="form-control no-registrasi" readonly></td>
-                        <td><input type="date" name="tanggal_validator[]" class="form-control"></td>
+
+                        <td>
+                            @if($periodeAktif === 'sebelum')
+                                {{-- no met masuk otomatis--}}
+                                <input type="text" name="no_registrasi[]" 
+                                    class="form-control no-registrasi" 
+                                    placeholder="No Met" readonly>
+                            @else
+                                {{-- bisa pilih dari list atau ketik manual --}}
+                                <input type="text" name="no_registrasi[]" class="form-control" placeholder="Masukkan No Met">
+                            @endif
+                        </td>
+
+                        <td>
+                            <input type="date" name="tanggal_validator[]" class="form-control">
+                        </td>
+
                         <td class="text-center">
                             <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc; cursor:pointer;"></canvas>
                             <input type="hidden" name="tanda_tangan_validator[]" class="tanda_tangan">
                         </td>
+
                         <td class="text-center">
                             <button type="button" class="btn btn-danger btn-sm delete-row"><i class="fa fa-trash"></i></button>
                         </td>
                     </tr>
                 </tbody>
             </table>
+
             <button type="button" class="btn btn-success mt-2" id="add-validator-row">+ Tambah Validator</button>
         </div>
     </div>
+    <script>
+       document.addEventListener('change', function(e) {
+            // Untuk periode "sebelum" (pakai <select>)
+            if (e.target.classList.contains('nama-validator-sebelum')) {
+                const no = e.target.selectedOptions[0]?.dataset.no || '';
+                e.target.closest('tr').querySelector('.no-registrasi').value = no;
+            }
 
+            // Untuk periode lain (pakai datalist)
+            if (e.target.classList.contains('nama-validator')) {
+                const val = e.target.value.trim();
+                const options = document.getElementById('daftar-validator').options;
+                let found = false;
+                for (let i = 0; i < options.length; i++) {
+                    if (options[i].value === val) {
+                        e.target.closest('tr').querySelector('.no-registrasi').value = options[i].dataset.no;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) e.target.closest('tr').querySelector('.no-registrasi').value = '';
+            }
+        });
+    </script>
     <button type="submit" class="simpan-btn mt-4"><span>Simpan</span></button>
 </form>
 
@@ -201,13 +264,29 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     document.addEventListener('change', e=>{
+        // Untuk Penanggung Jawab
         if(e.target.classList.contains('penanggung')){
             const no = e.target.selectedOptions[0]?.dataset.no || '';
-            e.target.closest('tr').querySelector('.no-registrasi-penanggung').value=no;
+            e.target.closest('tr').querySelector('.no-registrasi-penanggung').value = no;
         }
+
+        // Untuk Validator (pakai datalist)
         if(e.target.classList.contains('nama-validator')){
-            const no = e.target.selectedOptions[0]?.dataset.no || '';
-            e.target.closest('tr').querySelector('.no-registrasi').value=no;
+            const val = e.target.value.trim();
+            const options = document.getElementById('daftar-validator').options;
+            let found = false;
+
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].value === val) {
+                    e.target.closest('tr').querySelector('.no-registrasi').value = options[i].dataset.no;
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                e.target.closest('tr').querySelector('.no-registrasi').value = '';
+            }
         }
     });
 

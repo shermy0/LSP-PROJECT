@@ -31,7 +31,8 @@
     <div class="menu">
         <ul>
             @if(Auth::user()->role == 'admin')
-                <li><i class="bi bi-house-door-fill"></i><a href="#">Dashboard</a></li>
+                <li><i class="bi bi-house-door-fill"></i><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                <li><i class="bi bi-pencil-square"></i><a href="{{ route('formperencanaan.index') }}">Form Perencanaan</a></li>
             @endif
 
             @if(Auth::user()->role == 'asesor')

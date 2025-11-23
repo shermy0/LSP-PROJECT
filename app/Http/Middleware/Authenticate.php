@@ -1,14 +1,11 @@
 <?php
 
-// app/Http/Controllers/AuthController.php
-namespace App\Http\Controllers;
+namespace App\Http\Middleware;
 
-use Illuminate\Http\Request;
+use Illuminate\Auth\Middleware\Authenticate as Middleware;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
-class AuthController extends Controller
+class Authenticate extends Middleware
 {
     public function showLogin()
     {
@@ -24,9 +21,9 @@ class AuthController extends Controller
 
             // Redirect berdasarkan role
             if ($user->role === 'admin') {
-                return redirect()->route('dashboard.admin');
+                return redirect()->route('admin.dashboard');
             } elseif ($user->role === 'asesor') {
-                return redirect()->route('formperencanaan');
+                return redirect()->route('formperencanaan.index');
             } else {
                 return redirect()->route('dashboard.asesi');
             }
@@ -59,9 +56,9 @@ class AuthController extends Controller
         return redirect()->route('login')->with('success', 'Registrasi berhasil, silakan login');
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
-         Auth::logout();
+        Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

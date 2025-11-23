@@ -9,6 +9,12 @@ use App\Models\LaporanAsesmen;
 use App\Models\Skema;
 use App\Models\Asesor;
 use Carbon\Carbon;
+use Dompdf\Dompdf;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\ProsesValidasi;
+use App\Models\Diskusi;
+use App\Models\AcuanPembanding;
+use App\Models\HasilValidasi;
 
 class PerencanaanController extends Controller
 {
@@ -24,7 +30,7 @@ class PerencanaanController extends Controller
         $validPeriode = [
             'sebelum' => 'Sebelum Asesmen',
             'saat'    => 'Pada Saat Asesmen',
-            'sesudah' => 'Setelah Asesmen'
+            'sesudah' => 'Sesudah Asesmen'
         ];
 
         $periode = $request->query('periode');
@@ -131,6 +137,7 @@ class PerencanaanController extends Controller
         // validasi urutan isi
         $sebelum = DB::table('proses_validasi')->where('skema_id', $skema_id)->where('periode','sebelum')->exists();
         $saat    = DB::table('proses_validasi')->where('skema_id', $skema_id)->where('periode','saat')->exists();
+        $sesudah    = DB::table('proses_validasi')->where('skema_id', $skema_id)->where('periode','sesudah')->exists();
 
         if ($periode === 'saat' && !$sebelum) {
             return redirect()->back()->with('error', 'Harap isi dulu bagian Sebelum Asesmen.');
@@ -157,8 +164,11 @@ class PerencanaanController extends Controller
         $tujuanLain     = $prosesValidasi->tujuan_lain ?? '';
         $konteksLain    = $prosesValidasi->konteks_lain ?? '';
         $konteksLain2   = $prosesValidasi->konteks_lain2 ?? '';
+        $acuanLain1     = $prosesValidasi->acuan_lain1 ?? '';
         $dokumenLain1   = $prosesValidasi->dokumen_lain1 ?? '';
         $dokumenLain2   = $prosesValidasi->dokumen_lain2 ?? '';
+        $dokumenLain3   = $prosesValidasi->dokumen_lain3 ?? '';
+        $dokumenLain4   = $prosesValidasi->dokumen_lain4 ?? '';
 
         return view('form_perencanaan.fr_va.fr_va', compact(
             'periode',
@@ -172,8 +182,11 @@ class PerencanaanController extends Controller
             'tujuanLain',
             'konteksLain',
             'konteksLain2',
+            'acuanLain1',
             'dokumenLain1',
-            'dokumenLain2'
+            'dokumenLain2',
+            'dokumenLain3',
+            'dokumenLain4'
         ));
     }
 
@@ -182,11 +195,17 @@ class PerencanaanController extends Controller
     {
         $skema  = Skema::find($skema_id);
         $skemas = Skema::all();
-    
         $periodeText = $periode == 'sebelum' ? 'Sebelum' : ($periode == 'sesudah' ? 'Sesudah' : ucfirst($periode));
-    
-        return view('form_perencanaan.fr_va.fr_va_asesor', compact('periode','periodeText','skema','skemas','skema_id'));
-    }     
+
+        // ambil fr_va dari session
+        $frvaId = session('frva_id');
+        $frvaData = $frvaId ? DB::table('fr_va')->where('id', $frvaId)->first() : null;
+
+        // ambil asesor terkait fr_va jika ada
+        $asesors = $frvaId ? DB::table('fr_va_asesor')->where('fr_va_id', $frvaId)->get() : collect();
+
+        return view('form_perencanaan.fr_va.fr_va_asesor', compact('periode','periodeText','skema','skemas','skema_id','frvaData','asesors'));
+    }   
 
     public function simpanLanjutfrVa(Request $request)
     {
@@ -196,38 +215,61 @@ class PerencanaanController extends Controller
 
         $skema_id = $request->input('skema_id');
 
-        // 🔹 Tentukan periode berikutnya secara otomatis
+        // urutan periode
         $urutanPeriode = ['sebelum', 'saat', 'sesudah'];
 
         $lastPeriode = DB::table('proses_validasi')
-                        ->where('skema_id', $skema_id)
-                        ->orderByRaw("FIELD(periode, 'sebelum','saat','sesudah') DESC")
-                        ->value('periode');
+            ->where('skema_id', $skema_id)
+            ->orderByRaw("FIELD(periode, 'sebelum','saat','sesudah') DESC")
+            ->value('periode');
 
-        $nextPeriode = 'sebelum'; // default jika belum ada
+        $nextPeriode = 'sebelum';
         if ($lastPeriode) {
             $index = array_search($lastPeriode, $urutanPeriode);
             $nextPeriode = $urutanPeriode[$index + 1] ?? null;
         }
 
         if (!$nextPeriode) {
-            return redirect()->back()->with('error', 'Semua periode sudah diisi.');
+            return back()->with('error', 'Semua periode sudah diisi.');
         }
 
-        // 🔹 Simpan proses_validasi
+        // Siapkan konteks lain (bisa lebih dari satu)
+        $konteksLain = $request->konteks_lain;
+
+        if (is_array($konteksLain)) {
+            // Hanya simpan yang tidak kosong
+            $konteksLain = array_filter($konteksLain);
+
+            $konteksLain = json_encode(array_values($konteksLain));
+        } else {
+            $konteksLain = null;
+        }
+
         $id_validasi = DB::table('proses_validasi')->insertGetId([
-            'skema_id'       => $skema_id,
-            'periode'        => $nextPeriode, // otomatis
-            'tujuan'         => is_array($request->tujuan) ? implode(", ", $request->tujuan) : $request->tujuan,
-            'tujuan_lain'    => $request->tujuan_lain ?? null,
-            'konteks'        => is_array($request->konteks) ? implode(", ", $request->konteks) : $request->konteks,
-            'konteks_lain'   => $request->konteks_lain ?? null,
-            'pendekatan'     => is_array($request->pendekatan) ? implode(", ", $request->pendekatan) : $request->pendekatan,
-            'pendekatan_lain'=> $request->pendekatan_lain ?? null,
+            'skema_id'        => $skema_id,
+            'periode'         => $nextPeriode,
+
+            'tujuan'          => is_array($request->tujuan)
+                                    ? implode(", ", $request->tujuan)
+                                    : $request->tujuan,
+
+            'tujuan_lain'     => $request->tujuan_lain ?? null,
+
+            'konteks'         => is_array($request->konteks)
+                                    ? implode(", ", $request->konteks)
+                                    : $request->konteks,
+
+            'konteks_lain'    => $konteksLain, // <= JSON berisi beberapa nilai
+
+            'pendekatan'      => is_array($request->pendekatan)
+                                    ? implode(", ", $request->pendekatan)
+                                    : $request->pendekatan,
+
+            'pendekatan_lain' => $request->pendekatan_lain ?? null,
         ]);
 
-        // 🔹 Simpan orang relevan
         $orangRelevan = $request->input('orangRelevan', []);
+
         $jabatanMap = [
             'asesorCheckbox'      => 'Asesor Kompetensi (wajib)',
             'leadCheckbox'        => 'Lead Asesor [Ketua TUK]',
@@ -237,49 +279,86 @@ class PerencanaanController extends Controller
             'anggotaCheckbox'     => 'Anggota Asosiasi Industry Profesi'
         ];
 
+        // hasil diskusi satu untuk semua nama dalam setiap jabatan
+        $hasilDiskusi = $request->hasil_diskusi_global;
+
         foreach ($orangRelevan as $idCheckbox) {
-            $namaArray  = (array) $request->input($idCheckbox.'_nama', []);
-            $hasilArray = (array) $request->input($idCheckbox.'_diskusi', []);
 
-            $namaGabung  = [];
-            $hasilGabung = [];
+            // Semua nama dalam jabatan ini
+            $namaArray = (array) $request->input($idCheckbox . '_nama', []);
 
-            foreach ($namaArray as $index => $nama) {
-                if (!empty($nama)) {
-                    $namaGabung[]  = $nama;
-                    $hasilGabung[] = $hasilArray[$index] ?? '';
-                }
-            }
+            // Bersihkan data kosong
+            $namaGabung = array_filter($namaArray);
 
             if (!empty($namaGabung)) {
                 DB::table('diskusi')->insert([
                     'skema_id'      => $skema_id,
-                    'nama_asesor'   => implode(", ", $namaGabung),
+                    'nama_asesor'   => implode(", ", $namaGabung), // semua orang dalam jabatan ini
                     'jabatan'       => $jabatanMap[$idCheckbox] ?? '-',
-                    'hasil_diskusi' => implode(" | ", $hasilGabung),
+                    'hasil_diskusi' => $hasilDiskusi,             // hasil diskusi global
                     'id_validasi'   => $id_validasi,
                 ]);
             }
         }
 
-        // 🔹 Simpan acuan pembanding
+        // Ambil checkbox utama
         $acuanArray   = $request->input('acuan', []);
         $dokumenArray = $request->input('dokumen', []);
+
+        // Ambil input acuan lain
+        $acuanLain1 = (array) $request->input('acuan_lain1', []);
+
+        // Ambil input dokumen lain (dinamis)
+        $dokumenLain1 = (array) $request->input('dokumen_lain', []);
+        $dokumenLain2 = (array) $request->input('dokumen_lain2', []);
+        $dokumenLain3 = (array) $request->input('dokumen_lain3', []);
+        $dokumenLain4 = (array) $request->input('dokumen_lain4', []);
+
+        // Gabungkan semua acuan
+        $allAcuan = array_filter(array_merge(
+            $acuanArray,
+            $acuanLain1
+        ));
+
+        // Gabungkan semua dokumen
+        $allDokumen = array_filter(array_merge(
+            $dokumenArray,
+            $dokumenLain1,
+            $dokumenLain2,
+            $dokumenLain3,
+            $dokumenLain4
+        ));
+
+        // Simpan
         DB::table('acuan_pembanding')->insert([
-            'id_validasi' => $id_validasi,
-            'skema_id'    => $skema_id,
-            'acuan'       => !empty($acuanArray) ? implode(", ", $acuanArray) : null,
-            'dokumen'     => !empty($dokumenArray) ? implode(", ", $dokumenArray) : null,
-        ]);
+            'id_validasi'     => $id_validasi,
+            'skema_id'        => $skema_id,
+            'acuan'           => !empty($acuanArray) 
+                                    ? implode(", ", $acuanArray) 
+                                    : null,
+            'dokumen'         => !empty($dokumenArray) 
+                                    ? implode(", ", $dokumenArray) 
+                                    : null,
+            'acuan_lain'=> !empty($request->acuan_lain)
+                            ? implode(", ", $request->acuan_lain)
+                            : null,                
+            'dokumen_lain' => collect([
+                                        $request->dokumen_lain,
+                                        $request->dokumen_lain2,
+                                        $request->dokumen_lain3,
+                                        $request->dokumen_lain4,
+                                    ])->flatten()->filter()->join(', '),
+        ]);         
 
-        // 🔹 Simpan keterampilan komunikasi
+        // KETERAMPILAN KOMUNIKASI
         $skills = $request->input('keterampilan', []);
-        $keterampilanJson = !empty($skills) ? json_encode($skills) : '[]';
+        $keterampilanJson = !empty($skills) ? json_encode($skills) : null;
 
-        // 🔹 Simpan aspek kegiatan dengan aturan & prinsip
+        // HASIL VALIDASI - ASPEK
         if ($request->has('aspek')) {
+
+            // Daftar Aspek (key = nomor aspek)
             $aspekList = [
-                0 => 'Keterampilan komunikasi yang digunakan dalam kegiatan validasi',
                 1 => 'Rencana Asesmen',
                 2 => 'Interpretasi Standar Kompetensi',
                 3 => 'Interpretasi Acuan Pembanding lainnya',
@@ -290,37 +369,71 @@ class PerencanaanController extends Controller
                 8 => 'Pengambilan Keputusan'
             ];
 
+            // Mapping checkbox kolom (posisi kolom -> huruf)
             $aturanMap  = [1 => 'V', 2 => 'A', 3 => 'T', 4 => 'M'];
-            $prinsipMap = [5 => 'F', 6 => 'R', 7 => 'F', 8 => 'F'];
+            $prinsipMap = [5 => 'V', 6 => 'R', 7 => 'F1', 8 => 'F2'];
 
-            foreach ($request->aspek as $index => $checks) {
-                $aturan = [];
+            // $request->input('aspek') sekarang ber-key sesuai nomor aspek (1..8)
+            foreach ($request->input('aspek') as $no => $checks) {
+                // pastikan $no adalah int
+                $no = (int) $no;
+
+                // Jika data bukan array skip
+                if (!is_array($checks)) continue;
+
+                $aturan  = [];
                 $prinsip = [];
 
                 foreach ($checks as $pos => $val) {
-                    if ($val === "on") {
-                        if (isset($aturanMap[$pos])) $aturan[] = $aturanMap[$pos];
-                        if (isset($prinsipMap[$pos])) $prinsip[] = $prinsipMap[$pos];
+                    // checkbox yang dicentang biasanya bernilai "on"
+                    if ($val) {
+                        $pos = (int)$pos;
+
+                        if (isset($aturanMap[$pos])) {
+                            $aturan[] = $aturanMap[$pos];
+                        }
+
+                        if (isset($prinsipMap[$pos])) {
+                            $prinsip[] = $prinsipMap[$pos];
+                        }
                     }
                 }
 
+                // Siapkan data untuk insert
+                $insertData = [
+                    'id_validasi'     => $id_validasi,
+                    'skema_id'        => $skema_id,
+                    'user_id'         => auth()->id(),
+                    'keterangan'      => null,
+                    'keterampilan'    => null,
+                    'aspek'           => $aspekList[$no] ?? null,
+                    'aturan_bukti'    => !empty($aturan) ? implode(", ", $aturan) : null,
+                    'prinsip_asesmen' => !empty($prinsip) ? implode(", ", $prinsip) : null,
+                ];
+
+                // Jika kamu ingin menyimpan baris khusus untuk "keterampilan komunikasi" misalnya,
+                // maka jangan masukkan aspek 0 — kita sedang menyimpan aspek 1..8.
+                // Jika perlu menyimpan keterampilan sebagai baris terpisah, lakukan di luar loop:
+                DB::table('hasil_validasi')->insert($insertData);
+            }
+
+            // Jika ingin menyimpan keterampilan komunikasi sebagai baris terpisah di tabel hasil_validasi:
+            if (!empty($skills)) {
                 DB::table('hasil_validasi')->insert([
                     'id_validasi'     => $id_validasi,
                     'skema_id'        => $skema_id,
-                    'user_id'         => auth()->id(), 
-                    'keterangan'      => $index === 0 ? $keterampilanJson : null,
-                    'aspek'           => $aspekList[$index] ?? null,
-                    'aturan_bukti'    => !empty($aturan) ? implode(", ", $aturan) : null,
-                    'prinsip_asesmen' => !empty($prinsip) ? implode(", ", $prinsip) : null,
-                ]);                
+                    'user_id'         => auth()->id(),
+                    'keterangan'      => 'Keterampilan Komunikasi',
+                    'keterampilan'    => $keterampilanJson,
+                    'aspek'           => null,
+                    'aturan_bukti'    => null,
+                    'prinsip_asesmen' => null,
+                ]);
             }
         }
 
-        return redirect()->route('form_perencanaan.fr_va_asesor', [
-            'periode' => $nextPeriode,
-            'skema_id' => $skema_id
-        ])->with('success', "Data periode '{$nextPeriode}' berhasil disimpan!");        
-    }  
+        return redirect()->route('form_perencanaan.fr_va_asesor', ['periode' => $nextPeriode, 'skema_id' => $skema_id])->with('success', "Data periode '{$nextPeriode}' berhasil disimpan!");
+    }
 
     // 5.2️⃣ Simpan FR VA + Asesor
     public function simpanFrVa(Request $request)
@@ -341,6 +454,9 @@ class PerencanaanController extends Controller
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+        
+        // simpan fr_va_id di session
+        session(['frva_id' => $frvaId]);        
 
         // simpan asesor
         if ($request->has('asesor')) {
@@ -362,19 +478,41 @@ class PerencanaanController extends Controller
     public function simpanSemua(Request $request)
     {
         $skema_id = $request->skema_id;
+        $periode = $request->periode ?? 'sebelum';
+
+        // 0️⃣ Ambil atau buat id_validasi
+        $validasi = DB::table('proses_validasi')
+            ->where('skema_id', $skema_id)
+            ->where('periode', $periode)
+            ->first();
+
+        if (!$validasi) {
+            $validasiId = DB::table('proses_validasi')->insertGetId([
+                'skema_id' => $skema_id,
+                'periode' => $periode,
+                'tujuan' => null,
+                'konteks' => null,
+                'pendekatan' => null,
+            ]);
+        } else {
+            $validasiId = $validasi->id;
+        }
 
         // 1️⃣ Simpan Kontribusi
-        foreach ($request->temuan as $index => $temuan) {
-            $temuan = trim($temuan);
-            if(empty($temuan)) continue;
-        
-            $rekomendasi = $request->rekomendasi[$index] ?? '';
-            DB::table('kontribusi')->insert([
-                'skema_id' => $skema_id,
-                'temuan' => $temuan,
-                'rekomendasi' => $rekomendasi,
-            ]);
-        }        
+        if ($request->temuan) {
+            foreach ($request->temuan as $index => $temuan) {
+                $temuan = trim($temuan);
+                if (empty($temuan)) continue;
+
+                $rekomendasi = $request->rekomendasi[$index] ?? '';
+                DB::table('kontribusi')->insert([
+                    'skema_id' => $skema_id,
+                    'id_validasi' => $validasiId,
+                    'temuan' => $temuan,
+                    'rekomendasi' => $rekomendasi,
+                ]);
+            }
+        }
 
         // 2️⃣ Simpan Perbaikan
         if ($request->perbaikan) {
@@ -386,6 +524,7 @@ class PerencanaanController extends Controller
 
                 DB::table('rencana_perbaikan')->insert([
                     'skema_id' => $skema_id,
+                    'id_validasi' => $validasiId,
                     'kegiatan_perbaikan' => $kegiatan,
                     'waktu_penyelesaian' => $waktu,
                     'penanggung_jawab' => $penanggung,
@@ -401,19 +540,682 @@ class PerencanaanController extends Controller
         $ttd             = $request->tanda_tangan_validator ?? [];
 
         foreach ($nama_validators as $index => $nama) {
-            if(empty($nama)) continue;
+            if (empty($nama)) continue;
+
+            // pastikan tanggal tidak kosong
+            if (empty($tanggal[$index])) {
+                return back()->with('error', 'Tanggal validator wajib diisi!');
+            }
+
             DB::table('validasi_validator')->insert([
                 'skema_id' => $skema_id,
+                'id_validasi' => $validasiId,
                 'nama_validator' => $nama,
                 'no_registrasi' => $no_registrasi[$index] ?? null,
-                'tanggal' => $tanggal[$index] ?? null,
+                'tanggal' => $tanggal[$index],
                 'ttd' => $ttd[$index] ?? null,
             ]);
         }
 
         return redirect()->route('formperencanaan.show', ['id_skema' => $skema_id])
-                         ->with('success', 'Semua data berhasil disimpan!');
+                        ->with('success', 'Semua data berhasil disimpan!');
     }
+
+    public function preview($skema_id, $periode)
+{
+    $skema = DB::table('skema_sertifikasi')
+        ->where('id_skema', $skema_id)
+        ->first();
+
+    // Ambil validasi sesuai skema & periode
+    $validasi = DB::table('proses_validasi')
+        ->where('skema_id', $skema_id)
+        ->where('periode', $periode)
+        ->first();
+
+    $validasiId = $validasi->id ?? null;
+
+    // Checkbox master
+    $allTujuan = [
+        'Bagian dari Proses Penjaminan Mutu Organisasi',
+        'Mengantisipasi Risiko',
+        'Memenuhi Persyaratan BNSP',
+        'Memastikan Kesesuaian Bukti',
+        'Meningkatkan Kualitas Asesmen',
+        'Mengevaluasi Kualitas Perangkat Asesmen'
+    ];
+
+    $allKonteks = [
+        'Internal Organisasi',
+        'Eksternal Organisasi',
+        'Proses Lisensi / Re-Lisensi',
+        'Dengan Kolega Asesor',
+        'Kolega dari Organisasi Pelatihan atau Asesmen',
+    ];
+
+    $allPendekatan = [
+        'Internal Organisasi',
+        'Pertemuan Moderasi',
+        'Mengkaji Perangkat Asesmen',
+        'Acuan Pembanding',
+        'Pengujian lapangan dan uji coba perangkat asesmen',
+        'Umpan Balik dari Klien',
+        'Mengkaji Bukti-bukti'
+    ];
+
+    // Data dari DB
+    $tujuanSelected = $validasi && $validasi->tujuan ? explode(', ', $validasi->tujuan) : [];
+    $pendekatanSelected = $validasi && $validasi->pendekatan ? explode(', ', $validasi->pendekatan) : [];
+    $tujuanLainVal = $validasi->tujuan_lain ?? '';
+    $konteksSelected = $validasi && $validasi->konteks 
+        ? array_map('trim', explode(',', $validasi->konteks)) 
+        : [];
+    $konteksLainList = $validasi && $validasi->konteks_lain 
+        ? json_decode($validasi->konteks_lain, true)
+        : [];
+    $allKonteksSelected = array_merge($konteksSelected, $konteksLainList);
+
+    // Diskusi
+    $diskusi = DB::table('diskusi')
+        ->where('id_validasi', $validasiId)
+        ->where('skema_id', $skema_id)
+        ->get();
+
+    // Orang relevan
+    $orangRelevanData = [
+        'asesorCheckbox' => false,
+        'leadCheckbox' => false,
+        'managerCheckbox' => false,
+        'ahliCheckbox' => false,
+        'koordinatorCheckbox' => false,
+        'anggotaCheckbox' => false
+    ];
+
+    $jabatanMap = [
+        'Asesor Kompetensi (wajib)' => 'asesorCheckbox',
+        'Lead Asesor [Ketua TUK]' => 'leadCheckbox',
+        'Manager, Supervisor' => 'managerCheckbox',
+        'Tenaga Ahli di bidangnya' => 'ahliCheckbox',
+        'Koordinator Pelatihan' => 'koordinatorCheckbox',
+        'Anggota Asosiasi Industry Profesi' => 'anggotaCheckbox'
+    ];
+
+    foreach($diskusi as $item) {
+        $key = $jabatanMap[$item->jabatan] ?? null;
+        if($key) {
+            $orangRelevanData[$key] = true;
+
+            $names = array_map('trim', explode(',', $item->nama_asesor));
+            foreach($names as $name) {
+                $orangRelevanData[$key.'_detail'][] = [
+                    'nama' => $name,
+                    'diskusi' => $item->hasil_diskusi
+                ];
+            }
+        }
+    }
+
+    $hasilDiskusi = $diskusi->pluck('hasil_diskusi')->unique()->implode("\n");
+
+    // Ambil data acuan_pembanding
+    $acuan = DB::table('acuan_pembanding')
+        ->where('id_validasi', $validasiId)
+        ->first();
+
+    $acuanList = [
+        'Standar Kompetensi (SKKNI/SKKK/SKI)',
+        'Skema Sertifikasi',
+        'SOP/IK',
+        'Manual Instruction / Book Manual',
+        'Standar Kinerja',
+    ];
+
+    $dokumenList = [
+        'Perangkat Asesmen',
+        'Peraturan / Pedoman',
+        null,
+        null,
+        null,
+    ];
+
+    $acuanSelected = $acuan && $acuan->acuan
+        ? array_map('trim', explode(',', $acuan->acuan))
+        : [];
+
+    $dokumenSelected = $acuan && $acuan->dokumen
+        ? array_map('trim', explode(',', $acuan->dokumen))
+        : [];
+
+    $dokumenLain = [];
+    if ($acuan && $acuan->dokumen_lain) {
+        $decoded = json_decode($acuan->dokumen_lain, true);
+        if (is_array($decoded)) {
+            $dokumenLain = $decoded;
+        } else {
+            $dokumenLain = array_map('trim', explode(',', $acuan->dokumen_lain));
+        }
+    }
+    for ($i = count($dokumenLain); $i < 4; $i++) $dokumenLain[$i] = '';
+    $acuanLain = $acuan->acuan_lain ?? '';
+
+    // ==========================================
+    // Keterampilan Komunikasi
+    // ==========================================
+    $hasilValidasi = DB::table('hasil_validasi')
+        ->where('id_validasi', $validasiId)
+        ->where('skema_id', $skema_id)
+        ->where('keterangan', 'Keterampilan Komunikasi')
+        ->first();
+
+    $selectedSkills = [];
+    if ($hasilValidasi && $hasilValidasi->keterampilan) {
+        $decoded = json_decode($hasilValidasi->keterampilan, true);
+        if (is_array($decoded)) $selectedSkills = $decoded;
+    }
+    $skills = ['Pro Aktif','Active Listening','Empati'];
+
+    // ==========================================
+    // Aspek dalam Kegiatan
+    // ==========================================
+    $aspek = [
+        'Rencana Asesmen',
+        'Interpretasi Standar Kompetensi',
+        'Interpretasi Acuan Pembanding lainnya',
+        'Proses Asesmen',
+        'Penyeleksian dan Penerapan Metode Asesmen',
+        'Penyeleksian dan Penerapan Perangkat Asesmen',
+        'Bukti-bukti yang Dikumpulkan',
+        'Pengambilan Keputusan'
+    ];
+
+    $hasilAspek = DB::table('hasil_validasi')
+        ->where('id_validasi', $validasiId)
+        ->where('skema_id', $skema_id)
+        ->whereIn('aspek', $aspek)
+        ->get();
+
+    $aspekData = [];
+    $aturanMap = ['V'=>1,'A'=>2,'T'=>3,'M'=>4];
+    $prinsipMap = ['V'=>5,'R'=>6,'F1'=>7,'F2'=>8];
+    foreach($aspek as $i => $item) {
+        $aspekData[$i] = [];
+        $row = $hasilAspek->firstWhere('aspek', $item);
+        if($row) {
+            // aturan bukti
+            if($row->aturan_bukti) {
+                $vals = explode(',', $row->aturan_bukti);
+                foreach($vals as $v) {
+                    $v = trim($v);
+                    if(isset($aturanMap[$v])) {
+                        $aspekData[$i][$aturanMap[$v]] = true;
+                    }
+                }
+            }
+
+            // prinsip asesmen
+            if($row->prinsip_asesmen) {
+                $vals = explode(',', $row->prinsip_asesmen);
+                $fCount = 0;
+                foreach($vals as $v) {
+                    $v = trim($v);
+                    if($v == 'F') {
+                        $fCount++;
+                        $v = 'F'.$fCount;
+                    }
+                    if(isset($prinsipMap[$v])) {
+                        $aspekData[$i][$prinsipMap[$v]] = true;
+                    }
+                }
+            }
+        }
+    }
+
+    // ==========================================
+    // Temuan & Rekomendasi per skema & periode
+    // ==========================================
+    $kontribusiList = DB::table('kontribusi')
+        ->join('proses_validasi', 'kontribusi.id_validasi', '=', 'proses_validasi.id')
+        ->where('proses_validasi.skema_id', $skema_id)
+        ->where('proses_validasi.periode', $periode)
+        ->select('kontribusi.*')
+        ->get();
+
+    $temuan = [];
+    $rekomendasi = [];
+    foreach($kontribusiList as $kontribusi) {
+        if($kontribusi->temuan) {
+            $temuan = array_merge($temuan, array_map('trim', explode(',', $kontribusi->temuan)));
+        }
+        if($kontribusi->rekomendasi) {
+            $rekomendasi = array_merge($rekomendasi, array_map('trim', explode(',', $kontribusi->rekomendasi)));
+        }
+    }
+
+    // ==========================================
+    // Rencana Perbaikan per skema & periode
+    // ==========================================
+    $perbaikanData = DB::table('rencana_perbaikan')
+        ->join('proses_validasi', 'rencana_perbaikan.id_validasi', '=', 'proses_validasi.id')
+        ->where('proses_validasi.skema_id', $skema_id)
+        ->where('proses_validasi.periode', $periode)
+        ->select('rencana_perbaikan.*')
+        ->get();
+
+    $perbaikan = [];
+    $waktuPerbaikan = [];
+    $penanggungPerbaikan = [];
+    $ttdPerbaikan = [];
+    foreach($perbaikanData as $p) {
+        $perbaikan[] = $p->kegiatan_perbaikan;
+        $waktuPerbaikan[] = $p->waktu_penyelesaian;
+        $penanggungPerbaikan[] = $p->penanggung_jawab;
+        $ttdPerbaikan[] = $p->ttd;
+    }
+
+    // ==========================================
+    // Validator per skema & periode
+    // ==========================================
+    $validatorData = DB::table('validasi_validator')
+        ->join('proses_validasi', 'validasi_validator.id_validasi', '=', 'proses_validasi.id')
+        ->where('proses_validasi.skema_id', $skema_id)
+        ->where('proses_validasi.periode', $periode)
+        ->select('validasi_validator.*')
+        ->get();
+
+    $validator = [];
+    $noMet = [];
+    $tanggal = [];
+    $ttdValidator = [];
+    foreach($validatorData as $v) {
+        $validator[] = $v->nama_validator;
+        $noMet[] = $v->no_registrasi;
+        $tanggal[] = $v->tanggal;
+        $ttdValidator[] = $v->ttd;
+    }
+
+    // ==========================================
+    // Periode user-friendly
+    // ==========================================
+    $periodeText = match($periode) {
+        'sebelum' => 'Sebelum Asesmen',
+        'saat'    => 'Saat Asesmen',
+        'sesudah' => 'Sesudah Asesmen',
+        default   => 'Periode Tidak Diketahui',
+    };
+
+    return view('form_perencanaan.fr_va.fr_va_pdf', [
+        'skema' => $skema,
+        'validasi' => $validasi,
+        'allTujuan' => $allTujuan,
+        'allKonteks' => $allKonteks,
+        'allPendekatan' => $allPendekatan,
+        'tujuanSelected' => $tujuanSelected,
+        'konteksSelected' => $konteksSelected,
+        'pendekatanSelected' => $pendekatanSelected,
+        'tujuanLainVal' => $tujuanLainVal,
+        'konteksLainList' => $konteksLainList,
+        'diskusi' => $diskusi,
+        'hasilDiskusi' => $hasilDiskusi,
+        'orangRelevanData' => $orangRelevanData,
+        'acuanList' => $acuanList,
+        'dokumenList' => $dokumenList,
+        'acuanSelected' => $acuanSelected,
+        'dokumenSelected' => $dokumenSelected,
+        'dokumenLain' => $dokumenLain,
+        'acuanLain' => $acuanLain,
+        'selectedSkills' => $selectedSkills,
+        'skills' => $skills,
+        'aspek' => $aspek,
+        'aspekData' => $aspekData,
+        'temuan' => $temuan,
+        'rekomendasi' => $rekomendasi,
+        'perbaikan' => $perbaikan,
+        'waktuPerbaikan' => $waktuPerbaikan,
+        'penanggungPerbaikan' => $penanggungPerbaikan,
+        'ttdPerbaikan' => $ttdPerbaikan,
+        'validator' => $validator,
+        'noMet' => $noMet,
+        'tanggal' => $tanggal,
+        'ttdValidator' => $ttdValidator,
+        'periode' => $periode,
+        'periodeText' => $periodeText,
+        'allKonteksSelected' => $allKonteksSelected,
+    ]);
+}
+
+public function download($skema_id, $periode)
+{
+    // =============================
+    // 0. VALIDASI PERIODE
+    // =============================
+    $periodeText = [
+        'sebelum' => 'Sebelum Asesmen',
+        'saat'    => 'Saat Asesmen',
+        'sesudah' => 'Sesudah Asesmen'
+    ];
+
+    // =============================
+    // 1. AMBIL DATA SKEMA
+    // =============================
+    $skema = DB::table('skema_sertifikasi')
+        ->where('id_skema', $skema_id)
+        ->first();
+
+    // =============================
+    // 2. AMBIL ID VALIDASI
+    // =============================
+    $prosesValidasi = DB::table('proses_validasi')
+        ->where('skema_id', $skema_id)
+        ->where('periode', $periode)
+        ->first();
+
+    $validasiId = $prosesValidasi->id ?? null;
+
+
+    // =============================
+    // 3. VALIDATOR
+    // =============================
+    $validators = DB::table('validasi_validator')
+        ->where('id_validasi', $validasiId)
+        ->select('nama_validator as nama_asesor', 'tanggal', 'ttd')
+        ->get();
+
+
+    // =============================
+    // 4. MASTER LIST
+    // =============================
+    $allTujuan = [
+        'Bagian dari Proses Penjaminan Mutu Organisasi',
+        'Mengantisipasi Risiko',
+        'Memenuhi Persyaratan BNSP',
+        'Memastikan Kesesuaian Bukti',
+        'Meningkatkan Kualitas Asesmen',
+        'Mengevaluasi Kualitas Perangkat Asesmen'
+    ];
+
+    $allKonteks = [
+        'Internal Organisasi',
+        'Eksternal Organisasi',
+        'Proses Lisensi / Re-Lisensi',
+        'Dengan Kolega Asesor',
+        'Kolega dari Organisasi Pelatihan atau Asesmen',
+    ];
+
+    $allPendekatan = [
+        'Panel Asesmen',
+        'Pertemuan Moderasi',
+        'Mengkaji Perangkat Asesmen',
+        'Acuan Pembanding',
+        'Pengujian lapangan dan uji coba perangkat asesmen',
+        'Umpan Balik dari Klien',
+        'Mengkaji Bukti-bukti'
+    ];
+
+
+    // =============================
+    // 5. CEKLIS DARI DB
+    // =============================
+    $tujuanSelected     = $prosesValidasi->tujuan ? array_map('trim', explode(',', $prosesValidasi->tujuan)) : [];
+    $allKonteksSelected = $prosesValidasi->konteks ? array_map('trim', explode(',', $prosesValidasi->konteks)) : [];
+    $pendekatanSelected = $prosesValidasi->pendekatan ? array_map('trim', explode(',', $prosesValidasi->pendekatan)) : [];
+
+    // =============================
+    // 6. TUJUAN LAIN / KONTEKS LAIN
+    // =============================
+    $tujuanLainVal   = trim($prosesValidasi->tujuan_lain ?? '');
+    $konteksLainRaw  = trim($prosesValidasi->konteks_lain ?? '');
+    $konteksLainList = [];
+
+    if ($konteksLainRaw) {
+        $tmp = array_map('trim', explode(',', $konteksLainRaw));
+        foreach ($tmp as $item) {
+            $item = trim($item, '[]"');
+            if ($item !== '') {
+                $konteksLainList[] = $item;
+            }
+        }
+    }
+
+
+    // =============================
+    // 7. HASIL DISKUSI
+    // =============================
+    $hasilDiskusi = DB::table('diskusi')
+        ->where('id_validasi', $validasiId)
+        ->get();
+
+    $jabatanList = [
+        'Asesor Kompetensi (wajib)',
+        'Lead Asesor [Ketua TUK]',
+        'Manager, Supervisor',
+        'Tenaga Ahli di bidangnya',
+        'Koordinator Pelatihan',
+        'Anggota Asosiasi Industry Profesi'
+    ];
+
+    $orangRelevanTable = [];
+
+    foreach ($jabatanList as $jabatan) {
+        $asesors = $hasilDiskusi->where('jabatan', $jabatan);
+        $namaList = [];
+
+        foreach ($asesors as $a) {
+            $namaList = array_merge($namaList, array_map('trim', explode(',', $a->nama_asesor)));
+        }
+
+        $orangRelevanTable[] = [
+            'jabatan' => $jabatan,
+            'adaIsi' => count($namaList) > 0,
+            'namaList' => $namaList
+        ];
+    }
+
+    $hasilDiskusiGlobal = $hasilDiskusi->pluck('hasil_diskusi')->filter()->implode("\n");
+
+
+    // =============================
+    // 8. ACUAN PEMBANDING
+    // =============================
+    $acuanDb = DB::table('acuan_pembanding')
+        ->where('id_validasi', $validasiId)
+        ->first();
+
+    $defaultAcuan = [
+        'Standar Kompetensi (SKKNI/SKKK/SKI)',
+        'Skema Sertifikasi',
+        'SOP/IK',
+        'Manual Instruction / Book Manual',
+        'Standar Kinerja'
+    ];
+
+    $defaultDokumen = [
+        'Perangkat Asesmen',
+        'Peraturan / Pedoman'
+    ];
+
+    $acuanTambahan = $acuanDb && $acuanDb->acuan_lain
+        ? array_filter(array_map('trim', explode(',', $acuanDb->acuan_lain)))
+        : [];
+
+    $dokumenTambahan = $acuanDb && $acuanDb->dokumen_lain
+        ? array_filter(array_map('trim', explode(',', $acuanDb->dokumen_lain)))
+        : [];
+
+    $acuanSelected = $acuanDb && $acuanDb->acuan
+        ? array_map('trim', explode(',', $acuanDb->acuan))
+        : [];
+
+    $dokumenSelected = $acuanDb && $acuanDb->dokumen
+        ? array_map('trim', explode(',', $acuanDb->dokumen))
+        : [];
+
+
+    // =============================
+    // 9. KETERAMPILAN KOMUNIKASI
+    // =============================
+    $defaultKeterampilan = ['pro aktif', 'active listening', 'empati'];
+
+    $hasilKeterampilan = DB::table('hasil_validasi')
+        ->where('id_validasi', $validasiId)
+        ->where('skema_id', $skema_id)
+        ->where('keterangan', 'LIKE', '%Keterampilan%')
+        ->first();
+
+    $keterampilanSelected = [];
+
+    if ($hasilKeterampilan && $hasilKeterampilan->keterampilan) {
+        $decoded = json_decode($hasilKeterampilan->keterampilan, true);
+        if (is_array($decoded)) {
+            $keterampilanSelected = array_map('strtolower', $decoded);
+        }
+    }
+
+
+    // =============================
+    // 10. ATURAN & PRINSIP ASESMENT
+    // =============================
+    $aturanList  = ['V', 'A', 'T', 'M'];
+    $prinsipList = ['V', 'R', 'F1', 'F2'];
+    $prinsipHeaderPdf = ['V','R','F','F'];
+
+    $aspekLabels = [
+        'Rencana Asesmen',
+        'Interpretasi Standar Kompetensi',
+        'Interpretasi Acuan Pembanding lainnya',
+        'Proses Asesmen',
+        'Penyeleksian dan Penerapan Metode Asesmen',
+        'Penyeleksian dan Penerapan Perangkat Asesmen',
+        'Bukti-bukti yang Dikumpulkan',
+        'Pengambilan Keputusan'
+    ];
+
+    $dataAspek = DB::table('hasil_validasi')
+        ->where('id_validasi', $validasiId)
+        ->where('skema_id', $skema_id)
+        ->whereNotNull('aspek')
+        ->get();
+
+    $aspekList = [];
+
+    foreach ($aspekLabels as $i => $label) {
+        $row = $dataAspek->firstWhere('aspek', $label);
+
+        $aturan = $row && $row->aturan_bukti
+            ? array_map('trim', explode(',', $row->aturan_bukti))
+            : [];
+
+        $prinsip = $row && $row->prinsip_asesmen
+            ? array_map('trim', explode(',', $row->prinsip_asesmen))
+            : [];
+
+        $aspekList[] = [
+            'no'      => $i + 1,
+            'label'   => $label,
+            'aturan'  => $aturan,
+            'prinsip' => $prinsip,
+        ];
+    }
+
+        $redCells = [];
+
+        // Data Temuan & Rekomendasi
+        $kontribusiList = DB::table('kontribusi')
+        ->join('proses_validasi', 'kontribusi.id_validasi', '=', 'proses_validasi.id')
+        ->where('proses_validasi.skema_id', $skema_id)
+        ->where('proses_validasi.periode', $periode)
+        ->select('kontribusi.*')
+        ->get();
+
+        // Siapkan array gabungan kalau perlu
+        $temuan = [];
+        $rekomendasi = [];
+        foreach ($kontribusiList as $kontribusi) {
+        if ($kontribusi->temuan) {
+            // Misal temuan dipisah koma
+            $temuan = array_merge($temuan, array_map('trim', explode(',', $kontribusi->temuan)));
+        }
+        if ($kontribusi->rekomendasi) {
+            $rekomendasi = array_merge($rekomendasi, array_map('trim', explode(',', $kontribusi->rekomendasi)));
+        }
+    }
+
+// ==========================================
+// Rencana Perbaikan per skema & periode
+// ==========================================
+$rencanaList = DB::table('rencana_perbaikan')
+    ->join('proses_validasi', 'rencana_perbaikan.id_validasi', '=', 'proses_validasi.id')
+    ->where('proses_validasi.skema_id', $skema_id)
+    ->where('proses_validasi.periode', $periode)
+    ->select('rencana_perbaikan.*')
+    ->get();
+
+// Optional: kalau mau buat array terpisah
+$perbaikan = [];
+$waktuPerbaikan = [];
+$penanggungPerbaikan = [];
+$ttdPerbaikan = [];
+
+foreach ($rencanaList as $p) {
+    $perbaikan[] = $p->kegiatan_perbaikan;
+    $waktuPerbaikan[] = $p->waktu_penyelesaian;
+    $penanggungPerbaikan[] = $p->penanggung_jawab;
+    $ttdPerbaikan[] = $p->ttd;
+}
+
+    // =============================
+    // 11. GENERATE PDF
+    // =============================
+    $pdf = Pdf::loadView('form_perencanaan.fr_va.pdf_frva', [
+        'skema'        => $skema,
+        'periode'      => $periode,
+        'periodeText'  => $periodeText[$periode] ?? $periode,
+
+        'validators' => $validators,
+
+        'allTujuan'          => $allTujuan,
+        'allKonteks'         => $allKonteks,
+        'allPendekatan'      => $allPendekatan,
+        'tujuanSelected'     => $tujuanSelected,
+        'allKonteksSelected' => $allKonteksSelected,
+        'pendekatanSelected' => $pendekatanSelected,
+
+        'tujuanLainVal'   => $tujuanLainVal,
+        'konteksLainRaw'  => $konteksLainRaw,
+        'konteksLainList' => $konteksLainList,
+
+        'orangRelevanTable'  => $orangRelevanTable,
+        'hasilDiskusiGlobal' => $hasilDiskusiGlobal,
+
+        'defaultAcuan'    => $defaultAcuan,
+        'defaultDokumen'  => $defaultDokumen,
+        'acuanLain'       => $acuanTambahan,
+        'dokumenLain'     => $dokumenTambahan,
+        'acuanSelected'   => $acuanSelected,
+        'dokumenSelected' => $dokumenSelected,
+
+        'defaultKeterampilan'  => $defaultKeterampilan,
+        'keterampilanSelected' => $keterampilanSelected,
+
+        'aspekList'  => $aspekList,
+        'aturanList' => $aturanList,
+        'prinsipList'=> $prinsipList,
+        'prinsipHeaderPdf' => $prinsipHeaderPdf,
+        'redCells'   => $redCells,
+
+        'kontribusiList' => $kontribusiList,
+        'temuan'         => $temuan,
+        'rekomendasi'    => $rekomendasi,
+
+        'rencanaList'      => $rencanaList,
+        'perbaikan'        => $perbaikan,
+        'waktuPerbaikan'   => $waktuPerbaikan,
+        'penanggungPerbaikan'=> $penanggungPerbaikan,
+        'ttdPerbaikan'     => $ttdPerbaikan,
+    ])
+    ->setPaper('A4', 'portrait');
+
+    return $pdf->download("FR_VA_{$skema->kode_skema}_{$periode}.pdf");
+}
 
     // 7️⃣ Laporan Asesmen (store manual)
     public function store(Request $request)
@@ -447,4 +1249,3 @@ class PerencanaanController extends Controller
         return response()->json($asesi);
     }
 }
-
