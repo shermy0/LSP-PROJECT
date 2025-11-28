@@ -345,83 +345,103 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const url = `/form-perencanaan/meninjau-proses/{{ $skema->id_skema }}/data/${asesorId}`;
         fetch(url)
-            .then(res => res.json())
-            .then(data => {
-                const prinsip = data.prinsip || {};
-                const dimensi = data.dimensi || {};
-                const tandaTangan = data.tanda_tangan || null;
+        .then(res => res.json())
+        .then(data => {
+            const prinsip = data.prinsip || {};
+            const dimensi = data.dimensi || {};
+            const tandaTangan = data.tanda_tangan || null;
 
-                // Isi tabel prinsip asesmen
-                prinsipTableBody.innerHTML = '';
-                aspekPrinsip.forEach((aspek, i) => {
-                    const prefix = ['rencana', 'persiapan', 'implementasi', 'keputusan', 'umpan'][i];
-                    prinsipTableBody.innerHTML += `
-                        <tr>
-                            <td>${aspek.nama}</td>
-                            <td class="text-center">
-                                <input class="form-check-input" type="checkbox" ${prinsip[prefix + '_validitas'] ? 'checked' : ''} disabled ${!aspek.validitas ? 'style="visibility:hidden"' : ''}>
-                            </td>
-                            <td class="text-center">
-                                <input class="form-check-input" type="checkbox" ${prinsip[prefix + '_reliabel'] ? 'checked' : ''} disabled ${!aspek.reliabel ? 'style="visibility:hidden"' : ''}>
-                            </td>
-                            <td class="text-center">
-                                <input class="form-check-input" type="checkbox" ${prinsip[prefix + '_fleksibel'] ? 'checked' : ''} disabled ${!aspek.fleksibel ? 'style="visibility:hidden"' : ''}>
-                            </td>
-                            <td class="text-center">
-                                <input class="form-check-input" type="checkbox" ${prinsip[prefix + '_adil'] ? 'checked' : ''} disabled ${!aspek.adil ? 'style="visibility:hidden"' : ''}>
-                            </td>
-                        </tr>
-                    `;
-                });
+            // Cek apakah data benar-benar kosong
+            const isPrinsipEmpty = Object.keys(prinsip).length === 0;
+            const isDimensiEmpty = Object.keys(dimensi).length === 0;
+            
+            if (isPrinsipEmpty && isDimensiEmpty) {
+                // Tampilkan pesan "tidak ada data"
+                prinsipTableBody.innerHTML = `<tr><td colspan="5" class="text-center">Tidak ada data</td></tr>`;
+                dimensiTableBody.innerHTML = `<tr><td colspan="6" class="text-center">Tidak ada data</td></tr>`;
+                document.getElementById('rekomendasi1').value = '';
+                document.getElementById('rekomendasi2').value = '';
+                document.getElementById('catatan_asesor').value = '';
+                document.getElementById('nama_asesor_view').value = '';
+                document.getElementById('no_registrasi_view').value = '';
+                document.getElementById('tanggal_asesmen_view').value = '';
+                document.getElementById('ttd_asesor').style.display = 'none';
+                document.getElementById('no_ttd_asesor').style.display = 'block';
+                return; // Keluar dari fungsi
+            }
 
-                // Isi tabel dimensi kompetensi
-                dimensiTableBody.innerHTML = '';
-                aspekDimensi.forEach((namaAspek, i) => {
-                    const prefix = i === 0 ? 'konsistensi' : 'bukti';
-                    let row = `<tr><td class="text-start">${namaAspek}</td>`;
+            // Isi tabel prinsip asesmen
+            prinsipTableBody.innerHTML = '';
+            aspekPrinsip.forEach((aspek, i) => {
+                const prefix = ['rencana', 'pertukar', 'implementasi', 'keputusan', 'umpan'][i];
+                prinsipTableBody.innerHTML += `
+                    <tr>
+                        <td>${aspek.nama}</td>
+                        <td class="text-center">
+                            <input class="form-check-input" type="checkbox" ${prinsip[prefix + '_validitas'] ? 'checked' : ''} disabled ${!aspek.validitas ? 'style="visibility:hidden"' : ''}>
+                        </td>
+                        <td class="text-center">
+                            <input class="form-check-input" type="checkbox" ${prinsip[prefix + '_reliabel'] ? 'checked' : ''} disabled ${!aspek.reliabel ? 'style="visibility:hidden"' : ''}>
+                        </td>
+                        <td class="text-center">
+                            <input class="form-check-input" type="checkbox" ${prinsip[prefix + '_fleksibel'] ? 'checked' : ''} disabled ${!aspek.fleksibel ? 'style="visibility:hidden"' : ''}>
+                        </td>
+                        <td class="text-center">
+                            <input class="form-check-input" type="checkbox" ${prinsip[prefix + '_adil'] ? 'checked' : ''} disabled ${!aspek.adil ? 'style="visibility:hidden"' : ''}>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            // Isi tabel dimensi kompetensi
+            dimensiTableBody.innerHTML = '';
+            aspekDimensi.forEach((namaAspek, i) => {
+                const prefix = i === 0 ? 'konsistensi' : 'bukti';
+                let row = `<tr><td class="text-start">${namaAspek}</td>`;
+                
+                dimensiKolom.forEach(kolom => {
+                    const key = `${prefix}_${kolom}`;
+                    const values = dimensi[key] || [];
+                    let cellContent = '';
                     
-                    dimensiKolom.forEach(kolom => {
-                        const key = `${prefix}_${kolom}`;
-                        const values = dimensi[key] || [];
-                        let cellContent = '';
-                        
-                        options.forEach(opt => {
-                            const isChecked = values.includes(opt);
-                            cellContent += `<label><input class="form-check-input" type="checkbox" ${isChecked ? 'checked' : ''} disabled> ${opt}</label><br>`;
-                        });
-                        
-                        row += `<td>${cellContent}</td>`;
+                    options.forEach(opt => {
+                        const isChecked = values.includes(opt);
+                        cellContent += `<label><input class="form-check-input" type="checkbox" ${isChecked ? 'checked' : ''} disabled> ${opt}</label><br>`;
                     });
                     
-                    row += `</tr>`;
-                    dimensiTableBody.innerHTML += row;
+                    row += `<td>${cellContent}</td>`;
                 });
-
-                // Isi rekomendasi
-                document.getElementById('rekomendasi1').value = data.rekomendasi1 || '';
-                document.getElementById('rekomendasi2').value = data.rekomendasi2 || '';
-
-                // Isi bagian tanda tangan
-                document.getElementById('catatan_asesor').value = tandaTangan?.catatan || '';
-                document.getElementById('nama_asesor_view').value = asesorSelect.options[asesorSelect.selectedIndex].text;
-                document.getElementById('no_registrasi_view').value = asesorSelect.options[asesorSelect.selectedIndex].dataset.no || '';
-                document.getElementById('tanggal_asesmen_view').value = tandaTangan?.tanggal?.split('T')[0] || '';
-
-                const ttdImg = document.getElementById('ttd_asesor');
-                const noTtdText = document.getElementById('no_ttd_text');
-                if (tandaTangan?.tanda_tangan) {
-                    ttdImg.src = tandaTangan.tanda_tangan;
-                    ttdImg.style.display = 'block';
-                    noTtdText.style.display = 'none';
-                } else {
-                    ttdImg.style.display = 'none';
-                    noTtdText.style.display = 'block';
-                }
-            })
-            .catch(() => {
-                prinsipTableBody.innerHTML = `<tr><td colspan="5" class="text-center">Gagal memuat data</td></tr>`;
-                dimensiTableBody.innerHTML = `<tr><td colspan="6">Gagal memuat data</td></tr>`;
+                
+                row += `</tr>`;
+                dimensiTableBody.innerHTML += row;
             });
+
+            // Isi rekomendasi
+            document.getElementById('rekomendasi1').value = data.rekomendasi1 || '';
+            document.getElementById('rekomendasi2').value = data.rekomendasi2 || '';
+
+            // Isi bagian tanda tangan
+            document.getElementById('catatan_asesor').value = tandaTangan?.catatan || '';
+            document.getElementById('nama_asesor_view').value = asesorSelect.options[asesorSelect.selectedIndex].text;
+            document.getElementById('no_registrasi_view').value = asesorSelect.options[asesorSelect.selectedIndex].dataset.no || '';
+            document.getElementById('tanggal_asesmen_view').value = tandaTangan?.tanggal?.split('T')[0] || '';
+
+            const ttdImg = document.getElementById('ttd_asesor');
+            const noTtdText = document.getElementById('no_ttd_text');
+            if (tandaTangan?.tanda_tangan) {
+                ttdImg.src = tandaTangan.tanda_tangan;
+                ttdImg.style.display = 'block';
+                noTtdText.style.display = 'none';
+            } else {
+                ttdImg.style.display = 'none';
+                noTtdText.style.display = 'block';
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            prinsipTableBody.innerHTML = `<tr><td colspan="5" class="text-center">Tidak ada data</td></tr>`;
+            dimensiTableBody.innerHTML = `<tr><td colspan="6" class="text-center">Tidak ada data</td></tr>`;
+        });
     });
 });
 </script>

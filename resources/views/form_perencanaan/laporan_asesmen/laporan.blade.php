@@ -179,140 +179,45 @@
 </form>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const asesorSelect   = document.getElementById('namaAsesor');
-    const asesiTableBody = document.getElementById('asesiTableBody');
-    const asesorIdHidden = document.getElementById('asesor_id_hidden');
-    const noRegHidden    = document.getElementById('no_registrasi_hidden');
-    const simpanForm     = document.getElementById('simpan-lanjut-form');
-
-    // auto-trigger jika ada asesor terakhir dipilih
-    @if(session('asesor_terpilih'))
-        asesorSelect.value = "{{ session('asesor_terpilih') }}";
-        asesorSelect.dispatchEvent(new Event('change'));
-    @endif
-
-    asesorSelect.addEventListener('change', function () {
-        const asesorId = this.value;
-        const noReg    = this.selectedOptions[0]?.dataset.no ?? '';
-
-        asesorIdHidden.value = asesorId;
-        noRegHidden.value    = noReg;
-
-        if (!asesorId) {
-            asesiTableBody.innerHTML = `<tr><td colspan="5">Silakan pilih asesor terlebih dahulu</td></tr>`;
-            document.querySelector('textarea[name="aspek_positif_negatif"]').value = '';
-            document.querySelector('textarea[name="penolakan"]').value = '';
-            document.querySelector('textarea[name="saran_perbaikan"]').value = '';
-            return;
-        }
-
-        const url = `{{ url('form-perencanaan/laporan/'.$skema->id_skema.'/asesi') }}/${asesorId}`;
-
-        fetch(url)
-            .then(res => res.json())
-            .then(data => {
-                const asesises = data.asesis;
-                const catatan  = data.catatan;
-
-                // render tabel asesi
-                asesiTableBody.innerHTML = '';
-                if (asesises.length > 0) {
-                    asesises.forEach((asesi, index) => {
-                        let unitOptions = '<option value="">-- Pilih Unit --</option>';
-                        @foreach($skema->unitKompetensi as $unit)
-                            unitOptions += `<option value="{{ $unit->id_unit }}"
-                                ${asesi.id_unit == {{ $unit->id_unit }} ? 'selected' : ''}>
-                                {{ $unit->kode_unit }} - {{ $unit->judul_unit }}
-                            </option>`;
-                        @endforeach
-
-                        asesiTableBody.innerHTML += `
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td>${asesi.nama_lengkap}</td>
-                                <td>
-                                    <input type="radio" name="rekomendasi_${asesi.id_asesi}" value="K"
-                                        ${asesi.hasil === 'K' ? 'checked' : ''}
-                                        onchange="toggleKeterangan(${asesi.id_asesi}, false)">
-                                </td>
-                                <td>
-                                    <input type="radio" name="rekomendasi_${asesi.id_asesi}" value="BK"
-                                        ${asesi.hasil === 'BK' ? 'checked' : ''}
-                                        onchange="toggleKeterangan(${asesi.id_asesi}, true)">
-                                </td>
-                                <td>
-                                    <select name="keterangan_${asesi.id_asesi}" id="keterangan_${asesi.id_asesi}" 
-                                        class="form-control" ${asesi.hasil === 'BK' ? '' : 'disabled'}>
-                                        ${unitOptions}
-                                    </select>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                } else {
-                    asesiTableBody.innerHTML = `<tr><td colspan="5">Tidak ada asesi untuk asesor ini</td></tr>`;
-                }
-
-                // load catatan asesmen
-                document.querySelector('textarea[name="aspek_positif_negatif"]').value = catatan?.aspek_positif_negatif || '';
-                document.querySelector('textarea[name="penolakan"]').value             = catatan?.penolakan || '';
-                document.querySelector('textarea[name="saran_perbaikan"]').value       = catatan?.saran_perbaikan || '';
-            })
-            .catch(() => {
-                Swal.fire('Error', 'Gagal memuat data asesi', 'error');
-                asesiTableBody.innerHTML = `<tr><td colspan="5">Gagal memuat data asesi</td></tr>`;
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const asesorSelect = document.getElementById('nama_asesor');
+    const tanggalInput = document.getElementById('tanggalAsesmen');
+    
+    // Validasi sebelum submit - SAMA SEPERTI DI LAPORAN
+    form.addEventListener('submit', function(e) {
+        const asesorValue = asesorSelect.value;
+        const tanggalValue = tanggalInput.value;
+        
+        // Cek apakah asesor belum dipilih
+        if (!asesorValue || asesorValue === '') {
+            e.preventDefault(); // Cegah submit HANYA kalau validasi gagal
+            Swal.fire({
+                icon: 'warning',
+                title: 'Perhatian!',
+                text: 'Silakan pilih Nama Asesor terlebih dahulu.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#d33'
             });
-    });
-
-    // validasi sebelum submit
-    simpanForm.addEventListener('submit', function(e) {
-        let valid = true;
-
-        // cek kalau asesor belum dipilih
-        if (!asesorSelect.value) {
-            e.preventDefault();
-            Swal.fire('Peringatan', 'Silakan pilih asesor terlebih dahulu sebelum menyimpan.', 'warning');
             return;
         }
-
-        // cek validasi BK wajib pilih unit
-        const rows = asesiTableBody.querySelectorAll('tr');
-        rows.forEach(row => {
-            const radioBK = row.querySelector('input[type=radio][value=BK]:checked');
-            if (radioBK) {
-                const select = row.querySelector('select');
-                if (select && select.value === "") {
-                    valid = false;
-                    select.classList.add('is-invalid');
-                } else if (select) {
-                    select.classList.remove('is-invalid');
-                }
-            }
-        });
-
-        if (!valid) {
-            e.preventDefault();
-            Swal.fire('Peringatan', 'Jika memilih BK, wajib memilih unit pada kolom Keterangan.', 'warning');
+        
+        // Cek apakah tanggal belum diisi
+        if (!tanggalValue || tanggalValue === '') {
+            e.preventDefault(); // Cegah submit HANYA kalau validasi gagal
+            Swal.fire({
+                icon: 'warning',
+                title: 'Perhatian!',
+                text: 'Silakan isi Tanggal Asesmen terlebih dahulu.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#d33'
+            });
             return;
         }
-
-      
+        
+        // Jika lolos validasi, biarkan form submit secara normal (tidak perlu form.submit() manual)
     });
 });
-
-// toggle keterangan select
-function toggleKeterangan(asesiId, enable) {
-    const selectEl = document.getElementById(`keterangan_${asesiId}`);
-    if (enable) {
-        selectEl.disabled = false;
-    } else {
-        selectEl.value = '';
-        selectEl.disabled = true;
-        selectEl.classList.remove('is-invalid');
-    }
-}
 </script>
 @endsection

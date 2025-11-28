@@ -61,7 +61,7 @@
                 <div class="col-md-6">
                     <div class="mapa-box">
                         <label for="nama_asesor" class="form-label">Nama Asesor</label>
-                        <select class="form-control" id="nama_asesor" name="asesor_id" required>
+                        <select class="form-control" id="nama_asesor" name="asesor_id" >
                             <option value="">-- Pilih Asesor --</option>
                             @foreach($asesors as $asesor)
                             <option value="{{ $asesor->id_asesor }}">
@@ -75,7 +75,7 @@
                 <div class="col-md-6">
                     <div class="mapa-box">
                         <label for="tanggalAsesmen" class="form-label">Tanggal Asesmen</label>
-                        <input type="date" class="form-control" id="tanggalAsesmen" name="tanggal_asesmen" required>
+                        <input type="date" class="form-control" id="tanggalAsesmen" name="tanggal_asesmen" >
                     </div>
                 </div>
             </div>
@@ -236,9 +236,46 @@
         </form>
     </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Script ini tidak perlu lagi karena data sudah dari controller
-    // Jika ada kebutuhan dinamis lainnya, bisa ditambahkan di sini
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const asesorSelect = document.getElementById('nama_asesor');
+    const tanggalInput = document.getElementById('tanggalAsesmen');
+    
+    // Validasi sebelum submit - SAMA SEPERTI DI LAPORAN
+    form.addEventListener('submit', function(e) {
+        const asesorValue = asesorSelect.value;
+        const tanggalValue = tanggalInput.value;
+        
+        // Cek apakah asesor belum dipilih
+        if (!asesorValue || asesorValue === '') {
+            e.preventDefault(); // Cegah submit HANYA kalau validasi gagal
+            Swal.fire({
+                icon: 'warning',
+                title: 'Perhatian!',
+                text: 'Silakan pilih Nama Asesor terlebih dahulu.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#d33'
+            });
+            return;
+        }
+        
+        // Cek apakah tanggal belum diisi
+        if (!tanggalValue || tanggalValue === '') {
+            e.preventDefault(); // Cegah submit HANYA kalau validasi gagal
+            Swal.fire({
+                icon: 'warning',
+                title: 'Perhatian!',
+                text: 'Silakan isi Tanggal Asesmen terlebih dahulu.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#d33'
+            });
+            return;
+        }
+        
+        // Jika lolos validasi, biarkan form submit secara normal (tidak perlu form.submit() manual)
+    });
+});
 </script>
 @endsection
