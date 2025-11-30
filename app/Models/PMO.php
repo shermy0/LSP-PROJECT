@@ -12,9 +12,10 @@ class PMO extends Model
     protected $table = 'pmo';
 
     protected $fillable = [
-        'id_skema',
-        'id_asesmen',
-        // hapus 'timer', 'jenis_pertanyaan', 'timescap' kalau kolom itu ga ada di tabel
+    'id_skema',
+    'id_asesmen',
+    'id_tuk', // ✅ tambahkan ini
+    'id_kuk',
     ];
 
     public $timestamps = false; // biar ga error created_at / updated_at

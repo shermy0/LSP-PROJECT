@@ -1054,10 +1054,13 @@ public function inputPMO(Request $request, $id_skema)
 
     // 🔹 Kalau belum ada, baru buat
     if (!$pmo) {
-        $pmo = PMO::create([
-            'id_skema' => $id_skema,
-            'id_asesmen' => 7,
-        ]);
+      $pmo = PMO::create([
+    'id_skema'   => $id_skema,
+    'id_asesmen' => $request->id_asesmen ?? 7,
+    'id_tuk'     => 1,
+    'id_kuk'     => $request->id_kuk,
+    'id_asesor'  => Auth::id(), // ✅ otomatis isi dari user login
+    ]);
     }
 
     // 🔹 Ambil data kelompok pekerjaan
@@ -1102,6 +1105,7 @@ public function inputPMO(Request $request, $id_skema)
             'timer'    => $timer,
             'jenis_pertanyaan' => 'pmo',
             'timescap' => now(),
+            'judul' => 'Pertanyaan PMO ' . $skema->nama_skema, // tambahan
         ]);
     }
 

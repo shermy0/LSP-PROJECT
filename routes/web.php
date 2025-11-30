@@ -74,7 +74,8 @@ Route::get('/rekaman/show/{id}', [RekamanAsesmenController::class, 'show'])->nam
 Route::prefix('pertanyaan/lisan')->name('lisan.')->group(function () {
     Route::get('/create', [PertanyaanController::class, 'createLisan'])->name('create');
     Route::post('/store', [PertanyaanController::class, 'storeLisan'])->name('store');
-    Route::get('/{id_skema}/{id_kelompok}/crud', [PertanyaanController::class, 'crudLisan'])->name('crud');
+Route::get('/pertanyaan/lisan/{id_skema}/{id_kelompok}/crud', [PertanyaanController::class, 'crudLisan'])
+    ->name('pertanyaan.lisan.crud');
     Route::get('/{id}/edit', [PertanyaanController::class, 'editLisan'])->name('edit');
     Route::put('/{id}', [PertanyaanController::class, 'updateLisan'])->name('update');
     Route::delete('/{id}', [PertanyaanController::class, 'destroyLisan'])->name('destroy');
@@ -159,9 +160,6 @@ Route::get('/formasesmen', [FormAsesmenController::class, 'index'])->name('forma
 
 Route::get('/esai/{id_skema}/{id_kelompok}', [PertanyaanController::class, 'crudEsai'])
     ->name('esai.crud');
-
-// PertanyaanController → simpan esai
-Route::post('/pertanyaan/esai/store', [PertanyaanController::class, 'storeEsai'])->name('pertanyaan.esai.store');
 
 // Index semua pertanyaan
 Route::get('/pertanyaan', [PertanyaanController::class, 'index'])->name('pertanyaan.index');
@@ -375,7 +373,7 @@ Route::get('/form-mapa01', [SkemaController::class, 'formMapa01'])->name('form.m
     Route::get('/get-skema/{id}', [PermohonanController::class, 'getSkema'])->name('get.skema');
 
     // ================== ASESOR ==================
-    Route::get('/asesor/dashboard', [DashboardController::class, 'asesor'])->name('asesor.dashboard');
+    Route::get('/asesor/dashboard', [DashboardController::class, 'asesor'])->name('dashboard.asesor');
 
     // ================== FORM ASESMEN ==================
     Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('formperencanaan');
@@ -392,7 +390,8 @@ Route::get('/form-mapa01', [SkemaController::class, 'formMapa01'])->name('form.m
 
     // pertanyaan esai
     Route::get('/form-asesmen/pertanyaan-esai', [FormAsesmenController::class, 'pertanyaanEsai'])->name('pertanyaan.esai');
-    Route::post('/form-asesmen/pertanyaan-esai/store', [FormAsesmenController::class, 'storeEsai'])->name('pertanyaan.esai.store');
+    Route::post('/form-asesmen/pertanyaan-esai/store', [PertanyaanController::class, 'storeEsai'])
+    ->name('pertanyaan.esai.store');
     Route::post('/form-asesmen/pertanyaan-esai/delete', [FormAsesmenController::class, 'deleteEsai'])->name('pertanyaan.esai.delete');
 
     // ================== ADMIN (FR.APL.01 - Permohonan) ==================

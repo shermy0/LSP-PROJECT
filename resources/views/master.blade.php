@@ -57,34 +57,7 @@
                 @endif
             </ul>
         </div>
-<<<<<<< HEAD
-        <i class="fas fa-bars"></i>
     </button>
-
-    <div class="menu">
-        <ul>
-            @if(Auth::user()->role == 'admin')
-                <li><i class="bi bi-house-door-fill"></i><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                <li><i class="bi bi-person-lines-fill"></i><a href="{{ route('admin.permohonan.index') }}">Daftar Permohonan</a></li>
-            @endif
-
-            @if(Auth::user()->role == 'asesor')
-                <li><i class="bi bi-house-door-fill"></i><a href="{{ route('asesor.dashboard') }}">Dashboard</a></li>
-                <li><i class="bi bi-file-earmark-text-fill"></i><a href="{{ route('form_pra_assesmen') }}">Form Pra Asesmen</a></li>
-                <li><i class="bi bi-journal-album"></i><a href="{{ route('formasesmen') }}">Form Asesmen</a></li>
-                <li><i class="bi bi-people-fill"></i><a href="#">Data Peserta Uji</a></li>
-                <li><i class="bi bi-pencil-square"></i><a href="{{ route('formperencanaan') }}">Form Perencanaan</a></li>
-                <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
-            @endif
-
-            @if(Auth::user()->role == 'asesi')
-                <li><i class="bi bi-house-door-fill"></i><a href="{{ route('asesi.dashboard') }}">Dashboard</a></li>
-                <li><i class="bi bi-file-earmark-text-fill"></i><a href="{{ route('form_pra_assesmen') }}">Form Pra Asesmen</a></li>
-                <li><i class="bi bi-pencil-square"></i><a href="#">Form Asesmen</a></li>
-                <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
-            @endif
-        </ul>
-    </div>
 
     <div class="sidebar-footer">
         <div class="avatar">
@@ -96,32 +69,6 @@
                 <span class="role">{{ ucfirst(Auth::user()->role) }}</span>
             </div>
         </div>
-=======
-    <div class="sidebar-footer">
-        @if(Auth::user()->role == 'asesor')
-            <a href="{{ route('profile.show') }}" style="text-decoration: none; color: inherit;">
-                <div class="avatar">
-                    <div class="avatar-img">
-                        <img src="{{ asset('assets/poto/potta.png') }}" alt="Potta" class="img-fluid">
-                    </div>
-                    <div class="user-info">
-                        <span class="username">{{ Auth::user()->name }}</span>
-                        <span class="role">{{ ucfirst(Auth::user()->role) }}</span>
-                    </div>
-                </div>
-            </a>
-        @else
-            <div class="avatar">
-                <div class="avatar-img">
-                    <img src="{{ asset('assets/poto/potta.png') }}" alt="Potta" class="img-fluid">
-                </div>
-                <div class="user-info">
-                    <span class="username">{{ Auth::user()->name }}</span>
-                    <span class="role">{{ ucfirst(Auth::user()->role) }}</span>
-                </div>
-            </div>
-        @endif
->>>>>>> 683117dae755d3616520f1c9bdd7086ea44cc527
 
         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="logout-form">
             @csrf
@@ -131,11 +78,7 @@
             </button>
         </form>
     </div>
-<<<<<<< HEAD
 </div>
-=======
-    </div>
->>>>>>> 683117dae755d3616520f1c9bdd7086ea44cc527
 
     <!-- Main content -->
     <main id="main-content">
