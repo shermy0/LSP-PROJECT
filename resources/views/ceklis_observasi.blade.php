@@ -2,7 +2,8 @@
 
 @section('konten')
 <div class="container mt-4">
-    <h1 class="fw-bold mb-4 text-primary">Form Ceklis Observasi (FR.IA.01)</h1>
+    <h1 class="fw-bold mb-4 text-primary">Form Ceklis Observasi Aktivitas Praktik</h1>
+    <h1 class="fw-bold mb-4 text-primary">(FR.IA.01)</h1>
 
     {{-- Pesan --}}
     @if(session('success'))

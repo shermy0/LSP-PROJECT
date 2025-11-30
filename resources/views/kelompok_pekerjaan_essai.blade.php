@@ -64,7 +64,6 @@
 
 </div>
 
-{{-- Script SweetAlert --}}
 <script>
 function popupJumlahPertanyaan(id_skema, timer, kelompok_id) {
     Swal.fire({
@@ -79,43 +78,19 @@ function popupJumlahPertanyaan(id_skema, timer, kelompok_id) {
         confirmButtonText: 'Lanjutkan',
         cancelButtonText: 'Batal',
         buttonsStyling: false,
-        customClass: {
-            popup: 'rounded-4 shadow-lg p-4',
-            confirmButton: 'swal2-confirm btn fw-bold px-4 me-2',
-            cancelButton: 'swal2-cancel btn fw-bold px-4'
-        },
-        didRender: () => {
-            // Style tombol Lanjutkan (biru tua)
-            const confirmBtn = document.querySelector('.swal2-confirm');
-            confirmBtn.style.backgroundColor = '#041562';
-            confirmBtn.style.color = '#fff';
-            confirmBtn.style.borderRadius = '8px';
-
-            // Style tombol Batal (abu-abu)
-            const cancelBtn = document.querySelector('.swal2-cancel');
-            cancelBtn.style.backgroundColor = '#6c757d';
-            cancelBtn.style.color = '#fff';
-            cancelBtn.style.borderRadius = '8px';
-        }
     }).then((result) => {
         if (result.isConfirmed) {
             let jumlah = parseInt(document.getElementById('jumlahPertanyaan').value);
-            if (isNaN(jumlah) || jumlah < 1) {
-                Swal.fire('Error', 'Minimal 1 pertanyaan', 'error');
-                return;
-            }
-            if (jumlah > 15) {
-                Swal.fire('Error', 'Maksimal 15 pertanyaan', 'error');
+            if (isNaN(jumlah) || jumlah < 1 || jumlah > 15) {
+                Swal.fire('Error', 'Jumlah pertanyaan harus antara 1–15', 'error');
                 return;
             }
 
-            // Redirect ke form create pertanyaan
-            let url = `{{ route('pertanyaan.esai.create') }}?id_skema=${id_skema}&timer=${timer}&kelompok_id=${kelompok_id}&jumlah=${jumlah}`;
-window.location.href = url;
-
+            // ✅ id_pembuatan_pertanyaan benar-benar dikirim
+            let url = `{{ route('pertanyaan.esai.create') }}?id_skema=${id_skema}&timer=${timer}&kelompok_id=${kelompok_id}&jumlah=${jumlah}&id_pembuatan_pertanyaan={{ $pembuatan->id_pembuatan_pertanyaan ?? '' }}`;
+            window.location.href = url;
         }
     });
 }
-
 </script>
 @endsection
