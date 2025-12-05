@@ -95,6 +95,17 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{user_id}', [Form1AdminController::class, 'show'])->name('show');
             Route::post('/{id_permohonan}/update', [Form1AdminController::class, 'update'])->name('update');
         });
+        // Daftar asesor
+        Route::get('/asesor', [\App\Http\Controllers\Admin\AsesorController::class, 'index'])
+            ->name('asesor.index');
+
+        // Detail asesor
+        Route::get('/asesor/{id}', [\App\Http\Controllers\Admin\AsesorController::class, 'show'])
+            ->name('asesor.show');
+
+        // Simpan asesor (dari modal)
+        Route::post('/asesor/store', [\App\Http\Controllers\Admin\AsesorController::class, 'store'])
+            ->name('asesor.store');
     });
 
     // ================== ASESMEN MANDIRI (FR.APL.02 - ASESI) ==================

@@ -435,6 +435,15 @@
                             <span class="label">Daftar Permohonan</span>
                         </a>
                     </li>
+
+                    <li>
+                        <a href="{{ route('admin.asesor.index') }}"
+                            class="{{ request()->routeIs('admin.asesor.*') ? 'active' : '' }}" title="Daftar Permohonan"
+                            data-label="Daftar Asesor">
+                            <span class="iicon"><i class="bi bi-person-vcard-fill"></i></span>
+                            <span class="label">Daftar Asesor</span>
+                        </a>
+                    </li>
                 @endif
 
 
