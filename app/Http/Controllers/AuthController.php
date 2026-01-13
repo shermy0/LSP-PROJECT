@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Jurusan; // Tambahkan ini
+use App\Models\Asesi;   // Tambahkan ini
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -63,23 +65,40 @@ class AuthController extends Controller
     =============================== */
     public function showRegister()
     {
-        return view('auth.register');
+        // Ambil data jurusan yang aktif untuk ditampilkan di dropdown
+        $jurusan = Jurusan::where('status', 'aktif')->get();
+        
+        return view('auth.register', compact('jurusan'));
     }
 
     public function register(Request $request)
     {
         $request->validate([
-            'name'                  => 'required|string|max:255',
-            'email'                 => 'required|email|unique:users,email',
-            'password'              => 'required|min:6|confirmed',
+            'name'         => 'required|string|max:255',
+            'email'        => 'required|email|unique:users,email',
+            'password'     => 'required|min:6|confirmed',
+            'jurusan_id'   => 'required|exists:jurusan,id_jurusan',
         ]);
 
+        // Buat user
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
             'role'     => 'asesi', // otomatis jadi asesi
         ]);
+
+        // Buat data asesi dengan jurusan_id
+        Asesi::create([
+            'user_id'     => $user->id,
+            'jurusan_id'  => $request->jurusan_id,
+            'nama_lengkap' => $request->name,
+            'email'       => $request->email,
+            // Kolom lain bisa diisi null atau default value
+        ]);
+
+        // Login otomatis setelah registrasi (opsional)
+        // Auth::login($user);
 
         return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan login.');
     }

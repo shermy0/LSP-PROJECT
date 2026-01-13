@@ -10,6 +10,7 @@ use App\Http\Controllers\PerencanaanController;
 use App\Http\Controllers\FormAsesmenController;
 use App\Http\Controllers\Asesi\PermohonanController;
 use App\Http\Controllers\Admin\Form1AdminController;
+use App\Http\Controllers\Admin\PenugasanController;
 use App\Http\Controllers\BandingAsesmenController;
 use App\Http\Controllers\FormPraAsesmenController;
 
@@ -90,11 +91,13 @@ Route::middleware(['auth'])->group(function () {
 
     // ================== ADMIN (FR.APL.01 - Permohonan) ==================
     Route::prefix('admin')->name('admin.')->group(function () {
+
         Route::prefix('permohonan')->name('permohonan.')->group(function () {
             Route::get('/', [Form1AdminController::class, 'index'])->name('index');
             Route::get('/{user_id}', [Form1AdminController::class, 'show'])->name('show');
             Route::post('/{id_permohonan}/update', [Form1AdminController::class, 'update'])->name('update');
         });
+
         // Daftar asesor
         Route::get('/asesor', [\App\Http\Controllers\Admin\AsesorController::class, 'index'])
             ->name('asesor.index');
@@ -106,7 +109,15 @@ Route::middleware(['auth'])->group(function () {
         // Simpan asesor (dari modal)
         Route::post('/asesor/store', [\App\Http\Controllers\Admin\AsesorController::class, 'store'])
             ->name('asesor.store');
+
+        // ==============================
+        // 📌 ROUTE PENUGASAN (Fix)
+        // ==============================
+        Route::get('/penugasan', [PenugasanController::class, 'index'])->name('penugasan.index');
+        Route::get('/penugasan/{id}/edit', [PenugasanController::class, 'edit'])->name('penugasan.edit');
+        Route::put('/penugasan/{id}', [PenugasanController::class, 'update'])->name('penugasan.update');
     });
+
 
     // ================== ASESMEN MANDIRI (FR.APL.02 - ASESI) ==================
     Route::prefix('asesi/asesmen-mandiri')->name('asesi.asesmen_mandiri.')->group(function () {

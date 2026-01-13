@@ -13,7 +13,10 @@ return new class extends Migration
 
             // Relasi ke user (akun login)
             $table->unsignedBigInteger('user_id');
-
+            
+            // Relasi ke jurusan
+            $table->unsignedBigInteger('jurusan_id')->nullable();
+            
             // Opsional: relasi ke asesor (bila sudah ditugaskan)
             $table->unsignedBigInteger('asesor_id')->nullable();
 
@@ -48,6 +51,10 @@ return new class extends Migration
             $table->foreign('user_id')
                 ->references('id')->on('users')
                 ->onDelete('cascade');
+
+            $table->foreign('jurusan_id')
+                ->references('id_jurusan')->on('jurusan')
+                ->onDelete('set null');
 
             $table->foreign('asesor_id')
                 ->references('id_asesor')->on('asesor')

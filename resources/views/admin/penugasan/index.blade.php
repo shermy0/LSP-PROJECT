@@ -1,6 +1,6 @@
 @extends('master')
 
-@section('title', 'Daftar Form Pra Asesmen')
+@section('title', 'Penugasan Asesor')
 
 @section('konten')
 <div class="container-fluid px-4 py-4">
@@ -11,21 +11,33 @@
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <div class="d-flex align-items-center gap-3">
                     <div class="icon-box">
-                        <i class="bi bi-journal-check fs-3"></i>
+                        <i class="bi bi-person-plus fs-3"></i>
                     </div>
                     <div>
-                        <h4 class="mb-1 fw-bold" style="color: #041562;">Daftar Permohonan Asesi</h4>
-                        <p class="mb-0 text-muted">Berikut daftar pengajuan FR.APL.01 oleh Asesi</p>
+                        <h4 class="mb-1 fw-bold" style="color: #041562;">Penugasan Asesor</h4>
+                        <p class="mb-0 text-muted">Menugaskan asesor ke asesi</p>
                     </div>
                 </div>
-                <div class="search-wrapper">
-                    <input type="text" id="searchInput" class="form-control search-input" 
-                           placeholder="Cari asesi berdasarkan nama, email, atau NIK...">
+                
+                <form class="d-flex search-wrapper" method="GET" action="{{ route('admin.penugasan.index') }}">
+                    <input name="q" value="{{ $q ?? '' }}" type="search" class="form-control search-input" 
+                           placeholder="Cari nama / nik / email asesi...">
                     <i class="bi bi-search search-icon"></i>
-                </div>
+                </form>
             </div>
         </div>
     </div>
+
+    {{-- Notifikasi --}}
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0" role="alert">
+            <div class="d-flex align-items-start">
+                <i class="bi bi-check-circle-fill me-3 fs-5 flex-shrink-0"></i>
+                <div class="flex-grow-1">{{ session('success') }}</div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
 
     {{-- Search & Table Card --}}
     <div class="card border-0 shadow-sm">
@@ -33,9 +45,9 @@
             <div class="row align-items-center g-3">
                 <div class="col-md-6">
                     <h6 class="mb-1 fw-semibold" style="color: #041562;">
-                        <i class="bi bi-list-ul me-2"></i>Daftar Pengajuan
+                        <i class="bi bi-list-ul me-2"></i>Daftar Asesi
                     </h6>
-                    <small class="text-muted">Formulir FR.APL.01 - Permohonan Sertifikasi Kompetensi</small>
+                    <small class="text-muted">Berikut adalah daftar asesi yang dapat ditugaskan ke asesor</small>
                 </div>
             </div>
         </div>
@@ -49,14 +61,14 @@
                             <th>Nama Asesi</th>
                             <th width="140">NIK</th>
                             <th>Email</th>
-                            <th width="120">Telepon</th>
+                            <th>Asesor</th>
                             <th width="160">Update Terakhir</th>
                             <th class="text-center" width="140">Aksi</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        @forelse ($asesi as $a)
+                        @forelse($asesi as $a)
                             <tr>
                                 {{-- NOMOR URUT --}}
                                 <td class="text-center">
@@ -78,7 +90,15 @@
 
                                 <td><span class="text-muted small">{{ $a->nik }}</span></td>
                                 <td><small class="text-muted">{{ $a->email }}</small></td>
-                                <td><span class="text-muted small">{{ $a->telepon ?? '-' }}</span></td>
+
+                                <td>
+                                    @if($a->asesor)
+                                        <span class="badge-keahlian bg-success text-white">{{ $a->asesor->nama_asesor }}</span>
+                                        <div><small class="text-muted">{{ $a->asesor->keahlian }}</small></div>
+                                    @else
+                                        <span class="badge bg-secondary">Belum Ditugaskan</span>
+                                    @endif
+                                </td>
 
                                 <td>
                                     <div class="d-flex flex-column">
@@ -94,10 +114,14 @@
                                 </td>
 
                                 <td class="text-center">
-                                    <a href="{{ route('admin.permohonan.show', $a->id_asesi) }}" 
-                                       class="btn btn-sm btn-outline-custom">
-                                        <i class="bi bi-eye me-1"></i>Detail
-                                    </a>
+                                    <button
+                                        class="btn btn-sm btn-primary-custom assign-btn"
+                                        data-id="{{ $a->id_asesi }}"
+                                        data-nama="{{ $a->nama_lengkap }}"
+                                        data-asesor="{{ $a->asesor_id }}"
+                                    >
+                                        <i class="bi bi-person-plus me-1"></i> Tugaskan
+                                    </button>
                                 </td>
                             </tr>
                         @empty
@@ -105,8 +129,8 @@
                                 <td colspan="7" class="text-center py-5">
                                     <div class="empty-state">
                                         <i class="bi bi-inbox"></i>
-                                        <p class="mb-1 mt-3 fw-semibold">Belum Ada Data Pengajuan</p>
-                                        <small class="text-muted">Belum ada formulir permohonan yang diajukan oleh asesi</small>
+                                        <p class="mb-1 mt-3 fw-semibold">Belum Ada Data Asesi</p>
+                                        <small class="text-muted">Tidak ada data asesi ditemukan</small>
                                     </div>
                                 </td>
                             </tr>
@@ -198,6 +222,76 @@
     </div>
 </div>
 
+{{-- ================== MODAL PENUGASAN ASESOR ================== --}}
+<div class="modal fade" id="assignModal" tabindex="-1" aria-labelledby="assignModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow">
+            <form method="POST" id="assignForm">
+                @csrf
+                @method('PUT')
+
+                <div class="modal-header border-bottom-0 pb-0">
+                    <div class="w-100">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <div class="modal-icon">
+                                <i class="bi bi-person-check-fill"></i>
+                            </div>
+                            <div>
+                                <h5 class="modal-title fw-bold mb-1" style="color: #041562;" id="assignModalLabel">
+                                    Tugaskan Asesor
+                                </h5>
+                                <small class="text-muted">Pilih asesor untuk ditugaskan ke asesi</small>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body pt-3">
+                    <input type="hidden" name="asesi_id" id="asesi_id">
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold small">Asesi</label>
+                        <div class="form-control bg-light" style="border: none;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="avatar-circle-sm">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                                <span class="fw-semibold" id="asesi_nama"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">
+                            Pilih Asesor <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select" name="asesor_id" id="asesor_select" required>
+                            <option value="">-- Pilih Asesor --</option>
+                            @foreach($asesors as $as)
+                                <option value="{{ $as->id_asesor }}">
+                                    {{ $as->nama_asesor }} - {{ $as->keahlian }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-2"></i>Batal
+                    </button>
+                    <button type="submit" class="btn btn-primary-custom px-4">
+                        <i class="bi bi-check-circle me-2"></i>Simpan Penugasan
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
 {{-- ================== CUSTOM CSS ================== --}}
 <style>
     /* Primary Color Variables */
@@ -223,22 +317,29 @@
         color: var(--primary-dark);
     }
 
-    /* Custom Outline Button */
-    .btn-outline-custom {
-        border-color: var(--primary-dark);
-        color: var(--primary-dark);
-        font-weight: 500;
-        transition: all 0.3s ease;
-        padding: 6px 12px;
-        font-size: 14px;
-    }
-
-    .btn-outline-custom:hover {
+    /* Custom Primary Button */
+    .btn-primary-custom {
         background-color: var(--primary-dark);
         border-color: var(--primary-dark);
         color: white;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(4, 21, 98, 0.2);
+        font-weight: 500;
+        padding: 8px 16px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+
+    .btn-primary-custom:hover {
+        background-color: #030f45;
+        border-color: #030f45;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(4, 21, 98, 0.3);
+    }
+
+    .btn-primary-custom:active {
+        background-color: #020a30 !important;
+        border-color: #020a30 !important;
     }
 
     /* Search Wrapper */
@@ -283,6 +384,19 @@
         flex-shrink: 0;
     }
 
+    .avatar-circle-sm {
+        width: 32px;
+        height: 32px;
+        background: var(--primary-light);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-dark);
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
     /* Badge ID */
     .badge-id {
         display: inline-block;
@@ -292,6 +406,17 @@
         border-radius: 6px;
         font-weight: 600;
         font-size: 13px;
+    }
+
+    /* Badge Keahlian */
+    .badge-keahlian {
+        display: inline-block;
+        padding: 5px 12px;
+        background: #e8f4f8;
+        color: #0c5460;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
     }
 
     /* Table Styling */
@@ -355,14 +480,31 @@
         color: #6c757d;
     }
 
+    /* Modal Styling */
+    .modal-icon {
+        width: 48px;
+        height: 48px;
+        background: var(--primary-light);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-dark);
+        font-size: 24px;
+    }
+
     /* Alerts */
     .alert {
         border-radius: 8px;
     }
 
-    /* Hover Effects */
-    .btn {
-        transition: all 0.3s ease;
+    /* Badge styling */
+    .badge.bg-secondary {
+        background-color: #6c757d !important;
+        color: white;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: 500;
     }
 
     /* Responsive */
@@ -386,7 +528,8 @@
             padding: 10px 8px;
         }
 
-        .badge-id {
+        .badge-id,
+        .badge-keahlian {
             font-size: 11px;
             padding: 4px 8px;
         }
@@ -401,46 +544,33 @@
 {{-- ================== SCRIPT ================== --}}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Search functionality with debounce
-        const searchInput = document.getElementById('searchInput');
-        const table = document.getElementById('asesiTable');
-        const rows = table ? table.querySelectorAll('tbody tr') : [];
+        // Modal Assignment Functionality
+        const assignButtons = document.querySelectorAll('.assign-btn');
+        const modal = new bootstrap.Modal(document.getElementById('assignModal'));
 
-        if (searchInput && rows.length > 0) {
-            let debounceTimer;
-            searchInput.addEventListener('keyup', function () {
-                clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(() => {
-                    const keyword = this.value.toLowerCase().trim();
-                    let visibleCount = 0;
+        assignButtons.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.dataset.id;
+                const nama = this.dataset.nama;
+                const asesor_id = this.dataset.asesor;
 
-                    rows.forEach(row => {
-                        const text = row.textContent.toLowerCase();
-                        const shouldShow = text.includes(keyword);
-                        row.style.display = shouldShow ? '' : 'none';
-                        if (shouldShow) visibleCount++;
-                    });
+                document.getElementById('asesi_id').value = id;
+                document.getElementById('asesi_nama').textContent = nama;
+                document.getElementById('asesor_select').value = asesor_id || "";
 
-                    // Optional: Show message if no results
-                    const noResultsRow = table.querySelector('.no-results-row');
-                    if (visibleCount === 0 && !row.classList.contains('no-results-row')) {
-                        console.log('Tidak ada hasil yang cocok');
-                    }
-                }, 300);
+                // Set action route
+                document.getElementById('assignForm').action = `/admin/penugasan/${id}`;
+
+                modal.show();
             });
-        }
+        });
 
-        // Auto-dismiss alerts after 5 seconds (if any)
+        // Auto-dismiss alerts after 5 seconds
         const alerts = document.querySelectorAll('.alert');
         alerts.forEach(alert => {
             setTimeout(() => {
-                try {
-                    const bsAlert = new bootstrap.Alert(alert);
-                    bsAlert.close();
-                } catch (e) {
-                    // If Bootstrap alert is not available, just hide it
-                    alert.style.display = 'none';
-                }
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
             }, 5000);
         });
     });

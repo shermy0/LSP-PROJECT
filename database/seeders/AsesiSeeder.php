@@ -16,7 +16,8 @@ class AsesiSeeder extends Seeder
         DB::table('asesi')->insert([
             [
                 'user_id'              => 3,
-                'asesor_id'            => null,
+                'jurusan_id'           => 1, // Desain Komunikasi Visual
+                'asesor_id'            => 6, // Ade Sarkosih
                 'nik'                  => '9674567436743289',
                 'nama_lengkap'         => 'Reno Susanto',
                 'tempat_lahir'         => 'Bandung',

@@ -28,7 +28,7 @@
 
         .card-wrap {
             width: 100%;
-            max-width: 480px;
+            max-width: 580px; /* Diperbesar sedikit untuk 2 kolom */
             background: var(--blue-deep);
             color: #ffffff;
             border-radius: var(--card-radius);
@@ -68,11 +68,18 @@
             margin-bottom: 1rem;
         }
 
+        .form-row-double {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
         .input-wrapper {
             position: relative;
         }
 
-        .input-clean {
+        .input-clean, .select-clean {
             width: 100%;
             background: #ffffff;
             color: #0b2140;
@@ -82,9 +89,12 @@
             height: 46px;
             box-shadow: 0 4px 10px rgba(7,33,79,0.06) inset;
             font-size: .95rem;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
         }
 
-        .input-clean:focus {
+        .input-clean:focus, .select-clean:focus {
             outline: none;
             box-shadow: 0 6px 18px rgba(7,33,79,0.06);
         }
@@ -110,6 +120,16 @@
             padding: 4px;
             cursor: pointer;
             font-size: 1.05rem;
+        }
+
+        .select-icon-right {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #0b3a70;
+            font-size: 1rem;
+            pointer-events: none;
         }
 
         .help-row {
@@ -152,8 +172,24 @@
 
         .text-error { color: #ffd6d6; font-size: .88rem; margin-top: .4rem; }
 
+        /* Responsif untuk form double */
+        @media (max-width: 768px) {
+            .form-row-double {
+                grid-template-columns: 1fr; /* Satu kolom di mobile */
+                gap: 0.5rem;
+            }
+        }
+
         @media (max-width: 520px) {
-            .card-wrap { padding: 1.4rem; border-radius: 12px; }
+            .card-wrap { 
+                padding: 1.4rem; 
+                border-radius: 12px;
+                max-width: 95%;
+            }
+            
+            body {
+                padding: 1rem;
+            }
         }
     </style>
 </head>
@@ -201,31 +237,52 @@
             @error('email') <div class="text-error">{{ $message }}</div> @enderror
         </div>
 
-        <!-- Password -->
-        <div class="form-row text-start">
-            <label for="password" style="color:#cfe7ff;font-size:.95rem;">Password</label>
-            <div class="input-wrapper">
-                <i class="bi bi-lock-fill input-icon-left" aria-hidden="true"></i>
-                <input id="password" name="password" type="password" class="input-clean @error('password') is-invalid @enderror"
-                       placeholder="Buat password" required autocomplete="new-password" />
-                <button type="button" id="togglePassword" class="input-icon-right" aria-label="Lihat password">
-                    <i class="bi bi-eye-slash" id="toggleIcon" aria-hidden="true"></i>
-                </button>
+        <!-- Password dan Konfirmasi Password (Bersebelahan) -->
+        <div class="form-row-double text-start">
+            <!-- Password -->
+            <div>
+                <label for="password" style="color:#cfe7ff;font-size:.95rem;">Password</label>
+                <div class="input-wrapper">
+                    <i class="bi bi-lock-fill input-icon-left" aria-hidden="true"></i>
+                    <input id="password" name="password" type="password" class="input-clean @error('password') is-invalid @enderror"
+                           placeholder="Buat password" required autocomplete="new-password" />
+                    <button type="button" id="togglePassword" class="input-icon-right" aria-label="Lihat password">
+                        <i class="bi bi-eye-slash" id="toggleIcon" aria-hidden="true"></i>
+                    </button>
+                </div>
+                @error('password') <div class="text-error">{{ $message }}</div> @enderror
             </div>
-            @error('password') <div class="text-error">{{ $message }}</div> @enderror
+
+            <!-- Konfirmasi Password -->
+            <div>
+                <label for="password_confirmation" style="color:#cfe7ff;font-size:.95rem;">Konfirmasi Password</label>
+                <div class="input-wrapper">
+                    <i class="bi bi-key-fill input-icon-left" aria-hidden="true"></i>
+                    <input id="password_confirmation" name="password_confirmation" type="password"
+                           class="input-clean" placeholder="Ulangi password" required autocomplete="new-password" />
+                    <button type="button" id="togglePasswordConfirm" class="input-icon-right" aria-label="Lihat konfirmasi password">
+                        <i class="bi bi-eye-slash" id="toggleIconConfirm" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
         </div>
 
-        <!-- Konfirmasi Password -->
+        <!-- Jurusan -->
         <div class="form-row text-start">
-            <label for="password_confirmation" style="color:#cfe7ff;font-size:.95rem;">Konfirmasi Password</label>
+            <label for="jurusan_id" style="color:#cfe7ff;font-size:.95rem;">Pilih Jurusan</label>
             <div class="input-wrapper">
-                <i class="bi bi-key-fill input-icon-left" aria-hidden="true"></i>
-                <input id="password_confirmation" name="password_confirmation" type="password"
-                       class="input-clean" placeholder="Ulangi password" required autocomplete="new-password" />
-                <button type="button" id="togglePasswordConfirm" class="input-icon-right" aria-label="Lihat konfirmasi password">
-                    <i class="bi bi-eye-slash" id="toggleIconConfirm" aria-hidden="true"></i>
-                </button>
+                <i class="bi bi-book-fill input-icon-left" aria-hidden="true"></i>
+                <select id="jurusan_id" name="jurusan_id" class="select-clean @error('jurusan_id') is-invalid @enderror" required>
+                    <option value="">-- Pilih Jurusan --</option>
+                    @foreach($jurusan as $item)
+                        <option value="{{ $item->id_jurusan }}" {{ old('jurusan_id') == $item->id_jurusan ? 'selected' : '' }}>
+                            {{ $item->nama_jurusan }} ({{ $item->kode_jurusan }})
+                        </option>
+                    @endforeach
+                </select>
+                <i class="bi bi-chevron-down select-icon-right" aria-hidden="true"></i>
             </div>
+            @error('jurusan_id') <div class="text-error">{{ $message }}</div> @enderror
         </div>
 
         <!-- help row: lupa password (fallback bukan aktif disini) -->
@@ -280,10 +337,19 @@
         document.querySelector('form').addEventListener('submit', function (e) {
             const p = passInput ? passInput.value : '';
             const c = passConfirm ? passConfirm.value : '';
+            const jurusan = document.getElementById('jurusan_id') ? document.getElementById('jurusan_id').value : '';
+            
             if (p !== c) {
                 e.preventDefault();
                 alert('Password dan konfirmasi password tidak sama.');
                 if (passConfirm) passConfirm.focus();
+                return;
+            }
+            
+            if (!jurusan) {
+                e.preventDefault();
+                alert('Silakan pilih jurusan terlebih dahulu.');
+                if (document.getElementById('jurusan_id')) document.getElementById('jurusan_id').focus();
             }
         });
     })();

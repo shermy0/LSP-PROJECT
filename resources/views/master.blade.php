@@ -444,6 +444,15 @@
                             <span class="label">Daftar Asesor</span>
                         </a>
                     </li>
+
+                    <li>
+                        <a href="{{ route('admin.penugasan.index') }}"
+                            class="{{ request()->routeIs('admin.penugasan.*') ? 'active' : '' }}" title="Daftar Permohonan"
+                            data-label="Penugasan Asesor">
+                            <span class="iicon"><i class="bi bi-clipboard-plus-fill"></i></span>
+                            <span class="label">Penugasan Asesor</span>
+                        </a>
+                    </li>
                 @endif
 
 
