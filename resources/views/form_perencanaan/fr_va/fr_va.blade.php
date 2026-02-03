@@ -78,14 +78,18 @@
 
                     <tbody>
                         @php
-                            $tujuanSelected = old('tujuan', $tujuan ?? []);
-                            $konteksSelected = old('konteks', $konteks ?? []);
-                            $pendekatanSelected = old('pendekatan', $pendekatan ?? []);
-                            // ambil konteks_lain dari old() atau dari DB (json)
-                            $konteksLainList = old('konteks_lain', isset($konteks_lain) ? json_decode($konteks_lain, true) : (isset($konteksLain) ? json_decode($konteksLain, true) : []));
-                            $tujuanLainVal = old('tujuan_lain', $tujuan_lain ?? $tujuanLain ?? '');
-                        @endphp
+                            $tujuanSelected     = old('tujuan', $tujuanSelected ?? []);
+                            $konteksSelected    = old('konteks', $konteksSelected ?? []);
+                            $pendekatanSelected = old('pendekatan', $pendekatanSelected ?? []);
 
+                            // KONTEXT LAIN (ANTI ERROR)
+                            $rawKonteksLain = old('konteks_lain', $konteksLain ?? []);
+                            $konteksLainList = is_string($rawKonteksLain) 
+                                ? json_decode($rawKonteksLain, true) 
+                                : $rawKonteksLain;
+
+                            $tujuanLainVal = old('tujuan_lain', $tujuanLain ?? '');
+                        @endphp
                         @foreach([
                             ['tujuan'=>'Bagian dari Proses Penjaminan Mutu Organisasi','konteks'=>'Internal Organisasi','pendekatan'=>'Internal Organisasi'],
                             ['tujuan'=>'Mengantisipasi Risiko','konteks'=>'Eksternal Organisasi','pendekatan'=>'Pertemuan Moderasi'],
@@ -206,14 +210,15 @@
         });
         </script>
 
-        <!-- Orang yang Relevan -->
+        <!-- 2. Orang yang Relevan -->
         <div class="card-box mb-4">
             <div class="judul-box">
                 <div class="judul-header">Orang yang Relevan</div>
             </div>
 
+            @foreach($orangRelevanData as $id => $checked)
             @php
-                $orangRelevan = [
+                $labelMap = [
                     'asesorCheckbox' => 'Asesor Kompetensi (wajib)',
                     'leadCheckbox' => 'Lead Asesor [Ketua TUK]',
                     'managerCheckbox' => 'Manager, Supervisor',
@@ -221,58 +226,64 @@
                     'koordinatorCheckbox' => 'Koordinator Pelatihan',
                     'anggotaCheckbox' => 'Anggota Asosiasi Industry Profesi'
                 ];
+                $label = $labelMap[$id] ?? $id;
+                $details = $orangRelevanDetail[$id] ?? [];
             @endphp
 
-            @foreach($orangRelevan as $id => $label)
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input toggle-section" type="checkbox" 
-                            id="{{ $id }}" name="orangRelevan[]" value="{{ $id }}"
-                            data-target="{{ $id }}Form">
-                        <label class="form-check-label fw-semibold" for="{{ $id }}">{{ $label }}</label>
-                    </div>
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input toggle-section" type="checkbox" 
+                        id="{{ $id }}" name="orangRelevan[]" value="{{ $id }}"
+                        data-target="{{ $id }}Form"
+                        {{ $checked ? 'checked' : '' }}>
+                    <label class="form-check-label fw-semibold" for="{{ $id }}">{{ $label }}</label>
+                </div>
 
-                    <!-- Input Nama (muncul hanya jika dicentang) -->
-                    <div id="{{ $id }}Form" class="mt-2" style="display:none;">
+                <div id="{{ $id }}Form" class="mt-2" style="display: {{ $checked ? 'block' : 'none' }};">
+                    @if(!empty($details))
+                        @foreach($details as $detail)
+                            <div class="input-group mb-2">
+                                <input type="text" name="{{ $id }}_nama[]" class="form-control" placeholder="Nama"
+                                    value="{{ $detail['nama'] }}">
+                                <button class="btn btn-danger removeNama" type="button">Hapus</button>
+                            </div>
+                        @endforeach
+                    @else
                         <div class="input-group mb-2">
                             <input type="text" name="{{ $id }}_nama[]" class="form-control" placeholder="Nama">
                             <button class="btn btn-danger removeNama" type="button">Hapus</button>
                         </div>
-                        <button type="button" class="btn btn-primary btn-sm addNama">Tambah</button>
-                    </div>
+                    @endif
+                    <button type="button" class="btn btn-primary btn-sm addNama">Tambah</button>
                 </div>
-            @endforeach
-
+            </div>
+        @endforeach
             <hr>
             <div class="mb-3">
                 <label class="fw-semibold d-block mb-2">Hasil Diskusi</label>
-                <textarea name="hasil_diskusi_global" class="form-control" rows="3" placeholder="Tulis hasil diskusi di sini..."></textarea>
+                <textarea name="hasil_diskusi_global" class="form-control" rows="3" placeholder="Tulis hasil diskusi di sini...">{{ $hasilDiskusiGlobal ?? '' }}</textarea>
             </div>
         </div>
 
         <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function(){
 
-            // Tampilkan / sembunyikan input nama berdasarkan checkbox
+            // Toggle container input orang relevan
             document.querySelectorAll(".toggle-section").forEach(checkbox => {
                 const target = document.getElementById(checkbox.dataset.target);
-
-                // tampilkan jika sudah dicentang (saat reload)
-                if (checkbox.checked) target.style.display = 'block';
-
-                // toggle saat dicentang / dilepas
-                checkbox.addEventListener("change", function() {
+                if(checkbox.checked) target.style.display='block';
+                checkbox.addEventListener("change", function(){
                     target.style.display = this.checked ? 'block' : 'none';
                 });
             });
 
-            // Tambah / hapus input nama dinamis
-            document.addEventListener("click", function(e) {
-                if (e.target.classList.contains("addNama")) {
+            // Tambah/hapus input nama dinamis
+            document.addEventListener("click", function(e){
+                if(e.target.classList.contains("addNama")){
                     const container = e.target.closest("div[id$='Form']");
-                    const idPrefix = container.id.replace('Form', '');
+                    const idPrefix = container.id.replace('Form','');
                     const newInput = document.createElement("div");
-                    newInput.classList.add("input-group", "mb-2");
+                    newInput.classList.add("input-group","mb-2");
                     newInput.innerHTML = `
                         <input type="text" name="${idPrefix}_nama[]" class="form-control" placeholder="Nama">
                         <button class="btn btn-danger removeNama" type="button">Hapus</button>
@@ -280,10 +291,11 @@
                     container.insertBefore(newInput, e.target);
                 }
 
-                if (e.target.classList.contains("removeNama")) {
+                if(e.target.classList.contains("removeNama")){
                     e.target.closest(".input-group").remove();
                 }
             });
+
         });
         </script>
 
@@ -302,93 +314,127 @@
                         </tr>
                     </thead>
                     <tbody>
+
+                        <!-- Standar Kompetensi -->
                         <tr>
                             <td>
-                                <input type="checkbox" name="acuan[]" value="Standar Kompetensi (SKKNI/SKKK/SKI)">
+                                <input type="checkbox" name="acuan[]" value="Standar Kompetensi (SKKNI/SKKK/SKI)"
+                                    {{ in_array("Standar Kompetensi (SKKNI/SKKK/SKI)", $acuanDipilih) ? 'checked' : '' }}>
                                 Standar Kompetensi (SKKNI/SKKK/SKI)
                             </td>
                             <td>
-                                <input type="checkbox" name="dokumen[]" value="Perangkat Asesmen"> Perangkat Asesmen
+                                <input type="checkbox" name="dokumen[]" value="Perangkat Asesmen"
+                                    {{ in_array("Perangkat Asesmen", $dokumenDipilih) ? 'checked' : '' }}>
+                                Perangkat Asesmen
                             </td>
                         </tr>
+
+                        <!-- Skema Sertifikasi -->
                         <tr>
                             <td>
-                                <input type="checkbox" name="acuan[]" value="Skema Sertifikasi"> Skema Sertifikasi
+                                <input type="checkbox" name="acuan[]" value="Skema Sertifikasi"
+                                    {{ in_array("Skema Sertifikasi", $acuanDipilih) ? 'checked' : '' }}>
+                                Skema Sertifikasi
                             </td>
                             <td>
-                                <input type="checkbox" name="dokumen[]" value="Peraturan / Pedoman"> Peraturan / Pedoman
+                                <input type="checkbox" name="dokumen[]" value="Peraturan / Pedoman"
+                                    {{ in_array("Peraturan / Pedoman", $dokumenDipilih) ? 'checked' : '' }}>
+                                Peraturan / Pedoman
                             </td>
                         </tr>
+
+                        <!-- SOP/IK -->
                         <tr>
                             <td>
-                                <input type="checkbox" name="acuan[]" value="SOP/IK"> SOP/IK
+                                <input type="checkbox" name="acuan[]" value="SOP/IK"
+                                    {{ in_array("SOP/IK", $acuanDipilih) ? 'checked' : '' }}>
+                                SOP/IK
                             </td>
                             <td>
-                                <input type="checkbox" class="toggleInput" data-target="dokumenLain1Input">
+                                <input type="checkbox" class="toggleInput" data-target="dokumenLain1Input"
+                                    {{ $dokumenLain1 ? 'checked' : '' }}>
                                 <input type="text" class="form-control mt-1" id="dokumenLain1Input"
-                                    name="dokumen_lain[]" placeholder="Masukkan dokumen lain" disabled>
+                                    name="dokumen_lain[1]" placeholder="Masukkan dokumen lain"
+                                    value="{{ $dokumenLain1 }}"
+                                    {{ $dokumenLain1 ? '' : 'disabled' }}>
                             </td>
                         </tr>
+
+                        <!-- Manual Instruction / Book Manual -->
                         <tr>
                             <td>
-                                <input type="checkbox" name="acuan[]" value="Manual Instruction / Book Manual">
+                                <input type="checkbox" name="acuan[]" value="Manual Instruction / Book Manual"
+                                    {{ in_array("Manual Instruction / Book Manual", $acuanDipilih) ? 'checked' : '' }}>
                                 Manual Instruction / Book Manual
                             </td>
                             <td>
-                                <input type="checkbox" class="toggleInput" data-target="dokumenLain2Input">
+                                <input type="checkbox" class="toggleInput" data-target="dokumenLain2Input"
+                                    {{ $dokumenLain2 ? 'checked' : '' }}>
                                 <input type="text" class="form-control mt-1" id="dokumenLain2Input"
-                                    name="dokumen_lain2[]" placeholder="Masukkan dokumen lain" disabled>
+                                    name="dokumen_lain[2]" placeholder="Masukkan dokumen lain"
+                                    value="{{ $dokumenLain2 }}"
+                                    {{ $dokumenLain2 ? '' : 'disabled' }}>
                             </td>
                         </tr>
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="acuan[]" value="Standar Kinerja"> Standar Kinerja
-                            </td>
-                            <td>
-                                <input type="checkbox" class="toggleInput" data-target="dokumenLain3Input">
-                                <input type="text" class="form-control mt-1" id="dokumenLain3Input"
-                                    name="dokumen_lain3[]" placeholder="Masukkan dokumen lain" disabled>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="checkbox" class="toggleInput" data-target="acuanLainInput">
-                                <input type="text" class="form-control mt-1" 
-                                    id="acuanLainInput" 
-                                    name="acuan_lain[]" 
-                                    placeholder="Masukkan acuan lain" 
-                                    disabled>
-                            </td>
 
+                        <!-- Standar Kinerja -->
+                        <tr>
                             <td>
-                                <input type="checkbox" class="toggleInput" data-target="dokumenLain4Input">
-                                <input type="text" class="form-control mt-1" id="dokumenLain4Input"
-                                    name="dokumen_lain4[]" placeholder="Masukkan dokumen lain" disabled>
+                                <input type="checkbox" name="acuan[]" value="Standar Kinerja"
+                                    {{ in_array("Standar Kinerja", $acuanDipilih) ? 'checked' : '' }}>
+                                Standar Kinerja
+                            </td>
+                            <td>
+                                <input type="checkbox" class="toggleInput" data-target="dokumenLain3Input"
+                                    {{ $dokumenLain3 ? 'checked' : '' }}>
+                                <input type="text" class="form-control mt-1" id="dokumenLain3Input"
+                                    name="dokumen_lain[3]" placeholder="Masukkan dokumen lain"
+                                    value="{{ $dokumenLain3 }}"
+                                    {{ $dokumenLain3 ? '' : 'disabled' }}>
                             </td>
                         </tr>
+
+                        <!-- Acuan Lain & Dokumen Lain4 -->
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="toggleInput" data-target="acuanLainInput"
+                                    {{ $acuanLain ? 'checked' : '' }}>
+                                <input type="text" class="form-control mt-1" id="acuanLainInput"
+                                    name="acuan_lain[]" placeholder="Masukkan acuan lain"
+                                    value="{{ $acuanLain }}"
+                                    {{ $acuanLain ? '' : 'disabled' }}>
+                            </td>
+                            <td>
+                                <input type="checkbox" class="toggleInput" data-target="dokumenLain4Input"
+                                    {{ $dokumenLain4 ? 'checked' : '' }}>
+                                <input type="text" class="form-control mt-1" id="dokumenLain4Input"
+                                    name="dokumen_lain[4]" placeholder="Masukkan dokumen lain"
+                                    value="{{ $dokumenLain4 }}"
+                                    {{ $dokumenLain4 ? '' : 'disabled' }}>
+                            </td>
+                        </tr>
+
                     </tbody>
                 </table>
             </div>
         </div>
 
         <script>
-            document.addEventListener("DOMContentLoaded", function() {
-
-                // Aktifkan input jika checkbox dicentang
-                document.querySelectorAll(".toggleInput").forEach(cb => {
-                    cb.addEventListener("change", function() {
-                        let target = document.getElementById(this.dataset.target);
-                        if (this.checked) {
-                            target.disabled = false;
-                        } else {
-                            target.disabled = true;
-                            target.value = "";
-                        }
-                    });
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll(".toggleInput").forEach(cb => {
+                cb.addEventListener("change", function() {
+                    let target = document.getElementById(this.dataset.target);
+                    if (this.checked) {
+                        target.disabled = false;
+                    } else {
+                        target.disabled = true;
+                        target.value = "";
+                    }
                 });
-
             });
+        });
         </script>
+
 
         <!-- 3. Memberikan Kontribusi (Keterangan & Keterampilan) -->
         <div class="card-box mb-4">
