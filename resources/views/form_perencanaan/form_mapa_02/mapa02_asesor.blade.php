@@ -2,191 +2,153 @@
 
 @section('konten')
 <div class="card-box">
-    <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a href="{{ route('formperencanaan.index') }}">Daftar Skema</a>
-            </li>
-            @if(isset($skema))
-            <li class="breadcrumb-item">
-                <a href="{{ route('formperencanaan.show', $skema->id_skema) }}">Form Perencanaan</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">FR.MAPA.02</li>
-            @endif
+            <li class="breadcrumb-item"><a href="{{ route('formperencanaan.index') }}">Daftar Skema</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('formperencanaan.show', $skema->id_skema) }}">Form Perencanaan</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('form.mapa02', ['id_skema' => $skema->id_skema]) }}">FR.MAPA.02</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Penyusun Persetujuan</li>
         </ol>
     </nav>
 </div>
 
+<form action="{{ route('form.mapa02.penyusun.store', $skema->id_skema) }}" method="POST" id="mapa02-asesor-form">
+    @csrf
 
-
+{{-- Penyusun MAPA.02 --}}
 <div class="container mt-4">
-    <!-- Penyusun -->
     <div class="card-box">
         <div class="judul-header">Penyusun</div>
         <div class="table-responsive mt-4">
             <table class="table table-bordered custom-table" id="penyusun-table">
                 <thead class="table-title">
                     <tr>
-                        <th class="text-center align-middle">Nama Asesor</th>
-                        <th class="text-center align-middle">No Met</th>
-                        <th class="text-center align-middle">Tanggal</th>
-                        <th class="text-center align-middle">Tanda Tangan</th>
-                        <th class="text-center align-middle">Aksi</th>
+                        <th>Nama Asesor</th>
+                        <th>No Met</th>
+                        <th>Tanggal</th>
+                        <th>Tanda Tangan</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>
-                            <select name="asesor_id[]" class="form-control asesor-select">
-                                <option value="">-- Pilih Asesor --</option>
-                            </select>
-                        </td>
-                        <td>
-                            <input type="text" name="no_met[]" class="form-control noMet" readonly>
-                        </td>
-                        <td><input type="date" name="tanggal[]" class="form-control"></td>
-                        <td class="text-center">
-                            <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc; cursor:pointer;"></canvas>
-                            <input type="hidden" name="tanda_tangan[]" class="tanda_tangan">
-                        </td>
-                        <td class="text-center">
-                            <button type="button" class="btn btn-danger btn-sm delete-row">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
+                    @foreach($penyusun as $i => $item)
+                        <tr>
+                            <td>
+                                <input type="hidden" name="penyusun_id[{{ $i }}]" value="{{ $item->id }}">
+                                <select name="nama_asesor[{{ $i }}]" class="form-select asesor-select">
+                                    <option value="">-- Pilih Asesor --</option>
+                                    @foreach($asesors as $asesor)
+                                        <option value="{{ $asesor->id_asesor }}" 
+                                                data-nomet="{{ $asesor->no_met ?? '' }}"
+                                                {{ $item->id_asesor == $asesor->id_asesor ? 'selected' : '' }}>
+                                            {{ $asesor->nama_asesor }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" name="nomet[{{ $i }}]" class="form-control nomet-input" readonly
+                                       value="{{ $item->no_met ?? ($asesors->firstWhere('id_asesor', $item->id_asesor)->no_met ?? '') }}">
+                            </td>
+                            <td>
+                                <input type="date" name="tanggal[{{ $i }}]" class="form-control" value="{{ $item->tanggal ?? '' }}">
+                            </td>
+                            <td class="text-center">
+                                @if($item->tanda_tangan)
+                                    <img src="{{ $item->tanda_tangan }}" width="120"><br>
+                                    <a href="{{ route('form.mapa02.penyusun.downloadTtd', $item->id) }}" class="btn btn-sm btn-primary mt-1">Download</a>
+                                    <button type="button" class="btn btn-danger btn-sm delete-ttd" data-id="{{ $item->id }}">Hapus TTD</button>
+                                @else
+                                    <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc;cursor:pointer;"></canvas>
+                                    <input type="hidden" name="tanda_tangan[{{ $i }}]" class="tanda_tangan">
+                                @endif
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm delete-row" data-id="{{ $item->id }}">Hapus</button>
+                            </td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
-            <button type="button" id="add-row" class="btn btn-success mt-2">+ Tambah Data Penyusun</button>
+            <button type="button" id="add-row" class="btn btn-success mt-2">+ Tambah Penyusun</button>
         </div>
     </div>
 </div>
 
+{{-- Validator (hanya info) --}}
 <div class="container mt-4">
     <div class="card-box">
-        <div class="judul-header">Validator</div>
-        <div class="table-responsive mt-4">
-            <table class="table table-bordered custom-table" id="validator-table">
+        <div class="judul-header d-flex justify-content-between align-items-center">
+            <span>Validator</span>
+        </div>
+
+        <div class="table-responsive mt-3">
+            <table class="table table-bordered custom-table">
                 <thead class="table-title">
                     <tr>
-                        <th class="text-center align-middle">Nama</th>
-                        <th class="text-center align-middle">No Met</th>
-                        <th class="text-center align-middle">Tanggal</th>
-                        <th class="text-center align-middle">Tanda Tangan</th>
+                        <th>Nama Validator</th>
+                        <th>No Met</th>
+                        <th>Tanggal</th>
+                        <th>Tanda Tangan</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><input type="text" name="nama_validator[]" class="form-control validator-field" placeholder="Nama Validator" readonly></td>
-                        <td><input type="text" name="nomet_validator[]" class="form-control validator-field" placeholder="No Met" readonly></td>
-                        <td><input type="date" name="tanggal_validator[]" class="form-control validator-field" readonly></td>
-                        <td class="text-center">
-                            <canvas class="signature-preview-validator validator-field" width="120" height="50" style="border:1px solid #ccc; background:#f1f1f1;"></canvas>
-                            <input type="hidden" name="tanda_tangan_validator[]" class="tanda_tangan">
-                        </td>
-                    </tr>
+                    @forelse($validators as $v)
+                        <tr>
+                            <td>{{ $v->nama_validator }}</td>
+                            <td>{{ $v->no_met }}</td>
+                            <td>{{ \Carbon\Carbon::parse($v->tanggal)->format('d/m/Y') }}</td>
+                            <td class="text-center">
+                                @if($v->ttd)
+                                    <img src="{{ $v->ttd }}" alt="TTD Validator" width="120">
+                                @else
+                                    <span class="text-muted">Belum ada tanda tangan</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">
+                                Belum ada data validator untuk skema ini
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-<!-- SweetAlert2 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".validator-field").forEach(field => {
-        field.addEventListener("focus", showValidatorAlert);
-        field.addEventListener("click", showValidatorAlert);
-    });
-
-    function showValidatorAlert(e) {
-        e.preventDefault();
-        Swal.fire({
-            icon: 'warning',
-            title: 'Akses Ditolak',
-            text: 'Validator diisi pada bagian FR.VA Memberikan Kontribusi dalam Validasi Asesmen',
-            confirmButtonColor: '#3085d6',
-            confirmButtonText: 'Mengerti'
-        });
-        e.target.blur(); // keluar dari field
-    }
-});
-</script>
-
-
-<!-- Simpan dan Lanjut -->
-    <button type="submit" class="simpan-btn">
-        <span>Simpan</span>
-    </button>
+    <div class="mt-4">
+        <button type="submit" class="simpan-btn">Simpan</button>
+    </div>
 </form>
 
-<!-- Modal tanda tangan -->
+{{-- Modal Tanda Tangan --}}
 <div class="modal fade" id="signatureModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Tanda Tangan</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
+      <div class="modal-header"><h5 class="modal-title">Tanda Tangan</h5></div>
       <div class="modal-body">
-        <canvas id="signature-pad" style="border:1px solid #ccc; width:100%; height:300px;"></canvas>
+        <canvas id="signature-pad" style="border:1px solid #ccc;width:100%;height:300px;"></canvas>
       </div>
       <div class="modal-footer">
-        <button type="button" id="clear-signature" class="btn btn-danger">Hapus</button>
-        <button type="button" id="save-signature" class="btn btn-primary" data-bs-dismiss="modal">Simpan</button>
+        <button id="clear-signature" class="btn btn-warning">Clear</button>
+        <button id="save-signature" class="btn btn-success" data-bs-dismiss="modal">Simpan</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Script -->
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.5/dist/signature_pad.umd.min.js"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const tableBody = document.querySelector("#penyusun-table tbody");
-    const addRowBtn = document.getElementById("add-row");
+document.addEventListener("DOMContentLoaded", () => {
     const canvasModal = document.getElementById("signature-pad");
     let signaturePad = new SignaturePad(canvasModal);
     let activePreview;
 
-    // ✅ Tambah baris baru
-    addRowBtn.addEventListener("click", function () {
-        const newRow = document.createElement("tr");
-        newRow.innerHTML = `
-            <td>
-                <select name="asesor_id[]" class="form-control asesor-select">
-                    <option value="">-- Pilih Asesor --</option>
-                </select>
-            </td>
-            <td>
-                <input type="text" name="no_met[]" class="form-control noMet" readonly>
-            </td>
-            <td><input type="date" name="tanggal[]" class="form-control"></td>
-            <td class="text-center">
-                <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc; cursor:pointer;"></canvas>
-                <input type="hidden" name="tanda_tangan[]" class="tanda_tangan">
-            </td>
-            <td class="text-center">
-                <button type="button" class="btn btn-danger btn-sm delete-row">
-                    <i class="fa fa-trash"></i>
-                </button>
-            </td>
-        `;
-        tableBody.appendChild(newRow);
-        loadAsesorOptions(skemaId); // isi dropdown asesor utk row baru
-    });
-
-    // ✅ Hapus baris
-    document.addEventListener("click", function(e) {
-        if (e.target.closest(".delete-row")) {
-            e.target.closest("tr").remove();
-        }
-    });
-
-    // ✅ Resize canvas modal
+    // Resize canvas signature modal
     function resizeCanvas() {
         const ratio = Math.max(window.devicePixelRatio || 1, 1);
         canvasModal.width = canvasModal.offsetWidth * ratio;
@@ -195,67 +157,167 @@ document.addEventListener("DOMContentLoaded", function () {
         signaturePad.clear();
     }
 
-    // ✅ Klik canvas kecil -> buka modal
-    document.addEventListener("click", function(e) {
-        if (e.target.classList.contains("signature-preview")) {
+    // Buka modal tanda tangan
+    document.addEventListener("click", e => {
+        if (e.target.classList.contains("signature-preview") && !e.target.classList.contains("validator-field")) {
             activePreview = e.target;
-            const modalEl = document.getElementById('signatureModal');
-            const modal = new bootstrap.Modal(modalEl);
+            const modal = new bootstrap.Modal(document.getElementById('signatureModal'));
             modal.show();
-
-            modalEl.addEventListener('shown.bs.modal', resizeCanvas, { once: true });
+            document.getElementById('signatureModal').addEventListener('shown.bs.modal', resizeCanvas, { once: true });
         }
     });
 
-    // ✅ Tombol hapus tanda tangan
-    document.getElementById("clear-signature").addEventListener("click", function () {
-        signaturePad.clear();
-    });
+    // Clear signature di modal
+    document.getElementById("clear-signature").onclick = () => signaturePad.clear();
 
-    // ✅ Tombol simpan tanda tangan
-    document.getElementById("save-signature").addEventListener("click", function () {
+    // Simpan signature ke canvas preview & hidden input
+    document.getElementById("save-signature").onclick = () => {
         if (!signaturePad.isEmpty() && activePreview) {
             const dataURL = signaturePad.toDataURL();
             const ctx = activePreview.getContext("2d");
             const img = new Image();
-            img.onload = function() {
+            img.onload = () => {
                 ctx.clearRect(0, 0, activePreview.width, activePreview.height);
                 ctx.drawImage(img, 0, 0, activePreview.width, activePreview.height);
             }
             img.src = dataURL;
             activePreview.nextElementSibling.value = dataURL;
         }
+    };
+
+    // Tambah row baru
+    document.getElementById("add-row").onclick = () => {
+        const i = document.querySelectorAll("#penyusun-table tbody tr").length;
+        const options = `@foreach($asesors as $asesor)<option value="{{ $asesor->id_asesor }}" data-nomet="{{ $asesor->no_met ?? '' }}">{{ $asesor->nama_asesor }}</option>@endforeach`;
+        document.querySelector("#penyusun-table tbody").insertAdjacentHTML("beforeend", `
+            <tr>
+                <td><select name="nama_asesor[${i}]" class="form-select asesor-select"><option value="">-- Pilih Asesor --</option>${options}</select></td>
+                <td><input type="text" name="nomet[${i}]" class="form-control nomet-input" readonly></td>
+                <td><input type="date" name="tanggal[${i}]" class="form-control"></td>
+                <td><canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc;cursor:pointer;"></canvas><input type="hidden" name="tanda_tangan[${i}]" class="tanda_tangan"></td>
+                <td><button type="button" class="btn btn-danger btn-sm delete-row">Hapus</button></td>
+            </tr>
+        `);
+    };
+
+
+    // Update No Met otomatis
+    document.addEventListener("change", e => {
+        if (e.target.classList.contains("asesor-select")) {
+            const noMet = e.target.selectedOptions[0].dataset.nomet || '';
+            e.target.closest("tr").querySelector(".nomet-input").value = noMet;
+        }
     });
 
-    // ✅ Load asesor
-    const skemaId = localStorage.getItem('selectedSkemaId');
-    if (skemaId) {
-        loadAsesorOptions(skemaId);
-    }
-});
+    // Hapus baris (baru, belum tersimpan di DB)
+    document.addEventListener("click", e => {
+        if (e.target.classList.contains("delete-row") && !e.target.dataset.id) {
+            e.target.closest("tr").remove();
+        }
+    });
 
-function loadAsesorOptions(skemaId) {
-    fetch(`/mapa02/skema/${skemaId}/asesor`)
-        .then(res => res.json())
-        .then(data => {
-            document.querySelectorAll('.asesor-select').forEach(select => {
-                select.innerHTML = '<option value="">-- Pilih Asesor --</option>';
-                data.forEach(asesor => {
-                    let opt = document.createElement('option');
-                    opt.value = asesor.id_asesor;
-                    opt.textContent = `${asesor.nama_asesor}`;
-                    opt.dataset.noMet = asesor.no_registrasi;
-                    select.appendChild(opt);
-                });
+    // Alert untuk validator field
+    document.querySelectorAll(".validator-field").forEach(field => {
+        field.addEventListener("focus", showAlert);
+        field.addEventListener("click", showAlert);
+    });
+    function showAlert(e) {
+        e.preventDefault();
+        Swal.fire({icon:'warning',title:'Akses Ditolak',text:'Validator diisi di FR.VA'});
+        e.target.blur();
+    }
+
+    // Hapus TTD lama
+    document.addEventListener("click", e => {
+        if (e.target.classList.contains("delete-ttd")) {
+            e.preventDefault();
+            let id = e.target.dataset.id;
+            Swal.fire({
+                title: "Hapus Tanda Tangan?",
+                text: "Tanda tangan ini akan dihapus permanen.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Ya, hapus!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let url = "{{ route('form.mapa02.penyusun.deleteTtd', ':id') }}".replace(':id', id);
+                    fetch(url, {
+                        method: "DELETE",
+                        headers: {
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                            "Accept": "application/json"
+                        }
+                    }).then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire("Terhapus!", data.message, "success").then(() => location.reload());
+                        } else {
+                            Swal.fire("Gagal", data.message, "error");
+                        }
+                    }).catch(() => Swal.fire("Error", "Terjadi kesalahan server.", "error"));
+                }
             });
-        });
-}
+        }
+    });
 
-document.addEventListener('change', function(e) {
-    if (e.target.classList.contains('asesor-select')) {
-        let noMetInput = e.target.closest('tr').querySelector('.noMet');
-        noMetInput.value = e.target.selectedOptions[0].dataset.noMet || '';
-    }
+    // Hapus row lama (sudah tersimpan)
+    document.addEventListener("click", e => {
+        if (e.target.classList.contains("delete-row") && e.target.dataset.id) {
+            const id = e.target.dataset.id;
+            Swal.fire({
+                title: "Hapus Penyusun?",
+                text: "Data penyusun ini akan dihapus permanen.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Ya, hapus!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`{{ route('form.mapa02.penyusun.delete', ':id') }}`.replace(':id', id), {
+                        method: "DELETE",
+                        headers: {
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                            "Accept": "application/json"
+                        }
+                    }).then(res => res.json())
+                    .then(data => {
+                        if(data.success) location.reload();
+                        else Swal.fire("Gagal", data.message, "error");
+                    }).catch(() => Swal.fire("Error", "Terjadi kesalahan server.", "error"));
+                }
+            });
+        }
+    });
+
+
+    // SweetAlert simpan
+    document.getElementById("mapa02-asesor-form").addEventListener("submit", function(e){
+        e.preventDefault();
+        let form = this;
+
+        // Simpan TTD terakhir ke hidden input
+        if (!signaturePad.isEmpty() && activePreview) {
+            activePreview.nextElementSibling.value = signaturePad.toDataURL();
+        }
+
+        Swal.fire({
+            title: "Berhasil!",
+            text: "Tanda tangan dan catatan berhasil disimpan.",
+            icon: "success",
+            showCancelButton: true,
+            confirmButtonText: "Tetap di Halaman",
+            cancelButtonText: "Ke Form Perencanaan"
+        }).then((result) => {
+            form.submit(); // kirim form dulu
+            if (result.dismiss === Swal.DismissReason.cancel) {
+                window.location.href = "{{ route('formperencanaan.show', $skema->id_skema) }}";
+            }
+        });
+    });
+
 });
 </script>
 @endsection

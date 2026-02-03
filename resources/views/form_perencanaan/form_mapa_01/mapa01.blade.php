@@ -37,16 +37,19 @@
                 <div class="mapa-box">
             <label class="fw-semibold d-block mb-2">Skema Sertifikasi</label>
             <div class="jenis-skema">
-                <input type="radio" id="kkni" name="skema" class="form-check-input me-2"
-                       value="KKNI"
-                       @if($skema->jenjang == 'KKNI') checked @endif disabled>
-                <label for="kkni">KKNI</label>
+<input type="radio" id="kkni" name="skema" class="form-check-input me-2"
+       value="KKNI"
+       @if(\Illuminate\Support\Str::contains($skema->jenjang, 'KKNI')) checked @endif disabled>
+<label for="kkni">KKNI</label>
+
+
 
                 <input type="radio" id="okupasi" name="skema" class="form-check-input me-2"
                        value="Okupasi"
                        @if($skema->jenjang == 'Okupasi') checked @endif disabled>
                 <label for="okupasi">Okupasi</label>
-            </div>                </div>
+            </div>
+            </div>
             </div>
 
             <div class="col-md-6">
@@ -215,35 +218,40 @@
         </div>
 
         <!-- HUBUNGAN -->
-        <div class="form-group mb-3">
-            <label class="form-label d-block">Hubungan antara standar kompetensi dan:</label>
-            @foreach(['Bukti untuk mendukung asesmen','Aktivitas kerja di tempat kerja Asesi','Kegiatan Pembelajaran'] as $h)
-            <div>
-                <label>
-                    <input type="checkbox" name="hubungan[]" value="{{ $h }}"
-                           class="form-check-input me-1"
-                           {{ in_array($h, $konteks->hubungan) ? 'checked' : '' }}>
-                    {{ $h }}
-                </label>
-            </div>
-            @endforeach
-        </div>
+<div class="form-group mb-3">
+    <label class="form-label d-block mb-2">Hubungan antara standar kompetensi dan:</label>
 
-        <!-- PELAKSANA -->
-        <div class="form-group mb-3">
-            <label class="form-label d-block">Siapa yang melakukan asesmen / RPL</label>
-            @foreach(['Lembaga Sertifikasi','Organisasi Pelatihan','Asesor Perusahaan'] as $p)
-            <div>
-                <label>
-                    <input type="checkbox" name="pelaksana[]" value="{{ $p }}"
-                           class="form-check-input me-1"
-                           {{ in_array($p, $konteks->pelaksana) ? 'checked' : '' }}>
-                    {{ $p }}
-                </label>
-            </div>
-            @endforeach
-        </div>
+    <div class="hubungan-list">
+        @foreach(['Bukti untuk mendukung asesmen','Aktivitas kerja di tempat kerja Asesi','Kegiatan Pembelajaran'] as $h)
+        @php
+            $selected = $konteks->hubungan_rating[$h] ?? '';
+            $checked = in_array($h, $konteks->hubungan);
+        @endphp
+        <div class="hubungan-item">
+            <label class="d-flex align-items-center flex-grow-1">
+                <input type="checkbox" 
+                       name="hubungan[]" 
+                       value="{{ $h }}" 
+                       class="form-check-input me-2 hubungan-checkbox"
+                       {{ $checked ? 'checked' : '' }}
+                       data-name="{{ $h }}">
+                <span class="hubungan-text">{{ $h }}</span>
+            </label>
 
+            <div class="emoji-group ms-3 {{ $checked ? '' : 'disabled' }}">
+                <div class="emoji-option {{ $selected === 'senang' ? 'active' : '' }}" data-value="senang" data-name="{{ $h }}">😊</div>
+                <div class="emoji-option {{ $selected === 'datar' ? 'active' : '' }}" data-value="datar" data-name="{{ $h }}">😐</div>
+                <div class="emoji-option {{ $selected === 'sedih' ? 'active' : '' }}" data-value="sedih" data-name="{{ $h }}">☹️</div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+
+    {{-- Hidden inputs untuk backend --}}
+    <div id="emoji-hidden-inputs">
+        @foreach($konteks->hubungan_rating ?? [] as $key => $val)
+            <input type="hidden" name="hubungan_rating[{{ $key }}]" value="{{ $val }}">
+        @endforeach
     </div>
 </div>
 
@@ -401,13 +409,22 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // === Delete tujuan ===
-        if (e.target.classList.contains("delete-tujuan")) {
-            if (!confirm("Yakin ingin menghapus tujuan ini?")) return;
+if (e.target.classList.contains("delete-tujuan")) {
+    const url = e.target.getAttribute("data-url");
 
-            const url = e.target.getAttribute("data-url");
-
+    Swal.fire({
+        title: "Hapus Tujuan?",
+        text: "Apakah kamu yakin ingin menghapus tujuan ini?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Ya, hapus",
+        cancelButtonText: "Batal"
+    }).then((result) => {
+        if (result.isConfirmed) {
             if (url) {
-                // tujuan dari DB → hapus pakai fetch
+                // Tujuan dari database
                 fetch(url, {
                     method: "DELETE",
                     headers: {
@@ -418,25 +435,69 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Berhasil",
+                            text: "Tujuan berhasil dihapus!",
+                            timer: 1200,
+                            showConfirmButton: false
+                        });
                         item.remove();
                     } else {
-                        alert("Gagal menghapus tujuan: " + data.message);
+                        Swal.fire({
+                            icon: "error",
+                            title: "Gagal",
+                            text: data.message || "Terjadi kesalahan saat menghapus tujuan.",
+                        });
                     }
                 })
-                .catch(() => alert("Terjadi error koneksi"));
+                .catch(() => {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Kesalahan",
+                        text: "Terjadi error koneksi saat menghapus tujuan.",
+                    });
+                });
             } else {
-                // tujuan baru (JS-only)
+                // Tujuan baru (belum di DB)
                 item.remove();
+                Swal.fire({
+                    icon: "success",
+                    title: "Berhasil",
+                    text: "Tujuan berhasil dihapus!",
+                    timer: 1200,
+                    showConfirmButton: false
+                });
             }
         }
     });
+}
 
+    });
+
+// Simpan perubahan edit tujuan
 // Simpan perubahan edit tujuan
 document.getElementById("btnUpdateTujuan").addEventListener("click", function () {
     const newName = document.getElementById("editNamaTujuan").value.trim();
     if (!newName || !currentEditId) return;
 
-    // Kirim ke backend pakai fetch
+    const editBtn = document.querySelector(`.edit-tujuan[data-id="${currentEditId}"]`);
+    const item = editBtn?.closest(".tujuan-item");
+    const checkbox = item?.querySelector("input[type=checkbox]");
+    const label = item?.querySelector("label");
+
+    // Kalau id bukan angka (belum di DB) → edit di client aja
+    if (isNaN(currentEditId)) {
+        if (checkbox) checkbox.value = newName;
+        if (label) label.textContent = newName;
+        editBtn.setAttribute("data-nama", newName);
+
+        bootstrap.Modal.getInstance(document.getElementById("modalEditTujuan")).hide();
+        currentEditId = null;
+        return; // ⛔ stop di sini, jangan fetch ke server
+    }
+
+    // kalau id valid (dari DB), baru fetch
     fetch(`/form-perencanaan/mapa01/{{ $skema->id_skema }}/tujuan/${currentEditId}/update`, {
         method: "POST",
         headers: {
@@ -449,19 +510,9 @@ document.getElementById("btnUpdateTujuan").addEventListener("click", function ()
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            // Update label & value checkbox di DOM
-            const checkbox = document.querySelector(`.edit-tujuan[data-id="${currentEditId}"]`)
-                .closest(".tujuan-item").querySelector("input[type=checkbox]");
-            
             if (checkbox) checkbox.value = newName;
-
-            const label = checkbox.closest(".tujuan-item").querySelector("label");
             if (label) label.textContent = newName;
-
-            const editBtn = checkbox.closest(".tujuan-item").querySelector(".edit-tujuan");
-            if (editBtn) editBtn.setAttribute("data-nama", newName);
-
-            // Tutup modal
+            editBtn.setAttribute("data-nama", newName);
             bootstrap.Modal.getInstance(document.getElementById("modalEditTujuan")).hide();
             currentEditId = null;
         } else {
@@ -471,6 +522,45 @@ document.getElementById("btnUpdateTujuan").addEventListener("click", function ()
     .catch(() => alert("Terjadi error koneksi"));
 });
 
+ // klik emoji
+    document.querySelectorAll(".emoji-option").forEach(el => {
+        el.addEventListener("click", () => {
+            const name = el.getAttribute("data-name");
+            const value = el.getAttribute("data-value");
+
+            // hapus active dari emoji lain di baris yang sama
+            el.parentElement.querySelectorAll(".emoji-option").forEach(e => e.classList.remove("active"));
+            el.classList.add("active");
+
+            // cari atau buat hidden input
+            let hiddenInput = document.querySelector(`#emoji-hidden-inputs input[name="hubungan_rating[${name}]"]`);
+            if (!hiddenInput) {
+                hiddenInput = document.createElement("input");
+                hiddenInput.type = "hidden";
+                hiddenInput.name = `hubungan_rating[${name}]`;
+                document.getElementById("emoji-hidden-inputs").appendChild(hiddenInput);
+            }
+            hiddenInput.value = value;
+        });
+    });
+
+    // kontrol munculnya emoji berdasar checkbox
+    document.querySelectorAll(".hubungan-checkbox").forEach(checkbox => {
+        checkbox.addEventListener("change", function() {
+            const name = this.getAttribute("data-name");
+            const emojiGroup = this.closest(".hubungan-item").querySelector(".emoji-group");
+
+            if (this.checked) {
+                emojiGroup.classList.remove("disabled");
+            } else {
+                emojiGroup.classList.add("disabled");
+                // hapus pilihan emoji & nilai hidden input kalau uncheck
+                emojiGroup.querySelectorAll(".emoji-option").forEach(e => e.classList.remove("active"));
+                const hiddenInput = document.querySelector(`#emoji-hidden-inputs input[name="hubungan_rating[${name}]"]`);
+                if (hiddenInput) hiddenInput.remove();
+            }
+        });
+    });
 });
 </script>
 @endsection

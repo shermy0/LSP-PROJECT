@@ -11,7 +11,7 @@ class HasilAsesmen extends Model
 
     protected $table = 'hasil_asesmen';
     protected $primaryKey = 'id_hasil';
-    public $timestamps = false; // ⬅️ ini biar nggak cari created_at & updated_at
+    public $timestamps = false; // ⬅ ini biar nggak cari created_at & updated_at
 protected $fillable = [
     'id_asesor',
     'id_asesi',
@@ -22,21 +22,20 @@ protected $fillable = [
 
 
     
-    public function bukti()
-    {
-        return $this->hasMany(HasilAsesmenBukti::class, 'id_hasil');
-    }
+public function unit()
+{
+    return $this->belongsTo(UnitKompetensi::class, 'id_unit', 'id_unit');
+}
 
-    public function perangkat()
-    {
-        return $this->hasMany(HasilAsesmenPerangkat::class, 'id_hasil');
-    }
+public function bukti()
+{
+    return $this->hasMany(HasilAsesmenBukti::class, 'id_hasil', 'id_hasil');
+}
 
-    // Relasi ke UnitKompetensi
-    public function unit()
-    {
-        return $this->belongsTo(UnitKompetensi::class, 'id_unit', 'id_unit');
-    }
+public function perangkat()
+{
+    return $this->hasMany(HasilAsesmenPerangkat::class, 'id_hasil', 'id_hasil');
+}
 
     // Relasi ke InstrumenAsesmen
     public function instrumen()
@@ -56,5 +55,3 @@ protected $fillable = [
 }
 
 }
-
-

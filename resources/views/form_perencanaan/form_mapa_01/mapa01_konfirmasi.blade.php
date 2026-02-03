@@ -72,102 +72,137 @@
     </div>
 
     {{-- Penyusun --}}
-    <div class="container mt-4">
-        <div class="card-box">
-            <div class="judul-header">Penyusun</div>
-            <div class="table-responsive mt-4">
-                <table class="table table-bordered custom-table" id="penyusun-table">
-                    <thead class="table-title">
+<div class="container mt-4">
+    <div class="card-box">
+        <div class="judul-header">Penyusun</div>
+        <div class="table-responsive mt-4">
+            <table class="table table-bordered custom-table" id="penyusun-table">
+                <thead class="table-title">
+                    <tr>
+                        <th>Nama Asesor</th>
+                        <th>No Met</th>
+                        <th>Tanggal</th>
+                        <th>Tanda Tangan</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach($penyusun as $i => $item)
+                    <tr>
+                        <td>
+                            <input type="hidden" name="penyusun_id[{{ $i }}]" value="{{ $item->id }}">
+                            <input type="hidden" name="form_type[{{ $i }}]" value="mapa01">
+                            <select name="nama_asesor[{{ $i }}]" class="form-select asesor-select">
+                                <option value="">-- Pilih Asesor --</option>
+                                @foreach($asesors as $asesor)
+                                    <option value="{{ $asesor->id_asesor }}"
+                                        data-nomet="{{ $asesor->no_met ?? '' }}"
+                                        {{ $item->id_asesor == $asesor->id_asesor ? 'selected' : '' }}>
+                                        {{ $asesor->nama_asesor }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" name="nomet[{{ $i }}]" class="form-control nomet-input" readonly
+                                value="{{ $item->no_met ?? ($asesors->firstWhere('id_asesor', $item->id_asesor)->no_met ?? '') }}">
+                        </td>
+                        <td>
+                            <input type="date" name="tanggal[{{ $i }}]" class="form-control" value="{{ $item->tanggal ?? '' }}">
+                        </td>
+                        <td class="text-center">
+                            @if($item->tanda_tangan)
+                                <img src="{{ $item->tanda_tangan }}" width="120"><br>
+                                <a href="{{ route('form.mapa01.konfirmasi.ttd.download', $item->id) }}" class="btn btn-sm btn-primary mt-1">Download</a>
+                                <button type="button" class="btn btn-sm btn-danger mt-1 delete-ttd"
+                                        data-id="{{ $item->id }}"
+                                        data-index="{{ $i }}">Hapus</button>
+                            @else
+                                <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc;cursor:pointer;"></canvas>
+                                <input type="hidden" name="tanda_tangan[{{ $i }}]" class="tanda_tangan">
+                            @endif
+                        </td>
+                        <td><button type="button" class="btn btn-danger btn-sm delete-row">Hapus</button></td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+            <button type="button" id="add-row" class="btn btn-success mt-2">+ Tambah Penyusun</button>
+        </div>
+    </div>
+</div>
+
+
+{{-- Validator --}}
+<div class="container mt-4">
+    <div class="card-box">
+        <div class="judul-header">Validator</div>
+        <div class="table-responsive mt-3">
+            <table class="table table-bordered custom-table">
+                <thead class="table-title">
+                    <tr>
+                        <th>Nama Validator</th>
+                        <th>No Registrasi</th>
+                        <th>Tanggal</th>
+                        <th>Tanda Tangan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($validators as $v)
                         <tr>
-                            <th>Nama Asesor</th>
-                            <th>No Met</th>
-                            <th>Tanggal</th>
-                            <th>Tanda Tangan</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($penyusun as $i => $item)
-                        <tr>
-                           <td>
-                                <input type="hidden" name="penyusun_id[{{ $i }}]" value="{{ $item->id }}">
-                                <select name="nama_asesor[{{ $i }}]" class="form-select asesor-select">
-                                    <option value="">-- Pilih Asesor --</option>
-                                    @foreach($asesors as $asesor)
-                                        <option value="{{ $asesor->id_asesor }}"
-                                            data-nomet="{{ $asesor->no_met ?? '' }}"
-                                            {{ $item->id_asesor == $asesor->id_asesor ? 'selected' : '' }}>
-                                            {{ $asesor->nama_asesor }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td>
-                                <input type="text" name="nomet[{{ $i }}]" class="form-control nomet-input" readonly
-                                    value="{{ $item->no_met ?? ($asesors->firstWhere('id_asesor', $item->id_asesor)->no_met ?? '') }}">
-                            </td>
-                            <td>
-                                <input type="date" name="tanggal[{{ $i }}]" class="form-control" value="{{ $item->tanggal ?? '' }}">
-                            </td>
+                            <td>{{ $v->nama_validator }}</td>
+                            <td>{{ $v->no_registrasi }}</td>
+                            <td>{{ \Carbon\Carbon::parse($v->tanggal)->format('d/m/Y') }}</td>
                             <td class="text-center">
-                                @if($item->tanda_tangan)
-                                    <img src="{{ $item->tanda_tangan }}" width="120"><br>
-                                    <a href="{{ route('form.mapa01.konfirmasi.ttd.download', $item->id) }}" class="btn btn-sm btn-primary mt-1">Download</a>
-                                    <button type="button" class="btn btn-sm btn-danger mt-1 delete-ttd"
-                                            data-id="{{ $item->id }}"
-                                            data-index="{{ $i }}">Hapus</button>
+                                @if($v->ttd)
+                                    <img src="{{ $v->ttd }}" width="120" alt="TTD Validator">
                                 @else
-                                    <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc;cursor:pointer;"></canvas>
-                                    <input type="hidden" name="tanda_tangan[{{ $i }}]" class="tanda_tangan">
+                                    <span class="text-muted">Belum ada tanda tangan</span>
                                 @endif
                             </td>
-                            <td><button type="button" class="btn btn-danger btn-sm delete-row">Hapus</button></td>
                         </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-                <button type="button" id="add-row" class="btn btn-success mt-2">+ Tambah Penyusun</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Konfirmasi Hapus Penyusun -->
-    <div class="modal fade" id="deletePenyusunModal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header bg-danger text-white">
-            <h5 class="modal-title">Konfirmasi Hapus</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <p>Apakah Anda yakin ingin menghapus penyusun ini?</p>
-            <input type="hidden" id="deletePenyusunId">
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-            <button type="button" class="btn btn-danger" id="confirmDeletePenyusun">Hapus</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    {{-- Validator --}}
-    <div class="container mt-4">
-        <div class="card-box">
-            <div class="judul-header">Validator</div>
-            <table class="table table-bordered custom-table">
-                <tr>
-                    <td><input type="text" name="nama[]" class="form-control" placeholder="Nama Validator"></td>
-                    <td><input type="text" name="nomet[]" class="form-control" placeholder="No Met"></td>
-                    <td><input type="date" name="tanggal[]" class="form-control"></td>
-                    <td>
-                        <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc;cursor:pointer;"></canvas>
-                        <input type="hidden" name="tanda_tangan[]" class="tanda_tangan">
-                    </td>
-                </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">Belum ada data validator</td>
+                        </tr>
+                    @endforelse
+                </tbody>
             </table>
         </div>
     </div>
+</div>
+
+@if(auth()->check() && auth()->user()->role === 'admin')
+    <div class="text-center mt-4">
+        <button id="btnDownloadMapa" class="btn btn-success">
+            <i class="bi bi-download"></i> Download Semua MAPA.01 (ZIP)
+        </button>
+    </div>
+
+    {{-- SweetAlert2 --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.getElementById('btnDownloadMapa').addEventListener('click', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Download Semua MAPA.01?',
+                text: "File akan dikompresi ke dalam ZIP dan diunduh.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Download Sekarang',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirect ke route download
+                    window.location.href = "{{ route('form.mapa01.downloadAll', $skema->id_skema) }}";
+                }
+            });
+        });
+    </script>
+@endif
+
 
     <div class="mt-4">
         <button type="submit" class="simpan-btn">Simpan</button>
@@ -198,14 +233,30 @@ document.addEventListener("DOMContentLoaded", () => {
     let activePreview;
 
     function resizeCanvas() {
+        let dataURL = "";
+        if (activePreview && activePreview.nextElementSibling.value) {
+            dataURL = activePreview.nextElementSibling.value;
+        }
+
         const ratio = Math.max(window.devicePixelRatio || 1, 1);
         canvasModal.width = canvasModal.offsetWidth * ratio;
         canvasModal.height = canvasModal.offsetHeight * ratio;
         canvasModal.getContext("2d").scale(ratio, ratio);
         signaturePad.clear();
+
+        if (dataURL) {
+            const img = new Image();
+            img.onload = () => {
+                const scaleX = canvasModal.width / img.width / ratio;
+                const scaleY = canvasModal.height / img.height / ratio;
+                signaturePad._ctx.scale(scaleX, scaleY);
+                signaturePad._ctx.drawImage(img, 0, 0);
+                signaturePad._ctx.setTransform(1,0,0,1,0,0);
+            };
+            img.src = dataURL;
+        }
     }
 
-    // Buka modal ketika klik preview
     document.addEventListener("click", e => {
         if (e.target.classList.contains("signature-preview")) {
             activePreview = e.target;
@@ -231,13 +282,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // Tambah baris penyusun
     document.getElementById("add-row").onclick = () => {
         const i = document.querySelectorAll("#penyusun-table tbody tr").length;
         const options = `@foreach($asesors as $asesor)<option value="{{ $asesor->id_asesor }}" data-nomet="{{ $asesor->no_met ?? '' }}">{{ $asesor->nama_asesor }}</option>@endforeach`;
         document.querySelector("#penyusun-table tbody").insertAdjacentHTML("beforeend", `
             <tr>
                 <td>
+                    <input type="hidden" name="form_type[${i}]" value="mapa01">
                     <select name="nama_asesor[${i}]" class="form-select asesor-select">
                         <option value="">-- Pilih Asesor --</option>
                         ${options}
@@ -254,7 +305,6 @@ document.addEventListener("DOMContentLoaded", () => {
         `);
     };
 
-    // Update No Met otomatis saat pilih asesor
     document.addEventListener("change", e => {
         if (e.target.classList.contains("asesor-select")) {
             const selected = e.target.selectedOptions[0];
@@ -265,7 +315,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // ==== AJAX Hapus TTD ====
+    // ==== AJAX Hapus TTD dengan SweetAlert ====
     document.addEventListener("click", e => {
         if(e.target.classList.contains('delete-ttd')) {
             const btn = e.target;
@@ -273,95 +323,93 @@ document.addEventListener("DOMContentLoaded", () => {
             const role = btn.dataset.role;
             const index = btn.dataset.index;
 
-            if(confirm('Yakin ingin menghapus tanda tangan?')) {
-                fetch(`{{ url('form-perencanaan/mapa01/konfirmasi/ttd') }}/${id}/delete`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if(data.success) {
-                        const td = btn.closest('td');
-                        let hiddenName = '';
-                        if (role) hiddenName = `tanda_tangan[${role}]`;
-                        else if (index) hiddenName = `tanda_tangan[${index}]`;
-
-                        td.innerHTML = `
-                            <canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc;cursor:pointer;"></canvas>
-                            <input type="hidden" name="${hiddenName}" class="tanda_tangan">
-                        `;
-
-                        alert(data.message);
-                    } else {
-                        alert(data.message || 'Gagal menghapus tanda tangan.');
-                    }
-                })
-                .catch(() => alert('Gagal menghapus tanda tangan.'));
-            }
+            Swal.fire({
+                title: 'Yakin ingin menghapus tanda tangan?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal'
+            }).then(result => {
+                if(result.isConfirmed){
+                    fetch(`{{ url('form-perencanaan/mapa01/konfirmasi/ttd') }}/${id}/delete`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if(data.success){
+                            const td = btn.closest('td');
+                            let hiddenName = role ? `tanda_tangan[${role}]` : `tanda_tangan[${index}]`;
+                            td.innerHTML = `<canvas class="signature-preview" width="120" height="50" style="border:1px solid #ccc;cursor:pointer;"></canvas>
+                                            <input type="hidden" name="${hiddenName}" class="tanda_tangan">`;
+                            Swal.fire('Berhasil', data.message, 'success');
+                        } else {
+                            Swal.fire('Gagal', data.message || 'Gagal menghapus tanda tangan', 'error');
+                        }
+                    })
+                    .catch(() => Swal.fire('Gagal', 'Gagal menghapus tanda tangan', 'error'));
+                }
+            });
         }
     });
 
-    // ==== Hapus penyusun ====
+    // ==== Hapus penyusun dengan SweetAlert ====
     document.addEventListener("click", e => {
         if (e.target.classList.contains("delete-row")) {
             const row = e.target.closest("tr");
             const penyusunIdInput = row.querySelector("input[name^='penyusun_id']");
             if (penyusunIdInput) {
-                // penyusun lama → modal
                 const penyusunId = penyusunIdInput.value;
-                document.getElementById("deletePenyusunId").value = penyusunId;
-                const modal = new bootstrap.Modal(document.getElementById("deletePenyusunModal"));
-                modal.show();
+                Swal.fire({
+                    title: 'Yakin ingin menghapus penyusun ini?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Hapus',
+                    cancelButtonText: 'Batal'
+                }).then(result => {
+                    if(result.isConfirmed){
+                        fetch(`{{ url('form-perencanaan/mapa01/konfirmasi/penyusun') }}/${penyusunId}/delete`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json'
+                            }
+                        })
+                        .then(res => {
+                            if(res.ok){
+                                row.remove();
+                                Swal.fire('Berhasil', 'Penyusun berhasil dihapus', 'success');
+                            } else {
+                                Swal.fire('Gagal', 'Gagal menghapus penyusun', 'error');
+                            }
+                        })
+                        .catch(() => Swal.fire('Gagal', 'Gagal menghapus penyusun', 'error'));
+                    }
+                });
             } else {
-                // penyusun baru → langsung hapus
-                row.remove();
+                row.remove(); // hapus langsung jika row baru
             }
         }
     });
 
-    // Konfirmasi hapus penyusun lama
-    document.getElementById("confirmDeletePenyusun").addEventListener("click", () => {
-        const id = document.getElementById("deletePenyusunId").value;
-fetch(`{{ url('form-perencanaan/mapa01/konfirmasi/penyusun') }}/${id}/delete`, {
-    method: 'DELETE',
-    headers: {
-        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-        'Accept': 'application/json'
-    }
-})
-.then(res => {
-    if (res.ok) {
-        document.querySelector(`#penyusun-table input[value='${id}']`).closest("tr").remove();
-        bootstrap.Modal.getInstance(document.getElementById("deletePenyusunModal")).hide();
-    } else {
-        alert("Gagal menghapus penyusun.");
-    }
-})
-.catch(() => alert("Gagal menghapus penyusun."));
-
-    });
-});
-document.addEventListener("DOMContentLoaded", () => {
-    const isKonfirmasi = document.querySelector('#page-konfirmasi-marker'); 
-    if (isKonfirmasi) {   // <--- cek dulu marker halaman
-        @if(session('success'))
-            Swal.fire({
-                title: "Berhasil!",
-                text: "{{ session('success') }}",
-                icon: "success",
-                showCancelButton: true,
-                confirmButtonText: "Tetap di Halaman",
-                cancelButtonText: "Ke Form Perencanaan"
-            }).then((result) => {
-                if (result.dismiss === Swal.DismissReason.cancel) {
-                    window.location.href = "{{ route('formperencanaan.show', $skema->id_skema) }}";
-                }
-            });
-        @endif
-    }
+    // ==== Notifikasi berhasil simpan ====
+    @if(session('success'))
+        Swal.fire({
+            title: "Berhasil!",
+            text: "{{ session('success') }}",
+            icon: "success",
+            showCancelButton: true,
+            confirmButtonText: "Tetap di Halaman",
+            cancelButtonText: "Ke Form Perencanaan"
+        }).then((result) => {
+            if (result.dismiss === Swal.DismissReason.cancel) {
+                window.location.href = "{{ route('formperencanaan.show', $skema->id_skema) }}";
+            }
+        });
+    @endif
 });
 
 

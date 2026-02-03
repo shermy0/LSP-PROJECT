@@ -16,14 +16,30 @@ class FormPerencanaanController extends Controller
     }
 
     // Halaman form perencanaan sesuai skema
-    public function show($id_skema)
-    {
-        $skema = Skema::findOrFail($id_skema);
+public function show($id_skema)
+{
+    $skema = Skema::findOrFail($id_skema);
 
-        // kirim juga id_skema ke view
-        return view('formperencanaan', [
-            'skema' => $skema,
-            'id_skema' => $id_skema,
-        ]);
-    }
+    // ambil jenis pertanyaan unik untuk skema ini
+    $jenis_pertanyaan = DB::table('pembuatan_pertanyaan')
+        ->where('id_skema', $id_skema)
+        ->distinct()
+        ->pluck('jenis_pertanyaan')
+        ->toArray();
+
+    $semuaJenis = ['pilihan_ganda','esai','lisan'];
+
+    // cek apakah ketiga jenis soal sudah ada
+    $laporanBisaDibuka = collect($semuaJenis)
+        ->every(fn($jenis) => in_array($jenis, $jenis_pertanyaan));
+
+    // jenis pertanyaan yang kurang
+    $jenisKurang = collect($semuaJenis)
+        ->diff($jenis_pertanyaan)
+        ->values()
+        ->toArray();
+
+    return view('formperencanaan', compact('skema', 'laporanBisaDibuka', 'jenisKurang'));
+}
+
 }

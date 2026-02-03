@@ -2,26 +2,30 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Asesor extends Model
 {
+    use HasFactory;
+
     protected $table = 'asesor';
     protected $primaryKey = 'id_asesor';
-    public $timestamps = true;
-
+    public $timestamps = false;
     protected $fillable = [
-        'user_id',
-        'nama_asesor',
-        'nip',
-        'email',
-        'bidang_keahlian',
-        'jabatan',
-        'no_registrasi',
+        'user_id','nama_asesor','nip','email','keahlian','jabatan','no_registrasi'
     ];
 
-    // Jika asesor terhubung ke skema
-    public function skema()
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function asesi()
+    {
+        return $this->hasMany(Asesi::class, 'asesor_id', 'id_asesor');
+    }
+        public function skema()
     {
         return $this->belongsToMany(Skema::class, 'skema_asesor', 'id_asesor', 'id_skema');
     }

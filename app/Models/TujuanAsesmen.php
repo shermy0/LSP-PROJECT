@@ -15,4 +15,3 @@ class TujuanAsesmen extends Model
         return $this->belongsToMany(Skema::class, 'skema_tujuan', 'tujuan_id', 'skema_id');
     }
 }
-

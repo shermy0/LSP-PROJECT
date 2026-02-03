@@ -1,7 +1,7 @@
 <?php
-
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class PenyusunPersetujuan extends Model
@@ -16,5 +16,7 @@ class PenyusunPersetujuan extends Model
         'no_met',
         'tanggal',
         'tanda_tangan',
+        'catatan',
+
     ];
 }

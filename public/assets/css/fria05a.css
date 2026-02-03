@@ -1,0 +1,397 @@
+/* ==== GLOBAL STYLES ==== */
+body {
+    font-family: Poppins, sans-serif;
+    color: #2B2B2B;
+    margin: 20px;
+    width: 100%;
+}
+
+/* ==== HEADER SECTION ==== */
+.form-asesmen-header {
+    text-align: center;
+    margin: 30px auto;
+}
+.form-asesmen-header .breadcrumb {
+    font-size: 14px;
+    color: #0D6EFD;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+.form-asesmen-header .form-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 5px;
+}
+.form-asesmen-header .icon-box {
+    width: 60px;
+    height: 60px;
+    background: #041C5C;
+    margin: 15px auto;
+    border-radius: 8px;
+}
+
+/* ==== TITLE ==== */
+.main-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 20px 0 10px;
+}
+.sub-title {
+    color: #484343;
+    font-size: 18px;
+    font-weight: 400;
+    margin-bottom: 15px;
+}
+
+/* ==== FORM CONTAINER ==== */
+.form-container {
+    width: 100%;
+    margin-top: 20px;
+}
+.label {
+    display: block;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 15px;
+}
+.input-box {
+    background: white;
+    border: 1px solid #989494;
+    border-radius: 8px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    padding-left: 14px;
+    color: #989494;
+    font-size: 14px;
+    margin-top: 6px;
+}
+
+/* ==== TUK SECTION ==== */
+.tuk-title {
+    font-size: 16px;
+    margin: 20px 0 10px;
+}
+.radio-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 6px;
+}
+.radio-group label {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+/* ==== CONTENT CARD ==== */
+.content-card {
+    width: 100%;
+    background: #E6F0FF;
+    border-radius: 12px;
+    margin: 20px 0;
+    padding: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    font-size: 14px;
+    line-height: 1.5;
+}
+.content-card h1 {
+    font-size: 18px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    text-align: left;
+}
+
+/* ==== CARD PERTANYAAN ==== */
+.card-pertanyaan {
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    padding: 12px;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 14px;
+}
+.card-pertanyaan .nomor {
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+/* ==== INPUT PERTANYAAN ==== */
+.input-pertanyaan {
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* ==== UPLOAD GAMBAR ==== */
+.upload-gambar {
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+.upload-gambar input[type="file"] {
+    margin-top: 4px;
+}
+
+/* ==== OPSI JAWABAN ==== */
+.opsi-jawaban .opsi-item {
+    margin: 4px 0;
+    font-size: 14px;
+}
+.opsi-jawaban input[type="text"] {
+    width: 75%;
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* ==== INPUT JAWABAN ==== */
+.input-jawaban {
+    width: 70%;
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 8px;
+}
+
+/* ==== INPUT GAMBAR JAWABAN ==== */
+.input-gambar-jawaban {
+    display: block;
+    margin-top: 4px;
+    font-size: 13px;
+}
+
+/* ==== KUNCI JAWABAN ==== */
+.kunci-jawaban {
+    margin-top: 10px;
+    font-size: 14px;
+}
+.kunci-jawaban label {
+    margin-right: 10px;
+}
+
+/* ==== TOMBOL SIMPAN ==== */
+.btn-primary {
+    margin-top: 15px;
+    padding: 10px 18px;
+    background: #0284C7;
+    color: #fff;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.btn-primary:hover {
+    background: #0369A1;
+}
+
+/* ==== POPUP ==== */
+.popup-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.popup-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+}
+.popup-buttons button {
+    flex: 1;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* ==== BUTTON TAMBAH SOAL ==== */
+.btn-tambah-soal {
+    background: #169569;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 8px 20px;
+    border-radius: 10px;
+    margin: 15px 0;
+    cursor: pointer;
+    transition: background 0.3s;
+    display: inline-block; /* normal */
+}
+.btn-tambah-soal:hover { background: #128056; }
+
+/* ==== BUTTON TAMBAH ASESOR ==== */
+.btn-tambah-asesor {
+    background: #169569;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 8px 20px;
+    border-radius: 10px;
+    margin: 15px 0;
+    cursor: pointer;
+    transition: background 0.3s;
+    display: inline-block;
+    margin-left: -125px; /* geser kiri */
+}
+.btn-tambah-asesor:hover { background: #128056; }
+
+/* ==== BUTTON LANJUT ==== */
+.btn-lanjut {
+    background: #0284C7;
+    color: #fff;
+}
+.btn-lanjut:hover { background: #0369A1; }
+
+/* ==== HEADER STRIP ==== */
+.header {
+    position: relative;
+    width: 100%;
+    background: #E5EEFF;
+    border-radius: 15px;
+    border: 1px solid #EBEBEB;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding-left: 30px;
+    margin: 15px 0 20px;
+    box-sizing: border-box;
+}
+.header-strip {
+    width: 10px;
+    height: 100%;
+    background: #0284C7;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+.header-title {
+    color: #2B2B2B;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* ==== CONTAINER ==== */
+.container {
+    max-width: 700px;
+    margin: 20px auto 100px;
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+
+/* ==== MODAL STYLE ==== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4);
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background: #fff;
+    padding: 25px 20px;
+    border-radius: 12px;
+    width: 340px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+.modal-content h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.note {
+    font-size: 13px;
+    color: red;
+    margin-bottom: 15px;
+}
+.modal-content input {
+    width: 100%;
+    font-size: 16px;
+    padding: 10px;
+    text-align: center;
+    margin-bottom: 18px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+    transition: border 0.2s;
+}
+.modal-content input:focus { border-color: #0A2E5C; }
+.modal-content .btn-primary {
+    background-color: #0A2E5C;
+    color: #fff;
+    padding: 12px;
+    width: 100%;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+.modal-content .btn-primary:hover { background-color: #0d3b75; }
+.close, .closeJumlah {
+    position: absolute;
+    top: 12px; right: 12px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #555;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.3s;
+}
+.close:hover, .closeJumlah:hover { color: #0A2E5C; }
+
+/* ==== TABEL PENYUSUN ==== */
+.table-wrapper {
+    margin-top: -80px;     /* lebih naik lagi */
+    margin-left: 1px;     /* agak geser ke kiri */
+    margin-right: 20px;   /* biar kanan masih ada ruang */
+    margin-bottom: 20px;  /* jarak bawah tetap */
+    
+    background: #fff;
+    border: 1px solid #EBEBEB;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    overflow-x: auto;
+}
+.table-penyusun {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+.table-penyusun th {
+    background: #041562;
+    color: #fff;
+    padding: 12px;
+    text-align: center;
+    font-weight: 600;
+    border: 1px solid #ddd;
+}
+.table-penyusun td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+.table-penyusun tr:nth-child(even) { background: #f9f9f9; }

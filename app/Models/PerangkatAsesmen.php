@@ -13,7 +13,7 @@ class PerangkatAsesmen extends Model
     protected $fillable = [
         'id_unit',
         'id_instrumen',
-        'id_jenis_bukti',
+        'jenis_bukti',
         'catatan_penerapan'
     ];
 
@@ -23,4 +23,3 @@ public function jenisBukti()
 }
 
 }
-
