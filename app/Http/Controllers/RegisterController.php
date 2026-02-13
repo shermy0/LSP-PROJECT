@@ -26,7 +26,7 @@ class RegisterController extends Controller
             'name' => 'required|string',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6|confirmed',
-            'nik' => 'required|digits:16',
+            'nik' => 'required|digits_between:9,16',
             'nama_lengkap' => 'required|string',
             'tempat_lahir' => 'required|string',
             'tgl_lahir' => 'required|date',
@@ -73,14 +73,15 @@ class RegisterController extends Controller
         ]);
 
         Asesor::create([
-            'user_id' => $user->id,
+            
             'nama_asesor' => $request->nama_asesor,
             'nip' => $request->nip,
             'keahlian' => $request->keahlian,
             'jabatan' => $request->jabatan,
             'no_registrasi' => $request->no_registrasi,
+            
         ]);
 
         return redirect()->route('login')->with('success', 'Pendaftaran Asesor berhasil!');
     }
-}
+}      
