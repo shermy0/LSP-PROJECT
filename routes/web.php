@@ -434,7 +434,11 @@ Route::put('/pertanyaan/pg/{id}', [PertanyaanController::class, 'updatePG'])->na
 Route::delete('/pertanyaan/pg/{id}', [PertanyaanController::class, 'destroyPG'])->name('pertanyaan.pg.destroy');
 Route::prefix('pmo')->name('pmo.')->group(function () {
 
+Route::get('/formasesmen/pertanyaan-pmo/{id_skema}', 
+    [FormAsesmenController::class, 'pertanyaanPMO']
+)->name('formasesmen.pertanyaanPMO');
 
+    
     // CRUD Pertanyaan PMO
     Route::get('/{id_pmo}/crud', [PertanyaanController::class, 'crudPMO'])
         ->name('crud');
