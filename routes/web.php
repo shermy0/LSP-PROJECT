@@ -211,13 +211,22 @@ Route::get('/form-asesmen/pertanyaan-demonstrasi/{id_skema}',
 | ROUTE JAWABAN                                                            |
 |--------------------------------------------------------------------------|
 */
-Route::prefix('jawaban')->group(function () {
-    // Tampilkan pertanyaan sesuai skema + jenis soal
-    Route::get('/{idSkema}/{jenis}', [JawabanController::class, 'show']);
 
-    // Simpan jawaban
+// Halaman pemilihan asesmen
+Route::get('/pilih-asesmen', [JawabanController::class, 'index'])->name('asesmen.pilih');
+
+Route::prefix('jawaban')->group(function () {
+    // 🔹 Route tanda tangan asesmen lisan
+    Route::get('/lisan/ttd/{idSkema}', [JawabanController::class, 'ttdLisan'])->name('jawaban.ttd_lisan');
+
+    // 🔹 Tampilkan pertanyaan sesuai skema + jenis soal
+    Route::get('/{idSkema}/{jenis}', [JawabanController::class, 'show'])->name('jawaban.show');
+
+    // 🔹 Simpan jawaban
     Route::post('/store', [JawabanController::class, 'store'])->name('jawaban.store');
 });
+
+
 
 
 /*

@@ -183,6 +183,7 @@
       <!-- ✅ Ambil nama skema dari database -->
     <span class="badge">{{ strtoupper($skema->nama_skema) }}</span>
     <!-- Petunjuk -->
+      <p class="text-muted">{{ $skema->kode_skema ?? 'N/A' }}</p>
     <div class="card">
       <h3>Petunjuk</h3>
       <ul class="instructions">
