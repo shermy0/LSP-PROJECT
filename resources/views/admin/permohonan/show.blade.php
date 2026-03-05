@@ -3,99 +3,514 @@
 @section('title', 'Detail Permohonan Sertifikasi Asesi')
 
 @section('konten')
-<div class="container mt-4">
-    <h2 class="mb-4">Detail Permohonan Sertifikasi (FR.APL.02)</h2>
-
-    {{-- Data Pribadi --}}
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white fw-bold">Data Pribadi</div>
-        <div class="card-body">
-            <p><strong>Nama Lengkap:</strong> {{ $asesi->nama_lengkap }}</p>
-            <p><strong>NIK:</strong> {{ $asesi->nik }}</p>
-            <p><strong>Tanggal Lahir:</strong> {{ $asesi->tgl_lahir }}</p>
-            <p><strong>Jenis Kelamin:</strong> {{ $asesi->jenis_kelamin }}</p>
-            <p><strong>Alamat:</strong> {{ $asesi->alamat }}</p>
-            <p><strong>Telepon/Email:</strong> {{ $asesi->telepon }} / {{ $asesi->email }}</p>
-            <p><strong>Pendidikan Terakhir:</strong> {{ $asesi->pendidikan_terakhir }}</p>
+<div class="container-fluid px-4 py-3">
+    <div class="bg-transparent">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <div class="rounded mx-auto mb-3" style="width:40px; height:40px; background-color:#041562;"></div>
+            <h1 class="h5 fw-bold">Detail Permohonan Sertifikasi (FR.APL.02)</h1>
+            <p class="small text-muted">Rincian Data Pemohon</p>
         </div>
-    </div>
 
-    {{-- Data Pekerjaan --}}
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white fw-bold">Data Pekerjaan</div>
-        <div class="card-body">
-            <p><strong>Nama Sekolah:</strong> {{ $asesi->nama_sekolah ?? '-' }}</p>
-            <p><strong>Jabatan:</strong> {{ $asesi->jabatan ?? '-' }}</p>
-            <p><strong>Alamat Instansi:</strong> {{ $asesi->alamat_instansi ?? '-' }}</p>
-            <p><strong>Telepon:</strong> {{ $asesi->telepon_instansi ?? '-' }}</p>
-            <p><strong>Email:</strong> {{ $asesi->email_instansi ?? '-' }}</p>
-        </div>
-    </div>
+        <!-- NOTE: tambah novalidate & class needs-validation -->
+        <form id="permohonanForm" action="{{ route('admin.permohonan.update', $permohonan->id_permohonan) }}" method="POST" class="needs-validation" novalidate>
+            @csrf
 
-    {{-- Data Sertifikasi --}}
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white fw-bold">Data Sertifikasi</div>
-        <div class="card-body">
-            <p><strong>Skema Sertifikasi:</strong> {{ $skema->nama_skema ?? '-' }}</p>
-            <p><strong>Judul Sertifikasi:</strong> {{ $skema->judul_skema ?? '-' }}</p>
-            <p><strong>Nomor Skema:</strong> {{ $skema->kode_skema ?? '-' }}</p>
-            <p><strong>Tujuan Asesmen:</strong> {{ $permohonan->tujuan_asesmen ?? '-' }}</p>
-        </div>
-    </div>
+            {{-- Data Pribadi --}}
+            <div class="unit-header">
+                <p class="mb-1 fw-semibold">Data Pribadi</p>
+                <p class="mb-0">Rincian identitas pemohon</p>
+            </div>
+            <div class="question-box mb-4">
+                <div class="ps-2">
+                    <p><strong>Nama Lengkap:</strong> {{ $asesi->nama_lengkap }}</p>
+                    <p><strong>NIK:</strong> {{ $asesi->nik }}</p>
+                    <p><strong>Tempat/Tgl Lahir:</strong> {{ $asesi->tempat_lahir }}, {{ $asesi->tgl_lahir }}</p>
+                    <p><strong>Jenis Kelamin:</strong> {{ $asesi->jenis_kelamin }}</p>
+                    <p><strong>Alamat:</strong> {{ $asesi->alamat }}</p>
+                    <p><strong>Telepon/Email:</strong> {{ $asesi->telepon }} / {{ $asesi->email }}</p>
+                    <p><strong>Pendidikan Terakhir:</strong> {{ $asesi->pendidikan_terakhir }}</p>
+                </div>
+            </div>
 
-    {{-- Daftar Unit Kompetensi --}}
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white fw-bold">Daftar Unit Kompetensi</div>
-        <div class="card-body">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Kode Unit</th>
-                        <th>Judul Unit</th>
-                        <th>Standar Kompetensi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($units as $i => $unit)
-                        <tr>
-                            <td>{{ $i+1 }}</td>
-                            <td>{{ $unit->kode_unit }}</td>
-                            <td>{{ $unit->judul_unit }}</td>
-                            <td>{{ $unit->standar_kompetensi }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
+            {{-- Data Pekerjaan --}}
+            <div class="unit-header">
+                <p class="mb-1 fw-semibold">Data Pekerjaan</p>
+                <p class="mb-0">Informasi TUK / instansi</p>
+            </div>
+            <div class="question-box mb-4">
+                <div class="ps-2">
+                    <p><strong>Nama Institusi:</strong> {{ $tuk->nama_tuk ?? '-' }}</p>
+                    <p><strong>Alamat Instansi:</strong> {{ $tuk->alamat_tuk ?? '-' }}</p>
+                    <p><strong>Telepon Instansi:</strong> {{ $tuk->telepon ?? '-' }}</p>
+                    <p><strong>Email Instansi:</strong> {{ $tuk->email ?? '-' }}</p>
+                </div>
+            </div>
 
-    {{-- Bukti Kelengkapan --}}
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white fw-bold">Bukti Kelengkapan</div>
-        <div class="card-body">
-            <p>1. Rapor: <a href="{{ asset('uploads/'.$permohonan->file_rapor) }}" target="_blank">Lihat</a></p>
-            <p>2. Sertifikat PKL: <a href="{{ asset('uploads/'.$permohonan->file_pkl) }}" target="_blank">Lihat</a></p>
-            <p>3. Kartu Siswa: <a href="{{ asset('uploads/'.$permohonan->file_kartu_siswa) }}" target="_blank">Lihat</a></p>
-            <p>4. KTP/Kartu Keluarga: <a href="{{ asset('uploads/'.$permohonan->file_ktp) }}" target="_blank">Lihat</a></p>
-            <p>5. Pas Foto: <a href="{{ asset('uploads/'.$permohonan->file_foto) }}" target="_blank">Lihat</a></p>
-        </div>
-    </div>
+            {{-- Data Sertifikasi --}}
+            <div class="unit-header">
+                <p class="mb-1 fw-semibold">Data Sertifikasi</p>
+                <p class="mb-0">Skema & status permohonan</p>
+            </div>
+            <div class="question-box mb-4">
+                <div class="ps-2">
+                    <p><strong>Skema Sertifikasi:</strong> {{ $skema->nama_skema ?? '-' }}</p>
+                    <p><strong>Judul Sertifikasi:</strong> {{ $skema->judul_skema ?? '-' }}</p>
+                    <p><strong>Nomor Skema:</strong> {{ $skema->kode_skema ?? '-' }}</p>
+                    <p><strong>Tujuan Asesmen:</strong> {{ $permohonan->tujuan_asesmen }}</p>
+                    <p><strong>Status:</strong>
+                        <span class="badge bg-{{ $permohonan->status=='Diajukan' ? 'warning text-dark' : ($permohonan->status=='Diterima' ? 'success' : 'danger') }}">
+                            {{ $permohonan->status }}
+                        </span>
+                    </p>
+                </div>
+            </div>
 
-    {{-- Tanda Tangan Asesi --}}
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white fw-bold">Tanda Tangan Asesi</div>
-        <div class="card-body">
-            <p><strong>Nama:</strong> {{ $asesi->nama_lengkap }}</p>
-            <p><strong>Tanggal:</strong> {{ $permohonan->tanggal_ttd ?? '-' }}</p>
-            @if(!empty($permohonan->ttd))
-                <img src="{{ asset('uploads/'.$permohonan->ttd) }}" alt="Tanda Tangan" class="border" style="max-width:200px;">
-            @else
-                <p class="text-muted">Belum ada tanda tangan</p>
-            @endif
-        </div>
-    </div>
+            {{-- Daftar Unit Kompetensi --}}
+            <div class="unit-header">
+                <p class="mb-1 fw-semibold">Daftar Unit Kompetensi</p>
+                <p class="mb-0">Unit kompetensi pemohon</p>
+            </div>
+            <div class="question-box mb-4">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>No</th>
+                                <th>Kode Unit</th>
+                                <th>Judul Unit</th>
+                                <th>Standar Kompetensi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($units as $i => $unit)
+                                <tr>
+                                    <td>{{ $i + 1 }}</td>
+                                    <td>{{ $unit->kode_unit }}</td>
+                                    <td>{{ $unit->judul_unit }}</td>
+                                    <td>{{ $unit->standar_kompetensi }}</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="4" class="text-center text-muted">Belum ada unit kompetensi</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-    <a href="{{ route('admin.permohonan.index') }}" class="btn btn-secondary">Kembali</a>
+            {{-- Bukti Kelengkapan --}}
+            <div class="unit-header">
+                <p class="mb-1 fw-semibold">Bukti Kelengkapan</p>
+                <p class="mb-0">Lampiran dokumen pemohon</p>
+            </div>
+            <div class="question-box mb-4">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light text-center">
+                            <tr>
+                                <th>No</th>
+                                <th>Jenis Dokumen</th>
+                                <th>Lampiran</th>
+                                <th>Memenuhi Syarat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($dokumen as $i => $d)
+                                <tr>
+                                    <td class="text-center">{{ $i + 1 }}</td>
+                                    <td>{{ $d->jenis }}</td>
+                                    <td class="text-center">
+                                        @if($d->file_path)
+                                            <button type="button" class="btn btn-sm btn-info"
+                                                onclick="openPreview('{{ asset('storage/' . $d->file_path) }}', '{{ pathinfo($d->file_path, PATHINFO_EXTENSION) }}')">
+                                                Lihat
+                                            </button>
+                                        @else
+                                            <span class="text-muted">Belum diunggah</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check form-check-inline">
+                                            <!-- required ditambahkan pada pilihan pertama tiap grup -->
+                                            <input class="form-check-input" type="radio"
+                                                name="syarat[{{ $d->id_dokumen }}]" value="Ya" id="ya{{ $i }}" required>
+                                            <label class="form-check-label" for="ya{{ $i }}">Memenuhi</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio"
+                                                name="syarat[{{ $d->id_dokumen }}]" value="Tidak" id="tidak{{ $i }}">
+                                            <label class="form-check-label" for="tidak{{ $i }}">Tidak Memenuhi</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="4" class="text-center text-muted">Belum ada dokumen persyaratan</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {{-- Tanda Tangan Persetujuan --}}
+            <div class="unit-header">
+                <p class="mb-1 fw-semibold">Tanda Tangan Persetujuan</p>
+                <p class="mb-0">TTD Asesi & Admin</p>
+            </div>
+            <div class="question-box mb-4">
+                <div class="row g-3">
+                    <!-- Asesi (read-only image) -->
+                    <div class="col-md-6">
+                        <div>
+                            <p class="mb-2 fw-semibold">Asesi</p>
+                            <p><strong>Tanggal:</strong> {{ $persetujuan->tgl_ttd_asesi ?? '-' }}</p>
+                            @if(!empty($persetujuan->ttd_asesi))
+                                <img src="{{ asset('storage/' . $persetujuan->ttd_asesi) }}" alt="TTD Asesi" class="border rounded" style="max-width:100%; height:150px; object-fit:contain;">
+                            @else
+                                <p class="text-muted">Belum ada tanda tangan asesi</p>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Admin (interactive canvas) -->
+                    <div class="col-md-6">
+                        <div>
+                            <p class="mb-2 fw-semibold">Admin</p>
+                            <div class="mb-2">
+                                <label for="tanggal-admin" class="form-label">Tanggal</label>
+                                <input type="date" id="tanggal-admin" name="tanggal_admin" class="form-control" value="{{ date('Y-m-d') }}" readonly required>
+                                <div class="invalid-feedback">Tanggal admin wajib diisi.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Tanda Tangan Admin <span class="text-danger">*</span></label>
+                                <div class="canvas-wrapper">
+                                    <canvas id="ttd-admin"></canvas>
+                                    <span class="canvas-placeholder">Tanda tangan admin di sini</span>
+                                </div>
+                                <input type="hidden" name="ttd_admin" id="ttd_admin_data">
+                                <div class="invalid-feedback">Tanda tangan admin wajib diisi.</div>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn-back" onclick="clearCanvasAdmin()">Hapus</button>
+                                <button type="button" class="btn-next" onclick="downloadTTDAdmin()">Unduh</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Keputusan Permohonan --}}
+            <div class="unit-header">
+                <p class="mb-1 fw-semibold">Keputusan Permohonan</p>
+                <p class="mb-0">Pilih status dan catatan</p>
+            </div>
+            <div class="question-box mb-4">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Status Keputusan</label>
+                    <div class="form-check">
+                        <!-- required ditambahkan di radio pertama group -->
+                        <input class="form-check-input" type="radio"
+                               name="status_permohonan" id="statusDiterima" value="Diterima"
+                               {{ old('status_permohonan', $permohonan->status ?? '') == 'Diterima' ? 'checked' : '' }} required>
+                        <label class="form-check-label text-success fw-semibold" for="statusDiterima">✅ Diterima</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio"
+                               name="status_permohonan" id="statusDitolak" value="Ditolak"
+                               {{ old('status_permohonan', $permohonan->status ?? '') == 'Ditolak' ? 'checked' : '' }}>
+                        <label class="form-check-label text-danger fw-semibold" for="statusDitolak">❌ Ditolak</label>
+                    </div>
+                    <div class="invalid-feedback">Silakan pilih status keputusan.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="catatan" class="form-label fw-semibold">Alasan / Keterangan</label>
+                    <textarea id="catatan" name="catatan" class="form-control" rows="3">{{ old('catatan', $permohonan->catatan ?? '') }}</textarea>
+                    <!-- catatan intentionally not required -->
+                </div>
+            </div>
+
+            {{-- Tombol --}}
+            <div class="d-flex justify-content-end gap-2 mb-5">
+                <a href="{{ route('admin.permohonan.index') }}" class="btn-back">Kembali</a>
+                <button type="submit" class="btn-next">Simpan</button>
+            </div>
+        </form>
+    </div>
 </div>
+
+{{-- Modal Preview --}}
+<div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Preview Dokumen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body text-center" id="previewContent">
+                <p class="text-muted">Memuat...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- STYLE (mengikuti style kode kedua: unit-header / question-box / tombol) --}}
+<style>
+    body { font-family: 'Poppins', sans-serif; background: #f9f9fb; }
+    .unit-header {
+        background: #E9F1FF; border-left: 6px solid #007BFF; border-radius: 8px;
+        padding: 12px 16px; margin-bottom: 12px; font-size: 14px;
+    }
+    .question-box {
+        border: 1px solid #ddd; border-radius: 12px;
+        padding: 18px; margin-bottom: 20px; background: #fff;
+    }
+    .form-control.is-invalid, .form-select.is-invalid {
+        border: 2px solid #d9534f !important; background: #fff8f8 !important;
+    }
+    .invalid-feedback { font-size: 12px; display: block; }
+
+    .btn-back {
+        background: #d9534f; color: #fff; padding: 8px 16px; border-radius: 8px;
+        font-weight: 600; text-decoration: none; border: none;
+    }
+    .btn-next {
+        background: #041562; color: #fff; padding: 8px 18px;
+        border-radius: 8px; font-weight: 600; border: none;
+    }
+    .btn-back:hover { background: #c9302c; }
+    .btn-next:hover { background: #06208a; }
+
+    /* canvas responsive but keep internal pixel ratio */
+    .canvas-wrapper { position: relative; width: 100%; max-width: 700px; margin: 0 auto 8px auto; }
+    #ttd-admin {
+        display: block;
+        width: 100%;
+        height: 150px;          /* visible height for admin */
+        border: 2px dashed #ccc;
+        border-radius: 6px;
+        background-color: #fff;
+        cursor: crosshair;
+    }
+    .canvas-placeholder {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        color: #aaa; font-size: 14px; pointer-events: none;
+    }
+
+    .table-light th { vertical-align: middle; }
+</style>
+
+{{-- SCRIPT Preview + VALIDASI + TTD Admin (wajib) --}}
+<script>
+    function openPreview(url, ext) {
+        let content = '';
+        ext = ext.toLowerCase();
+        if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
+            content = `<img src="${url}" class="img-fluid" alt="preview">`;
+        } else if (ext === 'pdf') {
+            content = `<embed src="${url}" type="application/pdf" width="100%" height="600px">`;
+        } else {
+            content = `<a href="${url}" target="_blank">Download File</a>`;
+        }
+        document.getElementById('previewContent').innerHTML = content;
+        let modal = new bootstrap.Modal(document.getElementById('previewModal'));
+        modal.show();
+    }
+
+    // === TTD Admin: responsive, hi-dpi, blank-detection using white background, touch support (REQUIRED) ===
+    (function () {
+        const canvas = document.getElementById('ttd-admin');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const placeholder = document.querySelector('.canvas-placeholder');
+        const VISIBLE_HEIGHT = 150; // CSS px height
+        let drawing = false;
+        let blankDataURL = null;
+
+        // resize & prepare blank white canvas
+        function resizeCanvasAndPrepareBlankAdmin() {
+            const cssWidth = canvas.clientWidth;
+            const cssHeight = VISIBLE_HEIGHT;
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+
+            canvas.width = Math.round(cssWidth * ratio);
+            canvas.height = Math.round(cssHeight * ratio);
+
+            // reset transform and scale to CSS px coordinates
+            ctx.setTransform(1,0,0,1,0,0);
+            ctx.scale(ratio, ratio);
+
+            // fill white background
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, cssWidth, cssHeight);
+
+            // set drawing style
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.strokeStyle = '#000';
+
+            // store blank state (white)
+            blankDataURL = canvas.toDataURL();
+        }
+
+        // pointer pos (CSS px)
+        function getPointerPosAdmin(evt) {
+            const rect = canvas.getBoundingClientRect();
+            let clientX, clientY;
+            if (evt.touches && evt.touches.length > 0) {
+                clientX = evt.touches[0].clientX;
+                clientY = evt.touches[0].clientY;
+            } else {
+                clientX = evt.clientX;
+                clientY = evt.clientY;
+            }
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            return { x, y };
+        }
+
+        function startDrawingAdmin(evt) {
+            evt.preventDefault();
+            drawing = true;
+            const pos = getPointerPosAdmin(evt);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+            placeholder.style.display = 'none';
+        }
+        function drawMoveAdmin(evt) {
+            if (!drawing) return;
+            evt.preventDefault();
+            const pos = getPointerPosAdmin(evt);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+        }
+        function stopDrawingAdmin(evt) {
+            if (!drawing) return;
+            evt.preventDefault();
+            drawing = false;
+            ctx.beginPath();
+        }
+
+        function clearCanvasAdmin() {
+            const cssWidth = canvas.clientWidth;
+            const cssHeight = VISIBLE_HEIGHT;
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+
+            ctx.setTransform(1,0,0,1,0,0);
+            ctx.scale(ratio, ratio);
+
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, cssWidth, cssHeight);
+
+            // update blank
+            blankDataURL = canvas.toDataURL();
+            document.getElementById('ttd_admin_data').value = '';
+            placeholder.style.display = 'block';
+        }
+
+        function isCanvasBlankAdmin() {
+            return canvas.toDataURL() === blankDataURL;
+        }
+
+        function saveAdminTTD(required = true) {
+            // required=true => will block submit if blank (alert), else will just set hidden input (optional)
+            if (isCanvasBlankAdmin()) {
+                if (required) {
+                    alert("Silakan tanda tangan admin terlebih dahulu sebelum lanjut.");
+                    canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return false;
+                } else {
+                    document.getElementById('ttd_admin_data').value = '';
+                    return true;
+                }
+            }
+            document.getElementById('ttd_admin_data').value = canvas.toDataURL('image/png');
+            return true;
+        }
+
+        function downloadTTDAdmin() {
+            if (isCanvasBlankAdmin()) {
+                alert('Belum ada tanda tangan untuk diunduh.');
+                return;
+            }
+            const link = document.createElement('a');
+            const tanggal = document.getElementById('tanggal-admin').value || new Date().toISOString().split('T')[0];
+            link.download = `Admin_${tanggal}_tanda_tangan.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // attach handlers
+        function attachEventsAdmin() {
+            // mouse
+            canvas.addEventListener('mousedown', startDrawingAdmin);
+            canvas.addEventListener('mousemove', drawMoveAdmin);
+            window.addEventListener('mouseup', stopDrawingAdmin);
+            // touch
+            canvas.addEventListener('touchstart', function(e){ startDrawingAdmin(e); }, { passive: false });
+            canvas.addEventListener('touchmove', function(e){ drawMoveAdmin(e); }, { passive: false });
+            window.addEventListener('touchend', stopDrawingAdmin);
+        }
+
+        // preserve signature on resize
+        window.addEventListener('resize', function () {
+            const prev = canvas.toDataURL();
+            resizeCanvasAndPrepareBlankAdmin();
+            if (prev && prev !== blankDataURL) {
+                const img = new Image();
+                img.onload = function () {
+                    ctx.drawImage(img, 0, 0, canvas.clientWidth, VISIBLE_HEIGHT);
+                };
+                img.src = prev;
+            }
+        });
+
+        // initialize
+        resizeCanvasAndPrepareBlankAdmin();
+        attachEventsAdmin();
+
+        // expose functions to global scope used by buttons
+        window.clearCanvasAdmin = clearCanvasAdmin;
+        window.downloadTTDAdmin = downloadTTDAdmin;
+        window.saveAdminTTD = saveAdminTTD;
+    })();
+
+    // === FORM VALIDATION (Bootstrap style) ===
+    (function () {
+        'use strict';
+        const form = document.getElementById('permohonanForm');
+        form.addEventListener('submit', function (event) {
+            // pertama, pastikan admin TTD disimpan dan required
+            if (typeof saveAdminTTD === 'function') {
+                const ok = saveAdminTTD(true); // pass required=true so it will alert & block if blank
+                if (!ok) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    return false;
+                }
+            }
+
+            // lalu jalankan validasi HTML5/Bootstrap
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                // cari element invalid pertama, scroll to it & focus
+                const firstInvalid = form.querySelector(':invalid');
+                if (firstInvalid) {
+                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstInvalid.focus();
+                }
+            }
+
+            form.classList.add('was-validated');
+        }, false);
+    })();
+
+    // Pastikan date admin diisi (readonly logic handled by required on input) and radio groups required already set in markup
+</script>
 @endsection

@@ -8,7 +8,7 @@ class SkemaSertifikasi extends Model
 {
     protected $table = 'skema_sertifikasi';
     protected $primaryKey = 'id_skema';
-    public $timestamps = false;
+    public $timestamps = false; // karena biasanya tabel ini tidak punya created_at & updated_at
 
     protected $fillable = [
         'kode_skema',
@@ -31,7 +31,7 @@ class SkemaSertifikasi extends Model
         return $this->hasMany(KelompokPekerjaan::class, 'id_skema', 'id_skema');
     }
 
-    // Relasi Many-to-Many ke Tujuan Asesmen
+    // Relasi Many-to-Many ke Tujuan Asesmen lewat pivot skema_tujuan
     public function tujuans()
     {
         return $this->belongsToMany(

@@ -28,7 +28,7 @@ class AuthController extends Controller
             if ($user->role === 'admin') {
                 return redirect()->route('admin.dashboard');
             } elseif ($user->role === 'asesor') {
-            return redirect()->route('dashboard.asesor');
+            return redirect()->route('asesor.dashboard');
             } elseif ($user->role === 'asesi') {
                 return redirect()->route('asesi.dashboard');
             } else {
@@ -71,7 +71,7 @@ class AuthController extends Controller
     $request->session()->invalidate();
     $request->session()->regenerateToken();
 
+
         return redirect('/login');
     }
-
 }

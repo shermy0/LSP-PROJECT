@@ -105,14 +105,14 @@
                 $pembuatanPMO = $pembuatanList->firstWhere('jenis_pertanyaan', 'pmo');
               @endphp
 
-                    <a href="{{ $pembuatanPMO 
-                    ? route('pertanyaan.pmo.kelompok', ['id_skema' => $skema->id_skema, 'id_pembuatan' => $pembuatanPMO->id_pembuatan_pertanyaan, 'id_tuk' => $id_tuk ?? Auth::user()->id_tuk])
-                    : route('pertanyaan.pmo.kelompok', ['id_skema' => $skema->id_skema, 'id_tuk' => $id_tuk ?? Auth::user()->id_tuk])
+                <a href="{{ $pembuatanPMO 
+                    ? route('pertanyaan.pmo.kelompok', ['id_skema' => $skema->id_skema, 'id_pembuatan' => $pembuatanPMO->id_pembuatan_pertanyaan])
+                    : route('pertanyaan.pmo.kelompok', ['id_skema' => $skema->id_skema])
                     }}?timer={{ request('timer') ?? 30 }}" 
                     class="btn w-100 mb-2 text-white fw-bold" 
                     style="background-color:#041562;">
                         Input Soal
-                    </a>
+                </a>
 
                 <!-- Jawaban Asesi PMO -->
                 @php
