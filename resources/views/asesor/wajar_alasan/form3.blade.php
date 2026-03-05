@@ -166,10 +166,7 @@ input:focus {
     background: #ff6b6b;
     color: white;
 }
-.btn-download {
-    background: #041562;
-    color: white;
-}
+
 .btn-main {
     background: #008060;
     color: white;
@@ -260,7 +257,6 @@ input:focus {
                     <canvas id="signatureAsesor" class="signature-pad"></canvas>
                 </div>
                 <button class="btn-clean" onclick="clearSignature('signatureAsesor')">Bersih</button>
-                <button class="btn-download" onclick="downloadSignature('signatureAsesor')">Unduh</button>
             </div>
         </div>
     </div>

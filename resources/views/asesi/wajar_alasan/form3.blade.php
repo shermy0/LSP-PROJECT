@@ -187,10 +187,7 @@ textarea:focus, input:focus {
         color: white;
     }
 
-    .btn-download {
-        background: #041562;
-        color: white;
-    }
+
 
 .btn-main {
     background: #008060;
@@ -276,7 +273,6 @@ textarea:focus, input:focus {
                         <canvas id="signatureAsesi" class="signature-pad"></canvas>
                     </div>
                     <button class="btn-clean" onclick="clearSignature('signatureAsesi')">Bersih</button>
-                    <button class="btn-download" onclick="downloadSignature('signatureAsesi')">Unduh</button>
                 </div>
             </div>
 
@@ -301,7 +297,6 @@ textarea:focus, input:focus {
                         <canvas id="signatureAsesor" class="signature-pad"></canvas>
                     </div>
                     <button class="btn-clean" onclick="clearSignature('signatureAsesor')">Bersih</button>
-                    <button class="btn-download" onclick="downloadSignature('signatureAsesor')">Unduh</button>
                 </div>
             </div>
         </div>
