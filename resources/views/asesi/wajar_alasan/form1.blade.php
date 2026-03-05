@@ -123,6 +123,7 @@
             <input type="text" id="tuk" value="SMKN 11 BANDUNG" readonly>
         </div>
 
+        
         <!-- Nama Assessor -->
         <div class="form-box">
             <label for="assessor">Nama Assessor</label>
