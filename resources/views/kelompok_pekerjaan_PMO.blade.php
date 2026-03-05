@@ -99,8 +99,9 @@ function popupJumlahPertanyaan(id_skema, timer, kelompok_id, nama_kelompok) {
             if (jumlah > 15) jumlah = 15;
 
             // Redirect ke input PMO
-            let url = `/form-asesmen/${id_skema}/input-pmo?timer=${timer}&kelompok_id=${kelompok_id}&jumlah=${jumlah}`;
-            window.location.href = url;
+           let url = `/form-asesmen/${id_skema}/input-pmo?timer=${timer}&kelompok_id=${kelompok_id}&jumlah=${jumlah}`;
+           window.location.href = url;
+
         }
     });
 }

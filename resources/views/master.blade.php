@@ -57,30 +57,18 @@
                 @endif
             </ul>
         </div>
+    </button>
+
     <div class="sidebar-footer">
-        @if(Auth::user()->role == 'asesor')
-            <a href="{{ route('profile.show') }}" style="text-decoration: none; color: inherit;">
-                <div class="avatar">
-                    <div class="avatar-img">
-                        <img src="{{ asset('assets/poto/potta.png') }}" alt="Potta" class="img-fluid">
-                    </div>
-                    <div class="user-info">
-                        <span class="username">{{ Auth::user()->name }}</span>
-                        <span class="role">{{ ucfirst(Auth::user()->role) }}</span>
-                    </div>
-                </div>
-            </a>
-        @else
-            <div class="avatar">
-                <div class="avatar-img">
-                    <img src="{{ asset('assets/poto/potta.png') }}" alt="Potta" class="img-fluid">
-                </div>
-                <div class="user-info">
-                    <span class="username">{{ Auth::user()->name }}</span>
-                    <span class="role">{{ ucfirst(Auth::user()->role) }}</span>
-                </div>
+        <div class="avatar">
+            <div class="avatar-img">
+                <img src="{{ asset('assets/poto/potta.png') }}" alt="Potta" class="img-fluid">
             </div>
-        @endif
+            <div class="user-info">
+                <span class="username">{{ Auth::user()->name }}</span>
+                <span class="role">{{ ucfirst(Auth::user()->role) }}</span>
+            </div>
+        </div>
 
         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="logout-form">
             @csrf
@@ -90,7 +78,7 @@
             </button>
         </form>
     </div>
-    </div>
+</div>
 
     <!-- Main content -->
     <main id="main-content">

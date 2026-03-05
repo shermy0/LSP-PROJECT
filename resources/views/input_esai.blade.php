@@ -8,10 +8,11 @@
    <form id="formPertanyaan" action="{{ route('pertanyaan.esai.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
 
+    <input type="hidden" name="id_pembuatan_pertanyaan" value="{{ request('id_pembuatan_pertanyaan') }}">
     <input type="hidden" name="id_skema" value="{{ $skema->id_skema }}">
     <input type="hidden" name="id_asesor" value="1">
-    <input type="hidden" name="timer" value="{{ request('timer', 30) }}"> <!-- dari GET modal -->
-    <input type="hidden" name="id_kelompok" value="{{ request('kelompok_id') }}"> <!-- ✅ ditambahin -->
+    <input type="hidden" name="timer" value="{{ request('timer', 30) }}">
+    <input type="hidden" name="id_kelompok" value="{{ request('kelompok_id') }}">
 
     <div id="daftarPertanyaan">
         @for ($i = 1; $i <= $jumlah; $i++)

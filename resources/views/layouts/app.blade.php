@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
     <title>@yield('title', 'Dashboard')</title>
 
     <!-- Bootstrap -->
@@ -54,5 +55,27 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+=======
+    <title>@yield('title', 'LSP Project')</title>
+    <link rel="stylesheet" href="{{ asset('assets/css/master.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    {{-- Sidebar include --}}
+    @include('layouts.master')
+
+    <div id="content" style="margin-left:240px; padding:20px; transition: margin-left 0.3s ease;">
+        @yield('content')
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("collapsed");
+            document.getElementById("content").style.marginLeft =
+                document.getElementById("sidebar").classList.contains("collapsed") ? "70px" : "240px";
+        }
+    </script>
+>>>>>>> fc23860cdc99f1db4e1288cbb020fa4d4abcd33f
 </body>
 </html>
