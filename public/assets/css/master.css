@@ -23,6 +23,10 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+<<<<<<< HEAD
+=======
+    z-index: 1000;
+>>>>>>> fc23860cdc99f1db4e1288cbb020fa4d4abcd33f
 }
 
 .sidebar.collapsed {
@@ -122,6 +126,7 @@ body {
 /* Footer */
 .sidebar-footer {
     padding: 15px;
+<<<<<<< HEAD
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     flex-direction: column;
@@ -519,6 +524,8 @@ h3.fw-bold {
     border-radius: 5px;
     margin-top: 10px;
     cursor: pointer;
+=======
+>>>>>>> migration
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     flex-direction: column;
@@ -599,16 +606,258 @@ h3.fw-bold {
 }
 
 /* Konten utama */
+<<<<<<< HEAD
 #main-content {
+=======
+#content {
+>>>>>>> fc23860cdc99f1db4e1288cbb020fa4d4abcd33f
     margin-left: 240px;
     padding: 20px;
     box-shadow: 0 3px 8px rgba(0,0,0,0.1);
     margin-bottom: 20px;
 }
 
+<<<<<<< HEAD
 /* Judul Box */
 .judul-box {
     background: #fff;
+=======
+<<<<<<< HEAD
+.sidebar.collapsed + #main-content {
+=======
+#content.shrink {
+    margin-left: 70px;
+}
+
+.sidebar.collapsed + #content {
+>>>>>>> fc23860cdc99f1db4e1288cbb020fa4d4abcd33f
+    margin-left: 70px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 70px;
+    }
+
+    .sidebar .menu ul li a {
+        display: none;
+    }
+
+    .sidebar .menu ul li {
+        justify-content: center;
+    }
+}
+
+/* FORM PERENCANAAN */
+h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 20px;
+}
+
+h5 {
+    display: block;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 500;
+    margin-top: 0;
+    color: #4C4C4C;
+}
+
+.center-underline {
+    display: inline-block;
+    position: relative;
+    text-align: center;
+}
+
+.center-underline::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -5px;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 3px;
+    background-color: #0284C7;
+    border-radius: 2px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 0 15px;
+}
+
+/* Accordion */
+.accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.accordion-item {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    overflow: hidden;
+    border: none;
+}
+
+.accordion-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    background-color: #fff;
+    border-radius: 12px;
+    transition: background-color 0.2s ease;
+}
+
+.accordion-header:hover {
+    background-color: #f7f7f7;
+}
+
+.accordion-button::after {
+    display: none;
+}
+
+/* Dropdown */
+.dropdown .btn {
+    background-color: #fff;
+    color: #4C4C4C;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    padding: 15px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.2s ease;
+    border: none;
+    position: relative;
+}
+
+.dropdown .btn::after {
+    content: "\f078";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #4C4C4C;
+}
+
+.dropdown-menu {
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    font-size: 0.9rem;
+    min-width: 180px;
+    padding: 6px 0;
+    margin-top: 8px;
+}
+
+.dropdown-item {
+    padding: 12px 20px;
+    font-size: 0.85rem;
+    color: #4C4C4C;
+    transition: background-color 0.2s ease;
+    border-radius: 12px;
+    border: none;
+}
+body {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    background-color: #f4f4f4;
+}
+
+/* Sidebar */
+.sidebar {
+    height: 100vh;
+    width: 240px;
+    background-color: #041562;
+    color: white;
+    transition: width 0.3s ease;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.sidebar.collapsed {
+    width: 70px;
+}
+
+/* Header Toggle */
+.toggle-btn {
+    display: flex;
+    align-items: flex-end;
+    text-align: right;
+    gap: 10px;
+    background-color: #041562;
+    color: white;
+    border: none;
+    padding: 15px;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.toggle-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.sidebar.collapsed .toggle-left {
+    opacity: 0;
+    transform: translateX(-10px);
+}
+
+.lsp-title {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.lsp-subtitle {
+    font-size: 12px;
+    color: #ccc;
+}
+
+/* Menu */
+.menu {
+    flex-grow: 1;
+    margin-top: 10px;
+}
+
+.menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu ul li {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+>>>>>>> migration
     border-radius: 8px;
     overflow: hidden;
 }
@@ -744,9 +993,84 @@ thead.table-title th {
 
 .box-input {
     border: none;
+<<<<<<< HEAD
     border-top: 1px solid #ccc;
     border-radius: 0 0 6px 6px;
     width: 100%;
     padding: 8px;
     resize: vertical;
 }
+=======
+}
+
+.accordion-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    background-color: #fff;
+    border-radius: 12px;
+    transition: background-color 0.2s ease;
+}
+
+.accordion-header:hover {
+    background-color: #f7f7f7;
+}
+
+.accordion-button::after {
+    display: none;
+}
+
+/* Dropdown */
+.dropdown .btn {
+    background-color: #fff;
+    color: #4C4C4C;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    padding: 15px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.2s ease;
+    border: none;
+    position: relative;
+}
+
+.dropdown .btn::after {
+    content: "\f078";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #4C4C4C;
+}
+
+.dropdown-menu {
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    font-size: 0.9rem;
+    min-width: 180px;
+    padding: 6px 0;
+    margin-top: 8px;
+}
+
+.dropdown-item {
+    padding: 12px 20px;
+    font-size: 0.85rem;
+    color: #4C4C4C;
+    transition: background-color 0.2s ease;
+    border-radius: 12px;
+    border: none;
+}
+>>>>>>> migration
