@@ -10,7 +10,7 @@
                 (Skema: {{ $skema->nama_skema ?? 'Belum ada skema' }})
             </span>
         </h4>
-    </div>
+    </div>  
 
     {{-- Tampilkan pertanyaan kelompok tertentu --}}
     @isset($kelompok)

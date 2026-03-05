@@ -21,7 +21,7 @@
             </button>
         </div>
 
-        <p class="text-muted">{{ $skema->kode_skema ?? 'N/A' }}</p>
+       
     </div>
 
     <!-- Panduan Khusus PG -->
