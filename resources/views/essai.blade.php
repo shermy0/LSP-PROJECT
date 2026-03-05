@@ -6,14 +6,9 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-<<<<<<< HEAD
-            <li class="breadcrumb-item"><a href="{{ route('formasesmen') }}" class="text-primary">Form Asesmen</a></li>
-            <li class="breadcrumb-item"><a href="#" class="text-primary">Form Asesmen</a></li>
-=======
             <li class="breadcrumb-item">
                 <a href="{{ route('formasesmen') }}" class="text-primary">Form Asesmen</a>
             </li>
->>>>>>> ed213bd88a642ce32adf4991801ecf294e70bc5f
             <li class="breadcrumb-item active" aria-current="page">FR.IA.07</li>
         </ol>
     </nav>
