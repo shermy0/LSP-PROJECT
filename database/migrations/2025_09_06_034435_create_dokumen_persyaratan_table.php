@@ -26,11 +26,11 @@ return new class extends Migration
             $table->timestamps();
 
             // ✅ Foreign keys
-            $table->foreign('permohonan_id')
+            $table->foreign('id_permohonan')
                 ->references('id_permohonan')->on('permohonan')
                 ->onDelete('cascade');
 
-            $table->foreign('jenis_dokumen_id')
+            $table->foreign('id_jenis_dokumen')
                 ->references('id_jenis_dokumen')->on('jenis_dokumen')
                 ->onDelete('cascade');
         });

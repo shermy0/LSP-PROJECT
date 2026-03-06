@@ -77,7 +77,7 @@ class Asesi extends Model
      */
     public function permohonan()
     {
-        return $this->hasMany(Permohonan::class, 'asesi_id', 'id_asesi');
+        return $this->hasMany(Permohonan::class, 'id_asesi', 'id_asesi');
     }
 
     /**
@@ -85,7 +85,7 @@ class Asesi extends Model
      */
     public function permohonanTerakhir()
     {
-        return $this->hasOne(Permohonan::class, 'asesi_id', 'id_asesi')->latestOfMany();
+        return $this->hasOne(Permohonan::class, 'id_asesi', 'id_asesi')->latestOfMany();
     }
 
     // ===============================
