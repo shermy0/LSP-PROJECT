@@ -11,11 +11,9 @@ return new class extends Migration
         Schema::create('pertanyaan', function (Blueprint $table) {
             $table->id('id_pertanyaan');
             $table->unsignedBigInteger('id_skema');
-            $table->unsignedBigInteger('id_unit');
-            $table->unsignedBigInteger('id_elemen');
-            $table->unsignedBigInteger('id_kuk');
-            $table->unsignedBigInteger('id_pembuatan_pertanyaan');
+            $table->unsignedBigInteger('id_pembuatan_pertanyaan')->nullable();
             $table->unsignedBigInteger('id_asesor');
+            $table->unsignedBigInteger('id_kelompok')->nullable();
             $table->enum('jenis_pertanyaan', ['lisan', 'esai', 'pilihan_ganda']);
             $table->string('isi_pertanyaan');
             $table->string('file_path')->nullable();
@@ -23,10 +21,8 @@ return new class extends Migration
             $table->text('deskripsi_pertanyaan')->nullable();
             $table->string('kunci_jawaban')->nullable();
 
-            $table->foreign('id_unit')->references('id_unit')->on('unit_kompetensi')->onDelete('cascade');
-            $table->foreign('id_elemen')->references('id_elemen')->on('elemen_kompetensi')->onDelete('cascade');
-            $table->foreign('id_kuk')->references('id_kuk')->on('kuk')->onDelete('cascade');
             $table->foreign('id_skema')->references('id_skema')->on('skema_sertifikasi')->onDelete('cascade');
+            $table->foreign('id_kelompok')->references('id_kelompok')->on('kelompok_pekerjaan')->onDelete('cascade');
             $table->foreign('id_asesor')->references('id_asesor')->on('asesor')->onDelete('cascade');
             $table->foreign('id_pembuatan_pertanyaan')->references('id_pembuatan_pertanyaan')->on('pembuatan_pertanyaan')->onDelete('cascade');
         });

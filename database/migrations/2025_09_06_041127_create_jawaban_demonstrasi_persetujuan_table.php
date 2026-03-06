@@ -12,9 +12,10 @@ return new class extends Migration
             $table->id('id_jawaban_demonstrasi_persetujuan');
             $table->unsignedBigInteger('id_jawaban');
             $table->date('tgl_ttd_asesi')->nullable();
-            $table->string('ttd_asesi')->nullable();
+            $table->longText('ttd_asesi')->nullable();
             $table->date('tgl_ttd_asesor')->nullable();
-            $table->string('ttd_asesor')->nullable();
+            $table->longText('ttd_asesor')->nullable();
+            $table->timestamps();
 
             $table->foreign('id_jawaban')->references('id_jawaban')->on('jawaban_demonstrasi')->onDelete('cascade');
         });

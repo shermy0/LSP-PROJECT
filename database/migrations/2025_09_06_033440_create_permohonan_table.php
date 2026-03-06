@@ -11,35 +11,56 @@ return new class extends Migration
         Schema::create('permohonan', function (Blueprint $table) {
             $table->id('id_permohonan');
 
-            $table->unsignedBigInteger('id_asesi');
-            $table->unsignedBigInteger('id_admin')->nullable(); // boleh kosong
-            $table->unsignedBigInteger('id_skema');
+            // 🔗 Relasi utama
+            $table->unsignedBigInteger('asesi_id');       
+            $table->unsignedBigInteger('admin_id')->nullable();
+            $table->unsignedBigInteger('skema_id');
+            $table->unsignedBigInteger('id_tujuan')->nullable(); // relasi ke tabel tujuan_asesmen
 
-            $table->date('tgl_permohonan')->nullable();
-            $table->enum('tujuan_asesmen', ['Sertifikasi', 'PKT', 'RPL', 'Lainnya'])->nullable();
-            $table->enum('status', ['Diajukan', 'Diterima', 'Ditolak'])->default('Diajukan');
+            // 📅 Informasi permohonan
+            $table->date('tgl_permohonan')->nullable(); // biar diisi di controller pakai now()
+
+            // 🧾 Status permohonan
+            $table->enum('status', [
+                'Diajukan',
+                'Diperiksa',
+                'Diterima',
+                'Ditolak'
+            ])->default('Diajukan');
+
+            // 📝 Catatan admin/asesor
             $table->text('catatan')->nullable();
 
-            // timestamps biar bisa pakai created_at & updated_at
             $table->timestamps();
 
-            // foreign key
-            $table->foreign('id_asesi')
+            // ✅ Foreign key
+            $table->foreign('asesi_id')
                 ->references('id_asesi')->on('asesi')
-                ->onUpdate('cascade')->onDelete('cascade');
+                ->onDelete('cascade');
 
-            $table->foreign('id_admin')
+            $table->foreign('admin_id')
                 ->references('id_admin')->on('admin')
-                ->onUpdate('cascade')->onDelete('set null');
+                ->onDelete('set null');
 
-            $table->foreign('id_skema')
+            $table->foreign('skema_id')
                 ->references('id_skema')->on('skema_sertifikasi')
-                ->onUpdate('cascade')->onDelete('cascade');
+                ->onDelete('cascade');
+
+            $table->foreign('id_tujuan')
+                ->references('id_tujuan')->on('tujuan_asesmen')
+                ->onDelete('set null');
         });
     }
 
     public function down()
     {
+        Schema::table('permohonan', function (Blueprint $table) {
+            $table->dropForeign(['asesi_id']);
+            $table->dropForeign(['admin_id']);
+            $table->dropForeign(['skema_id']);
+            $table->dropForeign(['id_tujuan']);
+        });
+
         Schema::dropIfExists('permohonan');
     }
 };
