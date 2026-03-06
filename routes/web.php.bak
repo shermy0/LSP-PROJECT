@@ -49,18 +49,12 @@ Route::get('/formasesmen/pertanyaan-esai/create', [FormAsesmenController::class,
 Route::get('/form-asesmen/{id_skema}', [FormAsesmenController::class, 'showSkema'])
     ->name('formasesmen.show');
 
-// Edit & Update Essai
-Route::get('/pertanyaan/esai/{id_pertanyaan}/edit',
-    [PertanyaanController::class, 'editPertanyaanEsai'])
-    ->name('pertanyaan.esai.edit');
+// Edit & Update
+Route::get('/pertanyaan/esai/{id}/edit', [PertanyaanController::class, 'editEsai'])->name('pertanyaan.esai.edit');
+Route::put('/pertanyaan/esai/{id}', [PertanyaanController::class, 'updateEsai'])->name('pertanyaan.esai.update');
 
-Route::put('/pertanyaan/esai/{id_pertanyaan}/update',
-    [PertanyaanController::class, 'updatePertanyaanEsai'])
-    ->name('pertanyaan.esai.update');
-
-Route::delete('/pertanyaan/esai/{id_pertanyaan}/delete',
-    [PertanyaanController::class, 'deletePertanyaanEsai'])
-    ->name('pertanyaan.esai.delete');
+// Hapus
+Route::delete('/pertanyaan/esai/{id}', [PertanyaanController::class, 'destroyEsai'])->name('pertanyaan.esai.destroy');
 
 
 
@@ -407,7 +401,7 @@ Route::get('/form-mapa01', [SkemaController::class, 'formMapa01'])->name('form.m
     Route::get('/form-asesmen/pertanyaan-esai', [FormAsesmenController::class, 'pertanyaanEsai'])->name('pertanyaan.esai');
     Route::post('/form-asesmen/pertanyaan-esai/store', [PertanyaanController::class, 'storeEsai'])
     ->name('pertanyaan.esai.store');
-
+    Route::post('/form-asesmen/pertanyaan-esai/delete', [FormAsesmenController::class, 'deleteEsai'])->name('pertanyaan.esai.delete');
 
     // ================== ADMIN (FR.APL.01 - Permohonan) ==================
     Route::prefix('admin')->name('admin.')->group(function () {
@@ -519,11 +513,7 @@ Route::put('/pertanyaan/pg/{id}', [PertanyaanController::class, 'updatePG'])->na
 Route::delete('/pertanyaan/pg/{id}', [PertanyaanController::class, 'destroyPG'])->name('pertanyaan.pg.destroy');
 Route::prefix('pmo')->name('pmo.')->group(function () {
 
-Route::get('/formasesmen/pertanyaan-pmo/{id_skema}', 
-    [FormAsesmenController::class, 'pertanyaanPMO']
-)->name('formasesmen.pertanyaanPMO');
 
-    
     // CRUD Pertanyaan PMO
     Route::get('/{id_pmo}/crud', [PertanyaanController::class, 'crudPMO'])
         ->name('crud');
@@ -557,49 +547,49 @@ Route::get('/formasesmen/pertanyaan-pmo/{id_skema}',
         ->name('pertanyaan.pmo.store');
 });
 
-// ================== ROUTE PMO ==================
+// ================== FORM ASESMEN / PMO ==================
 
-// List PMO per skema
+// List semua PMO untuk skema
 Route::get('/form-asesmen/{id_skema}/pmo', [PertanyaanController::class, 'pertanyaanPMO'])
     ->name('formasesmen.pmo');
 
-// ✅ TAMBAH INI — gantikan kelompokPMO
+// ✅ SATU route untuk kelompok PMO - pakai pertanyaanPMOKelompok (BUKAN kelompokPMO)
 Route::get('/pmo/kelompok/{id_skema}/{id_pembuatan?}', [PertanyaanController::class, 'pertanyaanPMOKelompok'])
     ->name('pertanyaan.pmo.kelompok');
 
-// Input PMO (form isi pertanyaan)
+// Input PMO
 Route::get('/form-asesmen/{id_skema}/input-pmo', [PertanyaanController::class, 'inputPMO'])
     ->name('form.input.pmo');
 
-Route::get('/pmo/input/{id_skema}', [PertanyaanController::class, 'inputPMO'])
-    ->name('input.pmo');
-
-// Simpan pertanyaan PMO
+// Simpan pertanyaan PMO baru
 Route::post('/pmo/{id_pmo}/store', [PertanyaanController::class, 'storePertanyaanPMO'])
     ->name('pmo.pertanyaan.pmo.store');
 
-// CRUD PMO
-Route::get('/pmo/{id_pmo}/crud', [PertanyaanController::class, 'crudPMO'])
-    ->name('pmo.crud');
+// TAMPILAN INPUT PMO
+Route::get('/pmo/input/{id_skema}', [PertanyaanController::class, 'inputPMO'])->name('input.pmo');
+
+// SIMPAN PERTANYAAN PMO
+Route::post('/pmo/{id_pmo}/store', [PertanyaanController::class, 'storePertanyaanPMO'])->name('pmo.pertanyaan.pmo.store');
+
+// Jawaban Asesi PMO
+Route::get('/form-asesmen/{id_skema}/jawaban-pmo/{id_pembuatan}', [PertanyaanController::class, 'jawabanPMO'])
+    ->name('jawaban.pmo');
+Route::post('/form-asesmen/{id_skema}/jawaban-pmo/{id_pembuatan}', [PertanyaanController::class, 'simpanJawabanPMO'])
+    ->name('jawaban.pmo.simpan');
+
+// Tampilkan jawaban PMO (asesor lihat hasil)
+Route::get('/jawaban-pmo/{id_skema}/{id_pembuatan}', [PertanyaanController::class, 'tampilJawabanPMO'])
+    ->name('jawaban_pmo.form');
+
+// CRUD Pertanyaan PMO
+Route::delete('/pmo/{id_pmo}/pertanyaan/{id}', [PertanyaanController::class, 'destroyPertanyaanPMO'])
+    ->name('pmo.pertanyaan.destroy');
 
 Route::get('/pmo/{id_pmo}/pertanyaan/{id}/edit', [PertanyaanController::class, 'editPertanyaanPMO'])
     ->name('pmo.pertanyaan.edit');
 
 Route::put('/pmo/pertanyaan/{id}', [PertanyaanController::class, 'updatePertanyaanPMO'])
     ->name('pmo.pertanyaan.update');
-
-Route::delete('/pmo/{id_pmo}/pertanyaan/{id}', [PertanyaanController::class, 'destroyPertanyaanPMO'])
-    ->name('pmo.pertanyaan.destroy');
-
-// Jawaban PMO
-Route::get('/form-asesmen/{id_skema}/jawaban-pmo/{id_pembuatan}', [PertanyaanController::class, 'jawabanPMO'])
-    ->name('jawaban.pmo');
-
-Route::post('/form-asesmen/{id_skema}/jawaban-pmo/{id_pembuatan}', [PertanyaanController::class, 'simpanJawabanPMO'])
-    ->name('jawaban.pmo.simpan');
-
-Route::get('/jawaban-pmo/{id_skema}/{id_pembuatan}', [PertanyaanController::class, 'tampilJawabanPMO'])
-    ->name('jawaban_pmo.form');
 
 // ================== DATA PESERTA UJI ==================
 
@@ -615,6 +605,8 @@ Route::get('/demonstrasi/{id_skema}', [JawabanDemonstrasiController::class, 'sho
 Route::post('/demonstrasi/store/jawaban', [JawabanDemonstrasiController::class, 'store'])
     ->name('demonstrasi.storeJawaban');
 
+    Route::get('/pmo/kelompok/{id_skema}/{id_pembuatan?}', [PertanyaanController::class, 'kelompokPMO'])
+     ->name('pertanyaan.pmo.kelompok');
 // ================== VIEW STATIC (opsional) ==================
 Route::get('/asesi', function () {
     return view('asesi.index');

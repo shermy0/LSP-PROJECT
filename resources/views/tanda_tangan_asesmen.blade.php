@@ -145,4 +145,9 @@
         document.getElementById('ttd_asesor').value = dataURL;
     }
 </script>
+<div class="text-start mt-3">
+    <a href="{{ route('formasesmen') }}" class="btn btn-secondary">
+        &laquo; Kembali
+    </a>
+</div>
 @endsection

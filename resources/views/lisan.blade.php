@@ -101,13 +101,11 @@
             </div>
 
             {{-- Arahkan ke kelompok pekerjaan --}}
-            <form method="GET" action="{{ route('pertanyaan.lisan.kelompok', $skema->id_skema) }}">
+           <form method="GET" action="{{ route('kelompok.pekerjaan.lisan', ['id' => $skema->id_skema]) }}">
                 <div class="modal-body pt-2">
-                    <!-- Timer -->
                     <label for="timer" class="fw-bold small mt-3">Timer (menit)</label>
                     <input type="number" name="timer" id="timer" class="form-control" min="1" value="30" required>
                 </div>
-
                 <div class="modal-footer border-0">
                     <button type="submit" class="btn w-100 text-white" style="background-color:#041562; font-weight:bold;">
                         Simpan
@@ -117,8 +115,6 @@
         </div>
     </div>
 </div>
-
-
 
 <script>
 function redirectToForm() {
