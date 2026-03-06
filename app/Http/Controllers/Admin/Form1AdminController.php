@@ -25,7 +25,7 @@ class Form1AdminController extends Controller
                 'permohonan.updated_at'
             )
             ->orderBy('permohonan.updated_at', 'desc')
-            ->get();
+            ->paginate(10); // ✅ ganti dari get()
 
         return view('admin.permohonan.index', compact('asesi'));
     }

@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id('id_skema');
 
             // 🧾 Informasi dasar skema
-            $table->string('kode_skema', 50)->unique();   // misal: J.59MTM00.010.1
+            $table->string('kode_skema', 50);   // misal: J.59MTM00.010.1
             $table->string('nama_skema', 150);            // misal: Junior Operator Desain Grafis
 
             // 📌 Tambahan judul skema (yang kamu butuhkan)

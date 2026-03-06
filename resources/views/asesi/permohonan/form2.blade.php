@@ -132,7 +132,6 @@
                 @endforeach
             </div>
 
-
             <!-- Tanda Tangan Asesi -->
             <div class="unit-header">
                 <p class="mb-1 fw-semibold">Tanda Tangan Asesi</p>
@@ -174,6 +173,25 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                         </div>
                         <div class="modal-body text-center" id="previewContent"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal: TTD Required -->
+            <div class="modal fade" id="ttdRequiredModal" tabindex="-1" aria-labelledby="ttdRequiredModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-danger">
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title" id="ttdRequiredModalLabel">Tanda Tangan Diperlukan</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="mb-0">Silakan tanda tangan pada area tanda tangan sebelum melanjutkan.</p>
+                            <p class="small text-muted mt-2">Tekan <strong>Hapus</strong> jika ingin mulai ulang, lalu tanda tangan ulang.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -525,8 +543,15 @@
 
         function saveTTD() {
             if (isCanvasBlank()) {
-                alert("Silakan tanda tangan terlebih dahulu sebelum lanjut.");
-                canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Show modal (instead of alert)
+                const modalEl = document.getElementById('ttdRequiredModal');
+                if (modalEl) {
+                    const modal = new bootstrap.Modal(modalEl);
+                    modal.show();
+                } else {
+                    // fallback
+                    alert("Silakan tanda tangan terlebih dahulu sebelum lanjut.");
+                }
                 return false;
             }
             document.getElementById("ttd_asesi_data").value = canvas.toDataURL("image/png");

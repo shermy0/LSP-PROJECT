@@ -223,9 +223,13 @@
                     <div class="invalid-feedback">Silakan pilih status keputusan.</div>
                 </div>
 
-                <div class="mb-3">
+                {{-- catatan box: initial display dikontrol server-side (jika sebelumnya sudah 'Ditolak' tampil) --}}
+                <div class="mb-3" id="catatanBox" style="display: {{ old('status_permohonan', $permohonan->status ?? '') == 'Ditolak' ? 'block' : 'none' }};">
                     <label for="catatan" class="form-label fw-semibold">Alasan / Keterangan</label>
-                    <textarea id="catatan" name="catatan" class="form-control" rows="3">{{ old('catatan', $permohonan->catatan ?? '') }}</textarea>
+                    <textarea id="catatan" name="catatan" class="form-control" rows="3"
+                        {{ old('status_permohonan', $permohonan->status ?? '') == 'Ditolak' ? 'required' : '' }}
+                    >{{ old('catatan', $permohonan->catatan ?? '') }}</textarea>
+                    <div class="invalid-feedback">Harap isi alasan penolakan.</div>
                 </div>
             </div>
 
@@ -253,7 +257,25 @@
     </div>
 </div>
 
-{{-- STYLE (mengikuti style halaman FR.APL.02 contoh) --}}
+{{-- Modal Alert untuk TTD Admin --}}
+<div class="modal fade" id="ttdAlertModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger">Tanda Tangan Diperlukan</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+      </div>
+      <div class="modal-body">
+        <p>Silakan isi tanda tangan admin terlebih dahulu sebelum menyimpan keputusan.</p>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Mengerti</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{-- STYLE --}}
 <style>
     body { font-family: 'Poppins', sans-serif; background: #f9f9fb; }
 
@@ -320,7 +342,7 @@
     .table-light th { vertical-align: middle; }
 </style>
 
-{{-- SCRIPTS: preview, TTD admin, validation (digabung & disesuaikan) --}}
+{{-- SCRIPTS --}}
 <script>
     // Preview dokumen (image/pdf/other)
     function openPreview(url, ext) {
@@ -424,11 +446,12 @@
             return canvas.toDataURL() === blankDataURL;
         }
 
+        // use modal instead of alert; DO NOT auto-scroll when showing modal
         function saveAdminTTD(required = true) {
             if (isCanvasBlankAdmin()) {
                 if (required) {
-                    alert("Silakan tanda tangan admin terlebih dahulu sebelum lanjut.");
-                    canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // show bootstrap modal instead of alert
+                    new bootstrap.Modal(document.getElementById('ttdAlertModal')).show();
                     return false;
                 } else {
                     document.getElementById('ttd_admin_data').value = '';
@@ -441,7 +464,8 @@
 
         function downloadTTDAdmin() {
             if (isCanvasBlankAdmin()) {
-                alert('Belum ada tanda tangan untuk diunduh.');
+                // use modal as well
+                new bootstrap.Modal(document.getElementById('ttdAlertModal')).show();
                 return;
             }
             const link = document.createElement('a');
@@ -475,37 +499,90 @@
         // init
         resizeCanvasAndPrepareBlankAdmin();
 
-        // expose
+        // expose to window
         window.clearCanvasAdmin = clearCanvasAdmin;
         window.downloadTTDAdmin = downloadTTDAdmin;
         window.saveAdminTTD = saveAdminTTD;
+        window.isCanvasBlankAdmin = isCanvasBlankAdmin;
     })();
 
-    // === FORM VALIDATION (Bootstrap style) ===
+    // === Toggle catatan (hanya tampil ketika "Ditolak") ===
+    (function () {
+        const diterima = document.getElementById('statusDiterima');
+        const ditolak = document.getElementById('statusDitolak');
+        const catatanBox = document.getElementById('catatanBox');
+        const catatan = document.getElementById('catatan');
+
+        function toggleCatatan() {
+            if (ditolak.checked) {
+                catatanBox.style.display = 'block';
+                catatan.setAttribute('required', 'required');
+            } else {
+                catatanBox.style.display = 'none';
+                catatan.removeAttribute('required');
+                catatan.classList.remove('is-invalid');
+            }
+        }
+
+        if (diterima && ditolak && catatanBox) {
+            diterima.addEventListener('change', toggleCatatan);
+            ditolak.addEventListener('change', toggleCatatan);
+            // initial
+            toggleCatatan();
+        }
+    })();
+
+    // === FORM VALIDATION (Bootstrap style) + extra checks ===
     (function () {
         'use strict';
         const form = document.getElementById('permohonanForm');
+
         form.addEventListener('submit', function (event) {
-            // simpan tanda tangan admin ke input hidden (wajib)
+            // 1) Save admin TTD; if missing -> show modal and prevent submit
             if (typeof saveAdminTTD === 'function') {
                 const ok = saveAdminTTD(true);
                 if (!ok) {
                     event.preventDefault();
                     event.stopPropagation();
+                    // do not auto-scroll to top — modal gives feedback
                     return false;
                 }
             }
 
+            // 2) Let browser check validity (required fields, patterns)
             if (!form.checkValidity()) {
                 event.preventDefault();
                 event.stopPropagation();
+
+                // mark invalid fields (Bootstrap)
+                form.classList.add('was-validated');
+
+                // focus first invalid element (optional)
                 const firstInvalid = form.querySelector(':invalid');
                 if (firstInvalid) {
+                    try { firstInvalid.focus({ preventScroll: true }); } catch(e){ firstInvalid.focus(); }
+                    // scroll slightly to make it visible but avoid jumping to top; prefer smooth centered only when necessary
                     firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    firstInvalid.focus();
+                }
+                return false;
+            }
+
+            // 3) If "Ditolak", ensure catatan not empty (extra check to ensure browser didn't miss it)
+            const ditolak = document.getElementById('statusDitolak');
+            const catatan = document.getElementById('catatan');
+            if (ditolak && ditolak.checked) {
+                const val = (catatan.value || '').trim();
+                if (!val) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    catatan.classList.add('is-invalid');
+                    catatan.focus();
+                    catatan.scrollIntoView({ behavior:'smooth', block: 'center' });
+                    return false;
                 }
             }
 
+            // all good: allow submit; add visual validation class
             form.classList.add('was-validated');
         }, false);
     })();
