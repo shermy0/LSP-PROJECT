@@ -151,11 +151,11 @@ class PertanyaanController extends Controller
     $id_asesor   = $request->id_asesor;
     $id_kelompok = $request->id_kelompok;
 
-    // ✅ gunakan id_pembuatan_pertanyaan
     if ($request->filled('id_pembuatan_pertanyaan')) {
         $pembuatan = PembuatanPertanyaan::findOrFail($request->id_pembuatan_pertanyaan);
         $pembuatan->update([
-            'judul'            => $request->judul ?? 'Pertanyaan Esai ' . now()->format('d-m-Y H:i'),
+            // ✅ kalau judul tidak diisi, pakai judul lama (jangan pakai tanggal)
+            'judul'            => $request->filled('judul') ? $request->judul : $pembuatan->judul,
             'timer'            => $request->timer,
             'timescap'         => now(),
             'jenis_pertanyaan' => 'esai',
@@ -163,7 +163,8 @@ class PertanyaanController extends Controller
     } else {
         $pembuatan = PembuatanPertanyaan::create([
             'id_skema'         => $id_skema,
-            'judul'            => $request->judul ?? 'Pertanyaan Esai ' . now()->format('d-m-Y H:i'),
+            // ✅ kalau judul tidak diisi saat buat baru, pakai string sederhana tanpa tanggal
+            'judul'            => $request->filled('judul') ? $request->judul : 'Pertanyaan Esai',
             'timer'            => $request->timer,
             'timescap'         => now(),
             'jenis_pertanyaan' => 'esai',
@@ -173,18 +174,17 @@ class PertanyaanController extends Controller
     // Simpan pertanyaan
     foreach ($request->isi_pertanyaan as $key => $isi) {
         $pertanyaan = new Pertanyaan();
-        $pertanyaan->id_skema                 = $id_skema;
-        $pertanyaan->id_kelompok              = $id_kelompok;
-        $pertanyaan->id_asesor                = $id_asesor;
-        $pertanyaan->id_pembuatan_pertanyaan  = $pembuatan->id_pembuatan_pertanyaan; // ✅ pakai kolom ini
-        $pertanyaan->jenis_pertanyaan         = 'esai';
-        $pertanyaan->isi_pertanyaan           = $isi;
-        $pertanyaan->kunci_jawaban            = $request->kunci_jawaban[$key] ?? null;
+        $pertanyaan->id_skema                = $id_skema;
+        $pertanyaan->id_kelompok             = $id_kelompok;
+        $pertanyaan->id_asesor               = $id_asesor;
+        $pertanyaan->id_pembuatan_pertanyaan = $pembuatan->id_pembuatan_pertanyaan;
+        $pertanyaan->jenis_pertanyaan        = 'esai';
+        $pertanyaan->isi_pertanyaan          = $isi;
+        $pertanyaan->kunci_jawaban           = $request->kunci_jawaban[$key] ?? null;
 
         if ($request->hasFile("file.$key")) {
             $file = $request->file("file.$key");
-            $filePath = $file->store('uploads/pertanyaan', 'public');
-            $pertanyaan->file_path = $filePath;
+            $pertanyaan->file_path = $file->store('uploads/pertanyaan', 'public');
             $pertanyaan->file_type = $file->getClientOriginalExtension();
         }
 
@@ -195,8 +195,7 @@ class PertanyaanController extends Controller
         'id_skema'    => $id_skema,
         'id_kelompok' => $id_kelompok,
     ])->with('success', 'Semua pertanyaan esai berhasil disimpan!');
-}
-public function crudEsai($id_skema, $id_kelompok)
+}public function crudEsai($id_skema, $id_kelompok)
 {
     $skema = Skema::findOrFail($id_skema);
 
