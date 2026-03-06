@@ -30,7 +30,7 @@ class AsesiSeeder extends Seeder
                 'kode_pos_rumah'       => '40162',
                 'telepon_rumah'        => null,
                 'telepon_hp'           => '089612345678',
-                'email'                => 'reno.susanto@example.com',
+                'email'                => 'reno@gmail.com',
 
                 // 🎓 Data pendidikan
                 'kualifikasi_pendidikan' => 'SMK - Desain Komunikasi Visual',

@@ -22,7 +22,7 @@ class AsesmenMandiriController extends Controller
     {
         $asesi = DB::table('asesi')
             ->join('users', 'asesi.user_id', '=', 'users.id')
-            ->select('asesi.id_asesi', 'asesi.nama_lengkap', 'users.email')
+            ->select('asesi.asesi_id', 'asesi.nama_lengkap', 'users.email')
             ->get();
 
         return view('asesor.asesmen_mandiri.index', compact('asesi'));
@@ -31,11 +31,11 @@ class AsesmenMandiriController extends Controller
     /**
      * Detail asesmen mandiri untuk verifikasi
      */
-    public function show($id_asesi)
+    public function show($asesi_id)
     {
-        $asesi = Asesi::with('user')->findOrFail($id_asesi);
+        $asesi = Asesi::with('user')->findOrFail($asesi_id);
 
-        $asesmen = AsesmenMandiriMaster::where('id_asesi', $id_asesi)
+        $asesmen = AsesmenMandiriMaster::where('asesi_id', $asesi_id)
             ->latest('id_asesmen_mandiri')
             ->first();
 
@@ -52,10 +52,10 @@ class AsesmenMandiriController extends Controller
 
         // 🔹 Ambil skema permohonan terakhir
         $permohonan = DB::table('permohonan')
-            ->join('skema_sertifikasi', 'permohonan.id_skema', '=', 'skema_sertifikasi.id_skema')
-            ->where('id_asesi', $id_asesi)
+            ->join('skema_sertifikasi', 'permohonan.skema_id', '=', 'skema_sertifikasi.id_skema')
+            ->where('asesi_id', $asesi_id)
             ->latest('id_permohonan')
-            ->select('skema_sertifikasi.nama_skema as skema', 'permohonan.id_skema')
+            ->select('skema_sertifikasi.nama_skema as skema', 'permohonan.skema_id')
             ->first();
 
         // 🔹 Ambil struktur skema (unit → elemen → kuk)
@@ -90,14 +90,14 @@ class AsesmenMandiriController extends Controller
     /**
      * Simpan hasil verifikasi asesor
      */
-    public function verifikasiStore(Request $request, $id_asesi)
+    public function verifikasiStore(Request $request, $asesi_id)
     {
         // 🔹 Sesuaikan validasi dengan enum tabel
         $request->validate([
             'rekomendasi' => 'required|in:Dapat Dilanjutkan,Tidak Dapat Dilanjutkan',
         ]);
 
-        $asesmen = AsesmenMandiriMaster::where('id_asesi', $id_asesi)
+        $asesmen = AsesmenMandiriMaster::where('asesi_id', $asesi_id)
             ->latest('id_asesmen_mandiri')
             ->first();
 

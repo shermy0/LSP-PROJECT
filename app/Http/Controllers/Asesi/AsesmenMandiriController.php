@@ -64,22 +64,24 @@ class AsesmenMandiriController extends Controller
             ->get();
 
         $elemen = DB::table('elemen_kompetensi')
-            ->whereIn('id_unit', $units->pluck('id_unit'))
+            ->whereIn('id_unit', $units->pluck('id_unit')->toArray())
             ->select('id_elemen', 'id_unit', 'nama_elemen as judul_elemen')
             ->get();
 
         $kuk = DB::table('kuk')
-            ->whereIn('id_elemen', $elemen->pluck('id_elemen'))
+            ->whereIn('id_elemen', $elemen->pluck('id_elemen')->toArray())
             ->get();
 
+        // <-- Perbaikan utama: pakai nama kolom yang benar path_file & nama_file
         $dokumen = DB::table('dokumen_persyaratan')
-            ->join('jenis_dokumen', 'dokumen_persyaratan.id_jenis_dokumen', '=', 'jenis_dokumen.id_jenis_dokumen')
-            ->where('dokumen_persyaratan.id_permohonan', $permohonan->id_permohonan)
-            ->whereIn('dokumen_persyaratan.id_jenis_dokumen', [1, 2])
+            ->join('jenis_dokumen', 'dokumen_persyaratan.jenis_dokumen_id', '=', 'jenis_dokumen.id_jenis_dokumen')
+            ->where('dokumen_persyaratan.permohonan_id', $permohonan->id_permohonan)
+            ->whereIn('dokumen_persyaratan.jenis_dokumen_id', [1, 2])
             ->select(
                 'dokumen_persyaratan.id_dokumen',
-                'dokumen_persyaratan.file_path',
-                'jenis_dokumen.nama_jenis'
+                'dokumen_persyaratan.path_file as file_path',
+                'dokumen_persyaratan.nama_file',
+                'jenis_dokumen.nama_dokumen as nama_jenis'
             )
             ->get();
 
