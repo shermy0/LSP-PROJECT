@@ -4,6 +4,13 @@
 <div class="container mt-4">
     <h4 class="fw-bold text-center mb-4">FR.IA.07 – DPL – Tanda Tangan Pembuatan Asesmen</h4>
 
+    {{-- Tombol Back --}}
+    <div class="mb-3">
+        <a href="{{ url()->previous() }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Kembali
+        </a>
+    </div>
+
     {{-- Pesan sukses --}}
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -26,12 +33,13 @@
                         <input type="text" class="form-control" value="{{ $asesorLogin->nama_asesor }}" readonly>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">TanggalTanggal</label>
+                        <label class="form-label fw-bold">Tanggal</label>
                         <input type="date" 
-                        name="tgl_ttd_asesor" 
-                        class="form-control" 
-                        value="{{ date('Y-m-d') }}" 
-                        readonly>                    </div>
+                               name="tgl_ttd_asesor" 
+                               class="form-control" 
+                               value="{{ date('Y-m-d') }}" 
+                               readonly>
+                    </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Nomor MET</label>
                         <input type="text" class="form-control" value="{{ $asesorLogin->no_registrasi }}" readonly>
@@ -84,6 +92,7 @@
                 </tbody>
             </table>
         @endif
+    </div>
 </div>
 
 {{-- JS Signature Pad --}}
@@ -92,7 +101,6 @@
     let ctx = canvas.getContext('2d');
     let drawing = false;
 
-    // Set background putih
     ctx.fillStyle = "#fff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -105,7 +113,6 @@
         ctx.lineWidth = 2;
         ctx.lineCap = 'round';
         ctx.strokeStyle = '#000';
-
         ctx.lineTo(event.offsetX, event.offsetY);
         ctx.stroke();
         ctx.beginPath();

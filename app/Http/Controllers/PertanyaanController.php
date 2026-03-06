@@ -228,67 +228,50 @@ public function crudEsai($id_skema, $id_kelompok)
     ));
 }
 
-
-
-
-
-   public function editEsai($id)
+   // Tampilkan form edit 1 pertanyaan
+public function editPertanyaanEsai($id_pertanyaan)
 {
-    $pertanyaan = Pertanyaan::findOrFail($id);
-    $skema = Skema::find($pertanyaan->id_skema);
-
-    return view('input_esai_edit', [
-        'pertanyaan' => $pertanyaan,
-        'skema'      => $skema,
-        'id_skema'   => $pertanyaan->id_skema,
-        'id_kelompok'=> $pertanyaan->id_kelompok
-    ]);
-
-    
+    $pertanyaan = Pertanyaan::findOrFail($id_pertanyaan);
+    return view('input_esai_edit', compact('pertanyaan'));
 }
-    public function updateEsai(Request $request, $id)
-{
-    $pertanyaan = Pertanyaan::findOrFail($id);
 
-    $request->validate([
-        'isi_pertanyaan' => 'required|string',
-        'kunci_jawaban'  => 'nullable|string',
-        'file'           => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
-    ]);
+// Simpan perubahan 1 pertanyaan
+public function updatePertanyaanEsai(Request $request, $id_pertanyaan)
+{
+    $pertanyaan = Pertanyaan::findOrFail($id_pertanyaan);
 
     if ($request->hasFile('file') && $request->file('file')->isValid()) {
-        $file = $request->file('file');
-        $filePath = $file->store('uploads/pertanyaan', 'public');
-        $pertanyaan->file_path = $filePath;
-        $pertanyaan->file_type = $file->getClientOriginalExtension();
+        if ($pertanyaan->file_path && \Storage::disk('public')->exists($pertanyaan->file_path)) {
+            \Storage::disk('public')->delete($pertanyaan->file_path);
+        }
+        $pertanyaan->file_path = $request->file('file')->store('pertanyaan_files', 'public');
+        $pertanyaan->file_type = $request->file('file')->getClientOriginalExtension();
     }
 
     $pertanyaan->isi_pertanyaan = $request->isi_pertanyaan;
     $pertanyaan->kunci_jawaban  = $request->kunci_jawaban;
     $pertanyaan->save();
 
+    // ✅ Ganti return redirect ke sini
     return redirect()->route('esai.crud', [
         'id_skema'    => $pertanyaan->id_skema,
-        'id_kelompok' => $pertanyaan->id_kelompok
-    ])->with('success', 'Pertanyaan esai berhasil diupdate!');
+        'id_kelompok' => $pertanyaan->id_kelompok,
+    ])->with('success', 'Pertanyaan berhasil diperbarui!');
 }
 
-    public function destroyEsai($id)
-    {
-        $pertanyaan = Pertanyaan::findOrFail($id);
-        $id_skema   = $pertanyaan->id_skema;
+// Hapus 1 pertanyaan
+public function deletePertanyaanEsai($id_pertanyaan)
+{
+    $pertanyaan = Pertanyaan::findOrFail($id_pertanyaan);
 
-        if ($pertanyaan->file_path && \Storage::disk('public')->exists($pertanyaan->file_path)) {
-            \Storage::disk('public')->delete($pertanyaan->file_path);
-        }
-
-        $pertanyaan->delete();
-
-       return redirect()->route('esai.crud', [
-    'id_skema'   => $id_skema,
-    'id_kelompok'=> $pertanyaan->id_kelompok
-])->with('success', 'Pertanyaan esai berhasil dihapus!');
+    if ($pertanyaan->file_path && \Storage::disk('public')->exists($pertanyaan->file_path)) {
+        \Storage::disk('public')->delete($pertanyaan->file_path);
     }
+
+    $pertanyaan->delete();
+
+    return back()->with('success', 'Pertanyaan berhasil dihapus!');
+}
 
  // ================================
 // FORM PILIHAN GANDA (PG)
@@ -644,9 +627,9 @@ public function destroyPG($id)
 public function kelompokPekerjaan(Request $request, $id_skema, $jenis = null)
 {
     $jenis = $jenis ?? $request->query('jenis', 'esai');
-    $judul = $request->query('judul');                  // bisa null
-    $timer = $request->query('timer');                  // bisa null
-    $idPembuatan = $request->query('id_pembuatan_pertanyaan'); // ✅ ubah ke nama kolom sebenarnya
+    $judul = $request->query('judul');
+    $timer = $request->query('timer');
+    $idPembuatan = $request->query('id_pembuatan_pertanyaan');
 
     // kalau user klik "Lanjutkan"
     if ($idPembuatan) {
@@ -654,18 +637,18 @@ public function kelompokPekerjaan(Request $request, $id_skema, $jenis = null)
         if (!$pembuatan) {
             return back()->with('error', 'Data pembuatan pertanyaan tidak ditemukan.');
         }
-        $timer = $pembuatan->timer; // ambil timer dari record lama
-    } 
+        $timer = $pembuatan->timer;
+    }
     // kalau user klik "Buat Baru"
     else if ($judul) {
         $pembuatan = PembuatanPertanyaan::create([
-            'id_skema' => $id_skema,
-            'judul' => $judul,
-            'timer' => $timer ?? 30,
-            'timescap' => now(),
+            'id_skema'         => $id_skema,
+            'judul'            => $judul,
+            'timer'            => $timer ?? 30,
+            'timescap'         => now(),
             'jenis_pertanyaan' => $jenis,
         ]);
-    } 
+    }
     // kalau buka halaman tanpa judul baru / lanjutkan
     else {
         $pembuatan = PembuatanPertanyaan::where('id_skema', $id_skema)
@@ -684,17 +667,24 @@ public function kelompokPekerjaan(Request $request, $id_skema, $jenis = null)
 
     $skema = Skema::find($id_skema);
 
+    // ✅ Ambil soal berdasarkan id_pembuatan_pertanyaan
+    $soalList = $pembuatan
+        ? Pertanyaan::where('id_pembuatan_pertanyaan', $pembuatan->id_pembuatan_pertanyaan)
+            ->with('kelompok') // pastikan relasi kelompok ada di model Pertanyaan
+            ->get()
+        : collect();
+
     return view('kelompok_pekerjaan_essai', [
-        'kelompok' => $kelompok,
-        'timer' => $timer,
-        'id_skema' => $id_skema,
-        'jenis' => $jenis,
-        'judul' => $judul,
-        'skema' => $skema,
+        'kelompok'  => $kelompok,
+        'timer'     => $timer,
+        'id_skema'  => $id_skema,
+        'jenis'     => $jenis,
+        'judul'     => $judul,
+        'skema'     => $skema,
         'pembuatan' => $pembuatan,
+        'soalList'  => $soalList, // ✅ dikirim ke view
     ]);
 }
-
     // ================================
     // FORM TANDA TANGAN ASESOR
     // ================================

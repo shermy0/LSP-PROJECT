@@ -49,12 +49,18 @@ Route::get('/formasesmen/pertanyaan-esai/create', [FormAsesmenController::class,
 Route::get('/form-asesmen/{id_skema}', [FormAsesmenController::class, 'showSkema'])
     ->name('formasesmen.show');
 
-// Edit & Update
-Route::get('/pertanyaan/esai/{id}/edit', [PertanyaanController::class, 'editEsai'])->name('pertanyaan.esai.edit');
-Route::put('/pertanyaan/esai/{id}', [PertanyaanController::class, 'updateEsai'])->name('pertanyaan.esai.update');
+// Edit & Update Essai
+Route::get('/pertanyaan/esai/{id_pertanyaan}/edit',
+    [PertanyaanController::class, 'editPertanyaanEsai'])
+    ->name('pertanyaan.esai.edit');
 
-// Hapus
-Route::delete('/pertanyaan/esai/{id}', [PertanyaanController::class, 'destroyEsai'])->name('pertanyaan.esai.destroy');
+Route::put('/pertanyaan/esai/{id_pertanyaan}/update',
+    [PertanyaanController::class, 'updatePertanyaanEsai'])
+    ->name('pertanyaan.esai.update');
+
+Route::delete('/pertanyaan/esai/{id_pertanyaan}/delete',
+    [PertanyaanController::class, 'deletePertanyaanEsai'])
+    ->name('pertanyaan.esai.delete');
 
 
 
@@ -401,7 +407,7 @@ Route::get('/form-mapa01', [SkemaController::class, 'formMapa01'])->name('form.m
     Route::get('/form-asesmen/pertanyaan-esai', [FormAsesmenController::class, 'pertanyaanEsai'])->name('pertanyaan.esai');
     Route::post('/form-asesmen/pertanyaan-esai/store', [PertanyaanController::class, 'storeEsai'])
     ->name('pertanyaan.esai.store');
-    Route::post('/form-asesmen/pertanyaan-esai/delete', [FormAsesmenController::class, 'deleteEsai'])->name('pertanyaan.esai.delete');
+
 
     // ================== ADMIN (FR.APL.01 - Permohonan) ==================
     Route::prefix('admin')->name('admin.')->group(function () {

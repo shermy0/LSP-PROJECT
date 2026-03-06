@@ -59,8 +59,8 @@
             </a>
         </li>
         <li>
-            <a class="dropdown-item" 
-               href="{{ route('formasesmen.pertanyaanPMO', ['id_skema' => $skema->id_skema]) }}">
+             <a class="dropdown-item" 
+               href="{{ route('formasesmen.pmo', ['id_skema' => $skema->id_skema]) }}">
                 Pertanyaan PMO
             </a>
         </li>

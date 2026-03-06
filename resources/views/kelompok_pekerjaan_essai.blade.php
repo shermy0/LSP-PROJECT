@@ -62,6 +62,76 @@
         </div>
     @endforelse
 
+    {{-- ===================== DAFTAR SOAL ===================== --}}
+    @if($pembuatan && isset($soalList) && $soalList->count() > 0)
+        <div class="card shadow-sm mb-3 border-0">
+            <div class="card-header fw-bold" style="background-color:#041562; color:white;">
+                <i class="bi bi-list-ol me-2"></i>
+                Daftar Soal — ID Pembuatan: {{ $pembuatan->id_pembuatan_pertanyaan }}
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle mb-0">
+                        <thead style="background-color:#e6eef6; color:#041562; font-weight:bold;">
+                            <tr>
+                                <th class="text-center" style="width:60px;">No</th>
+                                <th>Pertanyaan</th>
+                                <th>Kunci Jawaban</th>
+                                <th style="width:180px;">Kelompok</th>
+                                <th style="width:100px;" class="text-center">Jenis</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($soalList as $sIndex => $soal)
+                                <tr>
+                                    <td class="text-center fw-bold text-dark">{{ $sIndex + 1 }}</td>
+                                    <td>{{ $soal->isi_pertanyaan }}</td>
+                                    <td>{{ $soal->kunci_jawaban ?? '-' }}</td>
+                                    <td>{{ $soal->kelompok->nama_kelompok ?? '-' }}</td>
+                                    <td class="text-center">
+                                        <span class="badge" style="background-color:#041562;">
+                                            {{ ucfirst(str_replace('_', ' ', $soal->jenis_pertanyaan)) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    @elseif($pembuatan)
+        <div class="alert alert-info text-center mb-4">
+            Belum ada soal yang dibuat untuk pembuatan ini.
+        </div>
+    @endif
+    {{-- ======================================================= --}}
+
+    {{-- Tombol Tanda Tangan (tengah) — tampil kalau ada pembuatan --}}
+    @if($pembuatan)
+        <div class="d-flex justify-content-center mb-3">
+            <a href="{{ route('tanda.tangan.asesmen', [
+                'id_skema'                => $skema->id_skema,
+                'id_pembuatan_pertanyaan' => $pembuatan->id_pembuatan_pertanyaan
+            ]) }}"
+            class="btn btn-primary px-5 py-2 fw-bold"
+            style="background-color:#041562; border-color:#041562; border-radius:8px;">
+                <i class="bi bi-pen me-2"></i> Tanda Tangan Asesmen
+            </a>
+        </div>
+    @endif
+
+    {{-- Tombol Simpan (tengah) — tampil setelah ada soal --}}
+    @if($pembuatan && isset($soalList) && $soalList->count() > 0)
+        <div class="d-flex justify-content-center mb-5">
+             <a href="{{ route('formasesmen.pertanyaanEsai', ['id_skema' => $skema->id_skema]) }}" 
+                class="btn btn-success px-5 py-2 fw-bold">
+                <i class="bi bi-save me-2"></i> Simpan Pertanyaan Esai
+            </a>
+        </div>
+    @endif
+
 </div>
 
 <script>
@@ -86,7 +156,6 @@ function popupJumlahPertanyaan(id_skema, timer, kelompok_id) {
                 return;
             }
 
-            // ✅ id_pembuatan_pertanyaan benar-benar dikirim
             let url = `{{ route('pertanyaan.esai.create') }}?id_skema=${id_skema}&timer=${timer}&kelompok_id=${kelompok_id}&jumlah=${jumlah}&id_pembuatan_pertanyaan={{ $pembuatan->id_pembuatan_pertanyaan ?? '' }}`;
             window.location.href = url;
         }

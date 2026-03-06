@@ -4,6 +4,10 @@
 <div class="container mt-4">
     <h4 class="fw-bold">FR.IA.07 – DPL – Daftar Pertanyaan Esai</h4>
 
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+
     @if($pertanyaan->isEmpty())
         <div class="alert alert-warning">Belum ada pertanyaan esai untuk pembuatan ini.</div>
     @else
@@ -18,22 +22,30 @@
                             <a href="{{ asset('storage/'.$p->file_path) }}" target="_blank">Lihat File</a>
                         </p>
                     @endif
+
+                    {{-- Tombol Edit & Hapus --}}
+                    <div class="d-flex gap-2 mt-2">
+                        <a href="{{ route('pertanyaan.esai.edit', $p->id_pertanyaan) }}"
+                           class="btn btn-warning btn-sm">
+                            <i class="fa fa-edit"></i> Edit
+                        </a>
+
+                        <!-- ✅ GANTI JADI INI -->
+<!-- ✅ BENAR -->
+<form action="{{ route('pertanyaan.esai.delete', $p->id_pertanyaan) }}"
+      method="POST"
+      onsubmit="return confirm('Yakin ingin menghapus?')">
+    @csrf
+    @method('DELETE')
+    <button type="submit" class="btn btn-danger btn-sm">
+        <i class="fa fa-trash"></i> Hapus
+    </button>
+</form>
+                    </div>
+
                 </div>
             </div>
         @endforeach
     @endif
-
-    {{-- Tombol Tanda Tangan --}}
-    @if($pembuatan_pertanyaan)
-        <a href="{{ route('tanda.tangan.asesmen', [
-    'id_skema' => $skema->id_skema, 
-    'id_pembuatan_pertanyaan' => $pembuatan_pertanyaan->id_pembuatan_pertanyaan
-]) }}" 
-class="btn btn-primary mb-3">
-    Tanda Tangan Asesmen
-</a>
-
-    @endif
-
 </div>
 @endsection
