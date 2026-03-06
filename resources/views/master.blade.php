@@ -37,11 +37,11 @@
 
         <div class="menu">
             <ul>
-                @if(Auth::user()->role == 'admin')
+                @if(Auth::check() && Auth::user()->role == 'admin')
                     <li><i class="bi bi-house-door-fill"></i><a href="#">Dashboard</a></li>
                 @endif
 
-                @if(Auth::user()->role == 'asesor')
+                @if(Auth::check() && Auth::user()->role == 'asesor')
                     <li><i class="bi bi-house-door-fill"></i><a href="{{ route('dashboard.asesor') }}">Dashboard</a></li>
                     <li><i class="bi bi-journal-album"></i><a href="{{ route('formasesmen') }}">Form Asesmen</a></li>
                     <li><i class="bi bi-people-fill"></i><a href="{{ route('datapesertauji') }}">Data Peserta Uji</a></li>
@@ -49,7 +49,7 @@
                     <li><i class="bi bi-journal-album"></i> <a href="{{ route('rekap.asesmen') }}">Rekap Asesmen</a></li>
                 @endif
 
-                @if(Auth::user()->role == 'asesi')
+                @if(Auth::check() && Auth::user()->role == 'asesi')
                     <li><i class="bi bi-house-door-fill"></i><a href="#">Dashboard</a></li>
                     <li><i class="bi bi-pencil-square"></i><a href="{{ route('asesmen.pilih') }}">Form Asesmen </a></li>
                     <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
@@ -65,8 +65,8 @@
                 <img src="{{ asset('assets/poto/potta.png') }}" alt="Potta" class="img-fluid">
             </div>
             <div class="user-info">
-                <span class="username">{{ Auth::user()->name }}</span>
-                <span class="role">{{ ucfirst(Auth::user()->role) }}</span>
+                <span class="username">{{ Auth::user()?->name ?? "" }}</span>
+                <span class="role">{{ ucfirst(Auth::user()?->role ?? "") }}</span>
             </div>
         </div>
 

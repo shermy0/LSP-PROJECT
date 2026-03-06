@@ -49,13 +49,13 @@
 
         <div class="menu">
             <ul>
-                @if(Auth::user()->role == 'admin')
+                @if(Auth::check() && Auth::user()->role == 'admin')
                     <li><i class="bi bi-house-door-fill"></i><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                     <li><i class="bi bi-person-lines-fill"></i><a href="{{ route('admin.permohonan.index') }}">Daftar
                             Permohonan</a></li>
                 @endif
 
-                @if(Auth::user()->role == 'asesor')
+                @if(Auth::check() && Auth::user()->role == 'asesor')
                     <li><i class="bi bi-house-door-fill"></i><a href="{{ route('asesor.dashboard') }}">Dashboard</a></li>
                     <li><i class="bi bi-file-earmark-text-fill"></i><a href="">Form Pra Asesmen </a></li>
                     <li><i class="bi bi-journal-album"></i><a href="{{ route('formasesmen') }}">Form Asesmen</a></li>
@@ -65,7 +65,7 @@
                     <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
                 @endif
 
-                @if(Auth::user()->role == 'asesi')
+                @if(Auth::check() && Auth::user()->role == 'asesi')
                     <li><i class="bi bi-house-door-fill"></i><a href="{{ route('asesi.dashboard') }}">Dashboard</a></li>
                     <li><i class="bi bi-file-earmark-text-fill"></i><a href="{{ route('form_pra_assesmen') }}">Form Pra
                             Asesmen </a></li>
@@ -81,8 +81,8 @@
                     <img src="{{ asset('assets/poto/potta.png') }}" alt="Potta" class="img-fluid">
                 </div>
                 <div class="user-info">
-                    <span class="username">{{ Auth::user()->name }}</span>
-                    <span class="role">{{ ucfirst(Auth::user()->role) }}</span>
+                    <span class="username">{{ Auth::user()?->name ?? "" }}</span>
+                    <span class="role">{{ ucfirst(Auth::user()?->role ?? "") }}</span>
                 </div>
             </div>
             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="logout-form">

@@ -25,7 +25,7 @@
 
     {{-- Tombol Tanda Tangan --}}
     @if($pembuatan_pertanyaan)
-        <a href="{{ route('tanda.tangan.asesmen', [$skema->id_skema, $pembuatan_pertanyaan->id_pembuatan]) }}" class="btn btn-primary mb-3">
+        <a href="{{ route('tanda.tangan.asesmen', [$skema->id_skema, $pembuatan_pertanyaan->id_pembuatan_pertanyaan]) }}" class="btn btn-primary mb-3">
             Tanda Tangan Asesmen
         </a>
     @endif

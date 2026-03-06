@@ -28,7 +28,7 @@
             <div class="mb-3">
                 <label for="asesi" class="form-label">Nama Asesi</label>
                 <input type="text" id="asesi" class="form-control"
-                    value="{{ Auth::user()->name }}" readonly>
+                    value="{{ Auth::user()?->name ?? "" }}" readonly>
             </div>
             <div class="mb-3">
                 <label for="asesor" class="form-label">Nama Asesor</label>
