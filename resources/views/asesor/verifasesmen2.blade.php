@@ -120,7 +120,6 @@
 
         <div class="ttd-btns">
           <button type="button" class="ttd-btn ttd-clear" onclick="clearCanvas('ttd-asesi2')">Hapus</button>
-          <button type="button" class="ttd-btn ttd-download" onclick="downloadTTD('ttd-asesi2','nama-asesi2','tanggal-asesi2')">Unduh</button>
         </div>
       </form>
     </div>
@@ -140,7 +139,6 @@
 
         <div class="ttd-btns">
           <button type="button" class="ttd-btn ttd-clear" onclick="clearCanvas('ttd-asesor')">Hapus</button>
-          <button type="button" class="ttd-btn ttd-download" onclick="downloadTTD('ttd-asesor','nama-asesor','tanggal-asesor')">Unduh</button>
         </div>
       </form>
     </div>

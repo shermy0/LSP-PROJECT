@@ -105,7 +105,6 @@
 
       <div class="ttd-btns">
         <button type="button" class="ttd-btn ttd-clear" onclick="clearCanvas('ttd-asesi')">Hapus</button>
-        <button type="button" class="ttd-btn ttd-download" onclick="downloadTTD('ttd-asesi','nama-asesi','tanggal-asesi')">Unduh</button>
       </div>
     </form>
   </div>
