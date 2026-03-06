@@ -971,7 +971,7 @@ public function storePertanyaanPMO(Request $request, $id_pmo)
             'timer'            => $timer,
             'jenis_pertanyaan' => 'pmo',
             'timescap'         => now(),
-            'judul'            => $judul ?? 'Pertanyaan PMO ' . now()->format('d-m-Y H:i'),
+            'judul'            => $request->input('judul', 'Set Pertanyaan PMO ' . date('Y-m-d H:i:s')),
         ]);
         $id_pembuatan = $pembuatanBaru->id_pembuatan_pertanyaan;
     }
@@ -1224,14 +1224,15 @@ public function inputPMO(Request $request, $id_skema)
     $kelompok = $kelompok_id ? KelompokPekerjaan::find($kelompok_id) : null;
 
     return view('input_PMO', [
-        'skema'          => Skema::findOrFail($id_skema),
-        'unitKompetensi' => $unitKompetensi,
-        'timer'          => $timer,
-        'id_pmo'         => $pmo->id_pmo,
-        'jumlah'         => $jumlah,
-        'kelompok'       => $kelompok,
-        'id_pembuatan'   => $id_pembuatan_param,
-    ]);
+    'skema'          => Skema::findOrFail($id_skema),
+    'unitKompetensi' => $unitKompetensi,
+    'timer'          => $timer,
+    'id_pmo'         => $pmo->id_pmo,
+    'jumlah'         => $jumlah,
+    'kelompok'       => $kelompok,
+    'id_pembuatan'   => $id_pembuatan_param,
+    'judul'          => $request->query('judul', ''), // ✅ tambah ini
+]);
 }
 
 public function dataPesertaUji()
