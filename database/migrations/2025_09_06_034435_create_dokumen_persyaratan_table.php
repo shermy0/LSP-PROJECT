@@ -12,8 +12,8 @@ return new class extends Migration
             $table->id('id_dokumen');
 
             // 🔗 Relasi ke permohonan dan jenis dokumen
-            $table->unsignedBigInteger('permohonan_id');
-            $table->unsignedBigInteger('jenis_dokumen_id');
+            $table->unsignedBigInteger('id_permohonan');
+            $table->unsignedBigInteger('id_jenis_dokumen');
 
             // 📄 Informasi status dan bukti
             $table->string('nama_file')->nullable();      // nama file asli
