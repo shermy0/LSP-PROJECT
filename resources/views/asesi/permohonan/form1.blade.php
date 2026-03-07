@@ -219,9 +219,11 @@
                 <div class="mb-3">
                     <label class="form-label">Telp. Kantor <span class="text-danger">*</span></label>
                     <input type="text" name="telepon_kantor" class="form-control @error('telepon_kantor') is-invalid @enderror"
-                        value="{{ old('telepon_kantor', isset($asesi) ? $asesi->telepon_kantor : '') }}" placeholder="Telp. kantor"
-                        required pattern="^\+?\d{7,15}$" title="Masukkan nomor telepon yang valid (7-15 digit, optional +)"
-                        data-msg="Nomor telepon kantor tidak valid.">
+                        value="{{ old('telepon_kantor', isset($asesi) ? $asesi->telepon_kantor : '') }}" placeholder="Contoh: (021) 1234567 atau -"
+                        required
+                        pattern="^([-+()0-9 ]+|-)$"
+                        title="Masukkan nomor telepon kantor yang valid (angka, spasi, -, +, (, )) atau isi '-' jika tidak ada"
+                        data-msg="Masukkan nomor telepon kantor yang valid atau '-' jika tidak ada.">
                     <div class="invalid-feedback">
                         @error('telepon_kantor') {{ $message }} @else Telp. kantor wajib diisi dan format harus benar. @enderror
                     </div>
@@ -231,9 +233,11 @@
                 <div class="mb-3">
                     <label class="form-label">Fax Kantor <span class="text-danger">*</span></label>
                     <input type="text" name="fax_kantor" class="form-control @error('fax_kantor') is-invalid @enderror"
-                        value="{{ old('fax_kantor', isset($asesi) ? $asesi->fax_kantor : '') }}" placeholder="Fax kantor"
-                        required pattern="^\+?[\d\-]{6,20}$" title="Masukkan nomor fax yang valid"
-                        data-msg="Nomor fax tidak valid.">
+                        value="{{ old('fax_kantor', isset($asesi) ? $asesi->fax_kantor : '') }}" placeholder="Contoh: 021-123456 atau -"
+                        required
+                        pattern="^([-+()0-9 ]+|-)$"
+                        title="Masukkan nomor fax yang valid (angka, spasi, -, +, (, )) atau isi '-' jika tidak ada"
+                        data-msg="Masukkan nomor fax yang valid atau '-' jika tidak ada.">
                     <div class="invalid-feedback">
                         @error('fax_kantor') {{ $message }} @else Fax kantor wajib diisi dan format harus benar. @enderror
                     </div>
@@ -258,7 +262,6 @@
             </div>
         </form>
     </div>
-
 
     <style>
         /* (tetap seperti style sebelumnya, dengan penyesuaian untuk invalid-feedback default hidden) */

@@ -45,8 +45,8 @@ class FormPraAsesmenController extends Controller
 
                 // ✅ Jika permohonan ditolak, ambil dokumen yang tidak memenuhi
                 if ($permohonan->status === 'Ditolak') {
-                    $dokumenTidakMemenuhi = DokumenPersyaratan::with('jenis')
-                        ->where('permohonan_id', $permohonan->id_permohonan)
+                    $dokumenTidakMemenuhi = DokumenPersyaratan::with('jenisDokumen')
+                        ->where('id_permohonan', $permohonan->id_permohonan)
                         ->where('memenuhi_syarat', false)
                         ->get();
                 }

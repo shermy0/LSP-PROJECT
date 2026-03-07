@@ -14,7 +14,7 @@ class Form1AdminController extends Controller
     {
         // ✅ Ambil hanya Asesi yang punya permohonan berstatus "Diajukan"
         $asesi = DB::table('asesi')
-            ->join('permohonan', 'permohonan.asesi_id', '=', 'asesi.id_asesi')
+            ->join('permohonan', 'permohonan.id_asesi', '=', 'asesi.id_asesi')
             ->where('permohonan.status', 'Diajukan')
             ->select(
                 'asesi.id_asesi',
@@ -41,7 +41,7 @@ class Form1AdminController extends Controller
         // ✅ Ambil permohonan terbaru + join tujuan_asesmen agar field tujuan_asesmen ada
         $permohonan = DB::table('permohonan')
             ->leftJoin('tujuan_asesmen', 'permohonan.id_tujuan', '=', 'tujuan_asesmen.id_tujuan')
-            ->where('permohonan.asesi_id', $id_asesi)
+            ->where('permohonan.id_asesi', $id_asesi)
             ->select(
                 'permohonan.*',
                 'tujuan_asesmen.nama_tujuan as tujuan_asesmen'
@@ -57,13 +57,13 @@ class Form1AdminController extends Controller
         $skema = null;
         $units = collect();
 
-        if (!empty($permohonan->skema_id)) {
+        if (!empty($permohonan->id_skema)) {
             $skema = DB::table('skema_sertifikasi')
-                ->where('id_skema', $permohonan->skema_id)
+                ->where('id_skema', $permohonan->id_skema)
                 ->first();
 
             $units = DB::table('unit_kompetensi')
-                ->where('id_skema', $permohonan->skema_id)
+                ->where('id_skema', $permohonan->id_skema)
                 ->select('kode_unit', 'judul_unit', 'standar_kompetensi')
                 ->get();
         }
@@ -78,8 +78,8 @@ class Form1AdminController extends Controller
 
         // ✅ Dokumen Persyaratan (join jenis_dokumen)
         $dokumen = DB::table('dokumen_persyaratan')
-            ->join('jenis_dokumen', 'dokumen_persyaratan.jenis_dokumen_id', '=', 'jenis_dokumen.id_jenis_dokumen')
-            ->where('dokumen_persyaratan.permohonan_id', $permohonan->id_permohonan)
+            ->join('jenis_dokumen', 'dokumen_persyaratan.id_jenis_dokumen', '=', 'jenis_dokumen.id_jenis_dokumen')
+            ->where('dokumen_persyaratan.id_permohonan', $permohonan->id_permohonan)
             ->select(
                 'dokumen_persyaratan.id_dokumen',
                 'dokumen_persyaratan.path_file',
@@ -124,7 +124,7 @@ class Form1AdminController extends Controller
             ->update([
                 'status' => $request->status_permohonan,
                 'catatan' => $request->catatan,
-                'admin_id' => $adminId,
+                'id_admin' => $adminId,
                 'updated_at' => now(),
             ]);
 

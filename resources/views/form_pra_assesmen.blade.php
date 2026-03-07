@@ -120,7 +120,7 @@
                                     <ul>
                                         @forelse($dokumenTidakMemenuhi as $dok)
                                             <li>
-                                                {{ $dok->jenis->nama_dokumen ?? 'Dokumen #' . $dok->jenis_dokumen_id }}
+                                                {{ $dok->jenis->nama_dokumen ?? 'Dokumen #' . $dok->id_jenis_dokumen }}
                                                 @if($dok->file_path)
                                                     (<a href="{{ asset('storage/' . $dok->file_path) }}" target="_blank">Lihat</a>)
                                                 @endif

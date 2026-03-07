@@ -37,13 +37,15 @@
 
                 <div class="mb-3">
                     <label class="form-label">Judul Sertifikasi</label>
-                    <input type="text" id="judulSertifikasi" class="form-control" readonly required>
+                    <!-- readonly info field (tidak required supaya tidak memblokir submit jika JS gagal) -->
+                    <input type="text" id="judulSertifikasi" class="form-control" readonly>
                     <div class="invalid-feedback">Judul sertifikasi wajib terisi.</div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Nomor Skema</label>
-                    <input type="text" id="nomorSkema" class="form-control" readonly required>
+                    <!-- readonly info field (tidak required) -->
+                    <input type="text" id="nomorSkema" class="form-control" readonly>
                     <div class="invalid-feedback">Nomor skema wajib terisi.</div>
                 </div>
 
@@ -100,8 +102,10 @@
                         <label class="form-label">{{ $loop->iteration }}. {{ $jd->nama_dokumen }} <span
                                 class="text-danger">*</span></label>
                         <div class="input-group">
+                            <!-- removed 'required' so form can submit even jika user tidak mengupload semua file;
+                                 server akan memvalidasi sesuai kebutuhan -->
                             <input type="file" name="dokumen[{{ $jd->id_jenis_dokumen }}]" class="form-control dokumen-input"
-                                accept=".jpg,.jpeg,.png,.pdf" onchange="previewFile(this)" required>
+                                accept=".jpg,.jpeg,.png,.pdf" onchange="previewFile(this)">
                             <button type="button" class="btn btn-outline-primary" onclick="lihatFile(this)"
                                 disabled>Lihat</button>
                             <button type="button" class="btn btn-outline-danger" onclick="hapusFile(this)">Hapus</button>
@@ -117,11 +121,10 @@
                 <h6 class="fw-bold text-primary mb-3">B. Bukti Administratif</h6>
                 @foreach($jenisDokumen->where('kategori', 'administratif') as $jd)
                     <div class="mb-3">
-                        <label class="form-label">{{ $loop->iteration }}. {{ $jd->nama_dokumen }} <span
-                                class="text-danger">*</span></label>
+                        <label class="form-label">{{ $loop->iteration }}. {{ $jd->nama_dokumen }} <span class="text-danger">*</span></label>
                         <div class="input-group">
                             <input type="file" name="dokumen[{{ $jd->id_jenis_dokumen }}]" class="form-control dokumen-input"
-                                accept=".jpg,.jpeg,.png,.pdf" onchange="previewFile(this)" required>
+                                accept=".jpg,.jpeg,.png,.pdf" onchange="previewFile(this)">
                             <button type="button" class="btn btn-outline-primary" onclick="lihatFile(this)"
                                 disabled>Lihat</button>
                             <button type="button" class="btn btn-outline-danger" onclick="hapusFile(this)">Hapus</button>
@@ -581,8 +584,17 @@
             }
         });
 
+        // initialize canvas + events
         resizeCanvasAndPrepareBlank();
         attachCanvasEvents();
 
+        // defensive: ensure preview buttons start disabled if no file chosen
+        document.querySelectorAll('.input-group').forEach(group => {
+            const input = group.querySelector('input[type="file"]');
+            const lihatBtn = group.querySelector('button.btn-outline-primary');
+            if (input && lihatBtn) {
+                lihatBtn.disabled = !input.files.length;
+            }
+        });
     </script>
 @endsection

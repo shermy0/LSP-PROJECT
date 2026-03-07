@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use App\Models\TujuanAsesmen;
+use App\Models\Permohonan;
 use Throwable;
 
 class PermohonanController extends Controller
@@ -62,8 +63,9 @@ class PermohonanController extends Controller
             'jabatan'                => 'nullable|string|max:255',
             'alamat_kantor'          => 'nullable|string',
             'kode_pos_kantor'        => 'nullable|string|max:10',
-            'telepon_kantor'         => 'nullable|string|max:50',
-            'fax_kantor'             => 'nullable|string|max:50',
+            // contoh validasi untuk telepon_kantor / fax_kantor
+            'telepon_kantor'         => ['nullable', 'string', 'max:50', 'regex:/^([-+()0-9\s]+|-)$/'],
+            'fax_kantor'             => ['nullable', 'string', 'max:50', 'regex:/^([-+()0-9\s]+|-)$/'],
             'email_kantor'           => 'nullable|email|max:255',
         ]);
 
@@ -94,7 +96,7 @@ class PermohonanController extends Controller
     {
         $skema = DB::table('skema_sertifikasi')
             ->where('id_skema', $id)
-            ->select('id_skema', 'nama_skema', 'kode_skema', 'deskripsi')
+            ->select('id_skema', 'nama_skema', 'kode_skema','jenjang', 'deskripsi')
             ->first();
 
         if (!$skema) {
@@ -115,7 +117,7 @@ class PermohonanController extends Controller
     public function storeDokumen(Request $request)
     {
         $request->validate([
-            'skema_id'  => 'required|exists:skema_sertifikasi,id_skema',
+            'id_skema'  => 'required|exists:skema_sertifikasi,id_skema',
             'tujuan_id' => 'required|exists:tujuan_asesmen,id_tujuan',
             'dokumen.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'tanggal'   => 'required|date',
@@ -133,42 +135,46 @@ class PermohonanController extends Controller
         DB::beginTransaction();
 
         try {
-            // ✅ Buat atau update permohonan
-            $permohonan = DB::table('permohonan')
-                ->where('asesi_id', $asesi->id_asesi)
+            /**
+             * Cari permohonan terakhir untuk asesi ini
+             * NOTE: gunakan kolom DB 'id_asesi' (sesuai migration)
+             */
+            $permohonan = Permohonan::where('id_asesi', $asesi->id_asesi)
                 ->latest('id_permohonan')
                 ->first();
 
-            if (!$permohonan || $permohonan->status === 'Ditolak') {
-                $idPermohonan = DB::table('permohonan')->insertGetId([
-                    'asesi_id'       => $asesi->id_asesi,
-                    'skema_id'       => $request->skema_id,
+            // Jika tidak ada atau status sebelumnya 'Ditolak' -> buat baru
+            if (!$permohonan || ($permohonan && $permohonan->status === 'Ditolak')) {
+                $permohonan = Permohonan::create([
+                    'id_asesi'       => $asesi->id_asesi,
+                    'id_skema'       => $request->id_skema,
                     'id_tujuan'      => $request->tujuan_id,
-                    'tgl_permohonan' => now(),
+                    'tgl_permohonan' => now()->toDateString(),
                     'status'         => 'Diajukan',
-                    'created_at'     => now(),
-                    'updated_at'     => now(),
+                    'catatan'        => null,
                 ]);
             } else {
-                $idPermohonan = $permohonan->id_permohonan;
-                DB::table('permohonan')->where('id_permohonan', $idPermohonan)->update([
-                    'skema_id'       => $request->skema_id,
+                // update permohonan existing dengan atribut yang benar
+                $permohonan->update([
+                    'id_skema'       => $request->id_skema,
                     'id_tujuan'      => $request->tujuan_id,
-                    'tgl_permohonan' => now(),
+                    'tgl_permohonan' => now()->toDateString(),
                     'status'         => 'Diajukan',
-                    'updated_at'     => now(),
                 ]);
             }
 
-            // ✅ Simpan dokumen
+            $idPermohonan = $permohonan->id_permohonan;
+
+            // Simpan dokumen (pastikan nama kolom sesuai di tabel dokumen_persyaratan)
             $dokumenFiles = $request->file('dokumen', []);
             foreach ($dokumenFiles as $jenisId => $file) {
                 $path = $file ? $file->store("dokumen/{$asesi->id_asesi}", 'public') : null;
 
+                // sesuaikan key kolom di tabel Anda: saya gunakan id_permohonan & id_jenis_dokumen
                 DB::table('dokumen_persyaratan')->updateOrInsert(
                     [
-                        'permohonan_id'    => $idPermohonan,
-                        'jenis_dokumen_id' => $jenisId,
+                        'id_permohonan'    => $idPermohonan,
+                        'id_jenis_dokumen' => $jenisId,
                     ],
                     [
                         'nama_file'       => $file ? $file->getClientOriginalName() : null,
@@ -181,7 +187,7 @@ class PermohonanController extends Controller
                 );
             }
 
-            // ✅ Simpan tanda tangan digital
+            // Simpan tanda tangan digital asesi (base64 -> file)
             $ttdBase64 = $request->ttd_asesi;
             if (preg_match('/^data:image\/(png|jpeg);base64,/', $ttdBase64)) {
                 $ttdData = base64_decode(substr($ttdBase64, strpos($ttdBase64, ',') + 1));
@@ -204,6 +210,7 @@ class PermohonanController extends Controller
             return redirect()->route('form_pra_assesmen')->with('success', 'Data permohonan berhasil disimpan.');
         } catch (Throwable $e) {
             DB::rollBack();
+            // untuk debugging lokal boleh tampilkan pesan; production: log saja dan tampil pesan generik
             return redirect()->back()->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
         }
     }

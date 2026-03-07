@@ -14,8 +14,8 @@ class DokumenPersyaratan extends Model
     public $timestamps = true;
 
     protected $fillable = [
-        'permohonan_id',
-        'jenis_dokumen_id',
+        'id_permohonan',
+        'id_jenis_dokumen',
         'nama_file',
         'path_file',
         'ada',
@@ -32,7 +32,7 @@ class DokumenPersyaratan extends Model
      */
     public function permohonan()
     {
-        return $this->belongsTo(Permohonan::class, 'permohonan_id', 'id_permohonan');
+        return $this->belongsTo(Permohonan::class, 'id_permohonan', 'id_permohonan');
     }
 
     /**
@@ -40,7 +40,7 @@ class DokumenPersyaratan extends Model
      */
     public function jenisDokumen()
     {
-        return $this->belongsTo(JenisDokumen::class, 'jenis_dokumen_id', 'id_jenis_dokumen');
+        return $this->belongsTo(JenisDokumen::class, 'id_jenis_dokumen', 'id_jenis_dokumen');
     }
 
     // ===============================
