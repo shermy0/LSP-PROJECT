@@ -70,27 +70,10 @@
                 </div>
             </div>
 
-            {{-- Data TUK / Instansi --}}
-            <div class="unit-header">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary rounded-pill px-3 py-1 fs-6">3</span>
-                    <p class="mb-1 fw-semibold fs-5">Data TUK / Instansi</p>
-                </div>
-                <p class="mb-0 text-secondary">Informasi TUK yang terkait (jika tersedia)</p>
-            </div>
-            <div class="question-box mb-4">
-                <div class="ps-2 data-grid">
-                    <p><strong>Nama TUK / Lokasi Uji:</strong> {{ $tuk->nama_tuk ?? '-' }}</p>
-                    <p><strong>Alamat TUK:</strong> {{ $tuk->alamat_tuk ?? '-' }}</p>
-                    <p><strong>Telepon TUK:</strong> {{ $tuk->telepon ?? '-' }}</p>
-                    <p><strong>Email TUK:</strong> {{ $tuk->email ?? '-' }}</p>
-                </div>
-            </div>
-
             {{-- Data Sertifikasi --}}
             <div class="unit-header">
                 <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary rounded-pill px-3 py-1 fs-6">4</span>
+                    <span class="badge bg-primary rounded-pill px-3 py-1 fs-6">3</span>
                     <p class="mb-1 fw-semibold fs-5">Data Sertifikasi</p>
                 </div>
                 <p class="mb-0 text-secondary">Skema & status permohonan</p>
@@ -120,7 +103,7 @@
             {{-- Daftar Unit Kompetensi --}}
             <div class="unit-header">
                 <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary rounded-pill px-3 py-1 fs-6">5</span>
+                    <span class="badge bg-primary rounded-pill px-3 py-1 fs-6">4</span>
                     <p class="mb-1 fw-semibold fs-5">Daftar Unit Kompetensi</p>
                 </div>
                 <p class="mb-0 text-secondary">Unit kompetensi pemohon</p>
@@ -155,7 +138,7 @@
             {{-- Bukti Kelengkapan --}}
             <div class="unit-header">
                 <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary rounded-pill px-3 py-1 fs-6">6</span>
+                    <span class="badge bg-primary rounded-pill px-3 py-1 fs-6">5</span>
                     <p class="mb-1 fw-semibold fs-5">Bukti Kelengkapan</p>
                 </div>
                 <p class="mb-0 text-secondary">Lampiran dokumen pemohon</p>
@@ -214,7 +197,7 @@
             {{-- Tanda Tangan Persetujuan --}}
             <div class="unit-header">
                 <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary rounded-pill px-3 py-1 fs-6">7</span>
+                    <span class="badge bg-primary rounded-pill px-3 py-1 fs-6">6</span>
                     <p class="mb-1 fw-semibold fs-5">Tanda Tangan Persetujuan</p>
                 </div>
                 <p class="mb-0 text-secondary">TTD Asesi & Admin</p>
@@ -270,7 +253,7 @@
             {{-- Keputusan Permohonan --}}
             <div class="unit-header">
                 <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary rounded-pill px-3 py-1 fs-6">8</span>
+                    <span class="badge bg-primary rounded-pill px-3 py-1 fs-6">7</span>
                     <p class="mb-1 fw-semibold fs-5">Keputusan Permohonan</p>
                 </div>
                 <p class="mb-0 text-secondary">Pilih status dan catatan</p>

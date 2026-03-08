@@ -24,10 +24,11 @@
             <div class="question-box">
                 <div class="mb-3">
                     <label class="form-label">Skema Sertifikasi <span class="text-danger">*</span></label>
-                    <select id="skemaSelect" name="skema_id" class="form-select" required>
-                        <option value="" disabled {{ old('skema_id') ? '' : 'selected' }}>Pilih Skema Sertifikasi</option>
+                    <select id="skemaSelect" name="id_skema" class="form-select" required>
+                        <option value="" disabled {{ old('id_skema', $permohonan->id_skema ?? '') ? '' : 'selected' }}>Pilih
+                            Skema Sertifikasi</option>
                         @foreach($skema as $s)
-                            <option value="{{ $s->id_skema }}" {{ old('skema_id') == $s->id_skema ? 'selected' : '' }}>
+                            <option value="{{ $s->id_skema }}" {{ (string) old('id_skema', $permohonan->id_skema ?? '') === (string) $s->id_skema ? 'selected' : '' }}>
                                 {{ $s->nama_skema }}
                             </option>
                         @endforeach
@@ -37,24 +38,23 @@
 
                 <div class="mb-3">
                     <label class="form-label">Judul Sertifikasi</label>
-                    <!-- readonly info field (tidak required supaya tidak memblokir submit jika JS gagal) -->
-                    <input type="text" id="judulSertifikasi" class="form-control" readonly>
+                    <input type="text" id="judulSertifikasi" class="form-control" readonly value="">
                     <div class="invalid-feedback">Judul sertifikasi wajib terisi.</div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Nomor Skema</label>
-                    <!-- readonly info field (tidak required) -->
-                    <input type="text" id="nomorSkema" class="form-control" readonly>
+                    <input type="text" id="nomorSkema" class="form-control" readonly value="">
                     <div class="invalid-feedback">Nomor skema wajib terisi.</div>
                 </div>
 
                 <div class="mb-0">
                     <label class="form-label">Tujuan Asesmen <span class="text-danger">*</span></label>
                     <select id="tujuanAsesmen" name="tujuan_id" class="form-select" required>
-                        <option value="" disabled {{ old('tujuan_id') ? '' : 'selected' }}>Pilih Tujuan Asesmen</option>
+                        <option value="" disabled {{ old('tujuan_id', $permohonan->id_tujuan ?? '') ? '' : 'selected' }}>
+                            Pilih Tujuan Asesmen</option>
                         @foreach($tujuanAsesmen as $t)
-                            <option value="{{ $t->id_tujuan }}" {{ old('tujuan_id') == $t->id_tujuan ? 'selected' : '' }}>
+                            <option value="{{ $t->id_tujuan }}" {{ (string) old('tujuan_id', $permohonan->id_tujuan ?? '') === (string) $t->id_tujuan ? 'selected' : '' }}>
                                 {{ $t->nama_tujuan }}
                             </option>
                         @endforeach
@@ -98,20 +98,56 @@
             <div class="question-box">
                 <h6 class="fw-bold text-primary mb-3">A. Bukti Persyaratan Dasar Pemohon</h6>
                 @foreach($jenisDokumen->where('kategori', 'dasar') as $jd)
+                    @php
+                        $doc = $existingDocs->get($jd->id_jenis_dokumen) ?? null;
+                        $invalidClass = ($doc && !$doc->memenuhi_syarat) ? 'is-invalid' : '';
+                        $existingFileUrl = $doc && $doc->path_file ? Storage::url($doc->path_file) : '';
+                        $existingFileName = $doc ? $doc->nama_file : '';
+                    @endphp
                     <div class="mb-3">
                         <label class="form-label">{{ $loop->iteration }}. {{ $jd->nama_dokumen }} <span
                                 class="text-danger">*</span></label>
+
                         <div class="input-group">
-                            <!-- removed 'required' so form can submit even jika user tidak mengupload semua file;
-                                 server akan memvalidasi sesuai kebutuhan -->
-                            <input type="file" name="dokumen[{{ $jd->id_jenis_dokumen }}]" class="form-control dokumen-input"
-                                accept=".jpg,.jpeg,.png,.pdf" onchange="previewFile(this)">
-                            <button type="button" class="btn btn-outline-primary" onclick="lihatFile(this)"
-                                disabled>Lihat</button>
-                            <button type="button" class="btn btn-outline-danger" onclick="hapusFile(this)">Hapus</button>
+                            {{-- file input (nama array 'dokumen[id]') --}}
+                            <input type="file" name="dokumen[{{ $jd->id_jenis_dokumen }}]"
+                                class="form-control dokumen-input {{ $invalidClass }}" accept=".jpg,.jpeg,.png,.pdf"
+                                onchange="previewFile(this)" data-existing-name="{{ $existingFileName }}"
+                                data-file-url="{{ $existingFileUrl }}"
+                                data-memenuhi="{{ $doc && $doc->memenuhi_syarat ? '1' : '0' }}">
+
+                            {{-- tombol lihat: data-file-url di-set agar preview existing dapat dibuka --}}
+                            <button type="button" class="btn btn-outline-primary lihat-btn" onclick="lihatFile(this)"
+                                data-file-url="{{ $existingFileUrl }}" {{ $existingFileUrl ? '' : 'disabled' }}>
+                                Lihat
+                            </button>
+
+                            {{-- tombol hapus: JS akan set hidden flag remove_dokumen[id] = 1 --}}
+                            <button type="button" class="btn btn-outline-danger btn-hapus"
+                                onclick="hapusFile(this)">Hapus</button>
+
                             <div class="invalid-feedback">Silakan unggah dokumen ini.</div>
                         </div>
-                        <div class="file-preview mt-2 text-muted small">Belum ada file dipilih</div>
+
+                        {{-- hidden flag untuk tandai hapus --}}
+                        <input type="hidden" name="remove_dokumen[{{ $jd->id_jenis_dokumen }}]" value="0" class="remove-flag">
+
+                        {{-- preview / existing --}}
+                        <div class="file-preview mt-2 small">
+                            @if($existingFileName)
+                                <strong>File tersimpan:</strong> {{ $existingFileName }}
+                            @else
+                                Belum ada file dipilih
+                            @endif
+                        </div>
+
+                        {{-- pesan jika dokumen tidak memenuhi syarat --}}
+                        @if($doc && !$doc->memenuhi_syarat)
+                            <div class="text-danger small mt-1">Dokumen belum memenuhi syarat.</div>
+                            @if(!empty($doc->catatan))
+                                <div class="text-muted small mt-1">Catatan: {{ $doc->catatan }}</div>
+                            @endif
+                        @endif
                     </div>
                 @endforeach
             </div>
@@ -120,17 +156,47 @@
             <div class="question-box">
                 <h6 class="fw-bold text-primary mb-3">B. Bukti Administratif</h6>
                 @foreach($jenisDokumen->where('kategori', 'administratif') as $jd)
+                    @php
+                        $doc = $existingDocs->get($jd->id_jenis_dokumen) ?? null;
+                        $invalidClass = ($doc && !$doc->memenuhi_syarat) ? 'is-invalid' : '';
+                        $existingFileUrl = $doc ? $doc->file_url : '';
+                        $existingFileName = $doc ? $doc->nama_file : '';
+                    @endphp
                     <div class="mb-3">
-                        <label class="form-label">{{ $loop->iteration }}. {{ $jd->nama_dokumen }} <span class="text-danger">*</span></label>
+                        <label class="form-label">{{ $loop->iteration }}. {{ $jd->nama_dokumen }} <span
+                                class="text-danger">*</span></label>
                         <div class="input-group">
-                            <input type="file" name="dokumen[{{ $jd->id_jenis_dokumen }}]" class="form-control dokumen-input"
-                                accept=".jpg,.jpeg,.png,.pdf" onchange="previewFile(this)">
-                            <button type="button" class="btn btn-outline-primary" onclick="lihatFile(this)"
-                                disabled>Lihat</button>
-                            <button type="button" class="btn btn-outline-danger" onclick="hapusFile(this)">Hapus</button>
+                            <input type="file" name="dokumen[{{ $jd->id_jenis_dokumen }}]"
+                                class="form-control dokumen-input {{ $invalidClass }}" accept=".jpg,.jpeg,.png,.pdf"
+                                onchange="previewFile(this)" data-existing-name="{{ $existingFileName }}"
+                                data-file-url="{{ $existingFileUrl }}"
+                                data-memenuhi="{{ $doc && $doc->memenuhi_syarat ? '1' : '0' }}">
+                            <button type="button" class="btn btn-outline-primary lihat-btn" onclick="lihatFile(this)"
+                                data-file-url="{{ $existingFileUrl }}" {{ $existingFileUrl ? '' : 'disabled' }}>
+                                Lihat
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-hapus"
+                                onclick="hapusFile(this)">Hapus</button>
                             <div class="invalid-feedback">Silakan unggah dokumen ini.</div>
                         </div>
-                        <div class="file-preview mt-2 text-muted small">Belum ada file dipilih</div>
+
+                        {{-- hidden flag untuk tandai hapus --}}
+                        <input type="hidden" name="remove_dokumen[{{ $jd->id_jenis_dokumen }}]" value="0" class="remove-flag">
+
+                        <div class="file-preview mt-2 small">
+                            @if($existingFileName)
+                                <strong>File tersimpan:</strong> {{ $existingFileName }}
+                            @else
+                                Belum ada file dipilih
+                            @endif
+                        </div>
+
+                        @if($doc && !$doc->memenuhi_syarat)
+                            <div class="text-danger small mt-1">Dokumen belum memenuhi syarat.</div>
+                            @if(!empty($doc->catatan))
+                                <div class="text-muted small mt-1">Catatan: {{ $doc->catatan }}</div>
+                            @endif
+                        @endif
                     </div>
                 @endforeach
             </div>
@@ -181,16 +247,19 @@
             </div>
 
             <!-- Modal: TTD Required -->
-            <div class="modal fade" id="ttdRequiredModal" tabindex="-1" aria-labelledby="ttdRequiredModalLabel" aria-hidden="true">
+            <div class="modal fade" id="ttdRequiredModal" tabindex="-1" aria-labelledby="ttdRequiredModalLabel"
+                aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content border-danger">
                         <div class="modal-header bg-danger text-white">
                             <h5 class="modal-title" id="ttdRequiredModalLabel">Tanda Tangan Diperlukan</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Tutup"></button>
                         </div>
                         <div class="modal-body">
                             <p class="mb-0">Silakan tanda tangan pada area tanda tangan sebelum melanjutkan.</p>
-                            <p class="small text-muted mt-2">Tekan <strong>Hapus</strong> jika ingin mulai ulang, lalu tanda tangan ulang.</p>
+                            <p class="small text-muted mt-2">Tekan <strong>Hapus</strong> jika ingin mulai ulang, lalu tanda
+                                tangan ulang.</p>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
@@ -362,48 +431,106 @@
         }
     </style>
 
-    {{-- === SCRIPT Bukti Kelengkapan === --}}
+    {{-- === SCRIPT Bukti Kelengkapan & Preview === --}}
     <script>
         function previewFile(input) {
             const file = input.files[0];
             const previewDiv = input.closest('.mb-3').querySelector('.file-preview');
-            const lihatBtn = input.closest('.input-group').querySelector('button.btn-outline-primary');
+            const lihatBtn = input.closest('.input-group').querySelector('button.lihat-btn');
+            const removeFlag = input.closest('.mb-3').querySelector('.remove-flag');
+
             if (file) {
-                previewDiv.textContent = `File dipilih: ${file.name}`;
-                lihatBtn.disabled = false;
+                previewDiv.innerHTML = `<strong>File dipilih:</strong> ${file.name}`;
+                if (lihatBtn) lihatBtn.disabled = false;
+                if (removeFlag) removeFlag.value = "0";
             } else {
-                previewDiv.textContent = "Belum ada file dipilih";
-                lihatBtn.disabled = true;
+                const existingName = input.dataset.existingName || '';
+                const existingUrl = input.dataset.fileUrl || '';
+                if (existingName) {
+                    previewDiv.innerHTML = `<strong>File tersimpan:</strong> ${existingName}`;
+                    if (lihatBtn) {
+                        lihatBtn.disabled = !existingUrl;
+                        lihatBtn.setAttribute('data-file-url', existingUrl || '');
+                    }
+                    if (removeFlag) removeFlag.value = "0";
+                } else {
+                    previewDiv.textContent = "Belum ada file dipilih";
+                    if (lihatBtn) lihatBtn.disabled = true;
+                    if (removeFlag) removeFlag.value = "0";
+                }
             }
         }
+
         function lihatFile(btn) {
             const input = btn.closest('.input-group').querySelector('input[type="file"]');
-            const file = input.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const modalBody = document.getElementById('previewContent');
-                modalBody.innerHTML = "";
-                if (file.type === "application/pdf") {
-                    modalBody.innerHTML = `<iframe src="${e.target.result}"></iframe>`;
-                } else if (file.type.startsWith("image/")) {
-                    modalBody.innerHTML = `<img src="${e.target.result}" alt="Preview Gambar">`;
-                } else {
-                    modalBody.innerHTML = `<p>Tipe file tidak didukung untuk preview</p>`;
-                }
-                new bootstrap.Modal(document.getElementById('previewModal')).show();
-            };
-            reader.readAsDataURL(file);
+            const file = input.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const modalBody = document.getElementById('previewContent');
+                    modalBody.innerHTML = "";
+                    if (file.type === "application/pdf") {
+                        modalBody.innerHTML = `<iframe src="${e.target.result}"></iframe>`;
+                    } else if (file.type.startsWith("image/")) {
+                        modalBody.innerHTML = `<img src="${e.target.result}" alt="Preview Gambar">`;
+                    } else {
+                        modalBody.innerHTML = `<p>Tipe file tidak didukung untuk preview</p>`;
+                    }
+                    new bootstrap.Modal(document.getElementById('previewModal')).show();
+                };
+                reader.readAsDataURL(file);
+                return;
+            }
+
+            const fileUrl = btn.getAttribute('data-file-url') || input.dataset.fileUrl || '';
+            if (!fileUrl) return;
+
+            const lower = fileUrl.toLowerCase();
+            const modalBody = document.getElementById('previewContent');
+            modalBody.innerHTML = "";
+            if (lower.endsWith('.pdf')) {
+                modalBody.innerHTML = `<iframe src="${fileUrl}"></iframe>`;
+            } else if (lower.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
+                modalBody.innerHTML = `<img src="${fileUrl}" alt="Preview Gambar">`;
+            } else {
+                window.open(fileUrl, '_blank');
+                return;
+            }
+            new bootstrap.Modal(document.getElementById('previewModal')).show();
         }
+
         function hapusFile(btn) {
-            const input = btn.closest('.input-group').querySelector('input[type="file"]');
-            const lihatBtn = btn.closest('.input-group').querySelector('button.btn-outline-primary');
-            const previewDiv = btn.closest('.mb-3').querySelector('.file-preview');
+            const mb = btn.closest('.mb-3');
+            const input = mb.querySelector('input[type="file"]');
+            const lihatBtn = mb.querySelector('button.lihat-btn');
+            const previewDiv = mb.querySelector('.file-preview');
+            const removeFlag = mb.querySelector('.remove-flag');
+
             input.value = "";
             previewDiv.textContent = "Belum ada file dipilih";
-            lihatBtn.disabled = true;
+            if (lihatBtn) lihatBtn.disabled = true;
+            if (removeFlag) removeFlag.value = "1";
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // set lihat-btn disabled sesuai existing
+            document.querySelectorAll('.input-group').forEach(group => {
+                const input = group.querySelector('input[type="file"]');
+                const lihatBtn = group.querySelector('button.lihat-btn');
+                if (input && lihatBtn) {
+                    const fileUrl = input.dataset.fileUrl || lihatBtn.getAttribute('data-file-url') || '';
+                    lihatBtn.disabled = !fileUrl && !(input.files && input.files.length);
+                }
+            });
+
+            // trigger change untuk prefill skema title/nomor
+            const skemaSelect = document.getElementById('skemaSelect');
+            if (skemaSelect && skemaSelect.value) skemaSelect.dispatchEvent(new Event('change'));
+        });
     </script>
 
+    {{-- === SCRIPT: SKEMA AJAX, FORM VALIDATION, TTD Canvas === --}}
     <script>
         (function () {
             'use strict'
@@ -425,7 +552,7 @@
                 }
                 form.classList.add('was-validated')
             }, false)
-        })()
+        })();
 
         // === SKEMA AJAX LOADER ===
         document.getElementById('skemaSelect').addEventListener('change', function () {
@@ -442,12 +569,12 @@
                     if (data.units && data.units.length > 0) {
                         data.units.forEach((u, i) => {
                             tbody.innerHTML += `
-                                <tr>
-                                    <td>${i + 1}</td>
-                                    <td>${u.kode_unit ?? '-'}</td>
-                                    <td>${u.judul_unit ?? '-'}</td>
-                                    <td>${u.standar_kompetensi ?? '-'}</td>
-                                </tr>`;
+                                    <tr>
+                                        <td>${i + 1}</td>
+                                        <td>${u.kode_unit ?? '-'}</td>
+                                        <td>${u.judul_unit ?? '-'}</td>
+                                        <td>${u.standar_kompetensi ?? '-'}</td>
+                                    </tr>`;
                         });
                     } else {
                         tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">Tidak ada unit kompetensi</td></tr>`;
@@ -464,8 +591,8 @@
         const ctx = canvas.getContext("2d");
         const placeholder = document.querySelector(".canvas-placeholder");
         let drawing = false;
-        let blankDataURL = null;   // akan berisi dataURL canvas saat hanya background putih
-        const VISIBLE_HEIGHT = 200; // px, sesuai CSS height
+        let blankDataURL = null;
+        const VISIBLE_HEIGHT = 200;
 
         function resizeCanvasAndPrepareBlank() {
             const cssWidth = canvas.clientWidth;
@@ -546,13 +673,11 @@
 
         function saveTTD() {
             if (isCanvasBlank()) {
-                // Show modal (instead of alert)
                 const modalEl = document.getElementById('ttdRequiredModal');
                 if (modalEl) {
                     const modal = new bootstrap.Modal(modalEl);
                     modal.show();
                 } else {
-                    // fallback
                     alert("Silakan tanda tangan terlebih dahulu sebelum lanjut.");
                 }
                 return false;
@@ -587,14 +712,5 @@
         // initialize canvas + events
         resizeCanvasAndPrepareBlank();
         attachCanvasEvents();
-
-        // defensive: ensure preview buttons start disabled if no file chosen
-        document.querySelectorAll('.input-group').forEach(group => {
-            const input = group.querySelector('input[type="file"]');
-            const lihatBtn = group.querySelector('button.btn-outline-primary');
-            if (input && lihatBtn) {
-                lihatBtn.disabled = !input.files.length;
-            }
-        });
     </script>
 @endsection
