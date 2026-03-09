@@ -14,7 +14,7 @@
 
                 <label for="nama-asesi" class="ttd-label">Nama Lengkap</label>
                 <input type="text" name="nama_asesi" id="nama-asesi" class="ttd-input"
-                       value="{{ Auth::user()->name }}" readonly>
+                       value="{{ Auth::user()?->name ?? "" }}" readonly>
 
                 <label for="tanggal-asesi" class="ttd-label">Tanggal</label>
                 <!-- tanggal dibuat readonly -->

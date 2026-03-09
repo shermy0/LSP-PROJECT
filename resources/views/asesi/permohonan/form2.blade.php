@@ -111,7 +111,7 @@
         <div class="question-box">
             <div class="mb-3">
                 <label for="nama-asesi" class="form-label">Nama Lengkap</label>
-                <input type="text" id="nama-asesi" class="form-control" value="{{ $asesi->nama_lengkap ?? Auth::user()->name }}" readonly required>
+                <input type="text" id="nama-asesi" class="form-control" value="{{ $asesi->nama_lengkap ?? Auth::user()?->name ?? "" }}" readonly required>
                 <div class="invalid-feedback">Nama wajib terisi.</div>
             </div>
             <div class="mb-3">

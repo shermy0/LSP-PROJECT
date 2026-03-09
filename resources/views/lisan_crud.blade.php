@@ -10,7 +10,7 @@
                 (Skema: {{ $skema->nama_skema ?? 'Belum ada skema' }})
             </span>
         </h4>
-    </div>
+    </div>  
 
     {{-- Tampilkan pertanyaan kelompok tertentu --}}
     @isset($kelompok)
@@ -21,7 +21,7 @@
             {{-- List pertanyaan --}}
             @forelse($kelompok->pertanyaan as $index => $p)
                 <div class="card mb-3 shadow-sm">
-                    <div class="card-body">
+                <div class="card-body">
                         <h6 class="fw-bold">{{ $index + 1 }}. Pertanyaan:</h6>
                         <p>{{ $p->isi_pertanyaan }}</p>
 
