@@ -20,10 +20,21 @@ class AsesmenMandiriController extends Controller
      */
     public function index()
     {
+        // Ambil data asesi yang sudah memiliki asesmen mandiri
         $asesi = DB::table('asesi')
             ->join('users', 'asesi.user_id', '=', 'users.id')
-            ->select('asesi.asesi_id', 'asesi.nama_lengkap', 'users.email')
-            ->get();
+            ->join('permohonan', 'asesi.id_asesi', '=', 'permohonan.id_asesi')
+            ->join('asesmen_mandiri_master', 'permohonan.id_permohonan', '=', 'asesmen_mandiri_master.id_permohonan')
+            ->select(
+                'asesi.id_asesi',
+                'asesi.nama_lengkap',
+                'asesi.nik',
+                'asesi.email',
+                'asesi.telepon_hp as telepon',
+                'permohonan.updated_at'
+            )
+            ->distinct()
+            ->paginate(10);
 
         return view('asesor.asesmen_mandiri.index', compact('asesi'));
     }
@@ -31,11 +42,11 @@ class AsesmenMandiriController extends Controller
     /**
      * Detail asesmen mandiri untuk verifikasi
      */
-    public function show($asesi_id)
+    public function show($id_asesi)
     {
-        $asesi = Asesi::with('user')->findOrFail($asesi_id);
+        $asesi = Asesi::with('user')->findOrFail($id_asesi);
 
-        $asesmen = AsesmenMandiriMaster::where('asesi_id', $asesi_id)
+        $asesmen = AsesmenMandiriMaster::where('id_asesi', $id_asesi)
             ->latest('id_asesmen_mandiri')
             ->first();
 
@@ -44,23 +55,28 @@ class AsesmenMandiriController extends Controller
                 ->with('error', 'Asesi belum mengisi asesmen mandiri.');
         }
 
-        // 🔹 Jawaban asesi
+        // Jawaban asesi
         $jawaban = AsesmenMandiriJawaban::where('id_asesmen_mandiri', $asesmen->id_asesmen_mandiri)
             ->with(['dokumen', 'kuk'])
             ->get()
             ->keyBy('id_kuk');
 
-        // 🔹 Ambil skema permohonan terakhir
+        // Ambil skema permohonan terakhir
         $permohonan = DB::table('permohonan')
-            ->join('skema_sertifikasi', 'permohonan.skema_id', '=', 'skema_sertifikasi.id_skema')
-            ->where('asesi_id', $asesi_id)
-            ->latest('id_permohonan')
-            ->select('skema_sertifikasi.nama_skema as skema', 'permohonan.skema_id')
+            ->join('skema_sertifikasi', 'permohonan.id_skema', '=', 'skema_sertifikasi.id_skema')
+            ->where('permohonan.id_asesi', $id_asesi)
+            ->latest('permohonan.id_permohonan')
+            ->select('skema_sertifikasi.nama_skema as skema', 'permohonan.id_skema')
             ->first();
 
-        // 🔹 Ambil struktur skema (unit → elemen → kuk)
+        if (!$permohonan) {
+            return redirect()->route('asesor.asesmen_mandiri.index')
+                ->with('error', 'Data permohonan tidak ditemukan.');
+        }
+
+        // Ambil struktur skema (unit → elemen → kuk)
         $units = DB::table('unit_kompetensi')
-            ->where('id_skema', $permohonan->id_skema ?? 0)
+            ->where('id_skema', $permohonan->id_skema)
             ->get();
 
         $elemen = DB::table('elemen_kompetensi')
@@ -72,7 +88,7 @@ class AsesmenMandiriController extends Controller
             ->whereIn('id_elemen', $elemen->pluck('id_elemen'))
             ->get();
 
-        // 🔹 Ambil persetujuan (tanda tangan asesi jika ada)
+        // Ambil persetujuan (tanda tangan asesi jika ada)
         $persetujuan = AsesmenMandiriPersetujuan::where('id_asesmen_mandiri', $asesmen->id_asesmen_mandiri)->first();
 
         return view('asesor.asesmen_mandiri.show', compact(
@@ -90,14 +106,13 @@ class AsesmenMandiriController extends Controller
     /**
      * Simpan hasil verifikasi asesor
      */
-    public function verifikasiStore(Request $request, $asesi_id)
+    public function verifikasiStore(Request $request, $id_asesi)
     {
-        // 🔹 Sesuaikan validasi dengan enum tabel
         $request->validate([
             'rekomendasi' => 'required|in:Dapat Dilanjutkan,Tidak Dapat Dilanjutkan',
         ]);
 
-        $asesmen = AsesmenMandiriMaster::where('asesi_id', $asesi_id)
+        $asesmen = AsesmenMandiriMaster::where('id_asesi', $id_asesi)
             ->latest('id_asesmen_mandiri')
             ->first();
 
@@ -105,7 +120,7 @@ class AsesmenMandiriController extends Controller
             return back()->with('error', 'Asesi belum mengisi asesmen mandiri.');
         }
 
-        // 🔹 Simpan tanda tangan asesor sebagai file
+        // Simpan tanda tangan asesor sebagai file
         $fileName = null;
         if ($request->filled('ttd_asesor')) {
             $image = str_replace('data:image/png;base64,', '', $request->ttd_asesor);
@@ -114,13 +129,13 @@ class AsesmenMandiriController extends Controller
             Storage::disk('public')->put($fileName, base64_decode($image));
         }
 
-        // 🔹 Update rekomendasi di master
+        // Update rekomendasi di master
         $asesmen->update([
             'id_asesor'   => Auth::id(),
             'rekomendasi' => $request->rekomendasi,
         ]);
 
-        // 🔹 Simpan/update persetujuan
+        // Simpan/update persetujuan
         AsesmenMandiriPersetujuan::updateOrCreate(
             ['id_asesmen_mandiri' => $asesmen->id_asesmen_mandiri],
             [

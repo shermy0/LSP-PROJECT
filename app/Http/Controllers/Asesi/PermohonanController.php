@@ -262,31 +262,33 @@ class PermohonanController extends Controller
                 ->first();
 
 
-            if(!$permohonan || $permohonan->status === 'Ditolak'){
+            if (!$permohonan) {
 
+                // ✅ Belum pernah mengajukan → buat baru
                 $permohonan = Permohonan::create([
 
-                    'id_asesi'=>$asesi->id_asesi,
-                    'id_skema'=>$request->id_skema,
-                    'id_tujuan'=>$request->tujuan_id,
+                    'id_asesi'       => $asesi->id_asesi,
+                    'id_skema'       => $request->id_skema,
+                    'id_tujuan'      => $request->tujuan_id,
 
-                    'tgl_permohonan'=>now()->toDateString(),
+                    'tgl_permohonan' => now()->toDateString(),
 
-                    'status'=>'Diajukan',
-                    'catatan'=>null
+                    'status'         => 'Diajukan',
+                    'catatan'        => null
 
                 ]);
 
-            }else{
+            } else {
 
+                // ✅ Sudah pernah mengajukan → update data yang ada (termasuk jika status Ditolak)
                 $permohonan->update([
 
-                    'id_skema'=>$request->id_skema,
-                    'id_tujuan'=>$request->tujuan_id,
+                    'id_skema'       => $request->id_skema,
+                    'id_tujuan'      => $request->tujuan_id,
 
-                    'tgl_permohonan'=>now()->toDateString(),
+                    'tgl_permohonan' => now()->toDateString(),
 
-                    'status'=>'Diajukan'
+                    'status'         => 'Diajukan'   // kembalikan ke Diajukan
 
                 ]);
 

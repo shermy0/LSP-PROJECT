@@ -170,20 +170,25 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        @if(isset($d->memenuhi_syarat))
-                                            <span class="badge {{ $d->memenuhi_syarat ? 'bg-success' : 'bg-danger' }} px-3 py-2">{{ $d->memenuhi_syarat ? 'Ya' : 'Tidak' }}</span>
-                                        @else
-                                            <div class="d-flex justify-content-center gap-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="radio" name="syarat[{{ $d->id_dokumen ?? $d->id ?? $i }}]" value="Ya" id="ya{{ $i }}">
-                                                    <label class="form-check-label" for="ya{{ $i }}">Ya</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="radio" name="syarat[{{ $d->id_dokumen ?? $d->id ?? $i }}]" value="Tidak" id="tidak{{ $i }}">
-                                                    <label class="form-check-label" for="tidak{{ $i }}">Tidak</label>
-                                                </div>
+                                        {{-- SELALU TAMPILKAN RADIO BUTTON DENGAN NILAI DARI DATABASE --}}
+                                        <div class="d-flex justify-content-center gap-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" 
+                                                       name="syarat[{{ $d->id_dokumen ?? $d->id ?? $i }}]" 
+                                                       value="Ya" 
+                                                       id="ya{{ $i }}"
+                                                       {{ isset($d->memenuhi_syarat) && $d->memenuhi_syarat ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="ya{{ $i }}">Ya</label>
                                             </div>
-                                        @endif
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" 
+                                                       name="syarat[{{ $d->id_dokumen ?? $d->id ?? $i }}]" 
+                                                       value="Tidak" 
+                                                       id="tidak{{ $i }}"
+                                                       {{ isset($d->memenuhi_syarat) && !$d->memenuhi_syarat ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="tidak{{ $i }}">Tidak</label>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
@@ -278,9 +283,10 @@
                         </div>
                         <div class="invalid-feedback">Silakan pilih status keputusan.</div>
                     </div>
-                    <div class="col-md-6 mb-3" id="catatanBox" style="display: {{ old('status_permohonan', $permohonan->status ?? '') == 'Ditolak' ? 'block' : 'none' }};">
-                        <label for="catatan" class="form-label fw-semibold">Alasan / Keterangan</label>
-                        <textarea id="catatan" name="catatan" class="form-control" rows="3" placeholder="Isi alasan penolakan (wajib jika ditolak)">{{ old('catatan', $permohonan->catatan ?? '') }}</textarea>
+                    {{-- CATATAN SELALU TAMPIL --}}
+                    <div class="col-md-6 mb-3">
+                        <label for="catatan" class="form-label fw-semibold">Catatan / Keterangan</label>
+                        <textarea id="catatan" name="catatan" class="form-control" rows="3" placeholder="Isi catatan jika diperlukan (wajib jika ditolak)">{{ old('catatan', $permohonan->catatan ?? '') }}</textarea>
                         <div class="invalid-feedback">Harap isi alasan penolakan.</div>
                     </div>
                 </div>
@@ -537,7 +543,7 @@
     }
 </style>
 
-{{-- SCRIPTS (sama persis, hanya tambahan inisialisasi) --}}
+{{-- SCRIPTS --}}
 <script>
     // Preview dokumen
     function openPreview(url, ext) {
@@ -708,31 +714,25 @@
         window.isCanvasBlankAdmin = isCanvasBlankAdmin;
     })();
 
-    // Toggle catatan ketika ditolak
-    (function () {
+    // Atur required catatan berdasarkan status (wajib jika ditolak)
+    (function() {
         const diterima = document.getElementById('statusDiterima');
         const ditolak = document.getElementById('statusDitolak');
-        const catatanBox = document.getElementById('catatanBox');
         const catatan = document.getElementById('catatan');
 
-        function toggleCatatan() {
-            if (!catatanBox) return;
+        function setCatatanRequired() {
             if (ditolak && ditolak.checked) {
-                catatanBox.style.display = 'block';
-                if (catatan) catatan.setAttribute('required', 'required');
+                catatan.setAttribute('required', 'required');
             } else {
-                catatanBox.style.display = 'none';
-                if (catatan) {
-                    catatan.removeAttribute('required');
-                    catatan.classList.remove('is-invalid');
-                }
+                catatan.removeAttribute('required');
+                catatan.classList.remove('is-invalid');
             }
         }
 
-        if (diterima && ditolak) {
-            diterima.addEventListener('change', toggleCatatan);
-            ditolak.addEventListener('change', toggleCatatan);
-            toggleCatatan();
+        if (diterima && ditolak && catatan) {
+            diterima.addEventListener('change', setCatatanRequired);
+            ditolak.addEventListener('change', setCatatanRequired);
+            setCatatanRequired(); // inisialisasi
         }
     })();
 
