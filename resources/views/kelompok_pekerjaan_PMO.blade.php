@@ -63,6 +63,52 @@
                         </tbody>
                     </table>
                 </div>
+
+                {{-- Daftar soal yang sudah diinput --}}
+                @if(isset($soalPerKelompok) && $soalPerKelompok->has($k->id_kelompok))
+                    @php $soalList = $soalPerKelompok->get($k->id_kelompok); @endphp
+                    <div class="px-4 py-3" style="border-top: 2px solid #e6eef6;">
+                        <p class="fw-bold mb-3" style="font-size:0.8rem; color:#041562; letter-spacing:0.5px;">
+                            <i class="bi bi-list-check me-1"></i>SOAL TERSIMPAN ({{ $soalList->count() }})
+                        </p>
+                        @foreach($soalList as $si => $soal)
+                        @php
+                            $unitIds = json_decode($soal->id_unit, true) ?? [];
+                            $units   = isset($unitList) ? $unitList->whereIn('id_unit', $unitIds) : collect();
+                        @endphp
+                        <div class="card mb-3 border-0 shadow-sm rounded-3">
+                            <div class="card-body p-3">
+                                <div class="d-flex gap-2">
+                                    <span class="fw-bold text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                          style="width:28px;height:28px;background-color:#041562;font-size:0.8rem;">
+                                        {{ $si + 1 }}
+                                    </span>
+                                    <div class="flex-grow-1">
+                                        <p class="fw-semibold mb-1" style="color:#041562; font-size:0.95rem;">
+                                            {{ $soal->pertanyaan }}
+                                        </p>
+                                        @if($soal->deskripsi_pertanyaan)
+                                            <p class="text-muted small mb-2">
+                                                <span class="fw-semibold">Jawaban:</span> {{ $soal->deskripsi_pertanyaan }}
+                                            </p>
+                                        @endif
+                                        <div class="p-2 rounded-2" style="background-color:#f4f6fb; border-left:3px solid #041562;">
+                                            <p class="text-muted small fw-semibold mb-1">Unit Kompetensi:</p>
+                                            @foreach($units as $unit)
+                                                <div class="d-flex align-items-start gap-2 mb-1">
+                                                    <i class="bi bi-check-circle-fill mt-1 flex-shrink-0" style="color:#041562; font-size:0.75rem;"></i>
+                                                    <span style="font-size:0.85rem; color:#333;">{{ $unit->judul_unit }}</span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                @endif
+
             </div>
         </div>
     @empty
@@ -90,10 +136,12 @@
 
 const globalIdPembuatan = "{{ $resolvedIdPembuatan }}";
 const globalIdPmo       = "{{ $resolvedIdPmo }}";
+const globalJudul = "{{ addslashes($judul ?? ($pembuatan->judul ?? '')) }}";
+const globalTimer       = "{{ $timer ?? 30 }}";
 
 function popupJumlahPertanyaan(id_skema, timer, kelompok_id, nama_kelompok) {
     Swal.fire({
-        title: `Jumlah Pertanyaan – ${nama_kelompok}`,
+        title: `Jumlah Pertanyaan - ${nama_kelompok}`,
         html: `
             <input id="jumlahPertanyaan" type="number" class="form-control mb-2 text-center border-primary"
                    min="1" max="15" value="1">
@@ -118,17 +166,53 @@ function popupJumlahPertanyaan(id_skema, timer, kelompok_id, nama_kelompok) {
             if (isNaN(jumlah) || jumlah < 1) jumlah = 1;
             if (jumlah > 15) jumlah = 15;
 
-            // ✅ Selalu kirim id_pmo dan id_pembuatan yang sudah ada
             let url = `{{ url('/form-asesmen') }}/${id_skema}/input-pmo`
                     + `?timer=${timer}`
                     + `&kelompok_id=${kelompok_id}`
                     + `&jumlah=${jumlah}`
                     + `&id_pmo=${globalIdPmo}`
-                    + `&id_pembuatan=${globalIdPembuatan}`;
+                    + `&id_pembuatan=${globalIdPembuatan}`
+                    + `&judul=${encodeURIComponent(globalJudul)}`;
 
             window.location.href = url;
         }
     });
 }
 </script>
+
+{{-- Kembali (kiri bawah) --}}
+<a href="{{ route('formasesmen.pmo', ['id_skema' => $skema->id_skema]) }}"
+   style="position:fixed; bottom:20px; left:260px; z-index:9999;
+          background-color:#041562; color:#fff; border:none;
+          border-radius:50px; padding:10px 18px;
+          font-weight:600; font-size:0.85rem;
+          box-shadow:0 4px 12px rgba(0,0,0,0.2);
+          display:flex; align-items:center; gap:6px;
+          text-decoration:none; transition:opacity 0.2s;"
+   onmouseover="this.style.opacity='0.85'"
+   onmouseout="this.style.opacity='1'">
+    <i class="bi bi-arrow-left"></i> Kembali
+</a>
+
+{{-- TTD Asesmen (kanan bawah) --}}
+@php
+    $ttdIdPembuatan = isset($pembuatan) && $pembuatan
+        ? $pembuatan->id_pembuatan_pertanyaan
+        : ($id_pembuatan ?? null);
+@endphp
+@if($ttdIdPembuatan)
+<a href="{{ route('tanda.tangan.asesmen', [$skema->id_skema, $ttdIdPembuatan]) }}"
+   style="position:fixed; bottom:20px; right:20px; z-index:9999;
+          background-color:#041562; color:#fff; border:none;
+          border-radius:50px; padding:10px 18px;
+          font-weight:600; font-size:0.85rem;
+          box-shadow:0 4px 12px rgba(0,0,0,0.2);
+          display:flex; align-items:center; gap:6px;
+          text-decoration:none; transition:opacity 0.2s;"
+   onmouseover="this.style.opacity='0.85'"
+   onmouseout="this.style.opacity='1'">
+    <i class="bi bi-pen-fill"></i> TTD Asesmen
+</a>
+@endif
+
 @endsection

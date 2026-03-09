@@ -27,7 +27,6 @@
         $units   = $unitList->whereIn('id_unit', $unitIds);
     @endphp
 
-    {{-- ✅ Tampilkan header kelompok kalau berganti --}}
     @if($currentKelompok !== $p->id_kelompok)
         @php $currentKelompok = $p->id_kelompok; $nomorPerKelompok = 0; @endphp
         <div class="d-flex align-items-center mb-3 mt-4">
@@ -44,31 +43,21 @@
     <div class="card mb-3 border-0 shadow-sm rounded-3">
         <div class="card-body p-4">
             <div class="row g-0">
-
-                {{-- Nomor --}}
                 <div class="col-auto me-3">
                     <span class="fw-bold text-white rounded-circle d-flex align-items-center justify-content-center"
                         style="width:32px;height:32px;background-color:#041562;font-size:0.85rem;">
                         {{ $nomorPerKelompok }}
                     </span>
                 </div>
-
-                {{-- Konten --}}
                 <div class="col">
-
-                    {{-- Pertanyaan --}}
                     <p class="fw-semibold mb-2" style="color:#041562; font-size:1rem;">
                         {{ $p->pertanyaan }}
                     </p>
-
-                    {{-- Deskripsi --}}
                     @if($p->deskripsi_pertanyaan)
                         <p class="text-muted small mb-2">
                             <i class="bi bi-info-circle me-1"></i>{{ $p->deskripsi_pertanyaan }}
                         </p>
                     @endif
-
-                    {{-- Unit Kompetensi --}}
                     <div class="p-2 rounded-2 mb-3" style="background-color:#f4f6fb; border-left: 3px solid #041562;">
                         <p class="text-muted small fw-semibold mb-1">Unit Kompetensi:</p>
                         @foreach($units as $unit)
@@ -78,8 +67,6 @@
                             </div>
                         @endforeach
                     </div>
-
-                    {{-- Tombol Aksi --}}
                     <div class="d-flex gap-2">
                         <a href="{{ route('pmo.pertanyaan.edit', [$pmo->id_pmo, $p->id_pmo_pertanyaan]) }}"
                            class="btn btn-sm btn-warning px-3">
@@ -95,7 +82,6 @@
                             </button>
                         </form>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -109,19 +95,27 @@
 
 </div>
 
-<div style="position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; gap: 10px;">
+{{-- Kembali ke halaman PMO (TTD sudah dipindah ke kelompok) --}}
+{{-- Kembali dinamis: kalau dari crud (ada id_pembuatan) → ke kelompok, kalau tidak → ke PMO list --}}
+@php
+    $backUrl = $id_pembuatan
+        ? route('pertanyaan.pmo.kelompok', [
+            'id_skema'     => $pmo->id_skema,
+            'id_pembuatan' => $id_pembuatan,
+          ])
+        : route('formasesmen.pmo', ['id_skema' => $pmo->id_skema]);
+@endphp
+<a href="{{ $backUrl }}"
+   style="position:fixed; bottom:20px; left:260px; z-index:9999;
+          background-color:#041562; color:#fff; border:none;
+          border-radius:50px; padding:10px 18px;
+          font-weight:600; font-size:0.85rem;
+          box-shadow:0 4px 12px rgba(0,0,0,0.2);
+          display:flex; align-items:center; gap:6px;
+          text-decoration:none; transition:opacity 0.2s;"
+   onmouseover="this.style.opacity='0.85'"
+   onmouseout="this.style.opacity='1'">
+    <i class="bi bi-arrow-left"></i> Kembali
+</a>
 
-    @if($id_pembuatan)
-        <a href="{{ route('tanda.tangan.asesmen', [$pmo->id_skema, $id_pembuatan]) }}"
-           class="btn btn-primary fw-bold">
-            <i class="bi bi-pen-fill me-1"></i> TTD Asesmen
-        </a>
-    @endif
-
-    <a href="{{ route('pertanyaan.pmo.kelompok', ['id_skema' => $pmo->id_skema]) }}"
-       class="btn btn-secondary fw-bold">
-        &laquo; Kembali
-    </a>
-
-</div>
 @endsection

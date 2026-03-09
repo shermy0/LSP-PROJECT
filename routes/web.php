@@ -559,26 +559,21 @@ Route::get('/formasesmen/pertanyaan-pmo/{id_skema}',
 
 // ================== ROUTE PMO ==================
 
-// List PMO per skema
 Route::get('/form-asesmen/{id_skema}/pmo', [PertanyaanController::class, 'pertanyaanPMO'])
     ->name('formasesmen.pmo');
 
-// ✅ TAMBAH INI — gantikan kelompokPMO
 Route::get('/pmo/kelompok/{id_skema}/{id_pembuatan?}', [PertanyaanController::class, 'pertanyaanPMOKelompok'])
     ->name('pertanyaan.pmo.kelompok');
 
-// Input PMO (form isi pertanyaan)
 Route::get('/form-asesmen/{id_skema}/input-pmo', [PertanyaanController::class, 'inputPMO'])
     ->name('form.input.pmo');
 
 Route::get('/pmo/input/{id_skema}', [PertanyaanController::class, 'inputPMO'])
     ->name('input.pmo');
 
-// Simpan pertanyaan PMO
 Route::post('/pmo/{id_pmo}/store', [PertanyaanController::class, 'storePertanyaanPMO'])
     ->name('pmo.pertanyaan.pmo.store');
 
-// CRUD PMO
 Route::get('/pmo/{id_pmo}/crud', [PertanyaanController::class, 'crudPMO'])
     ->name('pmo.crud');
 
@@ -591,7 +586,9 @@ Route::put('/pmo/pertanyaan/{id}', [PertanyaanController::class, 'updatePertanya
 Route::delete('/pmo/{id_pmo}/pertanyaan/{id}', [PertanyaanController::class, 'destroyPertanyaanPMO'])
     ->name('pmo.pertanyaan.destroy');
 
-// Jawaban PMO
+Route::delete('/pmo/set/{id_pembuatan}', [PertanyaanController::class, 'destroySetPMO'])
+    ->name('pmo.set.destroy');
+
 Route::get('/form-asesmen/{id_skema}/jawaban-pmo/{id_pembuatan}', [PertanyaanController::class, 'jawabanPMO'])
     ->name('jawaban.pmo');
 
@@ -600,6 +597,16 @@ Route::post('/form-asesmen/{id_skema}/jawaban-pmo/{id_pembuatan}', [PertanyaanCo
 
 Route::get('/jawaban-pmo/{id_skema}/{id_pembuatan}', [PertanyaanController::class, 'tampilJawabanPMO'])
     ->name('jawaban_pmo.form');
+
+// ===== HASIL / JAWABAN UJIAN PMO =====
+Route::get('/pmo/hasil/{id_skema}', [PertanyaanController::class, 'hasilKelompokPMO'])
+    ->name('pmo.hasil.kelompok');
+
+Route::get('/pmo/hasil/{id_skema}/{id_pembuatan}/{id_kelompok}', [PertanyaanController::class, 'pilihAsesiPMO'])
+    ->name('pmo.pilih.asesi');
+
+Route::get('/pmo/hasil/{id_skema}/{id_pembuatan}/{id_kelompok}/{id_asesi}', [PertanyaanController::class, 'inputJawabanPMO'])
+    ->name('pmo.input.jawaban');
 
 // ================== DATA PESERTA UJI ==================
 

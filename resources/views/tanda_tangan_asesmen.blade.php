@@ -3,14 +3,6 @@
 @section('konten')
 <div class="container mt-4">
     <h4 class="fw-bold text-center mb-4">FR.IA.07 – DPL – Tanda Tangan Pembuatan Asesmen</h4>
-
-    {{-- Tombol Back --}}
-    <div class="mb-3">
-        <a href="{{ url()->previous() }}" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Kembali
-        </a>
-    </div>
-
     {{-- Pesan sukses --}}
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -145,9 +137,24 @@
         document.getElementById('ttd_asesor').value = dataURL;
     }
 </script>
-<div class="text-start mt-3">
-    <a href="{{ route('formasesmen') }}" class="btn btn-secondary">
-        &laquo; Kembali
-    </a>
-</div>
+{{-- Kembali (kiri bawah) --}}
+@php
+    $pmoRec  = \App\Models\PMO::where('id_skema', $skema->id_skema)->latest('id_pmo')->first();
+    $backUrl = route('pertanyaan.pmo.kelompok', ['id_skema' => $skema->id_skema])
+             . '?id_pembuatan=' . $id_pembuatan_pertanyaan
+             . '&id_pmo=' . ($pmoRec->id_pmo ?? '')
+             . '&timer=' . ($pembuatan_pertanyaan->timer ?? 30);
+@endphp
+<a href="{{ $backUrl }}"
+   style="position:fixed; bottom:20px; left:260px; z-index:9999;
+          background-color:#041562; color:#fff; border:none;
+          border-radius:50px; padding:10px 18px;
+          font-weight:600; font-size:0.85rem;
+          box-shadow:0 4px 12px rgba(0,0,0,0.2);
+          display:flex; align-items:center; gap:6px;
+          text-decoration:none; transition:opacity 0.2s;"
+   onmouseover="this.style.opacity='0.85'"
+   onmouseout="this.style.opacity='1'">
+    <i class="bi bi-arrow-left"></i> Kembali
+</a>
 @endsection

@@ -14,15 +14,17 @@
     </p>
 
     <form action="{{ route('pmo.pertanyaan.pmo.store', ['id_pmo' => $id_pmo]) }}" method="POST">
-    @csrf
-    <input type="hidden" name="id_pmo" value="{{ $id_pmo }}">
-    
-    {{-- ✅ TAMBAH INI --}}
-    <input type="hidden" name="id_kelompok" value="{{ $kelompok->id_kelompok ?? '' }}">
+        @csrf
 
-    @if($id_pembuatan)
-        <input type="hidden" name="id_pembuatan" value="{{ $id_pembuatan ?? '' }}">
-    @endif
+        {{-- Hidden fields wajib --}}
+        <input type="hidden" name="id_pmo"      value="{{ $id_pmo }}">
+        <input type="hidden" name="id_kelompok" value="{{ $kelompok->id_kelompok ?? '' }}">
+        <input type="hidden" name="timer"        value="{{ $timer ?? 30 }}">
+        <input type="hidden" name="judul"        value="{{ $judul ?? '' }}">
+
+        @if($id_pembuatan)
+            <input type="hidden" name="id_pembuatan" value="{{ $id_pembuatan }}">
+        @endif
 
         @for($i = 0; $i < ($jumlah ?? 1); $i++)
             <div class="card shadow-sm mb-4 border-0">
@@ -35,7 +37,7 @@
                 </div>
                 <div class="card-body">
 
-                    {{-- Unit Kompetensi per pertanyaan — hanya unit dari kelompok ini --}}
+                    {{-- Unit Kompetensi --}}
                     <div class="mb-3">
                         <label class="form-label fw-bold">
                             Unit Kompetensi
@@ -64,6 +66,7 @@
                         <textarea name="pertanyaan[]" class="form-control" rows="3"
                                   placeholder="Tulis pertanyaan ke-{{ $i + 1 }}..." required></textarea>
                     </div>
+
                     <div class="mb-2">
                         <label class="form-label fw-bold">Deskripsi / Kunci Jawaban</label>
                         <textarea name="deskripsi_pertanyaan[]" class="form-control" rows="2"
@@ -75,7 +78,8 @@
         @endfor
 
         <div class="d-flex justify-content-between mt-2 mb-5">
-            <a href="javascript:history.back()" class="btn btn-secondary px-4">Kembali</a>
+            <a href="{{ route('pertanyaan.pmo.kelompok', ['id_skema' => request()->segment(2)]) }}"
+               class="btn btn-secondary px-4">Kembali</a>
             <button type="submit" class="btn text-white px-4" style="background-color:#041562;">
                 Simpan Semua Pertanyaan
             </button>
