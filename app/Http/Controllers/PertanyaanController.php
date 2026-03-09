@@ -1139,7 +1139,6 @@ public function tampilJawabanPMO($id_skema, $id_pembuatan)
         $id_asesor = \App\Models\Asesor::where('user_id', Auth::id())->value('id_asesor');
         $pmo = (object) ['id_pmo' => DB::table('pmo')->insertGetId([
             'id_skema'   => $id_skema,
-            'id_asesmen' => 7,
             'id_tuk'     => 1,
             'id_asesor'  => $id_asesor,
         ])];
@@ -1272,7 +1271,6 @@ public function inputPMO(Request $request, $id_skema)
     if (!$pmo) {
         $pmo = PMO::create([
             'id_skema'   => $id_skema,
-            'id_asesmen' => 7,
             'id_tuk'     => 1,
             'id_asesor'  => $id_asesor,
         ]);

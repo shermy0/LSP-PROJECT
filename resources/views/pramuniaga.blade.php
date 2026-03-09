@@ -11,7 +11,9 @@
 
      <div class="accordion mt-4" id="formAccordion">
         <!-- Item 1 -->
-        <div class="accordion-item mb-2">
+        <div class="accordion-item mb-2" 
+            onclick="window.location='{{ route('formasesmen.pertanyaanPG', ['id_skema' => $skema->id_skema]) }}';"
+            style="cursor: pointer;">
             <h2 class="accordion-header p-3 border rounded">
                 <i class="fa-solid fa-stop me-2"></i> Pertanyaan Pilihan Ganda
             </h2>

@@ -585,8 +585,12 @@ function validateAndSaveSignature() {
 
     // cek soal yang belum dijawab
     allQuestions.forEach((soal, index) => {
-        if (!soal.querySelector('input[type="radio"]:checked')) unanswered.push(index + 1);
-    });
+    const textarea = soal.querySelector('textarea.jawaban-textarea');
+
+    if (!textarea || textarea.value.trim() === '') {
+        unanswered.push(index + 1);
+    }
+});
 
     if (unanswered.length > 0) {
         Swal.fire({
