@@ -24,7 +24,7 @@ class DashboardController extends Controller
             ];
         } elseif ($user->role == 'asesi') {
             $menus = [
-                ['name' => 'Dashboard', 'route' => route('dashboard.asesi'), 'icon' => 'fas fa-home'],
+                ['name' => 'Dashboard', 'route' => route('asesi.dashboard'), 'icon' => 'fas fa-home'],
                 ['name' => 'Form Perencanaan', 'route' => route('formperencanaan'), 'icon' => 'fas fa-edit'],
             ];
         }
@@ -44,7 +44,7 @@ class DashboardController extends Controller
 
     public function asesi()
     {
-        return view('dashboard.asesi');
+        return view('asesi.dashboard');
     }
 
     public function asesor()

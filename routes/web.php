@@ -115,20 +115,16 @@ Route::post('/tanda_tangan_asesmen/{id_skema}/{id_pembuatan_pertanyaan}/simpan',
 )->name('tanda.tangan.asesmen.simpan');
 
 
+// ================== AUTH ==================
 // login
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
 // pilih role register
-Route::get('/register-role', [AuthController::class, 'showRegisterRole'])->name('register.role');
-
-// register asesi
-Route::get('/register/asesi', [RegisterController::class, 'showAsesiForm'])->name('register.asesi');
-Route::post('/register/asesi', [RegisterController::class, 'storeAsesi'])->name('register.asesi.store');
-
-// register asesor
-Route::get('/register/asesor', [RegisterController::class, 'showAsesorForm'])->name('register.asesor');
-Route::post('/register/asesor', [RegisterController::class, 'storeAsesor'])->name('register.asesor.store');
+// halaman register asesi (default)
+// REGISTER (gabungan asesi & asesor)
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+Route::post('/register', [AuthController::class, 'register'])->name('register.store');
 
 // Form Perencanaan untuk Asesor
 Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('formperencanaan');
