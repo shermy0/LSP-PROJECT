@@ -118,10 +118,10 @@ $validators = $asesors;
                             <select name="penanggung[]" class="form-control penanggung">
                                 <option value="">-- Pilih Penanggung Jawab --</option>
                                 @foreach($asesors as $asesor)
-                                    <option value="{{ $asesor->nama_asesor }}" data-no="{{ $asesor->no_registrasi }}"
-                                        {{ ($penanggungPerbaikan[$i] ?? '') === $asesor->nama_asesor ? 'selected' : '' }}>
-                                        {{ $asesor->nama_asesor }}
-                                    </option>
+                                <option value="{{ $asesor->id_asesor }}" data-no="{{ $asesor->no_registrasi }}"
+                                    {{ ($penanggungPerbaikan[$i] ?? '') == $asesor->id_asesor ? 'selected' : '' }}>
+                                    {{ $asesor->nama_asesor }}
+                                </option>
                                 @endforeach
                             </select>
                             <input type="hidden" name="no_registrasi_penanggung[]" class="no-registrasi-penanggung"
@@ -212,10 +212,11 @@ $validators = $asesors;
                 <select name="nama_validator[]" class="form-select nama-validator-sebelum">
                     <option value="">-- Pilih Asesor --</option>
                     @foreach($asesors as $asesor)
-                        <option value="{{ $asesor->nama_asesor }}" data-no="{{ $asesor->no_registrasi }}"
-                            {{ ($v ?? '') === $asesor->nama_asesor ? 'selected' : '' }}>
-                            {{ $asesor->nama_asesor }}
-                        </option>
+                    <option value="{{ $asesor->id_asesor }}"
+                        {{ ($v ?? '') == $asesor->id_asesor ? 'selected' : '' }}
+                        data-no="{{ $asesor->no_registrasi }}">
+                        {{ $asesor->nama_asesor }}
+                    </option>
                     @endforeach
                 </select>
             @else
@@ -405,3 +406,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 @endsection
+
+
+
