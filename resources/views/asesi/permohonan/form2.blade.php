@@ -3,350 +3,473 @@
 @section('title', 'FR.APL.02 - Permohonan Sertifikasi Kompetensi')
 
 @section('konten')
-    <div class="container-fluid px-4 py-3">
+    <div class="container-fluid px-4 py-4">
         <form id="permohonanForm" action="{{ route('asesi.permohonan.storeDokumen') }}" method="POST"
             enctype="multipart/form-data" class="needs-validation" novalidate>
             @csrf
 
-            <!-- Header -->
-            <div class="text-center mb-4">
-                <div class="rounded mx-auto mb-3" style="width:40px; height:40px; background-color:#041562;"></div>
-                <h1 class="h4 fw-bold">Permohonan Sertifikasi Kompetensi</h1>
-                <p class="text-muted">Form Asesmen &gt; FR.APL.02</p>
+            <!-- Header dengan ikon dan judul (warna #0b2f7c) -->
+            <div class="text-center mb-5">
+                <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-gradient text-white rounded-circle mb-3" style="width: 70px; height: 70px; box-shadow: 0 10px 20px rgba(11,47,124,0.3);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-file-text" viewBox="0 0 16 16">
+                        <path d="M5 4a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zM5 8a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm0 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1H5z"/>
+                        <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm10-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1z"/>
+                    </svg>
+                </div>
+                <h1 class="display-6 fw-bold text-dark">Permohonan Sertifikasi Kompetensi</h1>
+                <p class="text-secondary">Form Asesmen FR.APL.02 – Isi data dengan lengkap dan benar</p>
             </div>
 
-            <!-- Data Sertifikasi -->
-            <div class="unit-header">
-                <p class="mb-1 fw-semibold">Data Sertifikasi</p>
-                <p class="mb-0">Pilih skema sertifikasi dan tujuan asesmen</p>
-            </div>
-
-            <div class="question-box">
-                <div class="mb-3">
-                    <label class="form-label">Skema Sertifikasi <span class="text-danger">*</span></label>
-                    <select id="skemaSelect" name="id_skema" class="form-select" required>
-                        <option value="" disabled {{ old('id_skema', $permohonan->id_skema ?? '') ? '' : 'selected' }}>Pilih
-                            Skema Sertifikasi</option>
-                        @foreach($skema as $s)
-                            <option value="{{ $s->id_skema }}" {{ (string) old('id_skema', $permohonan->id_skema ?? '') === (string) $s->id_skema ? 'selected' : '' }}>
-                                {{ $s->nama_skema }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <div class="invalid-feedback">Silakan pilih skema sertifikasi.</div>
+            <!-- Data Sertifikasi - Card Modern -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-patch-check text-primary" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M10.354 6.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                                <path d="M14 8.5V6.127c0-.353-.145-.69-.402-.938l-3.73-3.53A1.5 1.5 0 0 0 8.812 1H4.5A1.5 1.5 0 0 0 3 2.5v11A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-1.959a2.5 2.5 0 0 0 .5-1.488V9.5h-.5v.042a2 2 0 0 1-2 2h-.5V9.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5v2h-.5a2 2 0 0 1-2-2v-.5h.042a2 2 0 0 1 1.488-.5H8.5v-.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5v.5h-.5a2 2 0 0 1-2-2V4.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v.5h2.5a.5.5 0 0 1 .5.5v.5h.5a2 2 0 0 1 2 2v.5h.5a2 2 0 0 1 2 2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0">Data Sertifikasi</h5>
+                            <p class="text-secondary mb-0 small">Pilih skema sertifikasi dan tujuan asesmen</p>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Judul Sertifikasi</label>
-                    <input type="text" id="judulSertifikasi" class="form-control" readonly value="">
-                    <div class="invalid-feedback">Judul sertifikasi wajib terisi.</div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Nomor Skema</label>
-                    <input type="text" id="nomorSkema" class="form-control" readonly value="">
-                    <div class="invalid-feedback">Nomor skema wajib terisi.</div>
-                </div>
-
-                <div class="mb-0">
-                    <label class="form-label">Tujuan Asesmen <span class="text-danger">*</span></label>
-                    <select id="tujuanAsesmen" name="tujuan_id" class="form-select" required>
-                        <option value="" disabled {{ old('tujuan_id', $permohonan->id_tujuan ?? '') ? '' : 'selected' }}>
-                            Pilih Tujuan Asesmen</option>
-                        @foreach($tujuanAsesmen as $t)
-                            <option value="{{ $t->id_tujuan }}" {{ (string) old('tujuan_id', $permohonan->id_tujuan ?? '') === (string) $t->id_tujuan ? 'selected' : '' }}>
-                                {{ $t->nama_tujuan }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <div class="invalid-feedback">Silakan pilih tujuan asesmen.</div>
+                <div class="card-body pt-3">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Skema Sertifikasi <span class="text-danger">*</span></label>
+                            <select id="skemaSelect" name="id_skema" class="form-select" required>
+                                <option value="" disabled {{ old('id_skema', $permohonan->id_skema ?? '') ? '' : 'selected' }}>Pilih Skema Sertifikasi</option>
+                                @foreach($skema as $s)
+                                    <option value="{{ $s->id_skema }}" {{ (string) old('id_skema', $permohonan->id_skema ?? '') === (string) $s->id_skema ? 'selected' : '' }}>
+                                        {{ $s->nama_skema }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div class="invalid-feedback">Silakan pilih skema sertifikasi.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tujuan Asesmen <span class="text-danger">*</span></label>
+                            <select id="tujuanAsesmen" name="tujuan_id" class="form-select" required>
+                                <option value="" disabled {{ old('tujuan_id', $permohonan->id_tujuan ?? '') ? '' : 'selected' }}>Pilih Tujuan Asesmen</option>
+                                @foreach($tujuanAsesmen as $t)
+                                    <option value="{{ $t->id_tujuan }}" {{ (string) old('tujuan_id', $permohonan->id_tujuan ?? '') === (string) $t->id_tujuan ? 'selected' : '' }}>
+                                        {{ $t->nama_tujuan }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div class="invalid-feedback">Silakan pilih tujuan asesmen.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Judul Sertifikasi</label>
+                            <input type="text" id="judulSertifikasi" class="form-control" readonly value="">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nomor Skema</label>
+                            <input type="text" id="nomorSkema" class="form-control" readonly value="">
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Daftar Unit Kompetensi -->
-            <div class="unit-header">
-                <p class="mb-1 fw-semibold">Daftar Unit Kompetensi</p>
-                <p class="mb-0">Unit kompetensi yang diujikan sesuai skema</p>
-            </div>
-            <div class="question-box">
-                <div class="table-responsive">
-                    <table class="table table-bordered align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>No</th>
-                                <th>Kode Unit</th>
-                                <th>Judul Unit</th>
-                                <th>Standar Kompetensi Kerja</th>
-                            </tr>
-                        </thead>
-                        <tbody id="unitTable">
-                            <tr>
-                                <td colspan="4" class="text-center text-muted">Pilih skema sertifikasi terlebih dahulu</td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-list-check text-primary" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0">Daftar Unit Kompetensi</h5>
+                            <p class="text-secondary mb-0 small">Unit kompetensi yang diujikan sesuai skema</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body pt-3">
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Kode Unit</th>
+                                    <th>Judul Unit</th>
+                                    <th>Standar Kompetensi Kerja</th>
+                                </tr>
+                            </thead>
+                            <tbody id="unitTable">
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">Pilih skema sertifikasi terlebih dahulu</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <!-- Bukti Kelengkapan -->
-            <div class="unit-header">
-                <p class="mb-1 fw-semibold">Bukti Kelengkapan Pemohon</p>
-                <p class="mb-0">Unggah dokumen yang diperlukan sesuai kategori</p>
-            </div>
-
-            {{-- === Bukti Persyaratan Dasar Pemohon === --}}
-            <div class="question-box">
-                <h6 class="fw-bold text-primary mb-3">A. Bukti Persyaratan Dasar Pemohon</h6>
-                @foreach($jenisDokumen->where('kategori', 'dasar') as $jd)
-                    @php
-                        $doc = $existingDocs->get($jd->id_jenis_dokumen) ?? null;
-                        $invalidClass = ($doc && !$doc->memenuhi_syarat) ? 'is-invalid' : '';
-                        $existingFileUrl = $doc && $doc->path_file ? Storage::url($doc->path_file) : '';
-                        $existingFileName = $doc ? $doc->nama_file : '';
-                    @endphp
-                    <div class="mb-3">
-                        <label class="form-label">{{ $loop->iteration }}. {{ $jd->nama_dokumen }} <span
-                                class="text-danger">*</span></label>
-
-                        <div class="input-group">
-                            {{-- file input (nama array 'dokumen[id]') --}}
-                            <input type="file" name="dokumen[{{ $jd->id_jenis_dokumen }}]"
-                                class="form-control dokumen-input {{ $invalidClass }}" accept=".jpg,.jpeg,.png,.pdf"
-                                onchange="previewFile(this)" data-existing-name="{{ $existingFileName }}"
-                                data-file-url="{{ $existingFileUrl }}"
-                                data-memenuhi="{{ $doc && $doc->memenuhi_syarat ? '1' : '0' }}">
-
-                            {{-- tombol lihat: data-file-url di-set agar preview existing dapat dibuka --}}
-                            <button type="button" class="btn btn-outline-primary lihat-btn" onclick="lihatFile(this)"
-                                data-file-url="{{ $existingFileUrl }}" {{ $existingFileUrl ? '' : 'disabled' }}>
-                                Lihat
-                            </button>
-
-                            {{-- tombol hapus: JS akan set hidden flag remove_dokumen[id] = 1 --}}
-                            <button type="button" class="btn btn-outline-danger btn-hapus"
-                                onclick="hapusFile(this)">Hapus</button>
-
-                            <div class="invalid-feedback">Silakan unggah dokumen ini.</div>
+            <!-- Card A. Bukti Persyaratan Dasar Pemohon -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-file-earmark-text text-primary" viewBox="0 0 16 16">
+                                <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5z"/>
+                                <path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5L9.5 0zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+                            </svg>
                         </div>
-
-                        {{-- hidden flag untuk tandai hapus --}}
-                        <input type="hidden" name="remove_dokumen[{{ $jd->id_jenis_dokumen }}]" value="0" class="remove-flag">
-
-                        {{-- preview / existing --}}
-                        <div class="file-preview mt-2 small">
-                            @if($existingFileName)
-                                <strong>File tersimpan:</strong> {{ $existingFileName }}
-                            @else
-                                Belum ada file dipilih
+                        <div>
+                            <h5 class="fw-bold mb-0">A. Bukti Persyaratan Dasar Pemohon</h5>
+                            <p class="text-secondary mb-0 small">Unggah dokumen persyaratan dasar yang diperlukan</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body pt-3">
+                    @foreach($jenisDokumen->where('kategori', 'dasar') as $jd)
+                        @php
+                            $doc = $existingDocs->get($jd->id_jenis_dokumen) ?? null;
+                            $invalidClass = ($doc && !$doc->memenuhi_syarat) ? 'is-invalid' : '';
+                            $existingFileUrl = $doc && $doc->path_file ? Storage::url($doc->path_file) : '';
+                            $existingFileName = $doc ? $doc->nama_file : '';
+                        @endphp
+                        <div class="mb-3 dokumen-item">
+                            <label class="form-label">{{ $loop->iteration }}. {{ $jd->nama_dokumen }} <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="file" name="dokumen[{{ $jd->id_jenis_dokumen }}]"
+                                    class="form-control dokumen-input {{ $invalidClass }}" accept=".jpg,.jpeg,.png,.pdf"
+                                    onchange="previewFile(this)" data-existing-name="{{ $existingFileName }}"
+                                    data-file-url="{{ $existingFileUrl }}"
+                                    data-memenuhi="{{ $doc && $doc->memenuhi_syarat ? '1' : '0' }}">
+                                <button type="button" class="btn btn-outline-primary lihat-btn" onclick="lihatFile(this)"
+                                    data-file-url="{{ $existingFileUrl }}" {{ $existingFileUrl ? '' : 'disabled' }}>
+                                    Lihat
+                                </button>
+                                <button type="button" class="btn btn-outline-danger btn-hapus" onclick="hapusFile(this)">Hapus</button>
+                            </div>
+                            <input type="hidden" name="remove_dokumen[{{ $jd->id_jenis_dokumen }}]" value="0" class="remove-flag">
+                            <div class="file-preview mt-2 small">
+                                @if($existingFileName)
+                                    <strong>File tersimpan:</strong> {{ $existingFileName }}
+                                @else
+                                    Belum ada file dipilih
+                                @endif
+                            </div>
+                            @if($doc && !$doc->memenuhi_syarat)
+                                <div class="text-danger small mt-1">Dokumen belum memenuhi syarat.</div>
+                                @if(!empty($doc->catatan))
+                                    <div class="text-muted small mt-1">Catatan: {{ $doc->catatan }}</div>
+                                @endif
                             @endif
+                            <div class="invalid-feedback dokumen-error">Silakan unggah dokumen ini.</div>
                         </div>
+                    @endforeach
+                </div>
+            </div>
 
-                        {{-- pesan jika dokumen tidak memenuhi syarat --}}
-                        @if($doc && !$doc->memenuhi_syarat)
-                            <div class="text-danger small mt-1">Dokumen belum memenuhi syarat.</div>
-                            @if(!empty($doc->catatan))
-                                <div class="text-muted small mt-1">Catatan: {{ $doc->catatan }}</div>
+            <!-- Card B. Bukti Administratif -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-files text-primary" viewBox="0 0 16 16">
+                                <path d="M13 0H6a2 2 0 0 0-2 2 2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2 2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm0 13V4a2 2 0 0 0-2-2H5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1zM3 4a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0">B. Bukti Administratif</h5>
+                            <p class="text-secondary mb-0 small">Unggah dokumen administratif yang diperlukan</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body pt-3">
+                    @foreach($jenisDokumen->where('kategori', 'administratif') as $jd)
+                        @php
+                            $doc = $existingDocs->get($jd->id_jenis_dokumen) ?? null;
+                            $invalidClass = ($doc && !$doc->memenuhi_syarat) ? 'is-invalid' : '';
+                            $existingFileUrl = $doc ? $doc->file_url : '';
+                            $existingFileName = $doc ? $doc->nama_file : '';
+                        @endphp
+                        <div class="mb-3 dokumen-item">
+                            <label class="form-label">{{ $loop->iteration }}. {{ $jd->nama_dokumen }} <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="file" name="dokumen[{{ $jd->id_jenis_dokumen }}]"
+                                    class="form-control dokumen-input {{ $invalidClass }}" accept=".jpg,.jpeg,.png,.pdf"
+                                    onchange="previewFile(this)" data-existing-name="{{ $existingFileName }}"
+                                    data-file-url="{{ $existingFileUrl }}"
+                                    data-memenuhi="{{ $doc && $doc->memenuhi_syarat ? '1' : '0' }}">
+                                <button type="button" class="btn btn-outline-primary lihat-btn" onclick="lihatFile(this)"
+                                    data-file-url="{{ $existingFileUrl }}" {{ $existingFileUrl ? '' : 'disabled' }}>
+                                    Lihat
+                                </button>
+                                <button type="button" class="btn btn-outline-danger btn-hapus" onclick="hapusFile(this)">Hapus</button>
+                            </div>
+                            <input type="hidden" name="remove_dokumen[{{ $jd->id_jenis_dokumen }}]" value="0" class="remove-flag">
+                            <div class="file-preview mt-2 small">
+                                @if($existingFileName)
+                                    <strong>File tersimpan:</strong> {{ $existingFileName }}
+                                @else
+                                    Belum ada file dipilih
+                                @endif
+                            </div>
+                            @if($doc && !$doc->memenuhi_syarat)
+                                <div class="text-danger small mt-1">Dokumen belum memenuhi syarat.</div>
+                                @if(!empty($doc->catatan))
+                                    <div class="text-muted small mt-1">Catatan: {{ $doc->catatan }}</div>
+                                @endif
                             @endif
-                        @endif
-                    </div>
-                @endforeach
-            </div>
-
-            {{-- === Bukti Administratif === --}}
-            <div class="question-box">
-                <h6 class="fw-bold text-primary mb-3">B. Bukti Administratif</h6>
-                @foreach($jenisDokumen->where('kategori', 'administratif') as $jd)
-                    @php
-                        $doc = $existingDocs->get($jd->id_jenis_dokumen) ?? null;
-                        $invalidClass = ($doc && !$doc->memenuhi_syarat) ? 'is-invalid' : '';
-                        $existingFileUrl = $doc ? $doc->file_url : '';
-                        $existingFileName = $doc ? $doc->nama_file : '';
-                    @endphp
-                    <div class="mb-3">
-                        <label class="form-label">{{ $loop->iteration }}. {{ $jd->nama_dokumen }} <span
-                                class="text-danger">*</span></label>
-                        <div class="input-group">
-                            <input type="file" name="dokumen[{{ $jd->id_jenis_dokumen }}]"
-                                class="form-control dokumen-input {{ $invalidClass }}" accept=".jpg,.jpeg,.png,.pdf"
-                                onchange="previewFile(this)" data-existing-name="{{ $existingFileName }}"
-                                data-file-url="{{ $existingFileUrl }}"
-                                data-memenuhi="{{ $doc && $doc->memenuhi_syarat ? '1' : '0' }}">
-                            <button type="button" class="btn btn-outline-primary lihat-btn" onclick="lihatFile(this)"
-                                data-file-url="{{ $existingFileUrl }}" {{ $existingFileUrl ? '' : 'disabled' }}>
-                                Lihat
-                            </button>
-                            <button type="button" class="btn btn-outline-danger btn-hapus"
-                                onclick="hapusFile(this)">Hapus</button>
-                            <div class="invalid-feedback">Silakan unggah dokumen ini.</div>
+                            <div class="invalid-feedback dokumen-error">Silakan unggah dokumen ini.</div>
                         </div>
+                    @endforeach
+                </div>
+            </div>
 
-                        {{-- hidden flag untuk tandai hapus --}}
-                        <input type="hidden" name="remove_dokumen[{{ $jd->id_jenis_dokumen }}]" value="0" class="remove-flag">
-
-                        <div class="file-preview mt-2 small">
-                            @if($existingFileName)
-                                <strong>File tersimpan:</strong> {{ $existingFileName }}
-                            @else
-                                Belum ada file dipilih
-                            @endif
+            <!-- Tanda Tangan Asesi - Card Modern -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-pen text-primary" viewBox="0 0 16 16">
+                                <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z"/>
+                            </svg>
                         </div>
-
-                        @if($doc && !$doc->memenuhi_syarat)
-                            <div class="text-danger small mt-1">Dokumen belum memenuhi syarat.</div>
-                            @if(!empty($doc->catatan))
-                                <div class="text-muted small mt-1">Catatan: {{ $doc->catatan }}</div>
-                            @endif
-                        @endif
-                    </div>
-                @endforeach
-            </div>
-
-            <!-- Tanda Tangan Asesi -->
-            <div class="unit-header">
-                <p class="mb-1 fw-semibold">Tanda Tangan Asesi</p>
-                <p class="mb-0">Isi nama, tanggal, dan tanda tangan digital</p>
-            </div>
-            <div class="question-box">
-                <div class="mb-3">
-                    <label for="nama-asesi" class="form-label">Nama Lengkap</label>
-                    <input type="text" id="nama-asesi" class="form-control"
-                        value="{{ $asesi->nama_lengkap ?? Auth::user()->name }}" readonly required>
-                    <div class="invalid-feedback">Nama wajib terisi.</div>
-                </div>
-                <div class="mb-3">
-                    <label for="tanggal-asesi" class="form-label">Tanggal</label>
-                    <input type="date" id="tanggal-asesi" name="tanggal" class="form-control"
-                        value="{{ old('tanggal', date('Y-m-d')) }}" required>
-                    <div class="invalid-feedback">Tanggal wajib diisi.</div>
-                </div>
-                <div class="mb-3">
-                    <label for="ttd-asesi" class="form-label">Tanda Tangan <span class="text-danger">*</span></label>
-                    <div class="canvas-wrapper">
-                        <canvas id="ttd-asesi"></canvas>
-                        <span class="canvas-placeholder">Tanda tangan di sini</span>
-                    </div>
-                    <input type="hidden" name="ttd_asesi" id="ttd_asesi_data" required>
-                    <div class="invalid-feedback">Tanda tangan wajib diisi.</div>
-                </div>
-                <div class="button-group">
-                    <button type="button" class="btn-back" onclick="clearCanvas()">Hapus</button>
-                </div>
-            </div>
-
-            <!-- Modal Preview -->
-            <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-xl modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Preview Dokumen</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                        <div>
+                            <h5 class="fw-bold mb-0">Tanda Tangan Asesi</h5>
+                            <p class="text-secondary mb-0 small">Isi nama, tanggal, dan tanda tangan digital</p>
                         </div>
-                        <div class="modal-body text-center" id="previewContent"></div>
+                    </div>
+                </div>
+                <div class="card-body pt-3">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nama Lengkap</label>
+                            <input type="text" id="nama-asesi" class="form-control"
+                                value="{{ $asesi->nama_lengkap ?? Auth::user()->name }}" readonly required>
+                            <div class="invalid-feedback">Nama wajib terisi.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tanggal</label>
+                            <input type="date" id="tanggal-asesi" name="tanggal" class="form-control"
+                                value="{{ old('tanggal', date('Y-m-d')) }}" required>
+                            <div class="invalid-feedback">Tanggal wajib diisi.</div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Tanda Tangan <span class="text-danger">*</span></label>
+                            <div class="canvas-wrapper">
+                                <canvas id="ttd-asesi"></canvas>
+                                <span class="canvas-placeholder">Tanda tangan di sini</span>
+                            </div>
+                            <input type="hidden" name="ttd_asesi" id="ttd_asesi_data" required>
+                            <div class="invalid-feedback">Tanda tangan wajib diisi.</div>
+                        </div>
+                    </div>
+                    <div class="button-group mt-3">
+                        <button type="button" class="btn-back" onclick="clearCanvas()">Hapus</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Modal: TTD Required -->
-            <div class="modal fade" id="ttdRequiredModal" tabindex="-1" aria-labelledby="ttdRequiredModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content border-danger">
-                        <div class="modal-header bg-danger text-white">
-                            <h5 class="modal-title" id="ttdRequiredModalLabel">Tanda Tangan Diperlukan</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                                aria-label="Tutup"></button>
-                        </div>
-                        <div class="modal-body">
-                            <p class="mb-0">Silakan tanda tangan pada area tanda tangan sebelum melanjutkan.</p>
-                            <p class="small text-muted mt-2">Tekan <strong>Hapus</strong> jika ingin mulai ulang, lalu tanda
-                                tangan ulang.</p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tombol -->
+            <!-- Tombol Aksi -->
             <div class="button-group mt-4">
-                <a href="{{ route('asesi.permohonan.form1') }}" class="btn-back">Kembali</a>
-                <button type="submit" class="btn-next">Simpan dan Kirim</button>
+                <a href="{{ route('asesi.permohonan.form1') }}" class="btn-back">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left me-2" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                    </svg>
+                    Kembali
+                </a>
+                <button type="submit" class="btn-next">
+                    Simpan dan Kirim
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send ms-2" viewBox="0 0 16 16">
+                        <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
+                    </svg>
+                </button>
             </div>
         </form>
     </div>
 
+    <!-- Modal Preview -->
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Preview Dokumen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body text-center" id="previewContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal TTD Required -->
+    <div class="modal fade" id="ttdRequiredModal" tabindex="-1" aria-labelledby="ttdRequiredModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-danger">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="ttdRequiredModalLabel">Tanda Tangan Diperlukan</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">Silakan tanda tangan pada area tanda tangan sebelum melanjutkan.</p>
+                    <p class="small text-muted mt-2">Tekan <strong>Hapus</strong> jika ingin mulai ulang, lalu tanda tangan ulang.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <style>
+        /* ===== VARIABEL & RESET dengan warna utama #0b2f7c ===== */
+        :root {
+            --primary: #0b2f7c;
+            --primary-dark: #08205c;
+            --primary-light: #1a3e9c;
+            --secondary: #6c757d;
+            --success: #198754;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --font-sans: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+
         body {
-            font-family: 'Poppins', sans-serif;
-            background: #f9f9fb;
+            font-family: var(--font-sans);
+            background-color: #f1f4f9;
         }
 
         .container-fluid {
-            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
         }
 
-        .unit-header {
-            background: #E9F1FF;
-            border-left: 6px solid #007BFF;
-            border-radius: 8px;
-            padding: 15px 20px;
-            margin-bottom: 20px;
-            font-size: 14px;
+        /* ===== FORM CARD & INPUT ===== */
+        .card {
+            border-radius: 1.25rem;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            background: #ffffff;
         }
 
-        .question-box {
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 25px;
-            background: #fff;
+        .card:hover {
+            box-shadow: 0 1rem 2rem rgba(0,0,0,0.08) !important;
         }
 
+        .card-header {
+            background: transparent;
+            padding-bottom: 0;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1e293b;
+            margin-bottom: 0.3rem;
+        }
+
+        .form-control, .form-select {
+            border: 1.5px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 0.6rem 1rem;
+            font-size: 0.95rem;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            background-color: #fff;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(11,47,124,0.15);
+            outline: none;
+        }
+
+        /* Validasi styling */
         .form-control.is-invalid,
         .form-select.is-invalid {
-            border: 2px solid #d9534f !important;
+            border: 2px solid var(--danger) !important;
             background: #fff8f8 !important;
         }
 
         .invalid-feedback {
-            font-size: 12px;
+            font-size: 0.8rem;
+            display: none;
+            color: var(--danger);
+            margin-top: 0.25rem;
+        }
+
+        .form-control.is-invalid + .invalid-feedback,
+        .form-select.is-invalid + .invalid-feedback {
+            display: block;
+        }
+
+        /* ===== WARNA UTAMA #0b2f7c ===== */
+        .bg-primary {
+            background-color: var(--primary) !important;
+        }
+
+        .bg-primary.bg-gradient {
+            background: linear-gradient(145deg, var(--primary), var(--primary-dark)) !important;
+        }
+
+        .bg-primary.bg-opacity-10 {
+            background-color: rgba(11,47,124,0.1) !important;
+        }
+
+        .text-primary {
+            color: var(--primary) !important;
+        }
+
+        /* Tombol Next & Back */
+        .btn-next {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            padding: 0.7rem 1.8rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 18px rgba(11,47,124,0.3);
+            transition: all 0.2s;
+        }
+
+        .btn-next:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #061944);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 22px rgba(11,47,124,0.35);
+        }
+
+        .btn-back {
+            background-color: #fff;
+            color: var(--secondary);
+            padding: 0.7rem 1.8rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            border: 1.5px solid #dee2e6;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn-back:hover {
+            background-color: #f1f3f5;
+            color: #495057;
+            border-color: #ced4da;
         }
 
         .button-group {
             display: flex;
             justify-content: flex-end;
-            gap: 12px;
-            flex-wrap: wrap;
+            gap: 0.75rem;
         }
 
-        .btn-back {
-            background: #d9534f;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            text-decoration: none;
-            border: none;
-        }
-
-        .btn-next {
-            background: #041562;
-            color: #fff;
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            border: none;
-        }
-
-        .btn-back:hover {
-            background: #c9302c;
-        }
-
-        .btn-next:hover {
-            background: #06208a;
-        }
-
+        /* Canvas TTD */
         .canvas-wrapper {
             position: relative;
             width: 100%;
@@ -374,10 +497,12 @@
             pointer-events: none;
         }
 
+        /* File preview */
         .file-preview {
             font-size: 13px;
         }
 
+        /* Modal preview */
         .modal-body img {
             max-width: 100%;
             height: auto;
@@ -391,58 +516,29 @@
             border: none;
         }
 
-        .unit-header {
-            background: #E9F1FF;
-            border-left: 6px solid #007BFF;
-            border-radius: 8px;
-            padding: 18px 20px;
-            margin-bottom: 12px;
-            font-size: 1.125rem;
-            line-height: 1.3;
-            font-weight: 700;
-            color: #041562;
-        }
-
-        .unit-header p.mb-0 {
-            font-size: 0.95rem;
-            color: #334155;
-            margin-top: 4px;
-            font-weight: 500;
-        }
-
-        label.form-label {
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: #0f172a;
-        }
-
-        .question-box .mb-3 {
-            margin-bottom: 14px;
-        }
-
-        @media (max-width: 576px) {
-            .unit-header {
-                font-size: 1rem;
-            }
-
-            label.form-label {
-                font-size: 0.9rem;
+        /* Responsive */
+        @media (max-width: 768px) {
+            .button-group {
+                justify-content: center;
             }
         }
     </style>
 
-    {{-- === SCRIPT Bukti Kelengkapan & Preview === --}}
     <script>
+        // Fungsi preview file
         function previewFile(input) {
             const file = input.files[0];
-            const previewDiv = input.closest('.mb-3').querySelector('.file-preview');
+            const previewDiv = input.closest('.dokumen-item').querySelector('.file-preview');
             const lihatBtn = input.closest('.input-group').querySelector('button.lihat-btn');
-            const removeFlag = input.closest('.mb-3').querySelector('.remove-flag');
+            const removeFlag = input.closest('.dokumen-item').querySelector('.remove-flag');
+            const errorDiv = input.closest('.dokumen-item').querySelector('.dokumen-error');
 
             if (file) {
                 previewDiv.innerHTML = `<strong>File dipilih:</strong> ${file.name}`;
                 if (lihatBtn) lihatBtn.disabled = false;
                 if (removeFlag) removeFlag.value = "0";
+                input.classList.remove('is-invalid');
+                if (errorDiv) errorDiv.style.display = 'none';
             } else {
                 const existingName = input.dataset.existingName || '';
                 const existingUrl = input.dataset.fileUrl || '';
@@ -461,6 +557,7 @@
             }
         }
 
+        // Fungsi lihat file
         function lihatFile(btn) {
             const input = btn.closest('.input-group').querySelector('input[type="file"]');
             const file = input.files[0];
@@ -500,61 +597,57 @@
             new bootstrap.Modal(document.getElementById('previewModal')).show();
         }
 
+        // Fungsi hapus file
         function hapusFile(btn) {
-            const mb = btn.closest('.mb-3');
+            const mb = btn.closest('.dokumen-item');
             const input = mb.querySelector('input[type="file"]');
             const lihatBtn = mb.querySelector('button.lihat-btn');
             const previewDiv = mb.querySelector('.file-preview');
             const removeFlag = mb.querySelector('.remove-flag');
+            const errorDiv = mb.querySelector('.dokumen-error');
 
             input.value = "";
             previewDiv.textContent = "Belum ada file dipilih";
             if (lihatBtn) lihatBtn.disabled = true;
             if (removeFlag) removeFlag.value = "1";
+            input.classList.remove('is-invalid');
+            if (errorDiv) errorDiv.style.display = 'none';
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
-            // set lihat-btn disabled sesuai existing
-            document.querySelectorAll('.input-group').forEach(group => {
-                const input = group.querySelector('input[type="file"]');
-                const lihatBtn = group.querySelector('button.lihat-btn');
-                if (input && lihatBtn) {
-                    const fileUrl = input.dataset.fileUrl || lihatBtn.getAttribute('data-file-url') || '';
-                    lihatBtn.disabled = !fileUrl && !(input.files && input.files.length);
+        // Validasi dokumen wajib diisi sebelum submit
+        function validateDocuments() {
+            const dokumenItems = document.querySelectorAll('.dokumen-item');
+            let valid = true;
+
+            dokumenItems.forEach(item => {
+                const input = item.querySelector('input[type="file"]');
+                const removeFlag = item.querySelector('.remove-flag');
+                const errorDiv = item.querySelector('.dokumen-error');
+                const existingName = input.dataset.existingName || '';
+                const hasExisting = existingName !== '';
+                const isRemoved = removeFlag && removeFlag.value === '1';
+                const hasNewFile = input.files.length > 0;
+
+                // Dokumen dianggap ada jika: (ada file baru) atau (ada existing dan tidak dihapus)
+                const isFilled = hasNewFile || (hasExisting && !isRemoved);
+
+                if (!isFilled) {
+                    valid = false;
+                    input.classList.add('is-invalid');
+                    if (errorDiv) {
+                        errorDiv.style.display = 'block';
+                        errorDiv.textContent = 'Dokumen ini wajib diisi.';
+                    }
+                } else {
+                    input.classList.remove('is-invalid');
+                    if (errorDiv) errorDiv.style.display = 'none';
                 }
             });
 
-            // trigger change untuk prefill skema title/nomor
-            const skemaSelect = document.getElementById('skemaSelect');
-            if (skemaSelect && skemaSelect.value) skemaSelect.dispatchEvent(new Event('change'));
-        });
-    </script>
+            return valid;
+        }
 
-    {{-- === SCRIPT: SKEMA AJAX, FORM VALIDATION, TTD Canvas === --}}
-    <script>
-        (function () {
-            'use strict'
-            const form = document.getElementById('permohonanForm')
-            form.addEventListener('submit', function (event) {
-                if (!saveTTD()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    return false;
-                }
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    const firstInvalid = form.querySelector(':invalid');
-                    if (firstInvalid) {
-                        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        firstInvalid.focus();
-                    }
-                }
-                form.classList.add('was-validated')
-            }, false)
-        })();
-
-        // === SKEMA AJAX LOADER ===
+        // SKEMA AJAX LOADER
         document.getElementById('skemaSelect').addEventListener('change', function () {
             let id = this.value;
             if (!id) return;
@@ -569,12 +662,12 @@
                     if (data.units && data.units.length > 0) {
                         data.units.forEach((u, i) => {
                             tbody.innerHTML += `
-                                    <tr>
-                                        <td>${i + 1}</td>
-                                        <td>${u.kode_unit ?? '-'}</td>
-                                        <td>${u.judul_unit ?? '-'}</td>
-                                        <td>${u.standar_kompetensi ?? '-'}</td>
-                                    </tr>`;
+                                <tr>
+                                    <td>${i + 1}</td>
+                                    <td>${u.kode_unit ?? '-'}</td>
+                                    <td>${u.judul_unit ?? '-'}</td>
+                                    <td>${u.standar_kompetensi ?? '-'}</td>
+                                </tr>`;
                         });
                     } else {
                         tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">Tidak ada unit kompetensi</td></tr>`;
@@ -586,7 +679,7 @@
                 });
         });
 
-        // === TTD Canvas (responsive, high-DPI aware, blank-detection using white background) ===
+        // TTD Canvas (sama seperti sebelumnya)
         const canvas = document.getElementById("ttd-asesi");
         const ctx = canvas.getContext("2d");
         const placeholder = document.querySelector(".canvas-placeholder");
@@ -709,8 +802,57 @@
             }
         });
 
-        // initialize canvas + events
         resizeCanvasAndPrepareBlank();
         attachCanvasEvents();
+
+        // Event submit form dengan validasi dokumen dan TTD
+        document.getElementById('permohonanForm').addEventListener('submit', function (event) {
+            let isValid = true;
+
+            // Validasi TTD
+            if (!saveTTD()) {
+                event.preventDefault();
+                isValid = false;
+            }
+
+            // Validasi dokumen wajib
+            if (!validateDocuments()) {
+                event.preventDefault();
+                isValid = false;
+            }
+
+            // Validasi form HTML5 (select, input required)
+            if (!this.checkValidity()) {
+                event.preventDefault();
+                isValid = false;
+            }
+
+            if (!isValid) {
+                event.stopPropagation();
+                const firstInvalid = this.querySelector(':invalid, .is-invalid');
+                if (firstInvalid) {
+                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstInvalid.focus();
+                }
+            }
+
+            this.classList.add('was-validated');
+        });
+
+        // Setelah DOM siap, inisialisasi tombol lihat
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.input-group').forEach(group => {
+                const input = group.querySelector('input[type="file"]');
+                const lihatBtn = group.querySelector('button.lihat-btn');
+                if (input && lihatBtn) {
+                    const fileUrl = input.dataset.fileUrl || lihatBtn.getAttribute('data-file-url') || '';
+                    lihatBtn.disabled = !fileUrl && !(input.files && input.files.length);
+                }
+            });
+
+            // Trigger change untuk skema jika ada nilai awal
+            const skemaSelect = document.getElementById('skemaSelect');
+            if (skemaSelect && skemaSelect.value) skemaSelect.dispatchEvent(new Event('change'));
+        });
     </script>
 @endsection

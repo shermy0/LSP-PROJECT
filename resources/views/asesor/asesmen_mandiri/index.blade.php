@@ -14,12 +14,12 @@
                         <i class="bi bi-journal-check fs-3"></i>
                     </div>
                     <div>
-                        <h4 class="mb-1 fw-bold" style="color: #041562;">Daftar Asesmen Mandiri Asesi</h4>
+                        <h4 class="mb-1 fw-bold" style="color: #0b2f7c;">Daftar Asesmen Mandiri Asesi</h4>
                         <p class="mb-0 text-muted">Berikut daftar asesi yang telah mengisi asesmen mandiri (FR.APL.02)</p>
                     </div>
                 </div>
                 <div class="search-wrapper">
-                    <input type="text" id="searchInput" class="form-control search-input" 
+                    <input type="text" id="searchInput" class="form-control search-input"
                            placeholder="Cari asesi berdasarkan nama, NIK, atau email...">
                     <i class="bi bi-search search-icon"></i>
                 </div>
@@ -32,7 +32,7 @@
         <div class="card-header bg-white border-bottom-0 py-3">
             <div class="row align-items-center g-3">
                 <div class="col-md-6">
-                    <h6 class="mb-1 fw-semibold" style="color: #041562;">
+                    <h6 class="mb-1 fw-semibold" style="color: #0b2f7c;">
                         <i class="bi bi-list-ul me-2"></i>Daftar Asesi
                     </h6>
                     <small class="text-muted">Asesi yang telah mengisi formulir asesmen mandiri</small>
@@ -93,7 +93,7 @@
                                 </td>
 
                                 <td class="text-center">
-                                    <a href="{{ route('asesor.asesmen_mandiri.show', $a->id_asesi) }}" 
+                                    <a href="{{ route('asesor.asesmen_mandiri.show', $a->id_asesi) }}"
                                        class="btn btn-sm btn-outline-custom">
                                         <i class="bi bi-eye me-1"></i>Detail
                                     </a>
@@ -199,15 +199,64 @@
 
 {{-- ================== CUSTOM CSS ================== --}}
 <style>
-    /* Primary Color Variables */
+    /* ===== VARIABEL & RESET dengan warna utama #0b2f7c ===== */
     :root {
-        --primary-dark: #041562;
-        --primary-light: #E9F1FF;
+        --primary: #0b2f7c;
+        --primary-dark: #08205c;
+        --primary-light: #e9effa;
+        --secondary: #6c757d;
+        --success: #198754;
+        --danger: #dc3545;
+        --font-sans: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+        font-family: var(--font-sans);
+        background-color: #f1f4f9;
+    }
+
+    .container-fluid {
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+
+    /* ===== CARD STYLE ===== */
+    .card {
+        border-radius: 1.25rem;
+        overflow: hidden;
+        transition: all 0.2s ease;
+        background: #ffffff;
+    }
+
+    .card:hover {
+        box-shadow: 0 1rem 2rem rgba(0,0,0,0.08) !important;
+    }
+
+    .card-header {
+        background: transparent;
+        padding-bottom: 0;
+    }
+
+    /* ===== WARNA UTAMA #0b2f7c ===== */
+    .bg-primary {
+        background-color: var(--primary) !important;
+    }
+
+    .bg-primary.bg-gradient {
+        background: linear-gradient(145deg, var(--primary), var(--primary-dark)) !important;
+    }
+
+    .bg-primary.bg-opacity-10 {
+        background-color: rgba(11,47,124,0.1) !important;
+    }
+
+    .text-primary {
+        color: var(--primary) !important;
     }
 
     /* Header Card */
     .header-card {
-        border-left: 4px solid var(--primary-dark);
+        border-left: 4px solid var(--primary);
     }
 
     /* Icon Box */
@@ -219,25 +268,26 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--primary-dark);
+        color: var(--primary);
     }
 
     /* Custom Outline Button */
     .btn-outline-custom {
-        border-color: var(--primary-dark);
-        color: var(--primary-dark);
+        border: 1.5px solid var(--primary);
+        color: var(--primary);
         font-weight: 500;
         transition: all 0.3s ease;
         padding: 6px 12px;
         font-size: 14px;
+        border-radius: 2rem;
     }
 
     .btn-outline-custom:hover {
-        background-color: var(--primary-dark);
-        border-color: var(--primary-dark);
+        background-color: var(--primary);
+        border-color: var(--primary);
         color: white;
         transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(4, 21, 98, 0.2);
+        box-shadow: 0 2px 8px rgba(11,47,124,0.2);
     }
 
     /* Search Wrapper */
@@ -248,15 +298,15 @@
 
     .search-input {
         padding-left: 40px;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 2rem;
         transition: all 0.3s ease;
         height: 44px;
     }
 
     .search-input:focus {
-        border-color: var(--primary-dark);
-        box-shadow: 0 0 0 3px rgba(4, 21, 98, 0.1);
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(11,47,124,0.15);
     }
 
     .search-icon {
@@ -277,7 +327,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--primary-dark);
+        color: var(--primary);
         font-size: 18px;
         flex-shrink: 0;
     }
@@ -287,8 +337,8 @@
         display: inline-block;
         padding: 6px 12px;
         background: var(--primary-light);
-        color: var(--primary-dark);
-        border-radius: 6px;
+        color: var(--primary);
+        border-radius: 2rem;
         font-weight: 600;
         font-size: 13px;
     }
@@ -296,7 +346,7 @@
     /* Table Styling */
     table thead {
         background-color: var(--primary-light);
-        color: var(--primary-dark);
+        color: var(--primary);
     }
 
     table thead th {
@@ -314,7 +364,7 @@
     }
 
     .table-hover tbody tr:hover {
-        background-color: #f8f9ff;
+        background-color: #f8fbff;
     }
 
     /* Empty State */
@@ -325,10 +375,10 @@
 
     /* Pagination Custom */
     .pagination .page-link {
-        border-radius: 6px;
+        border-radius: 2rem;
         margin: 0 3px;
-        border: 1px solid #dee2e6;
-        color: var(--primary-dark);
+        border: 1.5px solid #e2e8f0;
+        color: var(--primary);
         font-weight: 500;
         min-width: 36px;
         text-align: center;
@@ -337,13 +387,13 @@
 
     .pagination .page-link:hover {
         background-color: var(--primary-light);
-        border-color: var(--primary-dark);
-        color: var(--primary-dark);
+        border-color: var(--primary);
+        color: var(--primary);
     }
 
     .pagination .page-item.active .page-link {
-        background-color: var(--primary-dark);
-        border-color: var(--primary-dark);
+        background-color: var(--primary);
+        border-color: var(--primary);
         color: white;
         font-weight: 600;
     }
@@ -389,7 +439,7 @@
             font-size: 11px;
             padding: 4px 8px;
         }
-        
+
         .search-wrapper {
             min-width: 100%;
             margin-top: 10px;

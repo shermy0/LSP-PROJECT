@@ -3,14 +3,14 @@
 @section('title', 'Detail Permohonan Sertifikasi Asesi')
 
 @section('konten')
-<div class="container-fluid px-4 py-3">
+<div class="container-fluid px-4 py-4">
     <div class="bg-transparent">
-        <!-- Header dengan sentuhan lebih elegan -->
+        <!-- Header dengan sentuhan lebih elegan (warna #0b2f7c) -->
         <div class="text-center mb-5">
-            <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width:56px; height:56px; background: linear-gradient(145deg, #041562, #0a1e8a); box-shadow: 0 6px 12px rgba(4,21,98,0.2);">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width:70px; height:70px; background: linear-gradient(145deg, #0b2f7c, #1a3e9c); box-shadow: 0 10px 20px rgba(11,47,124,0.3);">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
             </div>
-            <h1 class="h3 fw-bold" style="color: #041562;">Detail Permohonan Sertifikasi</h1>
+            <h1 class="h3 fw-bold" style="color: #0b2f7c;">Detail Permohonan Sertifikasi</h1>
             <p class="text-secondary-emphasis bg-light d-inline-block px-4 py-2 rounded-pill fs-6"><span class="fw-semibold">FR.APL.02</span> — Rincian Data Pemohon</p>
         </div>
 
@@ -170,20 +170,19 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        {{-- SELALU TAMPILKAN RADIO BUTTON DENGAN NILAI DARI DATABASE --}}
                                         <div class="d-flex justify-content-center gap-3">
                                             <div class="form-check">
-                                                <input class="form-check-input" type="radio" 
-                                                       name="syarat[{{ $d->id_dokumen ?? $d->id ?? $i }}]" 
-                                                       value="Ya" 
+                                                <input class="form-check-input" type="radio"
+                                                       name="syarat[{{ $d->id_dokumen ?? $d->id ?? $i }}]"
+                                                       value="Ya"
                                                        id="ya{{ $i }}"
                                                        {{ isset($d->memenuhi_syarat) && $d->memenuhi_syarat ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="ya{{ $i }}">Ya</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="radio" 
-                                                       name="syarat[{{ $d->id_dokumen ?? $d->id ?? $i }}]" 
-                                                       value="Tidak" 
+                                                <input class="form-check-input" type="radio"
+                                                       name="syarat[{{ $d->id_dokumen ?? $d->id ?? $i }}]"
+                                                       value="Tidak"
                                                        id="tidak{{ $i }}"
                                                        {{ isset($d->memenuhi_syarat) && !$d->memenuhi_syarat ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="tidak{{ $i }}">Tidak</label>
@@ -238,7 +237,7 @@
 
                             <div class="mb-3 grow d-flex flex-column">
                                 <label class="form-label fw-medium">Tanda Tangan Admin <span class="text-danger">*</span></label>
-                                <div class="canvas-wrapper border-2 border-primary" style="border: 2px dashed #007BFF; border-radius: 16px; background: white; padding: 4px;">
+                                <div class="canvas-wrapper border-2 border-primary" style="border: 2px dashed #0b2f7c; border-radius: 16px; background: white; padding: 4px;">
                                     <canvas id="ttd-admin" style="width:100%; height:160px; border-radius: 12px; background: #fff; cursor: crosshair;"></canvas>
                                     <span class="canvas-placeholder" style="color: #aaa; bottom: 20px;">Tanda tangan admin di sini</span>
                                 </div>
@@ -295,7 +294,7 @@
             {{-- Tombol aksi --}}
             <div class="d-flex justify-content-end gap-3 mt-4 mb-5">
                 <a href="{{ route('admin.permohonan.index') }}" class="btn btn-outline-secondary rounded-pill px-5 py-2 fw-semibold">Kembali</a>
-                <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-semibold" style="background: #041562; border: none;">Simpan Keputusan</button>
+                <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-semibold" style="background: #0b2f7c; border: none;">Simpan Keputusan</button>
             </div>
         </form>
     </div>
@@ -334,9 +333,16 @@
   </div>
 </div>
 
-{{-- STYLE ditingkatkan --}}
+{{-- STYLE ditingkatkan dengan tema #0b2f7c --}}
 <style>
-    /* === FONT & DASAR === */
+    /* === VARIABEL WARNA UTAMA #0b2f7c === */
+    :root {
+        --primary: #0b2f7c;
+        --primary-dark: #08205c;
+        --primary-light: #e9effa;
+        --primary-soft: #f0f5ff;
+    }
+
     body {
         font-family: 'Inter', 'Poppins', system-ui, sans-serif;
         background: #f8fafd;
@@ -344,20 +350,20 @@
 
     /* === UNIT HEADER (lebih elegan) === */
     .unit-header {
-        background: linear-gradient(90deg, #E9F1FF 0%, #f1f7fe 100%);
-        border-left: 8px solid #007BFF;
+        background: linear-gradient(90deg, var(--primary-light) 0%, #f1f7fe 100%);
+        border-left: 8px solid var(--primary);
         border-radius: 20px 20px 20px 8px;
         padding: 1.25rem 1.5rem;
         margin-bottom: 1.25rem;
-        box-shadow: 0 6px 14px rgba(0,123,255,0.08);
+        box-shadow: 0 6px 14px rgba(11,47,124,0.08);
         transition: all 0.2s;
     }
     .unit-header:hover {
-        box-shadow: 0 8px 20px rgba(4,21,98,0.12);
+        box-shadow: 0 8px 20px rgba(11,47,124,0.15);
         border-left-width: 10px;
     }
     .unit-header .badge {
-        background: #041562 !important;
+        background: var(--primary) !important;
         font-size: 0.9rem;
     }
 
@@ -368,11 +374,11 @@
         padding: 1.75rem;
         margin-bottom: 2rem;
         background: #ffffff;
-        box-shadow: 0 15px 35px -10px rgba(4,21,98,0.1);
+        box-shadow: 0 15px 35px -10px rgba(11,47,124,0.1);
         transition: transform 0.2s, box-shadow 0.2s;
     }
     .question-box:hover {
-        box-shadow: 0 20px 40px -8px rgba(4,21,98,0.18);
+        box-shadow: 0 20px 40px -8px rgba(11,47,124,0.18);
     }
 
     /* === GRID DATA (dua kolom untuk field) === */
@@ -398,7 +404,7 @@
         border-color: #b8d3f0;
     }
     .data-grid p strong {
-        color: #041562;
+        color: var(--primary);
         font-weight: 600;
         min-width: 130px;
         flex-shrink: 0;
@@ -420,7 +426,7 @@
     }
     .table thead th {
         background: #eef2f7;
-        color: #041562;
+        color: var(--primary);
         font-weight: 600;
         text-transform: uppercase;
         font-size: 0.85rem;
@@ -435,10 +441,10 @@
         border-bottom: 1px solid #e2e8f0;
     }
     .table-hover tbody tr:hover td {
-        background: #f5f9ff;
+        background: var(--primary-soft);
     }
 
-    /* === CANVAS TTD (dibersihkan) === */
+    /* === CANVAS TTD === */
     .canvas-wrapper {
         position: relative;
         background: white;
@@ -451,7 +457,7 @@
         height: 160px;
         background: #ffffff;
         cursor: crosshair;
-        touch-action: none; /* untuk touch */
+        touch-action: none;
     }
     .canvas-placeholder {
         position: absolute;
@@ -467,52 +473,72 @@
         backdrop-filter: blur(2px);
     }
 
-    /* === BUTTONS (kustom) === */
-    .btn-back, .btn-next {
-        transition: all 0.2s;
-        font-weight: 600;
-        border-radius: 40px;
-        padding: 0.6rem 2rem;
-        box-shadow: 0 6px 12px rgba(0,0,0,0.05);
-    }
-    .btn-back {
-        background: #d9534f;
-        color: white;
+    /* === BUTTONS === */
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
         border: none;
+        box-shadow: 0 8px 18px rgba(11,47,124,0.3);
     }
-    .btn-back:hover {
-        background: #c13d39;
+    .btn-primary:hover {
+        background: linear-gradient(135deg, var(--primary-dark), #061944);
         transform: translateY(-2px);
-        box-shadow: 0 12px 18px rgba(217,83,79,0.3);
+        box-shadow: 0 12px 22px rgba(11,47,124,0.35);
     }
-    .btn-next {
-        background: #041562;
+
+    .btn-outline-primary {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+    .btn-outline-primary:hover {
+        background-color: var(--primary);
+        border-color: var(--primary);
         color: white;
-        border: none;
     }
-    .btn-next:hover {
-        background: #0a1e8a;
-        transform: translateY(-2px);
-        box-shadow: 0 12px 18px rgba(4,21,98,0.25);
+
+    .btn-outline-secondary {
+        border-color: #6c757d;
+        color: #6c757d;
+    }
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-outline-danger {
+        border-color: #dc3545;
+        color: #dc3545;
+    }
+    .btn-outline-danger:hover {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-outline-success {
+        border-color: #28a745;
+        color: #28a745;
+    }
+    .btn-outline-success:hover {
+        background-color: #28a745;
+        color: white;
     }
 
     /* === RADIO & FORM CUSTOM === */
     .form-check-input:checked {
-        background-color: #041562;
-        border-color: #041562;
+        background-color: var(--primary);
+        border-color: var(--primary);
     }
     .form-check-input:focus {
-        border-color: #007BFF;
-        box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.15);
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.2rem rgba(11,47,124,0.15);
     }
     .form-control, .form-select {
         border-radius: 50px;
         padding: 0.6rem 1.2rem;
-        border: 1px solid #dde3eb;
+        border: 1.5px solid #dde3eb;
     }
     .form-control:focus, .form-select:focus {
-        border-color: #007BFF;
-        box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(11,47,124,0.15);
     }
     .invalid-feedback {
         font-size: 0.85rem;
@@ -543,7 +569,7 @@
     }
 </style>
 
-{{-- SCRIPTS --}}
+{{-- SCRIPTS (tetap sama seperti sebelumnya, hanya warna di canvas border disesuaikan) --}}
 <script>
     // Preview dokumen
     function openPreview(url, ext) {
