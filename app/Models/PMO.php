@@ -18,6 +18,8 @@ class PMO extends Model
     'id_kuk',
     'id_asesor', 
     'id_asesi', 
+    'umpan_balik_untuk_asesi',
+    'id_unit',
     ];
 
     public $timestamps = false; // biar ga error created_at / updated_at

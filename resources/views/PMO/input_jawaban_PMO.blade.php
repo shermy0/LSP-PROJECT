@@ -23,14 +23,26 @@
                 </div>
             </div>
 
-            <hr class="mb-0">
+            <hr class="mb-2">
+
+            {{-- Timer --}}
+            <div class="text-center pt-2">
+                <div class="d-inline-flex align-items-center gap-2 px-4 py-2 rounded-pill"
+                     style="background-color:#f4f6fb;">
+                    <i class="bi bi-hourglass-split" style="color:#041562;"></i>
+                    <span class="fw-bold fs-5" id="timer" style="color:#041562;">
+                        {{ str_pad($pembuatan->timer ?? 30, 2, '0', STR_PAD_LEFT) }}:00
+                    </span>
+                    <small class="text-muted">sisa waktu</small>
+                </div>
+            </div>
+
         </div>
     </div>
 
     {{-- Form Jawaban --}}
-    <form action="{{ route('jawaban.pmo.simpan', [$skema->id_skema, $pembuatan->id_pembuatan_pertanyaan]) }}" method="POST">
+   <form id="form-jawaban" action="{{ route('jawaban.pmo.simpan', [$skema->id_skema, $pembuatan->id_pembuatan_pertanyaan, $asesi->id_asesi]) }}" method="POST">
         @csrf
-
         @forelse($pertanyaan as $i => $p)
         <div class="card shadow-sm border-0 rounded-4 mb-3">
             <div class="card-body p-4">
@@ -85,7 +97,6 @@
         </div>
         @endforelse
 
-        {{-- Spacer buat fixed button --}}
         <div style="height:80px;"></div>
     </form>
 
@@ -105,7 +116,6 @@
 
     @if($pertanyaan->count())
     <button form="form-jawaban" type="submit"
-            onclick="submitForm()"
             style="position:fixed; bottom:20px; right:20px; z-index:9999;
                    background-color:#041562; color:#fff; border:none;
                    border-radius:50px; padding:10px 22px;
@@ -122,9 +132,43 @@
 </div>
 
 <script>
-function submitForm() {
-    document.querySelector('form').submit();
+let totalDetik = {{ $pembuatan->timer ?? 30 }} * 60;
+let sudahSubmit = false;
+
+function updateTimer() {
+    if (sudahSubmit) return;
+
+    const menit = Math.floor(totalDetik / 60);
+    const detik = totalDetik % 60;
+    const el    = document.getElementById('timer');
+
+    el.textContent = String(menit).padStart(2, '0') + ':' + String(detik).padStart(2, '0');
+
+    if (totalDetik <= 60) {
+        el.style.color = '#dc3545';
+    }
+
+    if (totalDetik <= 0) {
+        sudahSubmit = true;
+        Swal.fire({
+            title: '⏰ Waktu Habis!',
+            text: 'Jawaban kamu akan disimpan otomatis.',
+            icon: 'warning',
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+            allowOutsideClick: false,
+        }).then(() => {
+            document.getElementById('form-jawaban').submit();
+        });
+        return;
+    }
+
+    totalDetik--;
 }
+
+setInterval(updateTimer, 1000);
+updateTimer();
 </script>
 
 @endsection

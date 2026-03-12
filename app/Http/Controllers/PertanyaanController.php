@@ -1167,22 +1167,32 @@ public function storePertanyaanPMO(Request $request, $id_pmo)
     // ================================
     // Simpan Jawaban PMO
     // ================================
-public function simpanJawabanPMO(Request $request, $id_skema, $id_pembuatan)
+public function simpanJawabanPMO(Request $request, $id_skema, $id_pembuatan, $id_asesi)
 {
     $jawaban = $request->input('jawaban', []);
 
     foreach($jawaban as $id_pmo_pertanyaan => $isi) {
-        // Bisa pakai updateOrInsert supaya jika sudah ada jawaban, update
+        $pmopertanyaan = DB::table('pmo_pertanyaan')
+            ->where('id_pmo_pertanyaan', $id_pmo_pertanyaan)
+            ->first();
+
+        if (!$pmopertanyaan) continue;
+
         DB::table('pmo_tanggapan')->updateOrInsert(
             ['id_pmo_pertanyaan' => $id_pmo_pertanyaan],
             [
-                'jawaban' => $isi,
-                'updated_at' => now(),  // kalau tabel ada timestamp
+                'id_pmo'    => $pmopertanyaan->id_pmo,
+                'id_unit'   => json_decode($pmopertanyaan->id_unit, true)[0] ?? null,
+                'tanggapan' => $isi,
             ]
         );
     }
 
-    return redirect()->back()->with('success', 'Jawaban berhasil disimpan.');
+    // ✅ Redirect ke halaman TTD asesi
+    return redirect()->route('tanda.tangan.asesmen', [
+        'id_skema'                => $id_skema,
+        'id_pembuatan_pertanyaan' => $id_pembuatan,
+    ])->with('success', 'Jawaban berhasil disimpan.');
 }
 
 public function tampilJawabanPMO($id_skema, $id_pembuatan)
@@ -1297,15 +1307,10 @@ public function pilihAsesiPMO($id_skema, $id_pembuatan, $id_kelompok)
     $pembuatan = PembuatanPertanyaan::findOrFail($id_pembuatan);
     $kelompok  = KelompokPekerjaan::findOrFail($id_kelompok);
 
-    // Ambil id_asesi dari hasil_asesmen berdasarkan id_kelompok
-    $idAsesiList = DB::table('hasil_asesmen')
-        ->where('id_kelompok', $id_kelompok)
-        ->whereNotNull('id_asesi')
-        ->pluck('id_asesi')
-        ->unique();
+    $id_asesor = Asesor::where('user_id', Auth::id())->value('id_asesor');
 
     $asesiList = DB::table('asesi')
-        ->whereIn('id_asesi', $idAsesiList)
+        ->where('asesor_id', $id_asesor)
         ->orderBy('nama_lengkap')
         ->get();
 
@@ -1319,6 +1324,7 @@ public function inputPMO(Request $request, $id_skema)
     $jumlah             = $request->query('jumlah');
     $id_pmo_param       = $request->query('id_pmo');
     $id_pembuatan_param = $request->query('id_pembuatan');
+    $id_unit_param      = $request->query('id_unit');
 
     $id_asesor = Asesor::where('user_id', Auth::id())->value('id_asesor');
 
@@ -1329,13 +1335,33 @@ public function inputPMO(Request $request, $id_skema)
         $pmo = PMO::where('id_skema', $id_skema)->latest('id_pmo')->first();
     }
 
-    if (!$pmo) {
-        $pmo = PMO::create([
-            'id_skema'   => $id_skema,
-            'id_tuk'     => 1,
-            'id_asesor'  => $id_asesor,
-        ]);
+   if (!$pmo) {
+    $skemaData = DB::table('skema_sertifikasi')->where('id_skema', $id_skema)->first();
+
+    $id_unit = DB::table('unit_kompetensi')
+        ->join('hasil_asesmen', 'unit_kompetensi.id_unit', '=', 'hasil_asesmen.id_unit')
+        ->where('hasil_asesmen.id_kelompok', $kelompok_id)
+        ->value('unit_kompetensi.id_unit');
+
+    // ✅ Ambil id_asesi dari hasil_asesmen berdasarkan kelompok_id
+    $id_asesi = DB::table('hasil_asesmen')
+        ->where('id_kelompok', $kelompok_id)
+        ->whereNotNull('id_asesi')
+        ->value('id_asesi');
+
+    if (!$id_asesi) {
+        return back()->with('error', 'Tidak ada asesi ditemukan untuk kelompok ini.');
     }
+
+    $pmo = PMO::create([
+        'id_skema'  => $id_skema,
+        'id_unit'   => $id_unit ?? 1,
+        'id_tuk'    => $skemaData->id_tuk ?? 1,
+        'id_kuk'    => $skemaData->id_kuk ?? 1,
+        'id_asesor' => $id_asesor,
+        'id_asesi'  => $id_asesi, // ✅ dari hasil_asesmen
+    ]);
+}
 
     $unitKompetensi = DB::table('unit_kompetensi')
     ->join('hasil_asesmen', 'unit_kompetensi.id_unit', '=', 'hasil_asesmen.id_unit')
