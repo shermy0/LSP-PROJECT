@@ -38,6 +38,15 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0" role="alert">
+            <div class="d-flex align-items-start">
+                <i class="bi bi-exclamation-triangle-fill me-3 fs-5 flex-shrink-0"></i>
+                <div class="flex-grow-1">{{ session('error') }}</div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
 
     {{-- Search & Table Card --}}
     <div class="card border-0 shadow-sm">
@@ -61,6 +70,7 @@
                             <th>Nama Asesi</th>
                             <th width="140">NIK</th>
                             <th>Email</th>
+                            <th>Skema Pilihan / Jurusan</th>
                             <th>Asesor</th>
                             <th width="160">Update Terakhir</th>
                             <th class="text-center" width="140">Aksi</th>
@@ -92,6 +102,14 @@
                                 <td><small class="text-muted">{{ $a->email }}</small></td>
 
                                 <td>
+                                    @if($a->skema_pilihan)
+                                        <span class="badge bg-info">{{ $a->skema_pilihan }}</span>
+                                    @else
+                                        <span class="badge bg-secondary">{{ $a->jurusan->nama_jurusan ?? 'Tidak ada' }}</span>
+                                    @endif
+                                </td>
+
+                                <td>
                                     @if($a->asesor)
                                         <span class="badge-keahlian bg-success text-white">{{ $a->asesor->nama_asesor }}</span>
                                         <div><small class="text-muted">{{ $a->asesor->keahlian }}</small></div>
@@ -119,6 +137,8 @@
                                         data-id="{{ $a->id_asesi }}"
                                         data-nama="{{ $a->nama_lengkap }}"
                                         data-asesor="{{ $a->asesor_id }}"
+                                        data-skema="{{ $a->skema_pilihan ?? '' }}"
+                                        data-jurusan="{{ $a->jurusan->nama_jurusan ?? '' }}"
                                     >
                                         <i class="bi bi-person-plus me-1"></i> Tugaskan
                                     </button>
@@ -126,7 +146,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center py-5">
+                                <td colspan="8" class="text-center py-5">
                                     <div class="empty-state">
                                         <i class="bi bi-inbox"></i>
                                         <p class="mb-1 mt-3 fw-semibold">Belum Ada Data Asesi</p>
@@ -262,6 +282,15 @@
                         </div>
                     </div>
 
+                    {{-- Informasi Persyaratan --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Persyaratan Penugasan</label>
+                        <div class="p-3 bg-light rounded" id="persyaratan_info">
+                            <p class="mb-1"><strong>Skema Pilihan:</strong> <span id="skema_pilihan_text"></span></p>
+                            <p class="mb-0"><strong>Jurusan:</strong> <span id="jurusan_text"></span></p>
+                        </div>
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label fw-semibold small">
                             Pilih Asesor <span class="text-danger">*</span>
@@ -270,7 +299,7 @@
                             <option value="">-- Pilih Asesor --</option>
                             @foreach($asesors as $as)
                                 <option value="{{ $as->id_asesor }}">
-                                    {{ $as->nama_asesor }} - {{ $as->keahlian }}
+                                    {{ $as->nama_asesor }} - {{ $as->keahlian ?? $as->jurusan->nama_jurusan ?? '-' }}
                                 </option>
                             @endforeach
                         </select>
@@ -553,10 +582,14 @@
                 const id = this.dataset.id;
                 const nama = this.dataset.nama;
                 const asesor_id = this.dataset.asesor;
+                const skema = this.dataset.skema || 'Tidak ada';
+                const jurusan = this.dataset.jurusan || 'Tidak ada';
 
                 document.getElementById('asesi_id').value = id;
                 document.getElementById('asesi_nama').textContent = nama;
                 document.getElementById('asesor_select').value = asesor_id || "";
+                document.getElementById('skema_pilihan_text').textContent = skema;
+                document.getElementById('jurusan_text').textContent = jurusan;
 
                 // Set action route
                 document.getElementById('assignForm').action = `/admin/penugasan/${id}`;

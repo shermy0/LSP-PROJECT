@@ -168,7 +168,7 @@ class AsesmenMandiriController extends Controller
                         ->where('id_asesmen_mandiri', $master->id_asesmen_mandiri)
                         ->update([
                             'rekomendasi' => null,
-                            'id_asesor'   => null,
+                            'id_asesor' => null,
                             // Tidak ada updated_at di tabel, jadi hapus
                         ]);
                     $idAsesmen = $master->id_asesmen_mandiri;
@@ -184,9 +184,9 @@ class AsesmenMandiriController extends Controller
                 // Belum ada master, buat baru
                 $idAsesmen = DB::table('asesmen_mandiri_master')->insertGetId([
                     'id_permohonan' => $permohonan->id_permohonan,
-                    'id_asesi'      => $asesi->id_asesi,
-                    'id_asesor'     => null,
-                    'rekomendasi'   => null,
+                    'id_asesi' => $asesi->id_asesi,
+                    'id_asesor' => null,
+                    'rekomendasi' => null,
                     // Jika tidak ada timestamps, jangan sertakan
                 ]);
             }
@@ -198,9 +198,9 @@ class AsesmenMandiriController extends Controller
             foreach ($jawabanKuk as $id_kuk => $status) {
                 DB::table('asesmen_mandiri_jawaban')->insert([
                     'id_asesmen_mandiri' => $idAsesmen,
-                    'id_kuk'              => $id_kuk,
-                    'status'              => $status,
-                    'id_dokumen'          => $dokumenKuk[$id_kuk] ?? null,
+                    'id_kuk' => $id_kuk,
+                    'status' => $status,
+                    'id_dokumen' => $dokumenKuk[$id_kuk] ?? null,
                 ]);
             }
 
@@ -230,6 +230,11 @@ class AsesmenMandiriController extends Controller
      */
     public function storeTTD(Request $request)
     {
+        $request->validate([
+            'ttd_asesi' => 'required|string',
+            'tgl_ttd_asesi' => 'required|date',
+        ]);
+
         $user = Auth::user();
         $asesi = DB::table('asesi')->where('user_id', $user->id)->first();
 
@@ -252,27 +257,23 @@ class AsesmenMandiriController extends Controller
 
         Storage::disk('public')->put('ttd/' . $imageName, base64_decode($image));
 
-        // Cek apakah sudah ada persetujuan
         $persetujuan = DB::table('asesmen_mandiri_persetujuan')
             ->where('id_asesmen_mandiri', $master->id_asesmen_mandiri)
             ->first();
 
         if ($persetujuan) {
-            // Update - tanpa updated_at
             DB::table('asesmen_mandiri_persetujuan')
                 ->where('id_asesmen_mandiri', $master->id_asesmen_mandiri)
                 ->update([
                     'tgl_ttd_asesi' => $request->tgl_ttd_asesi,
-                    'ttd_asesi'      => 'ttd/' . $imageName,
+                    'ttd_asesi' => 'ttd/' . $imageName,
                 ]);
         } else {
-            // Insert - tanpa created_at, updated_at
             DB::table('asesmen_mandiri_persetujuan')->insert([
                 'id_asesmen_mandiri' => $master->id_asesmen_mandiri,
-                'tgl_ttd_asesi'      => $request->tgl_ttd_asesi,
-                'ttd_asesi'          => 'ttd/' . $imageName,
+                'tgl_ttd_asesi' => $request->tgl_ttd_asesi,
+                'ttd_asesi' => 'ttd/' . $imageName,
                 'status_persetujuan' => 'menunggu',
-                // Jika tabel memiliki kolom status_persetujuan dan catatan, bisa diisi default
             ]);
         }
 

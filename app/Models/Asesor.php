@@ -11,14 +11,15 @@ class Asesor extends Model
 
     protected $table = 'asesor';
     protected $primaryKey = 'id_asesor';
-    public $timestamps = true; // migration menggunakan timestamps
+    public $timestamps = true;
     protected $fillable = [
         'user_id',
         'nama_asesor',
         'nip',
         'email',
+        'telepon',
         'jabatan',
-        'id_jurusan', // menggantikan keahlian
+        'id_jurusan',
         'no_registrasi'
     ];
 
@@ -45,9 +46,9 @@ class Asesor extends Model
     {
         return $this->belongsToMany(
             SkemaSertifikasi::class,
-            'asesor_skema',     // tabel pivot
-            'id_asesor',         // foreign key di pivot ke asesor
-            'id_skema'           // foreign key di pivot ke skema
-        )->withTimestamps();     // jika tabel pivot punya timestamps
+            'asesor_skema',
+            'id_asesor',
+            'id_skema'
+        )->withTimestamps();
     }
 }

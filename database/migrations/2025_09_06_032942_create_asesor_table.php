@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('nama_asesor')->nullable();
             $table->string('nip')->nullable();
             $table->string('email')->nullable();
+            $table->string('telepon')->nullable(); // tambahan kolom telepon
             $table->string('jabatan')->nullable();
             $table->unsignedBigInteger('id_jurusan')->nullable(); // foreign key ke jurusan
             $table->string('no_registrasi')->nullable();

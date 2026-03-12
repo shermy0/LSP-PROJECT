@@ -6,7 +6,7 @@
 <div class="container-fluid px-4 py-4">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <!-- Header dengan ikon dan judul (warna #0b2f7c) -->
+            <!-- Header -->
             <div class="text-center mb-5">
                 <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-gradient text-white rounded-circle mb-3" style="width: 70px; height: 70px; box-shadow: 0 10px 20px rgba(11,47,124,0.3);">
                     <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">
@@ -80,7 +80,7 @@
                     </svg>
                     Kembali
                 </a>
-                <button type="submit" class="btn-next" form="ttd-form" onclick="saveTTD()">
+                <button type="submit" class="btn-next" form="ttd-form">
                     Simpan dan Kirim
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send ms-2" viewBox="0 0 16 16">
                         <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
@@ -338,7 +338,6 @@ function initSignature(canvasId) {
     const ctx = canvas.getContext("2d");
     let drawing = false;
 
-    // Set canvas ukuran sebenarnya (CSS sudah mengatur width, tapi untuk koordinat mouse)
     function resizeCanvas() {
         const container = canvas.parentElement;
         const cssWidth = container.clientWidth;
@@ -355,7 +354,6 @@ function initSignature(canvasId) {
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // Event listeners
     canvas.addEventListener('mousedown', (e) => {
         e.preventDefault();
         drawing = true;
@@ -379,7 +377,6 @@ function initSignature(canvasId) {
     canvas.addEventListener('mouseup', () => drawing = false);
     canvas.addEventListener('mouseleave', () => drawing = false);
 
-    // Touch events
     canvas.addEventListener('touchstart', (e) => {
         e.preventDefault();
         drawing = true;
@@ -405,36 +402,29 @@ function initSignature(canvasId) {
     canvas.addEventListener('touchend', () => drawing = false);
 }
 
-// Clear canvas
 function clearCanvas(canvasId) {
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // Hapus hidden input value juga
     document.getElementById('ttd-asesi-input').value = '';
 }
 
-// Simpan base64 ke input hidden sebelum submit
 function saveTTD() {
     const canvas = document.getElementById("ttd-asesi");
     const dataURL = canvas.toDataURL("image/png");
     document.getElementById("ttd-asesi-input").value = dataURL;
 }
 
-// Inisialisasi saat halaman dimuat
 document.addEventListener('DOMContentLoaded', function() {
     initSignature("ttd-asesi");
 });
 
-// Validasi form sebelum submit (wajib tanda tangan)
 document.getElementById('ttd-form').addEventListener('submit', function(e) {
     const canvas = document.getElementById('ttd-asesi');
     const ctx = canvas.getContext('2d');
-    // Cek apakah canvas kosong (misal dengan mengambil pixel data)
     const pixelData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
     let isBlank = true;
     for (let i = 0; i < pixelData.length; i += 4) {
-        // Jika ada pixel bukan putih (nilai < 255) berarti ada coretan
         if (pixelData[i] < 255 || pixelData[i+1] < 255 || pixelData[i+2] < 255) {
             isBlank = false;
             break;
@@ -442,7 +432,6 @@ document.getElementById('ttd-form').addEventListener('submit', function(e) {
     }
     if (isBlank) {
         e.preventDefault();
-        // Tampilkan modal peringatan
         const modalEl = document.getElementById('ttdWarningModal');
         const modal = new bootstrap.Modal(modalEl);
         modal.show();
