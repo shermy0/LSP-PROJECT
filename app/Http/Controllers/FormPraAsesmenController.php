@@ -20,7 +20,7 @@ class FormPraAsesmenController extends Controller
         $dokumenTidakMemenuhi = collect();
 
         if ($asesi) {
-            $permohonan = Permohonan::where('id_asesi', $asesi->id_asesi)
+            $permohonan= Permohonan::where('id_asesi', $asesi->id_asesi)
                 ->latest('created_at')
                 ->first();
 

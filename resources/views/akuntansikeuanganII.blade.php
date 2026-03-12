@@ -62,14 +62,10 @@
             </a>
         </li>
         <li>
-<<<<<<< HEAD
-            <a class="dropdown-item" 
-=======
-           <a class="dropdown-item" 
->>>>>>> 05feaf5aedb5a1868b8b2d795f3c40228eed5012
-               href="{{ route('formasesmen.pmo', ['id_skema' => $skema->id_skema]) }}">
-                Pertanyaan PMO
-            </a>
+           <a class="dropdown-item"
+                       href="{{ route('formasesmen.pmo', ['id_skema' => $skema->id_skema]) }}">
+                        Pertanyaan PMO
+                    </a>
         </li>
         <li>
             <a class="dropdown-item" href="{{ url('/fr-va-setelah') }}">

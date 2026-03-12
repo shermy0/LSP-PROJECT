@@ -112,100 +112,108 @@ class JawabanController extends Controller
      }
      
 
-    public function show($id_skema, $jenis)
-    {
-        $user = auth()->user();
-        if (!$user) {
-            return redirect()->route('login')->withErrors(['error' => 'Silakan login terlebih dahulu.']);
-        }
-    
-        $asesi = Asesi::where('user_id', $user->id)->first();
-        if (!$asesi) {
-            return redirect()->route('login')->withErrors(['error' => 'Data Asesi tidak ditemukan.']);
-        }
-        $id_asesi = $asesi->id_asesi;
-    
-        // mapping alias URL ke nilai DB
-        $mapJenis = [
-            'pg' => 'pilihan_ganda',
-            'pilihan_ganda' => 'pilihan_ganda',
-            'esai' => 'esai',
-            'lisan' => 'lisan',
-        ];
-        if (!isset($mapJenis[$jenis])) {
-            abort(404, 'Jenis pertanyaan tidak valid');
-        }
-        $jenisDb = $mapJenis[$jenis];
-    
-        // ambil pertanyaan lengkap dengan id_pembuatan_pertanyaan
-        $pertanyaan = Pertanyaan::where('id_skema', $id_skema)
-            ->where('jenis_pertanyaan', $jenisDb)
-            ->with(['opsiJawaban' => fn($q) => $q->orderBy('kode_opsi')])
-            ->get();
-    
-        if ($pertanyaan->isEmpty()) {
-            return view("jawaban.$jenisDb" , compact(
-                'pertanyaan',
-                'id_skema',
-                'asesi',
-                'id_asesi'
-            ));
-        }
-    
-        // ambil jawaban lama user
-        $jawabanRaw = JawabanAsesmen::where('id_asesi', $id_asesi)
-            ->where('id_skema', $id_skema)
-            ->get();
-    
-        $jawaban = [];
-        foreach ($jawabanRaw as $j) {
-            $jawaban[$j->id_pertanyaan] = $j->jawaban_opsi ?? $j->jawaban_text;
-        }
+   public function show($id_skema, $jenis)
+{
+    $user = auth()->user();
+    if (!$user) {
+        return redirect()->route('login')->withErrors(['error' => 'Silakan login terlebih dahulu.']);
+    }
 
-        $skema = DB::table('skema_sertifikasi')->where('id_skema', $id_skema)->first();
-    
-        // kumpulkan semua id_pembuatan_pertanyaan dari pertanyaan
-        $idsPembuatan = $pertanyaan->pluck('id_pembuatan_pertanyaan')->unique();
-    
-        // ambil semua pembuatan pertanyaan terkait
-        $pembuatanList = PembuatanPertanyaan::whereIn('id_pembuatan_pertanyaan', $idsPembuatan)->get();
-    
-        // ambil 1 pembuatan pertanyaan
-        $pembuatan = $pembuatanList->first();
-        $id_pembuatan_pertanyaan = $pembuatan?->id_pembuatan_pertanyaan;
-        $timer = $pembuatan?->timer ?? 0; // menit
-        $timescap = $pembuatan?->timescap;
-    
-        // hitung sisa waktu (dalam detik)
-        $sisaDetik = $timer * 60;
-        if ($timescap) {
-            $endTime = \Carbon\Carbon::parse($timescap)->addMinutes($timer);
-            $sisaDetik = now()->diffInSeconds($endTime, false);
-            if ($sisaDetik < 0) {
-                $sisaDetik = 0; // sudah habis
-            }
-        }
-    
-        // pilih view
-        $viewMap = [
-            'pilihan_ganda' => 'jawaban.pg_asesi',
-            'esai' => 'jawaban.esai_asesi',
-            'lisan' => 'jawaban.lisan_asesi',
-        ];
-    
+    $asesi = Asesi::where('user_id', $user->id)->first();
+    if (!$asesi) {
+        return redirect()->route('login')->withErrors(['error' => 'Data Asesi tidak ditemukan.']);
+    }
+    $id_asesi = $asesi->id_asesi;
+
+    // Mapping alias URL ke nama jenis di DB
+    $mapJenis = [
+        'pg' => 'pilihan_ganda',
+        'pilihan_ganda' => 'pilihan_ganda',
+        'esai' => 'esai',
+        'lisan' => 'lisan',
+    ];
+    if (!isset($mapJenis[$jenis])) {
+        abort(404, 'Jenis pertanyaan tidak valid');
+    }
+    $jenisDb = $mapJenis[$jenis];
+
+    // Ambil pertanyaan lengkap dengan opsi jawaban
+    $pertanyaan = Pertanyaan::where('id_skema', $id_skema)
+        ->where('jenis_pertanyaan', $jenisDb)
+        ->with(['opsiJawaban' => fn($q) => $q->orderBy('kode_opsi')])
+        ->get();
+
+    // Map jenis ke view blade
+    $viewMap = [
+        'pilihan_ganda' => 'jawaban.pg_asesi',
+        'esai' => 'jawaban.esai_asesi',
+        'lisan' => 'jawaban.lisan_asesi', // perbaikan: gunakan view soal lisan biasa
+    ];
+
+    // Ambil skema (selalu)
+    $skema = DB::table('skema_sertifikasi')->where('id_skema', $id_skema)->first();
+
+    // Jika tidak ada pertanyaan, tetap kirim semua variabel ke view
+    if ($pertanyaan->isEmpty()) {
+        $timer = 0;
+        $timescap = null;
+        $sisaDetik = 0;
+        $id_pembuatan_pertanyaan = null;
+
         return view($viewMap[$jenisDb], compact(
             'pertanyaan',
-            'jawaban',
             'id_skema',
-            'timer',
-            'timescap',
             'asesi',
             'id_asesi',
-            'id_pembuatan_pertanyaan',
+            'timer',
+            'timescap',
             'sisaDetik',
+            'id_pembuatan_pertanyaan',
             'skema'
         ));
     }
+
+    // Ambil jawaban lama user
+    $jawabanRaw = JawabanAsesmen::where('id_asesi', $id_asesi)
+        ->where('id_skema', $id_skema)
+        ->get();
+
+    $jawaban = [];
+    foreach ($jawabanRaw as $j) {
+        $jawaban[$j->id_pertanyaan] = $j->jawaban_opsi ?? $j->jawaban_text;
+    }
+
+    // Kumpulkan semua id_pembuatan_pertanyaan
+    $idsPembuatan = $pertanyaan->pluck('id_pembuatan_pertanyaan')->unique();
+
+    // Ambil semua pembuatan pertanyaan terkait
+    $pembuatanList = PembuatanPertanyaan::whereIn('id_pembuatan_pertanyaan', $idsPembuatan)->get();
+    $pembuatan = $pembuatanList->first();
+
+    $id_pembuatan_pertanyaan = $pembuatan?->id_pembuatan_pertanyaan;
+    $timer = $pembuatan?->timer ?? 0; // menit
+    $timescap = $pembuatan?->timescap;
+
+    // Hitung sisa waktu dalam detik
+    $sisaDetik = $timer * 60;
+    if ($timescap) {
+        $endTime = \Carbon\Carbon::parse($timescap)->addMinutes($timer);
+        $sisaDetik = max(0, now()->diffInSeconds($endTime, false));
+    }
+
+    return view($viewMap[$jenisDb], compact(
+        'pertanyaan',
+        'jawaban',
+        'id_skema',
+        'timer',
+        'timescap',
+        'asesi',
+        'id_asesi',
+        'id_pembuatan_pertanyaan',
+        'sisaDetik',
+        'skema'
+    ));
+}
 
     /**
      * Simpan atau update jawaban user

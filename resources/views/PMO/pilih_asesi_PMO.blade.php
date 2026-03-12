@@ -43,8 +43,8 @@
                             <p class="fw-bold mb-0 text-truncate" style="color:#041562; font-size:0.9rem;">
                                 {{ $asesi->nama_lengkap }}
                             </p>
-                            @if($asesi->telepon)
-                                <small class="text-muted"><i class="bi bi-telephone me-1"></i>{{ $asesi->telepon }}</small>
+                           @if(isset($asesi->telepon_hp) && $asesi->telepon_hp)
+                                <small class="text-muted"><i class="bi bi-telephone me-1"></i>{{ $asesi->telepon_hp }}</small>
                             @else
                                 <small class="text-muted text-italic">No telepon tidak tersedia</small>
                             @endif
