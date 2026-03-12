@@ -20,7 +20,6 @@ class AsesmenMandiriController extends Controller
      */
     public function index()
     {
-        // Ambil data asesi yang sudah memiliki asesmen mandiri
         $asesi = DB::table('asesi')
             ->join('users', 'asesi.user_id', '=', 'users.id')
             ->join('permohonan', 'asesi.id_asesi', '=', 'permohonan.id_asesi')
@@ -55,13 +54,11 @@ class AsesmenMandiriController extends Controller
                 ->with('error', 'Asesi belum mengisi asesmen mandiri.');
         }
 
-        // Jawaban asesi
         $jawaban = AsesmenMandiriJawaban::where('id_asesmen_mandiri', $asesmen->id_asesmen_mandiri)
             ->with(['dokumen', 'kuk'])
             ->get()
             ->keyBy('id_kuk');
 
-        // Ambil skema permohonan terakhir
         $permohonan = DB::table('permohonan')
             ->join('skema_sertifikasi', 'permohonan.id_skema', '=', 'skema_sertifikasi.id_skema')
             ->where('permohonan.id_asesi', $id_asesi)
@@ -74,7 +71,6 @@ class AsesmenMandiriController extends Controller
                 ->with('error', 'Data permohonan tidak ditemukan.');
         }
 
-        // Ambil struktur skema (unit → elemen → kuk)
         $units = DB::table('unit_kompetensi')
             ->where('id_skema', $permohonan->id_skema)
             ->get();
@@ -88,7 +84,6 @@ class AsesmenMandiriController extends Controller
             ->whereIn('id_elemen', $elemen->pluck('id_elemen'))
             ->get();
 
-        // Ambil persetujuan (tanda tangan asesi jika ada)
         $persetujuan = AsesmenMandiriPersetujuan::where('id_asesmen_mandiri', $asesmen->id_asesmen_mandiri)->first();
 
         return view('asesor.asesmen_mandiri.show', compact(
@@ -120,7 +115,6 @@ class AsesmenMandiriController extends Controller
             return back()->with('error', 'Asesi belum mengisi asesmen mandiri.');
         }
 
-        // Simpan tanda tangan asesor sebagai file
         $fileName = null;
         if ($request->filled('ttd_asesor')) {
             $image = str_replace('data:image/png;base64,', '', $request->ttd_asesor);
@@ -129,13 +123,11 @@ class AsesmenMandiriController extends Controller
             Storage::disk('public')->put($fileName, base64_decode($image));
         }
 
-        // Update rekomendasi di master
         $asesmen->update([
             'id_asesor'   => Auth::id(),
             'rekomendasi' => $request->rekomendasi,
         ]);
 
-        // Simpan/update persetujuan
         AsesmenMandiriPersetujuan::updateOrCreate(
             ['id_asesmen_mandiri' => $asesmen->id_asesmen_mandiri],
             [

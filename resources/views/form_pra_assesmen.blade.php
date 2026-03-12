@@ -1,11 +1,10 @@
-{{-- File: resources/views/asesi/pra_asesmen.blade.php --}}
 @extends('master')
 
 @section('title', 'Form Pra Asesmen')
 
 @section('konten')
     <div class="container-fluid px-4 py-4">
-        <!-- Header dengan ikon dan judul (warna #0b2f7c) -->
+        <!-- Header -->
         <div class="text-center mb-5">
             <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-gradient text-white rounded-circle mb-3" style="width: 70px; height: 70px; box-shadow: 0 10px 20px rgba(11,47,124,0.3);">
                 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-clipboard-check" viewBox="0 0 16 16">
@@ -53,7 +52,6 @@
                             </div>
                             <span class="badge bg-secondary">Belum diisi</span>
                         </a>
-
                     @elseif($status === 'Diajukan')
                         <a href="{{ route('asesi.permohonan.menunggu') }}" class="pra-item">
                             <div class="d-flex align-items-center">
@@ -67,7 +65,6 @@
                             </div>
                             <span class="badge bg-warning text-dark">Diajukan</span>
                         </a>
-
                     @elseif($status === 'Diterima')
                         <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#infoPermohonanModal" class="pra-item">
                             <div class="d-flex align-items-center">
@@ -82,7 +79,7 @@
                             <span class="badge bg-success">Diterima</span>
                         </a>
 
-                        {{-- Modal Info --}}
+                        <!-- Modal Info Permohonan (sudah ada) -->
                         <div class="modal fade" id="infoPermohonanModal" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
@@ -101,10 +98,8 @@
                                 </div>
                             </div>
                         </div>
-
                     @elseif($status === 'Ditolak')
-                        <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#permohonanDitolakModal"
-                            class="pra-item">
+                        <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#permohonanDitolakModal" class="pra-item">
                             <div class="d-flex align-items-center">
                                 <div class="icon-wrap me-3 bg-danger bg-opacity-10 text-danger">
                                     <i class="bi bi-x-circle"></i>
@@ -117,7 +112,7 @@
                             <span class="badge bg-danger">Ditolak</span>
                         </a>
 
-                        {{-- Modal Penolakan --}}
+                        <!-- Modal Penolakan (sudah ada) -->
                         <div class="modal fade" id="permohonanDitolakModal" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog modal-lg modal-dialog-centered">
                                 <div class="modal-content">
@@ -134,9 +129,9 @@
                                         <ul>
                                             @forelse($dokumenTidakMemenuhi as $dok)
                                                 <li>
-                                                    {{ $dok->nama_dokumen }}
-                                                    @if($dok->file_url)
-                                                        ( <a href="{{ $dok->file_url }}" target="_blank">Lihat</a> )
+                                                    {{ $dok->jenisDokumen->nama_dokumen ?? 'Dokumen' }}
+                                                    @if($dok->path_file)
+                                                        ( <a href="{{ Storage::url($dok->path_file) }}" target="_blank">Lihat</a> )
                                                     @endif
                                                     @if($dok->catatan)
                                                         <br>
@@ -180,19 +175,33 @@
                             } elseif ($rekom === 'Dapat Dilanjutkan') {
                                 $asesmenLabel = 'Dapat Dilanjutkan';
                                 $asesmenBadge = 'bg-success';
-                                $asesmenHref = route('asesi.asesmen_mandiri.show', $asesmenMandiri->id_asesmen_mandiri);
+                                $asesmenHref = 'javascript:void(0)';
                                 $iconClass = 'bg-success bg-opacity-10 text-success';
                                 $icon = 'bi-check-circle';
-                            } else {
+                            } else { // Tidak Dapat Dilanjutkan
                                 $asesmenLabel = 'Tidak Dapat Dilanjutkan';
                                 $asesmenBadge = 'bg-danger';
-                                $asesmenHref = route('asesi.asesmen_mandiri.form1');
+                                $asesmenHref = 'javascript:void(0)'; // ubah jadi void(0) agar tidak langsung redirect
                                 $iconClass = 'bg-danger bg-opacity-10 text-danger';
                                 $icon = 'bi-x-circle';
                             }
                         @endphp
 
-                        <a href="{{ $asesmenHref }}" class="pra-item mt-3">
+                        <a href="{{ $asesmenHref }}" 
+                           class="pra-item mt-3" 
+                           @if(in_array($rekom, ['Dapat Dilanjutkan', 'Tidak Dapat Dilanjutkan'])) 
+                               data-bs-toggle="modal" 
+                               data-bs-target="#detailAsesmenModal"
+                               data-tanggal-asesi="{{ $asesmenMandiri->tgl_ttd_asesi ?? '-' }}"
+                               data-tanggal-asesor="{{ $asesmenMandiri->tgl_ttd_asesor ?? '-' }}"
+                               data-status-persetujuan="{{ $asesmenMandiri->status_persetujuan ?? '-' }}"
+                               data-rekomendasi="{{ $asesmenMandiri->rekomendasi ?? '-' }}"
+                               data-catatan="{{ $asesmenMandiri->catatan ?? '-' }}"
+                               data-ttd-asesi="{{ $asesmenMandiri->ttd_asesi ? Storage::url($asesmenMandiri->ttd_asesi) : '' }}"
+                               data-ttd-asesor="{{ $asesmenMandiri->ttd_asesor ? Storage::url($asesmenMandiri->ttd_asesor) : '' }}"
+                               data-status="{{ $rekom }}"
+                           @endif
+                        >
                             <div class="d-flex align-items-center">
                                 <div class="icon-wrap me-3 {{ $iconClass }}">
                                     <i class="bi {{ $icon }}"></i>
@@ -231,6 +240,60 @@
             </div>
         </div>
     </div>
+
+    {{-- Modal Detail Asesmen Mandiri --}}
+    <div class="modal fade" id="detailAsesmenModal" tabindex="-1" aria-labelledby="detailAsesmenModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold" id="detailAsesmenModalLabel">
+                        <i class="bi bi-check-circle-fill me-2"></i>Detail Asesmen Mandiri
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <p class="mb-1 fw-semibold text-secondary">Tanggal Asesi</p>
+                            <p class="fw-medium" id="modalTanggalAsesi">-</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1 fw-semibold text-secondary">Tanggal Asesor</p>
+                            <p class="fw-medium" id="modalTanggalAsesor">-</p>
+                        </div>
+                        <div class="col-12">
+                            <p class="mb-1 fw-semibold text-secondary">Status Persetujuan</p>
+                            <p class="fw-medium" id="modalStatusPersetujuan">-</p>
+                        </div>
+                        <div class="col-12">
+                            <p class="mb-1 fw-semibold text-secondary">Rekomendasi</p>
+                            <p class="fw-medium" id="modalRekomendasi">-</p>
+                        </div>
+                        <div class="col-12">
+                            <p class="mb-1 fw-semibold text-secondary">Catatan Asesor</p>
+                            <p class="fw-medium" id="modalCatatan">-</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1 fw-semibold text-secondary">Tanda Tangan Asesi</p>
+                            <div id="modalTTDAsesi" class="border rounded p-3 text-center bg-light">
+                                <span class="text-muted">Tidak tersedia</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1 fw-semibold text-secondary">Tanda Tangan Asesor</p>
+                            <div id="modalTTDAsesor" class="border rounded p-3 text-center bg-light">
+                                <span class="text-muted">Tidak tersedia</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <div id="modalFooterButton" style="display: inline-block;"></div>
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('head')
@@ -259,7 +322,6 @@
             margin: 0 auto;
         }
 
-        /* ===== CARD STYLE ===== */
         .card {
             border-radius: 1.25rem;
             overflow: hidden;
@@ -276,7 +338,6 @@
             padding-bottom: 0;
         }
 
-        /* ===== WARNA UTAMA #0b2f7c ===== */
         .bg-primary {
             background-color: var(--primary) !important;
         }
@@ -293,7 +354,6 @@
             color: var(--primary) !important;
         }
 
-        /* ===== PRA-ITEM (seperti card item) ===== */
         .pra-item {
             border: 1px solid #e2e8f0;
             border-radius: 1rem;
@@ -326,7 +386,6 @@
             border-radius: 12px;
         }
 
-        /* ===== BADGE CUSTOM ===== */
         .badge {
             font-weight: 500;
             padding: 0.5rem 1rem;
@@ -350,7 +409,6 @@
             background-color: var(--secondary) !important;
         }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .pra-item {
                 flex-direction: column;
@@ -362,4 +420,58 @@
             }
         }
     </style>
+@endpush
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('detailAsesmenModal');
+            if (modal) {
+                modal.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+
+                    // Ambil data dari atribut
+                    const tanggalAsesi = button.getAttribute('data-tanggal-asesi') || '-';
+                    const tanggalAsesor = button.getAttribute('data-tanggal-asesor') || '-';
+                    const statusPersetujuan = button.getAttribute('data-status-persetujuan') || '-';
+                    const rekomendasi = button.getAttribute('data-rekomendasi') || '-';
+                    const catatan = button.getAttribute('data-catatan') || '-';
+                    const ttdAsesiUrl = button.getAttribute('data-ttd-asesi');
+                    const ttdAsesorUrl = button.getAttribute('data-ttd-asesor');
+                    const status = button.getAttribute('data-status'); // 'Dapat Dilanjutkan' atau 'Tidak Dapat Dilanjutkan'
+
+                    // Isi elemen modal
+                    document.getElementById('modalTanggalAsesi').textContent = tanggalAsesi;
+                    document.getElementById('modalTanggalAsesor').textContent = tanggalAsesor;
+                    document.getElementById('modalStatusPersetujuan').textContent = statusPersetujuan;
+                    document.getElementById('modalRekomendasi').textContent = rekomendasi;
+                    document.getElementById('modalCatatan').textContent = catatan;
+
+                    // Tanda tangan asesi
+                    const ttdAsesiDiv = document.getElementById('modalTTDAsesi');
+                    if (ttdAsesiUrl) {
+                        ttdAsesiDiv.innerHTML = '<img src="' + ttdAsesiUrl + '" alt="TTD Asesi" class="img-fluid" style="max-height: 100px;">';
+                    } else {
+                        ttdAsesiDiv.innerHTML = '<span class="text-muted">Tidak tersedia</span>';
+                    }
+
+                    // Tanda tangan asesor
+                    const ttdAsesorDiv = document.getElementById('modalTTDAsesor');
+                    if (ttdAsesorUrl) {
+                        ttdAsesorDiv.innerHTML = '<img src="' + ttdAsesorUrl + '" alt="TTD Asesor" class="img-fluid" style="max-height: 100px;">';
+                    } else {
+                        ttdAsesorDiv.innerHTML = '<span class="text-muted">Tidak tersedia</span>';
+                    }
+
+                    // Tampilkan tombol perbaiki jika status = 'Tidak Dapat Dilanjutkan'
+                    const footerButton = document.getElementById('modalFooterButton');
+                    if (status === 'Tidak Dapat Dilanjutkan') {
+                        footerButton.innerHTML = '<a href="{{ route('asesi.asesmen_mandiri.form1') }}" class="btn btn-warning rounded-pill px-4 me-2"><i class="bi bi-pencil me-1"></i>Perbaiki</a>';
+                    } else {
+                        footerButton.innerHTML = '';
+                    }
+                });
+            }
+        });
+    </script>
 @endpush

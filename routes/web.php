@@ -13,10 +13,9 @@ use App\Http\Controllers\Admin\Form1AdminController;
 use App\Http\Controllers\Admin\PenugasanController;
 use App\Http\Controllers\BandingAsesmenController;
 use App\Http\Controllers\FormPraAsesmenController;
-
-// Tambahan controller Asesmen Mandiri
 use App\Http\Controllers\Asesi\AsesmenMandiriController as AsesiAsesmenMandiriController;
 use App\Http\Controllers\Asesor\AsesmenMandiriController as AsesorAsesmenMandiriController;
+use App\Http\Controllers\Asesor\PersetujuanAsesmenController;
 
 
 // ================== AUTH ==================
@@ -143,9 +142,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{asesi}/verifikasi', [AsesorAsesmenMandiriController::class, 'verifikasiStore'])->name('verifikasi.store');
     });
 
-
-
-
+// ================== PERSETUJUAN ASESMEN (FR.AK.01) ==================
+Route::prefix('asesor/persetujuan-asesmen')->name('asesor.persetujuan_asesmen.')->group(function () {
+    Route::get('/form1', [PersetujuanAsesmenController::class, 'form1'])->name('form1');
+    Route::post('/store', [PersetujuanAsesmenController::class, 'store'])->name('store');
+});
     // ================== PRA ASESMEN ==================
     Route::get('form-pra-assesmen', [FormPraAsesmenController::class, 'index'])
         ->name('form_pra_assesmen');

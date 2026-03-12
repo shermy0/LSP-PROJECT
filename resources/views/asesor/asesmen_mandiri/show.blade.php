@@ -10,7 +10,7 @@
                     id="verifikasiForm" novalidate>
                     @csrf
 
-                    <!-- Header dengan ikon dan judul (warna #0b2f7c) -->
+                    <!-- Header -->
                     <div class="text-center mb-5">
                         <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-gradient text-white rounded-circle mb-3" style="width: 70px; height: 70px; box-shadow: 0 10px 20px rgba(11,47,124,0.3);">
                             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-clipboard-check" viewBox="0 0 16 16">
@@ -23,7 +23,7 @@
                         <p class="text-secondary">Form Asesmen FR.APL.02 – Penilaian asesor</p>
                     </div>
 
-                    <!-- Data Asesi - Card Modern -->
+                    <!-- Data Asesi -->
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-header bg-white border-0 pt-4 pb-0">
                             <div class="d-flex align-items-center">
@@ -104,23 +104,23 @@
                                                             <td>{{ $k->deskripsi_kuk }}</td>
                                                             <td class="text-center">
                                                                 @if($j && $j->status === 'K')
-                                                                    <span class="badge bg-success rounded-pill px-3 py-2">✔</span>
+                                                                    <i class="bi bi-check-circle-fill text-success fs-5" title="Kompeten"></i>
                                                                 @endif
                                                             </td>
                                                             <td class="text-center">
                                                                 @if($j && $j->status === 'BK')
-                                                                    <span class="badge bg-danger rounded-pill px-3 py-2">✘</span>
+                                                                    <i class="bi bi-x-circle-fill text-danger fs-5" title="Belum Kompeten"></i>
                                                                 @endif
                                                             </td>
                                                             <td class="text-center">
                                                                 @if($j && $j->dokumen)
-                                                                    <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3"
-                                                                        data-bs-toggle="modal" data-bs-target="#dokumenModal"
-                                                                        data-src="{{ asset('storage/' . $j->dokumen->file_path) }}">
-                                                                        <i class="bi bi-eye me-1"></i>Lihat
+                                                                    <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#dokumenModal"
+                                                                        data-src="{{ Storage::url($j->dokumen->path_file) }}"
+                                                                        data-filename="{{ $j->dokumen->nama_file ?? $j->dokumen->path_file }}">
+                                                                        <i class="bi bi-file-earmark-fill text-primary fs-4" title="Lihat Dokumen"></i>
                                                                     </button>
                                                                 @else
-                                                                    <span class="text-muted small">Tidak ada bukti</span>
+                                                                    <span class="text-muted">-</span>
                                                                 @endif
                                                             </td>
                                                         </tr>
@@ -134,7 +134,7 @@
                         </div>
                     @endforeach
 
-                    <!-- Rekomendasi Asesor -->
+                    <!-- Rekomendasi Asesor (dengan nilai sebelumnya) -->
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-header bg-white border-0 pt-4 pb-0">
                             <div class="d-flex align-items-center">
@@ -152,13 +152,15 @@
                         <div class="card-body pt-3">
                             <div class="d-flex flex-column gap-2">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="rekomendasi" value="Dapat Dilanjutkan" id="rekomendasiYa" required>
+                                    <input class="form-check-input" type="radio" name="rekomendasi" value="Dapat Dilanjutkan" id="rekomendasiYa"
+                                        {{ old('rekomendasi', $asesmen->rekomendasi ?? '') == 'Dapat Dilanjutkan' ? 'checked' : '' }} required>
                                     <label class="form-check-label fw-medium" for="rekomendasiYa">
                                         Asesi dapat melanjutkan ke asesmen berikutnya
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="rekomendasi" value="Tidak Dapat Dilanjutkan" id="rekomendasiTidak" required>
+                                    <input class="form-check-input" type="radio" name="rekomendasi" value="Tidak Dapat Dilanjutkan" id="rekomendasiTidak"
+                                        {{ old('rekomendasi', $asesmen->rekomendasi ?? '') == 'Tidak Dapat Dilanjutkan' ? 'checked' : '' }} required>
                                     <label class="form-check-label fw-medium" for="rekomendasiTidak">
                                         Asesi tidak dapat melanjutkan ke asesmen berikutnya
                                     </label>
@@ -170,7 +172,7 @@
                         </div>
                     </div>
 
-                    <!-- Catatan Asesor -->
+                    <!-- Catatan Asesor (dengan nilai sebelumnya) -->
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-header bg-white border-0 pt-4 pb-0">
                             <div class="d-flex align-items-center">
@@ -187,7 +189,7 @@
                             </div>
                         </div>
                         <div class="card-body pt-3">
-                            <textarea name="catatan" class="form-control" rows="3" placeholder="Tulis catatan di sini..."></textarea>
+                            <textarea name="catatan" class="form-control" rows="3" placeholder="Tulis catatan di sini...">{{ old('catatan', $persetujuan->catatan ?? '') }}</textarea>
                         </div>
                     </div>
 
@@ -216,7 +218,7 @@
                                         <p><strong>Tanggal:</strong> {{ $persetujuan->tgl_ttd_asesi ?? '-' }}</p>
                                         @if(!empty($persetujuan->ttd_asesi))
                                             <div class="mt-2 text-center border rounded-3 p-3 bg-white">
-                                                <img src="{{ asset('storage/' . $persetujuan->ttd_asesi) }}" alt="TTD Asesi"
+                                                <img src="{{ Storage::url($persetujuan->ttd_asesi) }}" alt="TTD Asesi"
                                                      class="img-fluid" style="max-height:150px; object-fit:contain;">
                                             </div>
                                         @else
@@ -278,21 +280,39 @@
         </div>
     </div>
 
-    <!-- Modal Preview Dokumen -->
+    <!-- Modal Preview Dokumen (diperbaiki) -->
     <div class="modal fade" id="dokumenModal" tabindex="-1" aria-labelledby="dokumenModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header bg-light border-0">
-                    <h5 class="modal-title fw-bold">Preview Dokumen</h5>
-                    <div class="d-flex gap-2">
-                        <a id="downloadLink" href="#" target="_blank" class="btn btn-sm btn-success rounded-pill px-3">
-                            <i class="bi bi-download me-1"></i>Unduh
-                        </a>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold" id="dokumenModalLabel">
+                        <i class="bi bi-file-earmark-text me-2"></i>Preview Dokumen
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="d-flex flex-column">
+                        <!-- Info file -->
+                        <div class="bg-light p-3 border-bottom">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <span class="fw-semibold" id="modalFileName">Nama file</span>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <a id="downloadLink" href="#" target="_blank" class="btn btn-sm btn-success rounded-pill px-4" download>
+                                        <i class="bi bi-download me-1"></i>Unduh
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Preview konten -->
+                        <div class="p-4 text-center" id="dokumenPreview" style="min-height: 400px; max-height: 80vh; overflow: auto;">
+                            <p class="text-muted">Memuat preview...</p>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-body text-center p-4" id="dokumenPreview">
-                    <p class="text-muted">Memuat preview...</p>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
@@ -317,7 +337,6 @@
     </div>
 
     <style>
-        /* ===== VARIABEL & RESET dengan warna utama #0b2f7c ===== */
         :root {
             --primary: #0b2f7c;
             --primary-dark: #08205c;
@@ -338,7 +357,6 @@
             margin: 0 auto;
         }
 
-        /* ===== CARD STYLE ===== */
         .card {
             border-radius: 1.25rem;
             overflow: hidden;
@@ -355,7 +373,6 @@
             padding-bottom: 0;
         }
 
-        /* ===== WARNA UTAMA #0b2f7c ===== */
         .bg-primary {
             background-color: var(--primary) !important;
         }
@@ -372,7 +389,6 @@
             color: var(--primary) !important;
         }
 
-        /* ===== ELEMEN CARD ===== */
         .elemen-card {
             background: #ffffff;
             border: 1px solid #e9edf4;
@@ -405,7 +421,6 @@
             font-size: 0.9rem;
         }
 
-        /* ===== TABLE ===== */
         .table {
             border-radius: 1rem;
             overflow: hidden;
@@ -433,7 +448,6 @@
             background: #f8fbff;
         }
 
-        /* ===== FORM ELEMENTS ===== */
         .form-label {
             font-weight: 600;
             font-size: 0.9rem;
@@ -466,7 +480,6 @@
             box-shadow: 0 0 0 4px rgba(11,47,124,0.15);
         }
 
-        /* ===== CANVAS ===== */
         .canvas-wrapper {
             position: relative;
             background: white;
@@ -498,7 +511,6 @@
             backdrop-filter: blur(2px);
         }
 
-        /* ===== BUTTONS ===== */
         .btn-next {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: #fff;
@@ -566,13 +578,32 @@
             color: white;
         }
 
+        .btn-link {
+            text-decoration: none;
+        }
+
         .button-group {
             display: flex;
             justify-content: flex-end;
             gap: 0.75rem;
         }
 
-        /* ===== RESPONSIVE ===== */
+        /* Modal preview styling */
+        #dokumenPreview img {
+            max-width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        #dokumenPreview iframe {
+            width: 100%;
+            height: 70vh;
+            border: none;
+            border-radius: 8px;
+        }
+
         @media (max-width: 768px) {
             .button-group {
                 justify-content: center;
@@ -590,30 +621,56 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // Preview dokumen
-            var modal = document.getElementById('dokumenModal');
-            var preview = document.getElementById('dokumenPreview');
-            var downloadLink = document.getElementById('downloadLink');
+            const modal = document.getElementById('dokumenModal');
+            const preview = document.getElementById('dokumenPreview');
+            const downloadLink = document.getElementById('downloadLink');
+            const modalFileName = document.getElementById('modalFileName');
 
-            modal.addEventListener('show.bs.modal', function (event) {
-                var button = event.relatedTarget;
-                var src = button.getAttribute('data-src');
-                var ext = src.split('.').pop().toLowerCase();
-                downloadLink.href = src;
-                preview.innerHTML = "<p class='text-muted'>Memuat preview...</p>";
+            if (modal) {
+                modal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const src = button.getAttribute('data-src');
+                    const fileName = button.getAttribute('data-filename') || src.split('/').pop();
+                    const ext = fileName.split('.').pop().toLowerCase();
 
-                if (["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(ext)) {
-                    preview.innerHTML = `<img src="${src}" class="img-fluid rounded shadow" style="max-height:80vh;">`;
-                } else if (ext === "pdf") {
-                    preview.innerHTML = `<iframe src="${src}" frameborder="0" style="width:100%; height:80vh;"></iframe>`;
-                } else {
-                    preview.innerHTML = `<p class="text-muted">Preview tidak tersedia. Silakan unduh dokumen.</p>`;
-                }
-            });
+                    downloadLink.href = src;
+                    modalFileName.textContent = fileName;
+                    preview.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
 
-            modal.addEventListener('hidden.bs.modal', function () {
-                preview.innerHTML = "";
-                downloadLink.href = "#";
-            });
+                    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'].includes(ext)) {
+                        const img = new Image();
+                        img.onload = function() {
+                            preview.innerHTML = '';
+                            preview.appendChild(img);
+                        };
+                        img.onerror = function() {
+                            preview.innerHTML = `
+                                <div class="alert alert-warning d-inline-block">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    Gagal memuat gambar. <a href="${src}" target="_blank" class="alert-link">Klik untuk unduh</a>
+                                </div>`;
+                        };
+                        img.src = src;
+                        img.className = 'img-fluid rounded shadow';
+                        img.alt = 'Preview';
+                    } else if (ext === 'pdf') {
+                        preview.innerHTML = `<iframe src="${src}" frameborder="0" style="width:100%; height:70vh;" onerror="this.outerHTML='<div class=\\'alert alert-danger\\'>Gagal memuat PDF. <a href=\\''+src+'\\' target=\\'_blank\\'>Unduh</a></div>'"></iframe>`;
+                    } else {
+                        preview.innerHTML = `
+                            <div class="alert alert-info d-inline-block">
+                                <i class="bi bi-file-earmark me-2"></i>
+                                Preview tidak tersedia untuk file ${ext.toUpperCase()}. 
+                                <a href="${src}" target="_blank" class="alert-link">Unduh file</a>
+                            </div>`;
+                    }
+                });
+
+                modal.addEventListener('hidden.bs.modal', function () {
+                    preview.innerHTML = '<p class="text-muted">Memuat preview...</p>';
+                    downloadLink.href = '#';
+                    modalFileName.textContent = 'Nama file';
+                });
+            }
 
             // Signature Pad
             const canvas = document.getElementById('ttd-asesor');
@@ -733,11 +790,9 @@
                 return true;
             }
 
-            // Validasi form
             const ttdAlertModal = new bootstrap.Modal(document.getElementById('ttdAlertModal'));
 
             document.getElementById('verifikasiForm').addEventListener('submit', function (e) {
-                // Simpan TTD ke hidden input
                 const canvas = document.getElementById('ttd-asesor');
                 if (!isCanvasBlank(canvas)) {
                     document.getElementById('ttd-asesor-input').value = canvas.toDataURL('image/png');
@@ -746,24 +801,20 @@
                 let valid = true;
                 let firstInvalid = null;
 
-                // Cek rekomendasi
                 const rekomendasi = document.querySelector('input[name="rekomendasi"]:checked');
                 if (!rekomendasi) {
                     document.getElementById('rekomendasiError').style.display = 'block';
-                    if (!firstInvalid) firstInvalid = document.querySelector('.card:has(input[name="rekomendasi"])');
+                    const rekomendasiCard = document.querySelector('.card:has(input[name="rekomendasi"])');
+                    if (rekomendasiCard && !firstInvalid) firstInvalid = rekomendasiCard;
                     valid = false;
                 } else {
                     document.getElementById('rekomendasiError').style.display = 'none';
                 }
 
-                // Cek tanda tangan
                 if (isCanvasBlank(canvas)) {
-                    // Tampilkan modal peringatan
                     ttdAlertModal.show();
                     e.preventDefault();
                     return false;
-                } else {
-                    document.getElementById('ttdError').style.display = 'none';
                 }
 
                 if (!valid) {

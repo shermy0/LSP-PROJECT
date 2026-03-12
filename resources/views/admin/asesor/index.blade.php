@@ -103,7 +103,7 @@
                         <h6 class="mb-1 fw-semibold" style="color: #041562;">
                             <i class="bi bi-search me-2"></i>Pencarian Data
                         </h6>
-                        <small class="text-muted">Cari berdasarkan nama, NIP, email, atau bidang keahlian</small>
+                        <small class="text-muted">Cari berdasarkan nama, NIP, email, bidang keahlian, atau skema</small>
                     </div>
                     <div class="col-md-6">
                         <div class="search-wrapper">
@@ -125,6 +125,7 @@
                                 <th width="140">NIP</th>
                                 <th>Email</th>
                                 <th>Bidang Keahlian</th>
+                                <th>Skema Diampu</th>
                                 <th width="140">No. Registrasi</th>
                                 <th width="160">Update Terakhir</th>
                                 <th class="text-center" width="140">Aksi</th>
@@ -134,7 +135,6 @@
                         <tbody>
                             @forelse ($asesor as $a)
                                 <tr>
-                                    {{-- NOMOR URUT --}}
                                     <td class="text-center">
                                         <span class="badge-id">
                                             {{ $asesor->firstItem() + $loop->index }}
@@ -156,8 +156,23 @@
                                     <td><small class="text-muted">{{ $a->email ?? ($a->user->email ?? '-') }}</small></td>
 
                                     <td>
-                                        @if($a->bidang_keahlian)
-                                            <span class="badge-keahlian">{{ $a->bidang_keahlian }}</span>
+                                        @if($a->jurusan)
+                                            <span class="badge-keahlian">{{ $a->jurusan->nama_jurusan }}</span>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+
+                                    <td>
+                                        @if($a->skemas && $a->skemas->count() > 0)
+                                            <div class="d-flex flex-wrap gap-1">
+                                                @foreach($a->skemas->take(3) as $skema)
+                                                    <span class="badge bg-info text-dark">{{ $skema->kode_skema }}</span>
+                                                @endforeach
+                                                @if($a->skemas->count() > 3)
+                                                    <span class="badge bg-secondary">+{{ $a->skemas->count() - 3 }}</span>
+                                                @endif
+                                            </div>
                                         @else
                                             <span class="text-muted">-</span>
                                         @endif
@@ -187,7 +202,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="text-center py-5">
+                                    <td colspan="9" class="text-center py-5">
                                         <div class="empty-state">
                                             <i class="bi bi-inbox"></i>
                                             <p class="mb-1 mt-3 fw-semibold">Belum Ada Data Asesor</p>
@@ -369,10 +384,15 @@
 
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold small">Bidang Keahlian</label>
-                                <input type="text" name="bidang_keahlian"
-                                    class="form-control @error('bidang_keahlian') is-invalid @enderror"
-                                    value="{{ old('bidang_keahlian') }}" placeholder="Contoh: Teknologi Informasi">
-                                @error('bidang_keahlian')
+                                <select name="id_jurusan" class="form-select @error('id_jurusan') is-invalid @enderror">
+                                    <option value="">-- Pilih Bidang Keahlian --</option>
+                                    @foreach(\App\Models\Jurusan::all() as $jurusan)
+                                        <option value="{{ $jurusan->id_jurusan }}" {{ old('id_jurusan') == $jurusan->id_jurusan ? 'selected' : '' }}>
+                                            {{ $jurusan->nama_jurusan }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('id_jurusan')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -384,6 +404,33 @@
                                     value="{{ old('no_registrasi') }}" placeholder="Nomor registrasi asesor">
                                 @error('no_registrasi')
                                     <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            {{-- SKEMA YANG DIAMPU --}}
+                            <div class="col-12">
+                                <label class="form-label fw-semibold small">Skema yang Diampu</label>
+                                <div class="row g-2">
+                                    @if(is_iterable($skema) && count($skema) > 0)
+                                        @foreach($skema as $s)
+                                            <div class="col-md-4">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="skema_ids[]" value="{{ $s->id_skema }}" id="skema_{{ $s->id_skema }}"
+                                                        {{ in_array($s->id_skema, old('skema_ids', [])) ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="skema_{{ $s->id_skema }}">
+                                                        {{ $s->nama_skema }}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="col-12">
+                                            <p class="text-muted">Belum ada skema tersedia.</p>
+                                        </div>
+                                    @endif
+                                </div>
+                                @error('skema_ids')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
 
@@ -543,6 +590,17 @@
             border-radius: 6px;
             font-size: 12px;
             font-weight: 500;
+        }
+
+        /* Badge Skema */
+        .badge-skema {
+            background-color: #e2e8ff;
+            color: var(--primary-dark);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
         }
 
         /* Table Styling */
@@ -728,8 +786,8 @@
                 }
             @endif
 
-        // Auto-dismiss alerts after 5 seconds
-        const alerts = document.querySelectorAll('.alert');
+            // Auto-dismiss alerts after 5 seconds
+            const alerts = document.querySelectorAll('.alert');
             alerts.forEach(alert => {
                 setTimeout(() => {
                     const bsAlert = new bootstrap.Alert(alert);
