@@ -16,7 +16,14 @@ return new class extends Migration
             $table->date('tgl_ttd_asesor')->nullable();
             $table->string('ttd_asesor')->nullable();
 
-            $table->foreign('id_asesmen_mandiri')->references('id_asesmen_mandiri')->on('asesmen_mandiri_master')->onDelete('cascade');
+            // tambahan kolom sesuai saran
+            $table->enum('status_persetujuan', ['menunggu','diterima','ditolak'])->default('menunggu');
+            $table->text('catatan')->nullable();
+
+            $table->foreign('id_asesmen_mandiri')
+                ->references('id_asesmen_mandiri')
+                ->on('asesmen_mandiri_master')
+                ->onDelete('cascade');
         });
     }
 
