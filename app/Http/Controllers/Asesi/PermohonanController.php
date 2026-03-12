@@ -93,7 +93,7 @@ class PermohonanController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | SIMPAN DATA DIRI ASES I
+    | SIMPAN DATA DIRI ASESI
     |--------------------------------------------------------------------------
     */
 
@@ -102,7 +102,6 @@ class PermohonanController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-
             'nik' => 'nullable|string|max:255',
             'nama_lengkap' => 'nullable|string|max:255',
             'tempat_lahir' => 'nullable|string|max:255',
@@ -126,38 +125,33 @@ class PermohonanController extends Controller
             'telepon_kantor' => ['nullable','string','max:50','regex:/^([-+()0-9\s]+|-)$/'],
             'fax_kantor' => ['nullable','string','max:50','regex:/^([-+()0-9\s]+|-)$/'],
             'email_kantor' => 'nullable|email|max:255',
-
         ]);
 
         $validated['user_id'] = $user->id;
 
         $asesi = DB::table('asesi')
-            ->where('user_id',$user->id)
+            ->where('user_id', $user->id)
             ->first();
 
-        if($asesi){
-
+        if ($asesi) {
             DB::table('asesi')
-                ->where('user_id',$user->id)
+                ->where('user_id', $user->id)
                 ->update([
                     ...$validated,
-                    'updated_at'=>now()
+                    'updated_at' => now()
                 ]);
-
-        }else{
-
+        } else {
             DB::table('asesi')
                 ->insert([
                     ...$validated,
-                    'created_at'=>now(),
-                    'updated_at'=>now()
+                    'created_at' => now(),
+                    'updated_at' => now()
                 ]);
-
         }
 
         return redirect()
             ->route('asesi.permohonan.form2')
-            ->with('success','Data pribadi berhasil disimpan.');
+            ->with('success', 'Data pribadi berhasil disimpan.');
     }
 
 
@@ -170,9 +164,8 @@ class PermohonanController extends Controller
 
     public function getSkema($id)
     {
-
         $skema = DB::table('skema_sertifikasi')
-            ->where('id_skema',$id)
+            ->where('id_skema', $id)
             ->select(
                 'id_skema',
                 'nama_skema',
@@ -182,16 +175,14 @@ class PermohonanController extends Controller
             )
             ->first();
 
-        if(!$skema){
-
+        if (!$skema) {
             return response()->json([
-                'error'=>'Skema tidak ditemukan'
-            ],404);
-
+                'error' => 'Skema tidak ditemukan'
+            ], 404);
         }
 
         $units = DB::table('unit_kompetensi')
-            ->where('id_skema',$id)
+            ->where('id_skema', $id)
             ->select(
                 'kode_unit',
                 'judul_unit',
@@ -200,8 +191,8 @@ class PermohonanController extends Controller
             ->get();
 
         return response()->json([
-            'skema'=>$skema,
-            'units'=>$units
+            'skema' => $skema,
+            'units' => $units
         ]);
     }
 
@@ -215,241 +206,141 @@ class PermohonanController extends Controller
 
     public function storeDokumen(Request $request)
     {
-
         $request->validate([
-
             'id_skema'  => 'required|exists:skema_sertifikasi,id_skema',
             'tujuan_id' => 'required|exists:tujuan_asesmen,id_tujuan',
-
             'dokumen.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-
             'tanggal'   => 'required|date',
-
             'ttd_asesi' => 'required|string',
-
         ]);
-
 
         $user = Auth::user();
 
         $asesi = DB::table('asesi')
-            ->where('user_id',$user->id)
+            ->where('user_id', $user->id)
             ->first();
 
-
-        if(!$asesi){
-
+        if (!$asesi) {
             return redirect()
                 ->route('asesi.permohonan.form1')
-                ->with('error','Lengkapi data pribadi terlebih dahulu.');
-
+                ->with('error', 'Lengkapi data pribadi terlebih dahulu.');
         }
-
 
         DB::beginTransaction();
 
-        try{
-
-
-            /*
-            |--------------------------------------------------
-            | CEK PERMOHONAN TERAKHIR
-            |--------------------------------------------------
-            */
-
-            $permohonan = Permohonan::where('id_asesi',$asesi->id_asesi)
+        try {
+            // Cek permohonan terakhir
+            $permohonan = Permohonan::where('id_asesi', $asesi->id_asesi)
                 ->latest('id_permohonan')
                 ->first();
 
-
             if (!$permohonan) {
-
-                // ✅ Belum pernah mengajukan → buat baru
+                // Belum pernah mengajukan → buat baru
                 $permohonan = Permohonan::create([
-
                     'id_asesi'       => $asesi->id_asesi,
                     'id_skema'       => $request->id_skema,
                     'id_tujuan'      => $request->tujuan_id,
-
                     'tgl_permohonan' => now()->toDateString(),
-
                     'status'         => 'Diajukan',
                     'catatan'        => null
-
                 ]);
-
             } else {
-
-                // ✅ Sudah pernah mengajukan → update data yang ada (termasuk jika status Ditolak)
+                // Sudah pernah mengajukan → update data yang ada (termasuk jika status Ditolak)
                 $permohonan->update([
-
                     'id_skema'       => $request->id_skema,
                     'id_tujuan'      => $request->tujuan_id,
-
                     'tgl_permohonan' => now()->toDateString(),
-
                     'status'         => 'Diajukan'   // kembalikan ke Diajukan
-
                 ]);
-
             }
-
 
             $idPermohonan = $permohonan->id_permohonan;
 
+            // Handle remove dokumen
+            $removeFlags = $request->input('remove_dokumen', []);
+            foreach ($removeFlags as $jenisId => $flag) {
+                if ($flag != 1) continue;
 
-
-            /*
-            |--------------------------------------------------
-            | HANDLE REMOVE DOKUMEN
-            |--------------------------------------------------
-            */
-
-            $removeFlags = $request->input('remove_dokumen',[]);
-
-            foreach($removeFlags as $jenisId=>$flag){
-
-                if($flag != 1) continue;
-
-                $doc = DokumenPersyaratan::where('id_permohonan',$idPermohonan)
-                    ->where('id_jenis_dokumen',$jenisId)
+                $doc = DokumenPersyaratan::where('id_permohonan', $idPermohonan)
+                    ->where('id_jenis_dokumen', $jenisId)
                     ->first();
 
-                if($doc){
-
-                    if($doc->path_file){
-
+                if ($doc) {
+                    if ($doc->path_file) {
                         Storage::disk('public')->delete($doc->path_file);
-
                     }
 
                     $doc->update([
-
-                        'nama_file'=>null,
-                        'path_file'=>null,
-                        'ada'=>false,
-                        'memenuhi_syarat'=>false,
-                        'catatan'=>null
-
+                        'nama_file' => null,
+                        'path_file' => null,
+                        'ada' => false,
+                        'memenuhi_syarat' => false,
+                        'catatan' => null
                     ]);
-
                 }
-
             }
 
+            // Handle upload file
+            $uploadedFiles = $request->file('dokumen', []);
+            foreach ($uploadedFiles as $jenisId => $file) {
+                if (!$file) continue;
 
-
-            /*
-            |--------------------------------------------------
-            | HANDLE UPLOAD FILE
-            |--------------------------------------------------
-            */
-
-            $uploadedFiles = $request->file('dokumen',[]);
-
-            foreach($uploadedFiles as $jenisId=>$file){
-
-                if(!$file) continue;
-
-                $existing = DokumenPersyaratan::where('id_permohonan',$idPermohonan)
-                    ->where('id_jenis_dokumen',$jenisId)
+                $existing = DokumenPersyaratan::where('id_permohonan', $idPermohonan)
+                    ->where('id_jenis_dokumen', $jenisId)
                     ->first();
 
-
-                if($existing && $existing->path_file){
-
+                if ($existing && $existing->path_file) {
                     Storage::disk('public')->delete($existing->path_file);
-
                 }
 
-
-                $path = $file->store("dokumen/".$asesi->id_asesi,'public');
-
+                $path = $file->store("dokumen/" . $asesi->id_asesi, 'public');
 
                 DokumenPersyaratan::updateOrCreate(
-
                     [
-
-                        'id_permohonan'=>$idPermohonan,
-                        'id_jenis_dokumen'=>$jenisId
-
+                        'id_permohonan' => $idPermohonan,
+                        'id_jenis_dokumen' => $jenisId
                     ],
-
                     [
-
-                        'nama_file'=>$file->getClientOriginalName(),
-                        'path_file'=>$path,
-
-                        'ada'=>true,
-                        'memenuhi_syarat'=>false,
-                        'catatan'=>null
-
+                        'nama_file' => $file->getClientOriginalName(),
+                        'path_file' => $path,
+                        'ada' => true,
+                        'memenuhi_syarat' => false,
+                        'catatan' => null
                     ]
-
                 );
-
             }
 
-
-
-            /*
-            |--------------------------------------------------
-            | SIMPAN TTD ASES I
-            |--------------------------------------------------
-            */
-
+            // Simpan TTD Asesi
             $ttdBase64 = $request->ttd_asesi;
 
-            if(preg_match('/^data:image\/(png|jpeg);base64,/',$ttdBase64)){
-
-                $ttdData = base64_decode(
-                    substr($ttdBase64,strpos($ttdBase64,',')+1)
-                );
-
-                $fileName = "ttd/asesi_".$asesi->id_asesi."_".time().".png";
-
-                Storage::disk('public')->put($fileName,$ttdData);
-
+            if (preg_match('/^data:image\/(png|jpeg);base64,/', $ttdBase64)) {
+                $ttdData = base64_decode(substr($ttdBase64, strpos($ttdBase64, ',') + 1));
+                $fileName = "ttd/asesi_" . $asesi->id_asesi . "_" . time() . ".png";
+                Storage::disk('public')->put($fileName, $ttdData);
 
                 DB::table('permohonan_persetujuan')
                     ->updateOrInsert(
-
-                        ['id_permohonan'=>$idPermohonan],
-
+                        ['id_permohonan' => $idPermohonan],
                         [
-
-                            'tgl_ttd_asesi'=>$request->tanggal,
-                            'ttd_asesi'=>$fileName,
-
-                            'updated_at'=>now()
-
+                            'tgl_ttd_asesi' => $request->tanggal,
+                            'ttd_asesi' => $fileName,
+                            'updated_at' => now()
                         ]
-
                     );
-
             }
-
-
 
             DB::commit();
 
-
             return redirect()
                 ->route('form_pra_assesmen')
-                ->with('success','Data permohonan berhasil disimpan.');
+                ->with('success', 'Data permohonan berhasil disimpan.');
 
-
-
-        }catch(Throwable $e){
-
+        } catch (Throwable $e) {
             DB::rollBack();
 
             return redirect()
                 ->back()
-                ->with('error','Gagal menyimpan data : '.$e->getMessage());
-
+                ->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
         }
-
     }
-
 }

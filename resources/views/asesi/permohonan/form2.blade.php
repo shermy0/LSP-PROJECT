@@ -188,7 +188,7 @@
                         @php
                             $doc = $existingDocs->get($jd->id_jenis_dokumen) ?? null;
                             $invalidClass = ($doc && !$doc->memenuhi_syarat) ? 'is-invalid' : '';
-                            $existingFileUrl = $doc ? $doc->file_url : '';
+                            $existingFileUrl = $doc && $doc->path_file ? Storage::url($doc->path_file) : '';
                             $existingFileName = $doc ? $doc->nama_file : '';
                         @endphp
                         <div class="mb-3 dokumen-item">
@@ -623,8 +623,8 @@
                 const input = item.querySelector('input[type="file"]');
                 const removeFlag = item.querySelector('.remove-flag');
                 const errorDiv = item.querySelector('.dokumen-error');
-                const existingName = input.dataset.existingName || '';
-                const hasExisting = existingName !== '';
+                const existingFileUrl = input.dataset.fileUrl || '';
+                const hasExisting = existingFileUrl !== '';
                 const isRemoved = removeFlag && removeFlag.value === '1';
                 const hasNewFile = input.files.length > 0;
 
@@ -679,12 +679,11 @@
                 });
         });
 
-        // TTD Canvas (sama seperti sebelumnya)
+        // TTD Canvas
         const canvas = document.getElementById("ttd-asesi");
         const ctx = canvas.getContext("2d");
         const placeholder = document.querySelector(".canvas-placeholder");
         let drawing = false;
-        let blankDataURL = null;
         const VISIBLE_HEIGHT = 200;
 
         function resizeCanvasAndPrepareBlank() {
@@ -700,8 +699,6 @@
 
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, cssWidth, cssHeight);
-
-            blankDataURL = canvas.toDataURL();
         }
 
         function getPointerPos(evt) {
@@ -755,13 +752,22 @@
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, cssWidth, cssHeight);
 
-            blankDataURL = canvas.toDataURL();
             document.getElementById("ttd_asesi_data").value = "";
             placeholder.style.display = "block";
         }
 
+        // Deteksi canvas kosong dengan memeriksa pixel
         function isCanvasBlank() {
-            return canvas.toDataURL() === blankDataURL;
+            const canvas = document.getElementById('ttd-asesi');
+            const ctx = canvas.getContext('2d');
+            const pixelData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+            for (let i = 0; i < pixelData.length; i += 4) {
+                // Jika ada pixel yang tidak putih (nilai RGB tidak semuanya 255)
+                if (pixelData[i] !== 255 || pixelData[i+1] !== 255 || pixelData[i+2] !== 255) {
+                    return false; // ada coretan
+                }
+            }
+            return true; // semua putih
         }
 
         function saveTTD() {
@@ -771,11 +777,12 @@
                     const modal = new bootstrap.Modal(modalEl);
                     modal.show();
                 } else {
-                    alert("Silakan tanda tangan terlebih dahulu sebelum lanjut.");
+                    alert("Silakan tanda tangan terlebih dahulu.");
                 }
                 return false;
             }
-            document.getElementById("ttd_asesi_data").value = canvas.toDataURL("image/png");
+            const dataURL = canvas.toDataURL("image/png");
+            document.getElementById("ttd_asesi_data").value = dataURL;
             return true;
         }
 
@@ -793,7 +800,7 @@
             const prevData = canvas.toDataURL();
             resizeCanvasAndPrepareBlank();
 
-            if (prevData && prevData !== blankDataURL) {
+            if (prevData && prevData !== canvas.toDataURL()) { // jika sebelumnya tidak kosong
                 const img = new Image();
                 img.onload = function () {
                     ctx.drawImage(img, 0, 0, canvas.clientWidth, VISIBLE_HEIGHT);
