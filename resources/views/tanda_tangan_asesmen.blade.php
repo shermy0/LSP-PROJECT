@@ -139,11 +139,10 @@
 </script>
 {{-- Kembali (kiri bawah) --}}
 @php
-    $pmoRec  = \App\Models\PMO::where('id_skema', $skema->id_skema)->latest('id_pmo')->first();
-    $backUrl = route('pertanyaan.pmo.kelompok', ['id_skema' => $skema->id_skema])
-             . '?id_pembuatan=' . $id_pembuatan_pertanyaan
-             . '&id_pmo=' . ($pmoRec->id_pmo ?? '')
-             . '&timer=' . ($pembuatan_pertanyaan->timer ?? 30);
+$backUrl = route('pertanyaan.pg.kelompok', [
+    'id_skema' => $skema->id_skema,
+    'id_pembuatan_pertanyaan' => $id_pembuatan_pertanyaan
+]);
 @endphp
 <a href="{{ $backUrl }}"
    style="position:fixed; bottom:20px; left:260px; z-index:9999;

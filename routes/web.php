@@ -498,12 +498,10 @@ Route::prefix('opsi-jawaban')->group(function () {
 });
 
 // Routes untuk Pertanyaan Pilihan Ganda
-Route::get('/pertanyaan/{id_skema}/kelompok-pg', [PertanyaanController::class, 'kelompokPekerjaan'])
-->name('pertanyaan.pg.kelompok')
-->defaults('jenis', 'pilihan_ganda');
-
-Route::get('/pertanyaan/pg/kelompok/{id_skema}/{id_pembuatan_pertanyaan?}', [PertanyaanController::class, 'kelompokPekerjaanPG'])
-    ->name('pertanyaan.pg.kelompok.withId');
+// Route untuk menampilkan halaman kelompok pekerjaan PG (dengan ID pembuatan)
+Route::get('/pertanyaan/pg/kelompok/{id_skema}/{id_pembuatan_pertanyaan?}', 
+    [PertanyaanController::class, 'kelompokPekerjaanPG'])
+    ->name('pertanyaan.pg.kelompok');
 
 Route::get('/pertanyaan/pg/create', [PertanyaanController::class, 'createPG'])->name('pertanyaan.pg.create');
 Route::post('/pertanyaan/pg/store', [PertanyaanController::class, 'storePG'])->name('pertanyaan.pg.store');
@@ -646,3 +644,10 @@ Route::get('/verifasesmen', function () {
 Route::get('/verifasesmen2', function () {
     return view('asesor.verifasesmen2');
 })->name('verifasesmen2');
+
+// ================== ASESOR LIHAT JAWABAN ASESI ==================
+    Route::get('/asesor/skema', [JawabanController::class, 'indexSkema'])->name('asesor.skema.index');
+    Route::get('/asesor/skema/{id_skema}/jenis', [JawabanController::class, 'listJenis'])->name('asesor.skema.jenis');
+    Route::get('/asesor/skema/{id_skema}/jenis/{jenis}/asesi', [JawabanController::class, 'listAsesi'])->name('asesor.skema.jenis.asesi');
+    Route::get('/asesor/skema/{id_skema}/jenis/{jenis}/asesi/{id_asesi}', [JawabanController::class, 'viewJawaban'])->name('asesor.skema.jenis.asesi.jawaban');
+    Route::post('/asesor/pencapaian/store', [JawabanController::class,'storePencapaian']) ->name('asesor.pencapaian.store');

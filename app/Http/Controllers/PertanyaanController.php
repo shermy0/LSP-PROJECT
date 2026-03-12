@@ -345,16 +345,16 @@ public function storePMO(Request $request, $id_pmo)
                 'id_pembuatan_pertanyaan' => 'nullable|exists:pembuatan_pertanyaan,id_pembuatan_pertanyaan',
                 'timer' => 'required|integer|min:1',
                 'isi_pertanyaan' => 'required|array|min:1',
-                'isi_pertanyaan.*' => 'required|string|min:5',
+                'isi_pertanyaan.*' => 'required|string|min:1',
                 'jenis_opsi' => 'required|array',
-                'jenis_opsi.*' => 'required|array|min:5',
+                'jenis_opsi.*' => 'required|array|min:1',
                 'jenis_opsi.*.*' => 'required|string|in:text,gambar',
                 'opsi_text' => 'nullable|array',
                 'opsi_text.*' => 'nullable|array',
                 'opsi_text.*.*' => 'nullable|string',
                 'opsi_gambar' => 'nullable|array',
                 'opsi_gambar.*' => 'nullable|array',
-                'opsi_gambar.*.*' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+                'opsi_gambar.*.*' => 'nullable|file|mimes:jpg,jpeg,png',
                 'kunci_jawaban' => 'required|array',
                 'kunci_jawaban.*' => 'required|string|in:A,B,C,D,E',
                 'file.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
@@ -682,6 +682,67 @@ public function kelompokPekerjaan(Request $request, $id_skema, $jenis = null)
         'skema'     => $skema,
         'pembuatan' => $pembuatan,
         'soalList'  => $soalList, // ✅ dikirim ke view
+    ]);
+}
+
+public function kelompokPekerjaanPG(Request $request, $id_skema, $id_pembuatan_pertanyaan = null)
+{
+    $jenis = $request->query('jenis', 'pilihan_ganda');
+
+    $judul = $request->query('judul');
+    $timer = $request->query('timer');
+
+    // =========================
+    // LANJUTKAN PEMBUATAN
+    // =========================
+    if ($id_pembuatan_pertanyaan) {
+
+        $pembuatan = PembuatanPertanyaan::find($id_pembuatan_pertanyaan);
+
+        if (!$pembuatan) {
+            return back()->with('error', 'Data pembuatan pertanyaan tidak ditemukan.');
+        }
+
+        $timer = $pembuatan->timer;
+    }
+
+    // =========================
+    // BUAT BARU
+    // =========================
+    elseif ($judul) {
+
+        $pembuatan = PembuatanPertanyaan::create([
+            'id_skema' => $id_skema,
+            'judul' => $judul,
+            'timer' => $timer ?? 30,
+            'timescap' => now(),
+            'jenis_pertanyaan' => 'pilihan_ganda',
+        ]);
+    }
+
+    else {
+        return back()->with('error', 'Parameter tidak lengkap.');
+    }
+
+    $kelompok = KelompokPekerjaan::with(['unitKompetensi' => function ($q) use ($id_skema) {
+        $q->where('unit_kompetensi.id_skema', $id_skema);
+    }])->where('id_skema', $id_skema)->get();
+
+    $skema = Skema::find($id_skema);
+
+    $soalList = Pertanyaan::where('id_pembuatan_pertanyaan', $pembuatan->id_pembuatan_pertanyaan)
+        ->with('kelompok')
+        ->get();
+
+    return view('kelompok_pekerjaan_pg', [
+        'kelompok'  => $kelompok,
+        'timer'     => $timer,
+        'id_skema'  => $id_skema,
+        'jenis'     => $jenis,
+        'judul'     => $pembuatan->judul,
+        'skema'     => $skema,
+        'pembuatan' => $pembuatan,
+        'soalList'  => $soalList,
     ]);
 }
     // ================================

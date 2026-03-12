@@ -47,6 +47,7 @@
                 <li><i class="bi bi-people-fill"></i><a href="{{ route('datapesertauji') }}">Data Peserta Uji</a></li>
                 <li><i class="bi bi-pencil-square"></i><a href="{{ route('formperencanaan') }}">Form Perencanaan</a></li>
                 <li><i class="bi bi-journal-album"></i><a href="{{ route('rekap.asesmen') }}">Rekap Asesmen</a></li>
+                <li><i class="bi bi-clipboard-check"></i><a href="{{ route('asesor.skema.index') }}">Hasil Asesmen</a></li>
             @endif
 
             @if(Auth::check() && Auth::user()->role == 'asesi')

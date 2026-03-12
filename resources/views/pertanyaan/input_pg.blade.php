@@ -26,7 +26,15 @@
 
                     <div class="mb-3">
                         <label class="form-label">File Pendukung Pertanyaan (opsional)</label>
-                        <input type="file" name="file[{{ $i }}]" class="form-control" accept=".jpg,.jpeg,.png,.pdf,.docx,.mp3,.mp4">
+                        <input type="file" 
+                            name="file[{{ $i }}]" 
+                            class="form-control file-pertanyaan"
+                            accept=".jpg,.jpeg,.png,.pdf,.docx,.mp3,.mp4"
+                            data-index="{{ $i }}">
+
+                        <div class="preview-pertanyaan mt-2 d-none">
+                            <img src="" class="img-thumbnail" style="max-height:150px;">
+                        </div>                    
                     </div>
 
                     <div class="mb-3">
@@ -221,5 +229,40 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Preview gambar untuk file pertanyaan
+document.querySelectorAll('.file-pertanyaan').forEach(input => {
+
+input.addEventListener('change', function(){
+
+    const file = this.files[0];
+    const preview = this.parentElement.querySelector('.preview-pertanyaan');
+    const img = preview.querySelector('img');
+
+    if(!file){
+        preview.classList.add('d-none');
+        return;
+    }
+
+    // cek apakah gambar
+    if(file.type.startsWith('image/')){
+
+        const reader = new FileReader();
+
+        reader.onload = function(e){
+            img.src = e.target.result;
+            preview.classList.remove('d-none');
+        }
+
+        reader.readAsDataURL(file);
+
+    }else{
+        preview.classList.add('d-none');
+    }
+
+});
+
+});
+
 </script>
 @endsection

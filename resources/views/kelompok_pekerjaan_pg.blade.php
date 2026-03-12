@@ -2,27 +2,23 @@
 
 @section('konten')
 <div class="container mt-4">
+
     <div class="text-center mb-4">
-        <h4 class="fw-bold text-dark">Kelompok Pekerjaan & Unit Kompetensi - Pilihan Ganda</h4>
+        <h4 class="fw-bold text-dark">Kelompok Pekerjaan & Unit Kompetensi Pilihan Ganda</h4>
         <p class="text-muted">
-            Skema: <span class="fw-bold">{{ $skema->nama_skema ?? 'N/A' }}</span> | 
-            Timer: <span class="fw-bold">{{ $timer }} menit</span> |
-            Jenis: <span class="fw-bold text-primary">Pilihan Ganda</span>
+            Skema ID: <span class="fw-bold">{{ $id_skema }}</span> | 
+            Timer: <span class="fw-bold">{{ $timer }} menit</span>
         </p>
     </div>
 
     @forelse($kelompok as $index => $k)
         <div class="card shadow-sm mb-4 border-0">
-            <div class="card-header" style="background-color:#0d6efd; color:white; font-weight:bold;">
+            <div class="card-header" style="background-color:#041562; color:white; font-weight:bold;">
                 <div class="d-flex justify-content-between align-items-center">
                     <span>Kelompok {{ $index+1 }}: {{ $k->nama_kelompok }}</span>
-                    <button class="btn btn-light btn-sm"
-                            onclick="popupJumlahPertanyaan(
-                                {{ $id_skema }}, 
-                                '{{ $timer }}', 
-                                {{ $k->id_kelompok }},
-                                '{{ $id_pembuatan_pertanyaan ?? '' }}'
-                            )">
+                    <button 
+                        class="btn btn-light btn-sm"
+                        onclick="popupJumlahPertanyaan({{ $id_skema }}, '{{ $timer }}', {{ $k->id_kelompok }})">
                         <i class="bi bi-plus-circle"></i> Tambahkan Pertanyaan
                     </button>
                 </div>
@@ -30,7 +26,7 @@
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-bordered align-middle mb-0">
-                        <thead style="background-color:#e6f2ff; color:#0d6efd; font-weight:bold;">
+                        <thead style="background-color:#e6eef6; color:#041562; font-weight:bold;">
                             <tr>
                                 <th class="text-center" style="width: 60px;">No</th>
                                 <th style="width: 140px;">Kode Unit</th>
@@ -65,62 +61,102 @@
             Belum ada kelompok pekerjaan untuk skema ini.
         </div>
     @endforelse
+
+    {{-- ===================== DAFTAR SOAL ===================== --}}
+    @if($pembuatan && isset($soalList) && $soalList->count() > 0)
+        <div class="card shadow-sm mb-3 border-0">
+            <div class="card-header fw-bold" style="background-color:#041562; color:white;">
+                <i class="bi bi-list-ol me-2"></i>
+                Daftar Soal — ID Pembuatan: {{ $pembuatan->id_pembuatan_pertanyaan }}
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle mb-0">
+                        <thead style="background-color:#e6eef6; color:#041562; font-weight:bold;">
+                            <tr>
+                                <th class="text-center" style="width:60px;">No</th>
+                                <th>Pertanyaan</th>
+                                <th>Kunci Jawaban</th>
+                                <th style="width:180px;">Kelompok</th>
+                                <th style="width:100px;" class="text-center">Jenis</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($soalList as $sIndex => $soal)
+                                <tr>
+                                    <td class="text-center fw-bold text-dark">{{ $sIndex + 1 }}</td>
+                                    <td>{{ $soal->isi_pertanyaan }}</td>
+                                    <td>{{ $soal->kunci_jawaban ?? '-' }}</td>
+                                    <td>{{ $soal->kelompok->nama_kelompok ?? '-' }}</td>
+                                    <td class="text-center">
+                                        <span class="badge" style="background-color:#041562;">
+                                            {{ ucfirst(str_replace('_', ' ', $soal->jenis_pertanyaan)) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    @elseif($pembuatan)
+        <div class="alert alert-info text-center mb-4">
+            Belum ada soal yang dibuat untuk pembuatan ini.
+        </div>
+    @endif
+    {{-- ======================================================= --}}
+
+    {{-- Tombol Tanda Tangan (tengah) — tampil kalau ada pembuatan --}}
+    @if($pembuatan)
+        <div class="d-flex justify-content-center mb-3">
+            <a href="{{ route('tanda.tangan.asesmen', [
+                'id_skema'                => $skema->id_skema,
+                'id_pembuatan_pertanyaan' => $pembuatan->id_pembuatan_pertanyaan
+            ]) }}"
+            class="btn btn-primary px-5 py-2 fw-bold"
+            style="background-color:#041562; border-color:#041562; border-radius:8px;">
+                <i class="bi bi-pen me-2"></i> Tanda Tangan Asesmen
+            </a>
+        </div>
+    @endif
+
+    {{-- Tombol Simpan (tengah) — tampil setelah ada soal --}}
+    @if($pembuatan && isset($soalList) && $soalList->count() > 0)
+        <div class="d-flex justify-content-center mb-5">
+             <a href="{{ route('formasesmen.pertanyaanPG', ['id_skema' => $skema->id_skema]) }}" 
+                class="btn btn-success px-5 py-2 fw-bold">
+                <i class="bi bi-save me-2"></i> Simpan Pertanyaan Pilihan Ganda
+            </a>
+        </div>
+    @endif
+
 </div>
 
 <script>
-function popupJumlahPertanyaan(id_skema, timer, id_kelompok, id_pembuatan_pertanyaan = '') {
+function popupJumlahPertanyaan(id_skema, timer, kelompok_id) {
     Swal.fire({
-        title: '<h6 class="fw-bold mb-3">Masukkan Jumlah Pertanyaan Pilihan Ganda</h6>',
+        title: '<h6 class="fw-bold mb-3">Masukkan Jumlah Pertanyaan</h6>',
         html: `
-            <input id="jumlahPertanyaanPG" type="number" class="form-control mb-2 text-center border-primary" 
-                   style="border:2px solid #0d6efd; border-radius:8px;" 
-                   min="1" max="20" value="5">
-            <small class="text-danger d-block mb-3">note: maksimal 20 pertanyaan</small>
-            <small class="text-info d-block mb-2">Setiap pertanyaan akan memiliki 5 opsi (A, B, C, D, E)</small>
-            <div class="mt-3 p-2 border rounded bg-light">
-                <small class="text-dark fw-bold">Timer: ${timer} menit</small>
-            </div>
+            <input id="jumlahPertanyaan" type="number" class="form-control mb-2 text-center border-primary" 
+                   style="border:2px solid #041562; border-radius:8px;" 
+                   min="1" max="15" value="1">
+            <small class="text-danger d-block mb-3">note: maksimal 15 pertanyaan</small>
         `,
         showCancelButton: true,
         confirmButtonText: 'Lanjutkan',
         cancelButtonText: 'Batal',
         buttonsStyling: false,
-        customClass: {
-            popup: 'rounded-4 shadow-lg p-4',
-            confirmButton: 'swal2-confirm btn fw-bold px-4 me-2',
-            cancelButton: 'swal2-cancel btn fw-bold px-4'
-        },
-        didRender: () => {
-            const confirmBtn = document.querySelector('.swal2-confirm');
-            confirmBtn.style.backgroundColor = '#0d6efd';
-            confirmBtn.style.color = '#fff';
-            confirmBtn.style.borderRadius = '8px';
-
-            const cancelBtn = document.querySelector('.swal2-cancel');
-            cancelBtn.style.backgroundColor = '#6c757d';
-            cancelBtn.style.color = '#fff';
-            cancelBtn.style.borderRadius = '8px';
-        }
     }).then((result) => {
         if (result.isConfirmed) {
-            let jumlah = parseInt(document.getElementById('jumlahPertanyaanPG').value);
-            if (isNaN(jumlah) || jumlah < 1) {
-                Swal.fire('Error', 'Minimal 1 pertanyaan', 'error');
-                return;
-            }
-            if (jumlah > 20) {
-                Swal.fire('Error', 'Maksimal 20 pertanyaan', 'error');
+            let jumlah = parseInt(document.getElementById('jumlahPertanyaan').value);
+            if (isNaN(jumlah) || jumlah < 1 || jumlah > 15) {
+                Swal.fire('Error', 'Jumlah pertanyaan harus antara 1–15', 'error');
                 return;
             }
 
-            // Build URL dengan parameter yang sesuai
-            let url = `{{ route('pertanyaan.pg.create') }}?id_skema=${id_skema}&timer=${timer}&id_kelompok=${id_kelompok}&jumlah=${jumlah}`;
-            
-            // Tambahkan id_pembuatan_pertanyaan jika ada (mode Lanjutkan)
-            if (id_pembuatan_pertanyaan) {
-                url += `&id_pembuatan_pertanyaan=${id_pembuatan_pertanyaan}`;
-            }
-
+            let url = `{{ route('pertanyaan.pg.create') }}?id_skema=${id_skema}&timer=${timer}&id_kelompok=${kelompok_id}&jumlah=${jumlah}&id_pembuatan_pertanyaan={{ $pembuatan->id_pembuatan_pertanyaan ?? '' }}`;
             window.location.href = url;
         }
     });
