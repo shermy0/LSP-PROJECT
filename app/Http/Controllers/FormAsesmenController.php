@@ -86,10 +86,10 @@ public function showSkema($id_skema)
     return view('default', compact('skema'));
 }
 
-public function createEsai(Request $request)
+public function createPertanyaanEsai(Request $request)
 {
     $id_skema = $request->query('id_skema');
-    $id_pembuatan = $request->query('id_pembuatan'); 
+    $id_pembuatan = $request->query('id_pembuatan_pertanyaan');
     $jumlah = $request->query('jumlah', 5);
 
     $skema = Skema::findOrFail($id_skema);

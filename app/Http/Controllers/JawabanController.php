@@ -113,7 +113,7 @@ class JawabanController extends Controller
      }
      
 
-   public function show($id_skema, $jenis)
+public function show($id_skema, $jenis)
 {
     $user = auth()->user();
     if (!$user) {

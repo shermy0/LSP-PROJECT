@@ -119,7 +119,6 @@ class PertanyaanController extends Controller
         return view('lisan_crud', compact('skema', 'kelompok'));
     }
     
-     
 
     // ================================
     // FORM ESAI
@@ -1351,6 +1350,15 @@ public function inputPMO(Request $request, $id_skema)
 
     if (!$id_asesi) {
         return back()->with('error', 'Tidak ada asesi ditemukan untuk kelompok ini.');
+            if (!$pmo) {
+        $pmo = PMO::create([
+            'id_skema'   => $id_skema,
+            'id_tuk'     => 1,
+            'id_asesor'  => $id_asesor,
+            'id_kuk'     => 1,
+                    'id_asesi'   => 1,   // default sementara
+
+        ]);
     }
 
     $pmo = PMO::create([
@@ -1382,6 +1390,7 @@ public function inputPMO(Request $request, $id_skema)
     'id_pembuatan'   => $id_pembuatan_param,
     'judul'          => $request->query('judul', ''), // ✅ tambah ini
 ]);
+}
 }
 
 public function destroySetPMO($id_pembuatan)
