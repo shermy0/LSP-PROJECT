@@ -25,4 +25,9 @@ class AsesmenMandiriMaster extends Model
     {
         return $this->hasMany(AsesmenMandiriJawaban::class, 'id_asesmen_mandiri');
     }
+
+    public function permohonan()
+    {
+        return $this->belongsTo(Permohonan::class, 'id_permohonan', 'id_permohonan');
+    }
 }

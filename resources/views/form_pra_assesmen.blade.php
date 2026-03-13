@@ -181,7 +181,7 @@
                             } else { // Tidak Dapat Dilanjutkan
                                 $asesmenLabel = 'Tidak Dapat Dilanjutkan';
                                 $asesmenBadge = 'bg-danger';
-                                $asesmenHref = 'javascript:void(0)'; // ubah jadi void(0) agar tidak langsung redirect
+                                $asesmenHref = 'javascript:void(0)';
                                 $iconClass = 'bg-danger bg-opacity-10 text-danger';
                                 $icon = 'bi-x-circle';
                             }
@@ -219,6 +219,36 @@
                             </div>
                             <span class="badge {{ $asesmenBadge }}">{{ $asesmenLabel }}</span>
                         </a>
+
+                        {{-- FR.AK.01 - PERSETUJUAN ASESMEN (hanya muncul jika asesmen mandiri selesai dan dapat dilanjutkan) --}}
+                        @if($asesmenExists && $rekom === 'Dapat Dilanjutkan')
+                            @php
+                                // Asumsikan ada relasi persetujuan di permohonan
+                                $persetujuan = $permohonan->persetujuan ?? null;
+                                $persetujuanLabel = $persetujuan ? ($persetujuan->status == 'selesai' ? 'Selesai' : ($persetujuan->status == 'menunggu_asesor' ? 'Menunggu TTD Asesor' : 'Draf')) : 'Belum dibuat';
+                                $persetujuanBadge = $persetujuan ? ($persetujuan->status == 'selesai' ? 'bg-success' : ($persetujuan->status == 'menunggu_asesor' ? 'bg-warning text-dark' : 'bg-secondary')) : 'bg-secondary';
+                                $persetujuanHref = $persetujuan ? route('asesi.persetujuan_asesmen.show', $persetujuan->id_persetujuan) : '#';
+                                $persetujuanIcon = $persetujuan ? ($persetujuan->status == 'selesai' ? 'bi-check-circle' : 'bi-hourglass-split') : 'bi-file-earmark-text';
+                            @endphp
+                            <a href="{{ $persetujuanHref }}" class="pra-item mt-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrap me-3 {{ $persetujuan ? 'bg-info bg-opacity-10 text-info' : 'bg-secondary bg-opacity-10 text-secondary' }}">
+                                        <i class="bi {{ $persetujuanIcon }}"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1 fw-semibold text-dark">FR.AK.01 Persetujuan Asesmen dan Kerahasian</h6>
+                                        <small class="text-muted">
+                                            @if($persetujuan)
+                                                Terakhir diupdate: {{ $persetujuan->updated_at ? \Carbon\Carbon::parse($persetujuan->updated_at)->format('d M Y') : '-' }}
+                                            @else
+                                                Menunggu asesor membuat persetujuan.
+                                            @endif
+                                        </small>
+                                    </div>
+                                </div>
+                                <span class="badge {{ $persetujuanBadge }}">{{ $persetujuanLabel }}</span>
+                            </a>
+                        @endif
                     @endif
                 @endif
 
@@ -232,6 +262,20 @@
                             <div>
                                 <h6 class="mb-1 fw-semibold text-dark">FR.APL.02 Asesmen Mandiri</h6>
                                 <small class="text-muted">Form asesmen mandiri peserta uji</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-primary">Akses</span>
+                    </a>
+
+                    {{-- FR.AK.01 untuk Asesor --}}
+                    <a href="{{ route('asesor.persetujuan_asesmen.index') }}" class="pra-item mt-2">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-wrap me-3 bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-file-earmark-check"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-semibold text-dark">FR.AK.01 Persetujuan Asesmen</h6>
+                                <small class="text-muted">Kelola persetujuan asesmen untuk asesi</small>
                             </div>
                         </div>
                         <span class="badge bg-primary">Akses</span>

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\AsesmenMandiriMaster;
 
 class Permohonan extends Model
 {
@@ -53,6 +54,17 @@ class Permohonan extends Model
     {
         // Skema model diasumsikan bernama SkemaSertifikasi dan pk id_skema
         return $this->belongsTo(SkemaSertifikasi::class, 'id_skema', 'id_skema');
+    }
+
+    // app/Models/Permohonan.php
+    public function persetujuan()
+    {
+        return $this->hasOne(PersetujuanAsesmen::class, 'id_permohonan', 'id_permohonan');
+    }
+
+    public function asesmenMandiriMaster()
+    {
+        return $this->hasOne(AsesmenMandiriMaster::class, 'id_permohonan', 'id_permohonan');
     }
 
     // Accessor opsional untuk format tanggal

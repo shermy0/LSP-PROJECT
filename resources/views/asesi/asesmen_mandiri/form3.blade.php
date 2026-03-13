@@ -95,7 +95,6 @@
 <div class="modal fade" id="ttdWarningModal" tabindex="-1" aria-labelledby="ttdWarningModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem; overflow: hidden;">
-            <!-- Header dengan warna primary -->
             <div class="modal-header bg-primary text-white border-0 py-3" style="background: linear-gradient(135deg, #0b2f7c, #08205c);">
                 <h5 class="modal-title fw-bold" id="ttdWarningModalLabel">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-exclamation-triangle-fill me-2" viewBox="0 0 16 16">
@@ -105,7 +104,6 @@
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
-            <!-- Body -->
             <div class="modal-body text-center p-4">
                 <div class="my-3">
                     <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#0b2f7c" class="bi bi-pencil-fill" viewBox="0 0 16 16">
@@ -115,7 +113,6 @@
                 <p class="fs-5 mb-2">Anda belum menandatangani formulir ini.</p>
                 <p class="text-secondary mb-0">Silakan tanda tangan pada area yang tersedia sebelum melanjutkan.</p>
             </div>
-            <!-- Footer -->
             <div class="modal-footer border-0 justify-content-center pb-4">
                 <button type="button" class="btn btn-primary px-5 py-2 rounded-pill" style="background: linear-gradient(135deg, #0b2f7c, #08205c); border: none; box-shadow: 0 8px 18px rgba(11,47,124,0.3);" data-bs-dismiss="modal">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-lg me-2" viewBox="0 0 16 16">
@@ -341,17 +338,31 @@ function initSignature(canvasId) {
     function resizeCanvas() {
         const container = canvas.parentElement;
         const cssWidth = container.clientWidth;
+        const cssHeight = 200;
         const ratio = Math.max(window.devicePixelRatio || 1, 1);
-        canvas.width = cssWidth * ratio;
-        canvas.height = 200 * ratio;
-        ctx.setTransform(1,0,0,1,0,0);
+        canvas.width = Math.round(cssWidth * ratio);
+        canvas.height = Math.round(cssHeight * ratio);
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.scale(ratio, ratio);
+
+        // Isi dengan putih
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, cssWidth, cssHeight);
+
         ctx.lineWidth = 2;
         ctx.lineCap = 'round';
         ctx.strokeStyle = '#000';
     }
 
-    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('resize', () => {
+        // Simpan gambar sebelumnya
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        resizeCanvas();
+        // Kembalikan gambar
+        ctx.putImageData(imgData, 0, 0);
+    });
+
     resizeCanvas();
 
     canvas.addEventListener('mousedown', (e) => {
@@ -405,7 +416,20 @@ function initSignature(canvasId) {
 function clearCanvas(canvasId) {
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const container = canvas.parentElement;
+    const cssWidth = container.clientWidth;
+    const cssHeight = 200;
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+
+    canvas.width = Math.round(cssWidth * ratio);
+    canvas.height = Math.round(cssHeight * ratio);
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(ratio, ratio);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, cssWidth, cssHeight);
+
     document.getElementById('ttd-asesi-input').value = '';
 }
 
@@ -425,7 +449,8 @@ document.getElementById('ttd-form').addEventListener('submit', function(e) {
     const pixelData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
     let isBlank = true;
     for (let i = 0; i < pixelData.length; i += 4) {
-        if (pixelData[i] < 255 || pixelData[i+1] < 255 || pixelData[i+2] < 255) {
+        // Periksa apakah pixel bukan putih (R,G,B tidak semuanya 255)
+        if (pixelData[i] !== 255 || pixelData[i+1] !== 255 || pixelData[i+2] !== 255) {
             isBlank = false;
             break;
         }

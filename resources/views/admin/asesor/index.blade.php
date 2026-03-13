@@ -790,7 +790,7 @@
         // Auto-open modal if validation fails
         @if($errors->any() && old())
         const modalEl = document.getElementById('addAsesorModal');
-        if (modalEl) {
+        if (modalEl) {  
             const modal = new bootstrap.Modal(modalEl);
             modal.show();
         }
