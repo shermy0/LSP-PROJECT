@@ -27,29 +27,49 @@
     {{-- List Asesi --}}
     <div class="row g-3" id="asesiList">
         @forelse($asesiList as $asesi)
+            @php $sudah = in_array($asesi->id_asesi, $sudahInputIds); @endphp
             <div class="col-md-6 col-lg-4 asesi-item"
                  data-nama="{{ strtolower($asesi->nama_lengkap) }}">
-                <div class="card border-0 shadow-sm rounded-4 h-100"
-                     style="cursor:pointer; transition:all 0.2s; border:2px solid transparent !important;"
-                     onclick="pilihAsesi({{ $asesi->id_asesi }}, '{{ addslashes($asesi->nama_lengkap) }}')"
-                     onmouseover="this.style.setProperty('border-color','#041562','important'); this.style.backgroundColor='#f0f4ff';"
-                     onmouseout="this.style.setProperty('border-color','transparent','important'); this.style.backgroundColor='';">
+                <div class="card border-0 shadow-sm rounded-4 h-100 asesi-card"
+                     data-id="{{ $asesi->id_asesi }}"
+                     data-nama-asesi="{{ addslashes($asesi->nama_lengkap) }}"
+                     data-sudah="{{ $sudah ? '1' : '0' }}"
+                     style="transition:all 0.2s; border:2px solid transparent !important;
+                            cursor: {{ $sudah ? 'not-allowed' : 'pointer' }};
+                            {{ $sudah ? 'background-color:#f8fff9;' : '' }}">
                     <div class="card-body px-4 py-3 d-flex align-items-center gap-3">
+                        {{-- Avatar --}}
                         <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold text-white"
-                             style="width:44px; height:44px; background-color:#041562; font-size:1rem;">
+                             style="width:44px; height:44px; font-size:1rem;
+                                    background-color:{{ $sudah ? '#28a745' : '#041562' }};">
                             {{ strtoupper(substr($asesi->nama_lengkap, 0, 1)) }}
                         </div>
+
+                        {{-- Info --}}
                         <div class="flex-grow-1 overflow-hidden">
-                            <p class="fw-bold mb-0 text-truncate" style="color:#041562; font-size:0.9rem;">
+                            <p class="fw-bold mb-0 text-truncate"
+                               style="color:{{ $sudah ? '#28a745' : '#041562' }}; font-size:0.9rem;">
                                 {{ $asesi->nama_lengkap }}
                             </p>
-                           @if(isset($asesi->telepon_hp) && $asesi->telepon_hp)
-                                <small class="text-muted"><i class="bi bi-telephone me-1"></i>{{ $asesi->telepon_hp }}</small>
+                            @if($sudah)
+                                <small class="text-success fw-semibold">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Sudah diinput
+                                </small>
+                            @elseif(isset($asesi->telepon_hp) && $asesi->telepon_hp)
+                                <small class="text-muted">
+                                    <i class="bi bi-telephone me-1"></i>{{ $asesi->telepon_hp }}
+                                </small>
                             @else
-                                <small class="text-muted text-italic">No telepon tidak tersedia</small>
+                                <small class="text-muted">No telepon tidak tersedia</small>
                             @endif
                         </div>
-                        <i class="bi bi-arrow-right flex-shrink-0" style="color:#041562;"></i>
+
+                        {{-- Icon kanan --}}
+                        @if($sudah)
+                            <i class="bi bi-check-circle-fill flex-shrink-0" style="color:#28a745; font-size:1.1rem;"></i>
+                        @else
+                            <i class="bi bi-arrow-right flex-shrink-0" style="color:#041562;"></i>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -92,6 +112,43 @@
 const idSkema     = {{ $skema->id_skema }};
 const idPembuatan = {{ $pembuatan->id_pembuatan_pertanyaan }};
 const idKelompok  = {{ $kelompok->id_kelompok ?? 0 }};
+
+// Event listener untuk semua card asesi
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.asesi-card').forEach(function (card) {
+        const sudah   = card.dataset.sudah === '1';
+        const idAsesi = card.dataset.id;
+        const nama    = card.dataset.namaAsesi;
+
+        if (sudah) {
+            card.style.cursor = 'not-allowed';
+            card.addEventListener('click', function () {
+                Swal.fire({
+                    title: 'Sudah Diinput',
+                    html: `Jawaban untuk <strong>${nama}</strong> sudah pernah diinput.`,
+                    icon: 'info',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#041562'
+                });
+            });
+        } else {
+            // Belum diinput — bisa diklik
+            card.style.cursor = 'pointer';
+
+            card.addEventListener('mouseenter', function () {
+                card.style.setProperty('border-color', '#041562', 'important');
+                card.style.backgroundColor = '#f0f4ff';
+            });
+            card.addEventListener('mouseleave', function () {
+                card.style.setProperty('border-color', 'transparent', 'important');
+                card.style.backgroundColor = '';
+            });
+            card.addEventListener('click', function () {
+                pilihAsesi(idAsesi, nama);
+            });
+        }
+    });
+});
 
 function pilihAsesi(idAsesi, namaAsesi) {
     Swal.fire({

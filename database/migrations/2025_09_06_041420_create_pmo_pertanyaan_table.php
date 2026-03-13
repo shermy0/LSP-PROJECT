@@ -16,6 +16,7 @@ return new class extends Migration
             $table->text('id_unit')->nullable(); // ✅ ganti jadi text, simpan JSON
             $table->string('pertanyaan')->nullable();
             $table->text('deskripsi_pertanyaan')->nullable();
+            $table->timestamps(); // ✅ tambah ini
 
             $table->foreign('id_pmo')->references('id_pmo')->on('pmo')->onDelete('cascade');
             $table->foreign('id_pembuatan_pertanyaan')->references('id_pembuatan_pertanyaan')->on('pembuatan_pertanyaan')->onDelete('cascade');
