@@ -392,7 +392,11 @@
                             <td class="text-center">{{ $i + 1 }}</td>
                             <td><input type="text" class="form-control" value="{{ $p }}" readonly></td>
                             <td><input type="date" class="form-control" value="{{ $waktuPerbaikan[$i] ?? '' }}" readonly></td>
-                            <td><input type="text" class="form-control" value="{{ $penanggungPerbaikan[$i] ?? '' }}" readonly></td>
+                            <td>
+                            <input type="text" class="form-control"
+                            value="{{ $asesorList[$penanggungPerbaikan[$i]] ?? '' }}"
+                            readonly>
+                            </td>
                             <td>
                                 @if(!empty($ttdPerbaikan[$i]))
                                     <img src="{{ $ttdPerbaikan[$i] }}" alt="Tanda Tangan" style="width:120px; height:50px;">
@@ -421,12 +425,16 @@
                 <tbody>
                     @foreach($validator ?? [] as $i => $v)
                         <tr>
-                            <td><input type="text" class="form-control" value="{{ $v }}" readonly></td>
+                            <td>
+                                <input type="text" class="form-control"
+                                value="{{ is_numeric($v) ? ($asesorList[$v] ?? '') : $v }}"
+                                readonly>
+                            </td>
                             <td><input type="text" class="form-control" value="{{ $noMet[$i] ?? '' }}" readonly></td>
                             <td><input type="text" class="form-control" value="{{ $tanggal[$i] ?? '' }}" readonly></td>
                             <td>
                                 @if(!empty($ttdValidator[$i]))
-                                    <img src="{{ $ttdValidator[$i] }}" alt="Tanda Tangan" style="width:120px; height:50px;">
+                                <img src="{{ $ttdValidator[$i] }}" style="width:120px;height:50px;">
                                 @endif
                             </td>
                         </tr>

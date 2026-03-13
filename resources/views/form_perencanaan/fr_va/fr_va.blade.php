@@ -24,6 +24,8 @@
         <h3 class="fw-bold">FR.VA – MEMBERIKAN KONTRIBUSI DALAM VALIDASI ASESMEN</h3>
     </div>
 
+    <input type="hidden" name="periode" value="{{ $periode }}">
+
     <!-- Skema & Periode -->
     <div class="skema-container mb-4">
         <div class="skema-group">

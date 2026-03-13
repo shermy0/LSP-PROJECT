@@ -205,66 +205,108 @@ $validators = $asesors;
                     </tr>
                 </thead>
                 <tbody>
-    @forelse($validator as $i => $v)
-    <tr>
-        <td>
-            @if($periodeAktif === 'sebelum')
-                <select name="nama_validator[]" class="form-select nama-validator-sebelum">
-                    <option value="">-- Pilih Asesor --</option>
-                    @foreach($asesors as $asesor)
-                    <option value="{{ $asesor->id_asesor }}"
-                        {{ ($v ?? '') == $asesor->id_asesor ? 'selected' : '' }}
-                        data-no="{{ $asesor->no_registrasi }}">
-                        {{ $asesor->nama_asesor }}
-                    </option>
-                    @endforeach
-                </select>
-            @else
-                <input list="daftar-validator" 
-                       name="nama_validator[]" 
-                       class="form-control nama-validator" 
-                       value="{{ $v ?? '' }}"
-                       placeholder="Masukkan Validator">
-                <datalist id="daftar-validator">
-                    @foreach($validators as $validatorOption)
-                        <option value="{{ $validatorOption->nama_asesor }}" 
-                                data-no="{{ $validatorOption->no_registrasi }}">
-                            {{ $validatorOption->nama_asesor }}
-                        </option>
-                    @endforeach
-                </datalist>
-            @endif
-        </td>
+@forelse($validator as $i => $v)
+<tr>
 
-        <td>
-            <input type="text" name="no_registrasi[]" class="form-control no-registrasi" 
-                   value="{{ $noMet[$i] ?? '' }}" readonly>
-        </td>
+<td>
+@if($periodeAktif === 'sebelum')
+<select name="nama_validator[]" class="form-select nama-validator-sebelum">
+<option value="">-- Pilih Asesor --</option>
+@foreach($asesors as $asesor)
+<option value="{{ $asesor->id_asesor }}"
+data-no="{{ $asesor->no_registrasi }}"
+{{ $v == $asesor->id_asesor ? 'selected' : '' }}>
+{{ $asesor->nama_asesor }}
+</option>
+@endforeach
+</select>
+@else
+<input type="text"
+name="nama_validator[]"
+class="form-control nama-validator"
+value="{{ $v }}">
+@endif
+</td>
 
-        <td>
-            <input type="date" name="tanggal_validator[]" class="form-control" 
-                   value="{{ $tanggal[$i] ?? '' }}">
-        </td>
+<td>
+<input type="text"
+name="no_registrasi[]"
+class="form-control no-registrasi"
+value="{{ $noMet[$i] ?? '' }}"
+@if($periodeAktif === 'sebelum') readonly @endif>
+</td>
 
-        <td class="text-center">
-            @if(!empty($ttdValidator[$i]))
-                <img src="{{ $ttdValidator[$i] }}" alt="Tanda Tangan" style="width:120px; height:50px;">
-            @endif
-            <input type="hidden" name="tanda_tangan_validator[]" class="tanda_tangan" 
-                   value="{{ $ttdValidator[$i] ?? '' }}">
-        </td>
+<td>
+<input type="date"
+name="tanggal_validator[]"
+class="form-control"
+value="{{ $tanggal[$i] ?? '' }}">
+</td>
 
-        <td class="text-center">
-            <button type="button" class="btn btn-danger btn-sm delete-row"><i class="fa fa-trash"></i></button>
-        </td>
-    </tr>
-    @empty
-    <tr>
-        <td colspan="5" class="text-center">Belum ada validator</td>
-    </tr>
-    @endforelse
+<td class="text-center">
+<canvas class="signature-preview"
+        width="120"
+        height="50"
+        style="border:1px solid #ccc; cursor:pointer;">
+</canvas>
+
+<input type="hidden"
+name="tanda_tangan_validator[]"
+class="tanda_tangan"
+value="{{ $ttdValidator[$i] ?? '' }}">
+</td>
+
+<td class="text-center">
+<button type="button" class="btn btn-danger btn-sm delete-row">
+<i class="fa fa-trash"></i>
+</button>
+</td>
+
+</tr>
+
+@empty
+<tr>
+<td>
+@if($periodeAktif === 'sebelum')
+<select name="nama_validator[]" class="form-select nama-validator-sebelum">
+<option value="">-- Pilih Asesor --</option>
+@foreach($asesors as $asesor)
+<option value="{{ $asesor->id_asesor }}"
+data-no="{{ $asesor->no_registrasi }}">
+{{ $asesor->nama_asesor }}
+</option>
+@endforeach
+</select>
+@else
+<input type="text" name="nama_validator[]" class="form-control nama-validator">
+@endif</td>
+
+<td>
+<input type="text" name="no_registrasi[]" class="form-control no-registrasi"
+@if($periodeAktif === 'sebelum') readonly @endif>
+</td>
+
+<td>
+<input type="date" name="tanggal_validator[]" class="form-control">
+</td>
+
+<td>
+<canvas class="signature-preview"
+        width="120"
+        height="50"
+        style="border:1px solid #ccc; cursor:pointer;">
+</canvas>
+<input type="hidden" name="tanda_tangan_validator[]" class="tanda_tangan">
+</td>
+
+<td>
+<button type="button" class="btn btn-danger btn-sm delete-row">
+<i class="fa fa-trash"></i>
+</button>
+</td>
+</tr>
+@endforelse
 </tbody>
-
             </table>
 
             <button type="button" class="btn btn-success mt-2" id="add-validator-row">+ Tambah Validator</button>
@@ -406,6 +448,3 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 @endsection
-
-
-

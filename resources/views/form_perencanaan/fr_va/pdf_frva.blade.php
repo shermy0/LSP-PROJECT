@@ -66,7 +66,7 @@
                 @forelse($validators->take(3) as $v)
                     <tr>
                         <td style="border:none; {{ !$loop->last ? 'border-bottom:1px solid #000;' : '' }} padding:5px 6px;">
-                            {{ $loop->iteration }}. {{ $v->nama_asesor }}
+                            {{ $loop->iteration }}. {{ $v->nama_validator }}
                         </td>
                     </tr>
                 @empty
@@ -407,7 +407,9 @@
             <td style="border:1px solid #000; text-align:center;">
                 {{ $rencana->waktu_penyelesaian ? \Carbon\Carbon::parse($rencana->waktu_penyelesaian)->format('d/m/Y') : '-' }}
             </td>
-            <td style="border:1px solid #000;">{{ $rencana->penanggung_jawab ?? '-' }}</td>
+            <td style="border:1px solid #000;">
+                {{ $rencana->nama_penanggung ?? '-' }}
+            </td>
         </tr>
     @empty
         <tr>

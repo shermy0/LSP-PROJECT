@@ -439,7 +439,7 @@ if ($validasiId) {
     foreach($perbaikanData as $p) {
         $perbaikan[] = $p->kegiatan_perbaikan;
         $waktuPerbaikan[] = $p->waktu_penyelesaian;
-        $penanggungPerbaikan[] = $p->penanggung_jawab ?: ''; // pastikan tidak null
+        $penanggungPerbaikan[] = $p->penanggung_jawab ?: '';
         $ttdPerbaikan[] = $p->ttd;
 
         $asesor = DB::table('asesor')->where('nama_asesor', $p->penanggung_jawab)->first();
@@ -506,16 +506,21 @@ if ($validasiId) {
     // urutan periode
     $urutanPeriode = ['sebelum', 'saat', 'sesudah'];
 
-    $lastPeriode = DB::table('proses_validasi')
-        ->where('skema_id', $skema_id)
-        ->orderByRaw("FIELD(periode, 'sebelum','saat','sesudah') DESC")
-        ->latest('id')
-        ->value('periode');
+    // Ambil periode saat ini dari route/form, misal fr_va/{periode}/{skema_id}
+    $currentPeriode = $request->input('periode', 'sebelum');
 
-    $nextPeriode = 'sebelum';
-    if ($lastPeriode) {
-        $index = array_search($lastPeriode, $urutanPeriode);
-        $nextPeriode = $urutanPeriode[$index + 1] ?? null;
+    // Cek apakah data untuk periode ini sudah ada
+    $exists = DB::table('proses_validasi')
+        ->where('skema_id', $skema_id)
+        ->where('periode', $currentPeriode)
+        ->exists();
+
+    // Kalau sudah ada, tetap pakai periode saat ini (update)
+    // Kalau belum ada, tentukan periode berikutnya
+    $nextPeriode = $currentPeriode;
+    
+    if (!$nextPeriode) {
+        return back()->with('error', 'Semua periode sudah diisi.');
     }
 
     if (!$nextPeriode) {
@@ -654,7 +659,7 @@ if ($validasiId) {
         }
     }
 
-    return redirect()->route('form_perencanaan.fr_va_asesor', ['periode' => $nextPeriode, 'skema_id' => $skema_id])
+    return redirect()->route('form_perencanaan.fr_va_asesor', ['periode' => $currentPeriode, 'skema_id' => $skema_id])
         ->with('success', "Data periode '{$nextPeriode}' berhasil disimpan!");
 }
 
@@ -723,22 +728,22 @@ if ($validasiId) {
         }
 
         // 1️⃣ Simpan Kontribusi
-        if ($request->temuan) {
-            foreach ($request->temuan as $index => $temuan) {
-                $temuan = trim($temuan);
-                if (empty($temuan)) continue;
+        DB::table('kontribusi')->where('id_validasi', $validasiId)->delete();
 
-                $rekomendasi = $request->rekomendasi[$index] ?? '';
-                DB::table('kontribusi')->insert([
-                    'skema_id' => $skema_id,
-                    'id_validasi' => $validasiId,
-                    'temuan' => $temuan,
-                    'rekomendasi' => $rekomendasi,
-                ]);
-            }
+        foreach ($request->temuan as $index => $temuan) {
+            $temuan = trim($temuan);
+            if (empty($temuan)) continue;
+            $rekomendasi = $request->rekomendasi[$index] ?? '';
+            DB::table('kontribusi')->insert([
+                'skema_id' => $skema_id,
+                'id_validasi' => $validasiId,
+                'temuan' => $temuan,
+                'rekomendasi' => $rekomendasi,
+            ]);
         }
 
         // 2️⃣ Simpan Perbaikan
+        DB::table('rencana_perbaikan')->where('id_validasi', $validasiId)->delete();
         if ($request->perbaikan) {
             foreach ($request->perbaikan as $index => $kegiatan) {
                 $waktu = $request->waktu[$index] ?? null;
@@ -758,6 +763,10 @@ if ($validasiId) {
         }
 
         // 3️⃣ Simpan Validator
+        DB::table('validasi_validator')
+            ->where('id_validasi', $validasiId)
+            ->delete();
+
         $nama_validators = $request->nama_validator ?? [];
         $no_registrasi   = $request->no_registrasi ?? [];
         $tanggal         = $request->tanggal_validator ?? [];
@@ -766,18 +775,13 @@ if ($validasiId) {
         foreach ($nama_validators as $index => $nama) {
             if (empty($nama)) continue;
 
-            // pastikan tanggal tidak kosong
-            if (empty($tanggal[$index])) {
-                return back()->with('error', 'Tanggal validator wajib diisi!');
-            }
-
             DB::table('validasi_validator')->insert([
-                'skema_id' => $skema_id,
-                'id_validasi' => $validasiId,
+                'skema_id'       => $skema_id,
+                'id_validasi'    => $validasiId,
                 'nama_validator' => $nama,
-                'no_registrasi' => $no_registrasi[$index] ?? null,
-                'tanggal' => $tanggal[$index],
-                'ttd' => $ttd[$index] ?? null,
+                'no_registrasi'  => $no_registrasi[$index] ?? '-',
+                'tanggal'        => $tanggal[$index] ?? null,
+                'ttd'            => $ttd[$index] ?? null,
             ]);
         }
 
@@ -1009,10 +1013,10 @@ if ($validasiId) {
     $rekomendasi = [];
     foreach($kontribusiList as $kontribusi) {
         if($kontribusi->temuan) {
-            $temuan = array_merge($temuan, array_map('trim', explode(',', $kontribusi->temuan)));
+            $temuan[] = $kontribusi->temuan;
         }
         if($kontribusi->rekomendasi) {
-            $rekomendasi = array_merge($rekomendasi, array_map('trim', explode(',', $kontribusi->rekomendasi)));
+            $rekomendasi[] = $kontribusi->rekomendasi;
         }
     }
 
@@ -1051,6 +1055,7 @@ if ($validasiId) {
     $noMet = [];
     $tanggal = [];
     $ttdValidator = [];
+
     foreach($validatorData as $v) {
         $validator[] = $v->nama_validator;
         $noMet[] = $v->no_registrasi;
@@ -1067,6 +1072,9 @@ if ($validasiId) {
         'sesudah' => 'Sesudah Asesmen',
         default   => 'Periode Tidak Diketahui',
     };
+
+    $asesorList = DB::table('asesor')
+    ->pluck('nama_asesor', 'id_asesor');
 
     return view('form_perencanaan.fr_va.fr_va_pdf', [
         'skema' => $skema,
@@ -1105,6 +1113,7 @@ if ($validasiId) {
         'periode' => $periode,
         'periodeText' => $periodeText,
         'allKonteksSelected' => $allKonteksSelected,
+        'asesorList' => $asesorList,
     ]);
 }
 
@@ -1141,11 +1150,16 @@ public function download($skema_id, $periode)
     // =============================
     // 3. VALIDATOR
     // =============================
-    $validators = DB::table('validasi_validator')
-        ->where('id_validasi', $validasiId)
-        ->select('nama_validator as nama_asesor', 'tanggal', 'ttd')
-        ->get();
-
+$validators = DB::table('validasi_validator')
+    ->leftJoin('asesor', 'validasi_validator.nama_validator', '=', 'asesor.id_asesor')
+    ->select(
+        DB::raw('COALESCE(asesor.nama_asesor, validasi_validator.nama_validator) as nama_validator'),
+        'validasi_validator.no_registrasi',
+        'validasi_validator.tanggal',
+        'validasi_validator.ttd'
+    )
+    ->where('validasi_validator.id_validasi', $validasiId)
+    ->get();
 
     // =============================
     // 4. MASTER LIST
@@ -1369,10 +1383,12 @@ public function download($skema_id, $periode)
 // Rencana Perbaikan per skema & periode
 // ==========================================
 $rencanaList = DB::table('rencana_perbaikan')
-    ->join('proses_validasi', 'rencana_perbaikan.id_validasi', '=', 'proses_validasi.id')
-    ->where('proses_validasi.skema_id', $skema_id)
-    ->where('proses_validasi.periode', $periode)
-    ->select('rencana_perbaikan.*')
+    ->leftJoin('asesor', 'rencana_perbaikan.penanggung_jawab', '=', 'asesor.id_asesor')
+    ->select(
+        'rencana_perbaikan.*',
+        'asesor.nama_asesor as nama_penanggung'
+    )
+    ->where('rencana_perbaikan.id_validasi', $validasiId)
     ->get();
 
 // Optional: kalau mau buat array terpisah

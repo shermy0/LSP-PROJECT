@@ -96,7 +96,7 @@
                     @forelse($validators as $v)
                         <tr>
                             <td>{{ $v->nama_validator }}</td>
-                            <td>{{ $v->no_met }}</td>
+                            <td>{{ $v->no_registrasi }}</td>
                             <td>{{ \Carbon\Carbon::parse($v->tanggal)->format('d/m/Y') }}</td>
                             <td class="text-center">
                                 @if($v->ttd)
