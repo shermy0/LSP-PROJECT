@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\FormPerencanaan;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use App\Models\InstrumenAsesmen;
 use App\Models\LaporanAsesmen;
 use App\Models\Skema;

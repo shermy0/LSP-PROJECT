@@ -19,7 +19,7 @@ use App\Http\Controllers\DataPesertaUjiController;
 use App\Http\Controllers\ProfileAsesorController;
 use App\Http\Controllers\DemonstrasiController;
 //PERENCANAAN
-use App\Http\Controllers\PerencanaanController;
+use App\Http\Controllers\FormPerencanaan\PerencanaanController;
 use App\Http\Controllers\FormPerencanaan\Mapa01Controller;
 use App\Http\Controllers\FormPerencanaan\Mapa02Controller;
 use App\Http\Controllers\FormPerencanaan\ModifikasiController;
