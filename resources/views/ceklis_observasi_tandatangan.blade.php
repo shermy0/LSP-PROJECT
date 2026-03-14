@@ -518,7 +518,7 @@ document.addEventListener('DOMContentLoaded', function () {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
-    ctx.strokeStyle = '#041562';
+    ctx.strokeStyle = '#000';
 
     let isDrawing = false;
     let lastX = 0, lastY = 0;

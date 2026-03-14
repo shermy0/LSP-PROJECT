@@ -468,4 +468,5 @@ Route::post('/form-asesmen/{id_skema}/jawaban-pmo/{id_pembuatan}/{id_asesi}', [P
     Route::get('/ceklis-observasi/tandatangan/{id}', [CeklisObservasiController::class, 'tandatangan'])->name('ceklisobservasi.tandatangan');
     Route::post('/ceklis-observasi/tandatangan', [CeklisObservasiController::class, 'storeTandatangan'])->name('ceklisobservasi.storeTandatangan'); 
     Route::get('/ceklis-observasi/tandatangan/{id_skema}/{id_asesi}', [CeklisObservasiController::class, 'tandatanganBySkemaAsesi']) ->name('ceklisobservasi.tandatangan.bySkemaAsesi');
+    Route::get('/ttd/asesor/{filename}', [App\Http\Controllers\CeklisObservasiController::class, 'showTtdAsesor'])->name('ttd.asesor');
 }); // end middleware auth

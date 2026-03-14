@@ -374,7 +374,10 @@
                     <span>{{ count($asesi) }} asesi tersedia</span>
                 </div>
             </div>
-
+            <div style="margin-bottom: 15px; font-size: 0.85rem; color: var(--text-muted); background: #f0f4ff; padding: 8px 12px; border-radius: 8px;">
+                            <i class="bi bi-pencil-fill" style="color: #22c55e;"></i> Asesor sudah tanda tangan &nbsp;&nbsp;
+                            <i class="bi bi-check-circle-fill" style="color: #22c55e;"></i> Asesi dan Asesor sudah tanda tangan
+            </div>
             <div class="form-card-body">
                 <form method="GET" action="{{ route('ceklisobservasi.index') }}">
                     <input type="hidden" name="id_skema" value="{{ $skema->id_skema }}">
@@ -405,7 +408,14 @@
                                         <i class="bi bi-person-fill"></i>
                                     </div>
                                     <div class="asesi-info">
-                                        <div class="asesi-name">{{ $a->nama_lengkap }}</div>
+                                    <div class="asesi-name">
+    {{ $a->nama_lengkap }}
+    @if($signatureAsesiStatus[$a->id_asesi])
+        <i class="bi bi-check-circle-fill" style="color: #22c55e; margin-left: 5px;" title="Asesi sudah tanda tangan"></i>
+    @elseif($signatureAsesorStatus[$a->id_asesi])
+        <i class="bi bi-pencil-fill" style="color: #22c55e; margin-left: 5px;" title="Asesor sudah tanda tangan"></i>
+    @endif
+</div>
                                         <div class="asesi-nik">NIK: {{ $a->nik }}</div>
                                     </div>
                                     <div class="asesi-check"></div>

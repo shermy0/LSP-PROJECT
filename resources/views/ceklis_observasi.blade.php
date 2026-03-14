@@ -2,6 +2,7 @@
 
 @section('konten')
 <style>
+    /* (semua style tetap seperti sebelumnya, tidak diubah) */
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
     :root {
@@ -407,29 +408,24 @@
     .btn-submit i { transition: transform 0.2s ease; }
     .btn-submit:hover i { transform: translateX(3px); }
 
-    /* Loading state */
-    #kelompok-container .loading-text {
-        color: var(--text-muted);
-        font-size: 0.88rem;
-        font-style: italic;
-        text-align: center;
-        padding: 2rem 0;
-    }
-
     @keyframes fadeUp {
         from { opacity: 0; transform: translateY(22px); }
         to   { opacity: 1; transform: translateY(0); }
     }
+
+    /* Sembunyikan canvas jika tidak aktif */
+    #signature-canvas { display: block; }
+    #saved-signature { display: block; }
 </style>
 
     <div class="container">
         <center>
-        <div class="page-header">
-            <span class="header-badge">FR.IA.01</span>
-            <h2>Form Ceklis Observasi Aktivitas Praktik</h2>
-            <p>Isi form penilaian observasi untuk asesi yang dipilih.</p>
-            <div class="header-divider"></div>
-        </div>
+            <div class="page-header">
+                <span class="header-badge">FR.IA.01</span>
+                <h2>Form Ceklis Observasi Aktivitas Praktik</h2>
+                <p>Isi form penilaian observasi untuk asesi yang dipilih.</p>
+                <div class="header-divider"></div>
+            </div>
         </center>
 
         @if(session('success'))
@@ -452,6 +448,9 @@
             @csrf
             <input type="hidden" name="id_skema" value="{{ request('id_skema') }}">
             <input type="hidden" name="id_asesi" value="{{ request('id_asesi') }}">
+            @if(isset($observasi))
+                <input type="hidden" name="id_observasi" value="{{ $observasi->id_observasi }}">
+            @endif
             <input type="hidden" name="ttd_asesor" id="ttd_asesor">
 
             {{-- IDENTITAS --}}
@@ -464,7 +463,7 @@
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="field-label">Judul Skema</label>
-                            <input type="text" id="judul-skema" class="field-input" readonly>
+                            <input type="text" id="judul-skema" class="field-input" value="{{ $kelompok->first()?->skema->nama_skema ?? '' }}" readonly>
                         </div>
                         <div class="col-md-4">
                             <label class="field-label">Nama Asesi</label>
@@ -505,7 +504,111 @@
                 </div>
                 <div class="section-card-body">
                     <div id="kelompok-container">
-                        <p class="loading-text"><i class="bi bi-hourglass-split"></i> Memuat data kelompok pekerjaan...</p>
+                        @forelse($kelompok as $indexKel => $kel)
+                            <div class="table-responsive mb-4">
+                                <table class="table-observasi">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:25%">Kelompok Pekerjaan {{ $indexKel + 1 }}<br><small style="font-weight:400;">{{ $kel->nama_kelompok ?? '-' }}</small></th>
+                                            <th style="width:5%">No.</th>
+                                            <th style="width:25%">Kode Unit</th>
+                                            <th>Judul Unit</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($kel->unitKompetensi as $indexUnit => $unit)
+                                        <tr>
+                                            <td class="kelompok-label"></td>
+                                            <td style="text-align:center;">{{ $indexUnit + 1 }}.</td>
+                                            <td>{{ $unit->kode_unit ?? '-' }}</td>
+                                            <td>{{ $unit->judul_unit ?? '-' }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            @foreach($kel->unitKompetensi as $indexUnit => $unit)
+                                <div class="unit-header">
+                                    Unit Kompetensi {{ $indexUnit + 1 }}
+                                    <span style="font-weight:500; color:var(--text-muted); font-size:0.78rem; margin-left:8px;">
+                                        {{ $unit->kode_unit ?? '-' }} — {{ $unit->judul_unit ?? '-' }}
+                                    </span>
+                                </div>
+
+                                <div class="table-responsive mb-3">
+                                    <table class="table-observasi">
+                                        <thead>
+                                            <tr>
+                                                <th style="width:4%">No.</th>
+                                                <th style="width:18%">Elemen</th>
+                                                <th style="width:30%">Kriteria Unjuk Kerja</th>
+                                                <th style="width:18%">Standar Industri / Tempat Kerja</th>
+                                                <th colspan="2" style="width:12%">Pencapaian</th>
+                                                <th style="width:18%">Penilaian Lanjut</th>
+                                            </tr>
+                                            <tr>
+                                                <th></th><th></th><th></th><th></th>
+                                                <th style="text-align:center;">Ya</th>
+                                                <th style="text-align:center;">Tidak</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($unit->elemen as $ele)
+                                                @foreach($ele->kuk as $idxKuk => $kuk)
+                                                    @php
+                                                        $existing = $existingItems[$kuk->id_kuk] ?? null;
+                                                        $standar = old('kuk.'.$kuk->id_kuk.'.standar_industri', $existing->standar_industri ?? 'Modul Praktek');
+                                                        $status = old('kuk.'.$kuk->id_kuk.'.status', $existing->pencapaian ?? null);
+                                                        $catatan = old('kuk.'.$kuk->id_kuk.'.catatan', $existing->penilaian_lanjut ?? '');
+                                                    @endphp
+                                                    <tr>
+                                                        <td style="text-align:center;">{{ $ele->nomor_elemen ?? ($indexUnit+1) . '.' . ($idxKuk+1) }}</td>
+                                                        <td>{{ $ele->nama_elemen ?? '-' }}</td>
+                                                        <td>{{ $kuk->deskripsi_kuk ?? '-' }}</td>
+                                                        <td>
+                                                            <select class="form-select-sm-custom"
+                                                                    name="kuk[{{ $kuk->id_kuk }}][standar_industri]"
+                                                                    onchange="toggleLainnya(this, {{ $kuk->id_kuk }})">
+                                                                <option value="Modul Praktek" {{ $standar == 'Modul Praktek' ? 'selected' : '' }}>Modul Praktek</option>
+                                                                <option value="SOP" {{ $standar == 'SOP' ? 'selected' : '' }}>SOP</option>
+                                                                <option value="Lainnya" {{ $standar == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                                                            </select>
+                                                            <input type="text" class="form-control-sm-custom mt-1 {{ $standar == 'Lainnya' ? '' : 'd-none' }}"
+                                                                   name="kuk[{{ $kuk->id_kuk }}][standar_lainnya]"
+                                                                   placeholder="Tulis standar lainnya"
+                                                                   value="{{ old('kuk.'.$kuk->id_kuk.'.standar_lainnya', ($standar == 'Lainnya' ? $existing->standar_industri : '')) }}">
+                                                        </td>
+                                                        <td style="text-align:center;">
+                                                            <input class="radio-custom" type="radio"
+                                                                   name="kuk[{{ $kuk->id_kuk }}][status]"
+                                                                   value="Ya" {{ $status == 'Ya' ? 'checked' : '' }} required>
+                                                        </td>
+                                                        <td style="text-align:center;">
+                                                            <input class="radio-custom" type="radio"
+                                                                   name="kuk[{{ $kuk->id_kuk }}][status]"
+                                                                   value="Tidak" {{ $status == 'Tidak' ? 'checked' : '' }}>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="kuk[{{ $kuk->id_kuk }}][catatan]"
+                                                                   class="form-control-sm-custom"
+                                                                   placeholder="Catatan..."
+                                                                   value="{{ $catatan }}">
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endforeach
+                            @if(!$loop->last)
+                                <hr class="section-divider">
+                            @endif
+                        @empty
+                            <p style="color:var(--text-muted);font-style:italic;">Tidak ada data kelompok pekerjaan.</p>
+                        @endforelse
                     </div>
                 </div>
             </div>
@@ -520,14 +623,14 @@
                     <div class="mb-4">
                         <label class="field-label">Umpan Balik</label>
                         <textarea name="umpan_balik" class="textarea-custom" rows="3"
-                                  placeholder="Tuliskan umpan balik untuk asesi..."></textarea>
+                                  placeholder="Tuliskan umpan balik untuk asesi...">{{ old('umpan_balik', $observasi->umpan_balik ?? '') }}</textarea>
                     </div>
                     <div>
                         <label class="field-label">Rekomendasi</label>
                         <select name="rekomendasi" class="select-custom" required>
                             <option value="">— Pilih Rekomendasi —</option>
-                            <option value="Kompeten">Kompeten</option>
-                            <option value="Belum Kompeten">Belum Kompeten</option>
+                            <option value="Kompeten" {{ (old('rekomendasi', $observasi->rekomendasi ?? '') == 'Kompeten') ? 'selected' : '' }}>Kompeten</option>
+                            <option value="Belum Kompeten" {{ (old('rekomendasi', $observasi->rekomendasi ?? '') == 'Belum Kompeten') ? 'selected' : '' }}>Belum Kompeten</option>
                         </select>
                     </div>
                 </div>
@@ -539,14 +642,38 @@
                     <div class="hicon"><i class="bi bi-pen-fill"></i></div>
                     <h6>Tanda Tangan Asesor</h6>
                 </div>
+                <h5>&nbsp;</h5>
                 <center>
-                <div class="section-card-body">
-                    <canvas id="signature-pad" width="500" height="180"></canvas>
-                    <br>
-                    <button type="button" class="btn-clear-sig" id="clear-signature">
-                        <i class="bi bi-eraser-fill"></i> Hapus Tanda Tangan
-                    </button>
-                </div>
+                    <div id="signature-container">
+                        @if(isset($observasi) && $observasi->persetujuan && $observasi->persetujuan->ttd_asesor)
+                            <div id="saved-signature">
+                               <img src="{{ route('ttd.asesor', $observasi->persetujuan->ttd_asesor) }}"
+                                     style="max-width:250px;border:1px solid #ddd;border-radius:10px;">
+                                <br><br>
+                                <button type="button" class="btn-clear-sig" onclick="showCanvas()">
+                                    <i class="bi bi-arrow-repeat"></i> Perbarui Tanda Tangan
+                                </button>
+                            </div>
+                            <div id="signature-canvas" style="display:none;">
+                                <canvas id="signature-pad" width="500" height="180"></canvas>
+                                <br>
+                                <button type="button" class="btn-clear-sig" onclick="clearCanvas()">
+                                    <i class="bi bi-eraser-fill"></i> Hapus
+                                </button>
+                                <button type="button" class="btn-clear-sig" onclick="cancelCanvas()">
+                                    <i class="bi bi-x-circle"></i> Batal
+                                </button>
+                            </div>
+                        @else
+                            <div id="signature-canvas">
+                                <canvas id="signature-pad" width="500" height="180"></canvas>
+                                <br>
+                                <button type="button" class="btn-clear-sig" id="clear-signature">
+                                    <i class="bi bi-eraser-fill"></i> Hapus Tanda Tangan
+                                </button>
+                            </div>
+                        @endif
+                    </div>
                 </center>
             </div>
 
@@ -554,167 +681,84 @@
                 Simpan Penilaian <i class="bi bi-arrow-right"></i>
             </button>
         </form>
-
     </div>
 </div>
 
 <script>
-function loadData(skemaId) {
-    const container = document.getElementById('kelompok-container');
-    const judulSkema = document.getElementById('judul-skema');
-
-    fetch(`/ceklisobservasi/data/${skemaId}`)
-        .then(res => res.json())
-        .then(data => {
-            judulSkema.value = data.skema_nama ?? 'Tidak tersedia';
-            let html = '';
-
-            (data.kelompok ?? []).forEach((kel, kIndex) => {
-                html += `
-                <div class="table-responsive mb-4">
-                <table class="table-observasi">
-                    <thead>
-                        <tr>
-                            <th style="width:25%">Kelompok Pekerjaan ${kIndex + 1}<br><small style="font-weight:400;">${kel.nama_kelompok ?? '-'}</small></th>
-                            <th style="width:5%">No.</th>
-                            <th style="width:25%">Kode Unit</th>
-                            <th>Judul Unit</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
-
-                (kel.unit_kompetensi ?? []).forEach((unit, uIdx) => {
-                    html += `
-                    <tr>
-                        <td class="kelompok-label"></td>
-                        <td style="text-align:center;">${uIdx + 1}.</td>
-                        <td>${unit.kode_unit ?? '-'}</td>
-                        <td>${unit.judul_unit ?? '-'}</td>
-                    </tr>`;
-                });
-
-                html += `</tbody></table></div>`;
-
-                (kel.unit_kompetensi ?? []).forEach((unit, uIdx) => {
-                    html += `
-                    <div class="unit-header">
-                        Unit Kompetensi ${uIdx + 1}
-                        <span style="font-weight:500; color:var(--text-muted); font-size:0.78rem; margin-left:8px;">
-                            ${unit.kode_unit ?? '-'} — ${unit.judul_unit ?? '-'}
-                        </span>
-                    </div>
-
-                    <div class="table-responsive mb-3">
-                    <table class="table-observasi">
-                        <thead>
-                            <tr>
-                                <th style="width:4%">No.</th>
-                                <th style="width:18%">Elemen</th>
-                                <th style="width:30%">Kriteria Unjuk Kerja</th>
-                                <th style="width:18%">Standar Industri / Tempat Kerja</th>
-                                <th colspan="2" style="width:12%">Pencapaian</th>
-                                <th style="width:18%">Penilaian Lanjut</th>
-                            </tr>
-                            <tr>
-                                <th></th><th></th><th></th><th></th>
-                                <th style="text-align:center;">Ya</th>
-                                <th style="text-align:center;">Tidak</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>`;
-
-                    (unit.elemen ?? []).forEach(ele => {
-                        (ele.kuk ?? []).forEach((kuk, idx) => {
-                            const no = `${ele.nomor_elemen || uIdx + 1}.${idx + 1}`;
-                            const kukId = kuk.id_kuk ?? 0;
-                            html += `
-                            <tr>
-                                <td style="text-align:center;">${no}</td>
-                                <td>${ele.nama_elemen ?? '-'}</td>
-                                <td>${kuk.deskripsi_kuk ?? '-'}</td>
-                                <td>
-                                    <select class="form-select-sm-custom"
-                                            name="kuk[${kukId}][standar_industri]"
-                                            onchange="toggleLainnya(this, ${kukId})">
-                                        <option value="Modul Praktek" selected>Modul Praktek</option>
-                                        <option value="SOP">SOP</option>
-                                        <option value="Lainnya">Lainnya</option>
-                                    </select>
-                                    <input type="text" class="form-control-sm-custom mt-1 d-none"
-                                           name="kuk[${kukId}][standar_lainnya]"
-                                           placeholder="Tulis standar lainnya">
-                                </td>
-                                <td style="text-align:center;">
-                                    <input class="radio-custom" type="radio" name="kuk[${kukId}][status]" value="Ya" required>
-                                </td>
-                                <td style="text-align:center;">
-                                    <input class="radio-custom" type="radio" name="kuk[${kukId}][status]" value="Tidak">
-                                </td>
-                                <td>
-                                    <input type="text" name="kuk[${kukId}][catatan]" class="form-control-sm-custom" placeholder="Catatan...">
-                                </td>
-                            </tr>`;
-                        });
-                    });
-
-                    html += `</tbody></table></div>`;
-                });
-
-                html += `<hr class="section-divider">`;
-            });
-
-            container.innerHTML = html || '<p style="color:var(--text-muted);font-style:italic;">Tidak ada data kelompok pekerjaan.</p>';
-        })
-        .catch(() => {
-            container.innerHTML = '<p style="color:#b91c1c;font-style:italic;"><i class="bi bi-exclamation-circle"></i> Gagal memuat data.</p>';
-        });
-}
-
 function toggleLainnya(selectEl, kukId) {
     const input = selectEl.parentElement.querySelector(`input[name="kuk[${kukId}][standar_lainnya]"]`);
-    if (selectEl.value === "Lainnya") input.classList.remove("d-none");
-    else { input.classList.add("d-none"); input.value = ""; }
+    if (selectEl.value === "Lainnya") {
+        input.classList.remove("d-none");
+    } else {
+        input.classList.add("d-none");
+        input.value = "";
+    }
 }
 
-/* Signature Pad */
-const canvas = document.getElementById('signature-pad');
-const ctx = canvas.getContext('2d');
-let drawing = false;
+// Signature Pad
+let canvas = document.getElementById('signature-pad');
+if (canvas) {
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
 
-canvas.addEventListener('mousedown', () => drawing = true);
-canvas.addEventListener('mouseup', () => { drawing = false; ctx.beginPath(); });
-canvas.addEventListener('mouseleave', () => { drawing = false; ctx.beginPath(); });
-canvas.addEventListener('mousemove', e => {
-    if (!drawing) return;
-    ctx.lineWidth = 2;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = '#000';
-    ctx.lineTo(e.offsetX, e.offsetY);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(e.offsetX, e.offsetY);
-});
+    canvas.addEventListener('mousedown', () => drawing = true);
+    canvas.addEventListener('mouseup', () => { drawing = false; ctx.beginPath(); });
+    canvas.addEventListener('mouseleave', () => { drawing = false; ctx.beginPath(); });
+    canvas.addEventListener('mousemove', (e) => {
+        if (!drawing) return;
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#000';
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(e.offsetX, e.offsetY);
+    });
 
-document.getElementById('clear-signature').addEventListener('click', () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-});
+    document.getElementById('clear-signature')?.addEventListener('click', () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
+}
 
-document.getElementById('formObservasi')?.addEventListener('submit', e => {
-    const blank = document.createElement('canvas');
-    blank.width = canvas.width;
-    blank.height = canvas.height;
-    if (canvas.toDataURL() === blank.toDataURL()) {
-        e.preventDefault();
-        alert('Silakan tanda tangani terlebih dahulu.');
-        return false;
+function showCanvas() {
+    document.getElementById('saved-signature').style.display = 'none';
+    document.getElementById('signature-canvas').style.display = 'block';
+    // Kosongkan canvas
+    const canvas = document.getElementById('signature-pad');
+    if (canvas) canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function clearCanvas() {
+    const canvas = document.getElementById('signature-pad');
+    if (canvas) canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function cancelCanvas() {
+    document.getElementById('saved-signature').style.display = 'block';
+    document.getElementById('signature-canvas').style.display = 'none';
+}
+
+// Saat submit form
+document.getElementById('formObservasi')?.addEventListener('submit', function(e) {
+    const canvas = document.getElementById('signature-pad');
+    // Jika canvas ada dan sedang ditampilkan
+    if (canvas && canvas.style.display !== 'none') {
+        // Cek apakah canvas kosong
+        const blank = document.createElement('canvas');
+        blank.width = canvas.width;
+        blank.height = canvas.height;
+        if (canvas.toDataURL() !== blank.toDataURL()) {
+            // Ada coretan, kirim datanya
+            document.getElementById('ttd_asesor').value = canvas.toDataURL('image/png');
+        } else {
+            // Canvas kosong, hapus nilai hidden (agar server tidak update)
+            document.getElementById('ttd_asesor').value = '';
+        }
+    } else {
+        // Canvas tidak aktif (sedang menampilkan gambar), jangan kirim ttd
+        document.getElementById('ttd_asesor').value = '';
     }
-    document.getElementById('ttd_asesor').value = canvas.toDataURL('image/png');
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    const skemaId = new URLSearchParams(window.location.search).get('id_skema');
-    if (skemaId) loadData(skemaId);
+    // Form tetap submit
 });
 </script>
 @endsection

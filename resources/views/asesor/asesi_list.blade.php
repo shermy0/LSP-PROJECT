@@ -376,6 +376,10 @@
                     <h5>Data Asesi</h5>
                     <span>{{ count($dataAsesi) }} asesi terdaftar</span>
                 </div>
+                <div style="margin-left: auto; display: flex; align-items: center; gap: 15px; font-size: 0.8rem;">
+                    <span><span class="review-badge" style="background:#dcfce7; color:#15803d; width:24px; height:24px;"><i class="bi bi-check-lg"></i></span> Sudah direview</span>
+                    <span><span class="review-badge review-belum" style="width:24px; height:24px; background:#fa5f5f; color:#fff;"><i class="bi bi-x-lg"></i></span> Belum direview</span>
+                </div>
             </div>
 
             @if(count($dataAsesi) > 0)
@@ -433,7 +437,7 @@
                                                     <i class="bi bi-check-lg"></i>
                                                 </span>
                                             @else
-                                                <span class="review-badge review-belum" title="Belum direview">
+                                                <span class="review-badge review-belum" style="background:#fa5f5f; color:#fff;"  title="Belum direview">
                                                     <i class="bi bi-x-lg"></i>
                                                 </span>
                                             @endif

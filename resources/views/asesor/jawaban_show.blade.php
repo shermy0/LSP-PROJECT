@@ -750,7 +750,7 @@
                                         <img src="{{ asset('storage/'.$ttdAsesor) }}" width="260" class="mb-3" style="border:1px solid #ddd;border-radius:8px;">
                                         <br>
                                         <button type="button" class="btn-clear-sig" id="btn-edit-ttd">
-                                            <i class="bi bi-pen-fill"></i> Tanda Tangan Ulang
+                                            <i class="bi bi-pen-fill"></i>Perbarui Tanda Tangan
                                         </button>
                                     </div>
                                 @endif
