@@ -79,7 +79,7 @@
                             <span class="badge bg-success">Diterima</span>
                         </a>
 
-                        <!-- Modal Info Permohonan (sudah ada) -->
+                        <!-- Modal Info Permohonan -->
                         <div class="modal fade" id="infoPermohonanModal" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
@@ -112,7 +112,7 @@
                             <span class="badge bg-danger">Ditolak</span>
                         </a>
 
-                        <!-- Modal Penolakan (sudah ada) -->
+                        <!-- Modal Penolakan -->
                         <div class="modal fade" id="permohonanDitolakModal" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog modal-lg modal-dialog-centered">
                                 <div class="modal-content">
@@ -223,7 +223,6 @@
                         {{-- FR.AK.01 - PERSETUJUAN ASESMEN (hanya muncul jika asesmen mandiri selesai dan dapat dilanjutkan) --}}
                         @if($asesmenExists && $rekom === 'Dapat Dilanjutkan')
                             @php
-                                // Asumsikan ada relasi persetujuan di permohonan
                                 $persetujuan = $permohonan->persetujuan ?? null;
                                 $persetujuanLabel = $persetujuan ? ($persetujuan->status == 'selesai' ? 'Selesai' : ($persetujuan->status == 'menunggu_asesor' ? 'Menunggu TTD Asesor' : 'Draf')) : 'Belum dibuat';
                                 $persetujuanBadge = $persetujuan ? ($persetujuan->status == 'selesai' ? 'bg-success' : ($persetujuan->status == 'menunggu_asesor' ? 'bg-warning text-dark' : 'bg-secondary')) : 'bg-secondary';
@@ -247,6 +246,30 @@
                                     </div>
                                 </div>
                                 <span class="badge {{ $persetujuanBadge }}">{{ $persetujuanLabel }}</span>
+                            </a>
+                        @endif
+
+                        {{-- FR.AK.07 - PENYESUAIAN WAJAR (hanya muncul jika sudah dibuat) --}}
+                        @if(isset($penyesuaianWajar) && $penyesuaianWajar)
+                            @php
+                                $pwStatus = $penyesuaianWajar->status;
+                                $pwLabel = $pwStatus == 'selesai' ? 'Selesai' : ($pwStatus == 'menunggu_asesor' ? 'Menunggu TTD Asesor' : ($pwStatus == 'menunggu_asesi' ? 'Menunggu TTD Anda' : 'Draf'));
+                                $pwBadge = $pwStatus == 'selesai' ? 'bg-success' : ($pwStatus == 'menunggu_asesor' ? 'bg-warning text-dark' : ($pwStatus == 'menunggu_asesi' ? 'bg-info' : 'bg-secondary'));
+                                $pwHref = route('asesi.penyesuaian_wajar.show', $penyesuaianWajar->id_penyesuaian);
+                            @endphp
+                            <a href="{{ $pwHref }}" class="pra-item mt-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrap me-3 bg-info bg-opacity-10 text-info">
+                                        <i class="bi bi-folder-check"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1 fw-semibold text-dark">FR.AK.07 Penyesuaian Wajar</h6>
+                                        <small class="text-muted">
+                                            Terakhir diupdate: {{ $penyesuaianWajar->updated_at ? \Carbon\Carbon::parse($penyesuaianWajar->updated_at)->format('d M Y') : '-' }}
+                                        </small>
+                                    </div>
+                                </div>
+                                <span class="badge {{ $pwBadge }}">{{ $pwLabel }}</span>
                             </a>
                         @endif
                     @endif
@@ -276,6 +299,20 @@
                             <div>
                                 <h6 class="mb-1 fw-semibold text-dark">FR.AK.01 Persetujuan Asesmen</h6>
                                 <small class="text-muted">Kelola persetujuan asesmen untuk asesi</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-primary">Akses</span>
+                    </a>
+
+                    {{-- FR.AK.07 untuk Asesor --}}
+                    <a href="{{ route('asesor.penyesuaian_wajar.index') }}" class="pra-item mt-2">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-wrap me-3 bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-folder-check"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-semibold text-dark">FR.AK.07 Penyesuaian Wajar</h6>
+                                <small class="text-muted">Kelola penyesuaian wajar untuk asesi</small>
                             </div>
                         </div>
                         <span class="badge bg-primary">Akses</span>

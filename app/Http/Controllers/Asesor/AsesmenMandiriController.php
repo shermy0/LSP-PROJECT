@@ -4,11 +4,10 @@ namespace App\Http\Controllers\Asesor;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-
 use App\Models\Asesi;
+use App\Models\Asesor;
 use App\Models\AsesmenMandiriMaster;
 use App\Models\AsesmenMandiriJawaban;
 use App\Models\AsesmenMandiriPersetujuan;
@@ -16,23 +15,22 @@ use App\Models\AsesmenMandiriPersetujuan;
 class AsesmenMandiriController extends Controller
 {
     /**
-     * List semua asesi yang sudah mengisi asesmen mandiri
+     * List semua asesi yang sudah mengisi asesmen mandiri dan ditugaskan ke asesor ini.
      */
     public function index()
     {
-        $asesi = DB::table('asesi')
-            ->join('users', 'asesi.user_id', '=', 'users.id')
-            ->join('permohonan', 'asesi.id_asesi', '=', 'permohonan.id_asesi')
-            ->join('asesmen_mandiri_master', 'permohonan.id_permohonan', '=', 'asesmen_mandiri_master.id_permohonan')
-            ->select(
-                'asesi.id_asesi',
-                'asesi.nama_lengkap',
-                'asesi.nik',
-                'asesi.email',
-                'asesi.telepon_hp as telepon',
-                'permohonan.updated_at'
-            )
-            ->distinct()
+        $user = Auth::user();
+        $asesor = Asesor::where('user_id', $user->id)->first();
+
+        if (!$asesor) {
+            return redirect()->back()->with('error', 'Data asesor tidak ditemukan.');
+        }
+
+        // Ambil asesi yang ditugaskan ke asesor ini dan memiliki asesmen mandiri
+        $asesi = Asesi::where('asesor_id', $asesor->id_asesor)
+            ->whereHas('asesmenMandiriMaster') // pastikan relasi ada di model Asesi
+            ->with('user')
+            ->orderBy('updated_at', 'desc')
             ->paginate(10);
 
         return view('asesor.asesmen_mandiri.index', compact('asesi'));
@@ -43,7 +41,19 @@ class AsesmenMandiriController extends Controller
      */
     public function show($id_asesi)
     {
+        $user = Auth::user();
+        $asesor = Asesor::where('user_id', $user->id)->first();
+
+        if (!$asesor) {
+            abort(403, 'Anda bukan asesor.');
+        }
+
         $asesi = Asesi::with('user')->findOrFail($id_asesi);
+
+        // Pastikan asesi ini ditugaskan ke asesor yang login
+        if ($asesi->asesor_id != $asesor->id_asesor) {
+            abort(403, 'Anda tidak berhak mengakses asesi ini.');
+        }
 
         $asesmen = AsesmenMandiriMaster::where('id_asesi', $id_asesi)
             ->latest('id_asesmen_mandiri')
@@ -103,6 +113,18 @@ class AsesmenMandiriController extends Controller
      */
     public function verifikasiStore(Request $request, $id_asesi)
     {
+        $user = Auth::user();
+        $asesor = Asesor::where('user_id', $user->id)->first();
+
+        if (!$asesor) {
+            abort(403, 'Anda bukan asesor.');
+        }
+
+        $asesi = Asesi::findOrFail($id_asesi);
+        if ($asesi->asesor_id != $asesor->id_asesor) {
+            abort(403, 'Anda tidak berhak memverifikasi asesi ini.');
+        }
+
         $request->validate([
             'rekomendasi' => 'required|in:Dapat Dilanjutkan,Tidak Dapat Dilanjutkan',
         ]);

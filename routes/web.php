@@ -17,6 +17,8 @@ use App\Http\Controllers\Asesi\AsesmenMandiriController as AsesiAsesmenMandiriCo
 use App\Http\Controllers\Asesor\AsesmenMandiriController as AsesorAsesmenMandiriController;
 use App\Http\Controllers\Asesor\PersetujuanAsesmenController as AsesorPersetujuanController;
 use App\Http\Controllers\Asesi\PersetujuanAsesmenController as AsesiPersetujuanController;
+use App\Http\Controllers\Asesor\PenyesuaianWajarController as AsesorPenyesuaianWajarController;
+use App\Http\Controllers\Asesi\PenyesuaianWajarController as AsesiPenyesuaianWajarController;
 
 // ================== AUTH ==================
 // login
@@ -141,6 +143,24 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [AsesiPersetujuanController::class, 'index'])->name('index');
         Route::get('/{id}', [AsesiPersetujuanController::class, 'show'])->name('show');
         Route::post('/{id}/signature', [AsesorPersetujuanController::class, 'storeSignature'])->name('signature');
+    });
+
+    // ================== PENYESUAIAN WAJAR (FR.AK.07) ==================
+    // Asesor
+    Route::prefix('asesor/penyesuaian-wajar')->name('asesor.penyesuaian_wajar.')->group(function () {
+        Route::get('/', [AsesorPenyesuaianWajarController::class, 'index'])->name('index');
+        Route::get('/create/{id_permohonan}', [AsesorPenyesuaianWajarController::class, 'create'])->name('create');
+        Route::post('/', [AsesorPenyesuaianWajarController::class, 'store'])->name('store');
+        Route::get('/{id}', [AsesorPenyesuaianWajarController::class, 'show'])->name('show');
+        Route::put('/{id}', [AsesorPenyesuaianWajarController::class, 'update'])->name('update');
+        Route::post('/{id}/signature', [AsesorPenyesuaianWajarController::class, 'storeSignature'])->name('signature');
+    });
+
+    // Asesi
+    Route::prefix('asesi/penyesuaian-wajar')->name('asesi.penyesuaian_wajar.')->group(function () {
+        Route::get('/', [AsesiPenyesuaianWajarController::class, 'index'])->name('index');
+        Route::get('/{id}', [AsesiPenyesuaianWajarController::class, 'show'])->name('show');
+        Route::post('/{id}/signature', [AsesiPenyesuaianWajarController::class, 'storeSignature'])->name('signature');
     });
 
     // ================== PRA ASESMEN ==================
