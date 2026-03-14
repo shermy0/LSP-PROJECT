@@ -10,14 +10,14 @@ class MasterJenisBuktiSeeder extends Seeder
     public function run()
     {
         $bukti = [
-            ['nama_bukti' => 'verifikasi_portofolio'],
-            ['nama_bukti' => 'observasi_langsung'],
-            ['nama_bukti' => 'pertanyaan_lisan'],
-            ['nama_bukti' => 'reviu_produk'],
-            ['nama_bukti' => 'kegiatan_terstruktur'],
-            ['nama_bukti' => 'pertanyaan_tertulis'],
-            ['nama_bukti' => 'pertanyaan_wawancara'],
-            ['nama_bukti' => 'lainnya'],
+            ['nama_bukti' => 'Hasil Verifikasi Portofolio'],
+            ['nama_bukti' => 'Hasil Observasi Langsung'],
+            ['nama_bukti' => 'Hasil Pertanyaan Lisan'],
+            ['nama_bukti' => 'Hasil Reviu Produk'],
+            ['nama_bukti' => 'Hasil Kegiatan Terstruktur'],
+            ['nama_bukti' => 'Hasil Pertanyaan Tertulis'],
+            ['nama_bukti' => 'Hasil Pertanyaan Wawancara'],
+            ['nama_bukti' => 'Lainnya'],
         ];
 
         DB::table('master_jenis_bukti')->insert($bukti);

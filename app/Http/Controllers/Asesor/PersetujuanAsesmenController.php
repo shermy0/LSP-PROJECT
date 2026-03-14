@@ -67,7 +67,7 @@ class PersetujuanAsesmenController extends Controller
             'id_tuk' => 'required',
             'tgl_pelaksanaan' => 'nullable|date',
             'waktu' => 'nullable',
-            'setuju_asesmen' => 'nullable|boolean',
+            'lokasi' => 'nullable|string', // ruangan
             'bukti' => 'nullable|array',
             'bukti_lainnya' => 'nullable|string',
         ]);
@@ -89,7 +89,6 @@ class PersetujuanAsesmenController extends Controller
             // Tentukan id_tuk
             $id_tuk = $request->id_tuk;
             if ($request->id_tuk === 'lainnya') {
-                // Buat TUK baru
                 $tukBaru = Tuk::create([
                     'nama_tuk' => $request->tuk_baru_nama,
                     'jenis_tuk' => $request->tuk_baru_jenis,
@@ -108,45 +107,28 @@ class PersetujuanAsesmenController extends Controller
                 'id_tuk' => $id_tuk,
                 'tgl_pelaksanaan' => $request->tgl_pelaksanaan,
                 'waktu' => $request->waktu,
-                // Hari dan lokasi tidak ada di form, biarkan null
+                'lokasi' => $request->lokasi,
                 'hari' => null,
-                'lokasi' => null,
-                'pernyataan_kerahasiaan' => null, // tidak ada di form
-                'setuju_asesmen' => $request->setuju_asesmen ?? false,
+                'pernyataan_kerahasiaan' => null,
+                'setuju_asesmen' => null, // tidak diisi asesor
                 'status' => 'draf',
             ]);
 
-            // Proses bukti yang dipilih (menggunakan nama bukti, bukan id)
-            if ($request->has('bukti')) {
-                $masterBukti = MasterJenisBukti::all()->keyBy('nama_bukti'); // asumsi kolom nama_bukti
-
-                foreach ($request->bukti as $namaBukti) {
-                    if ($namaBukti === 'lainnya') {
-                        // Untuk 'lainnya', kita butuh id dari master_jenis_bukti yang mewakili "Lainnya"
-                        // Asumsikan ada entry dengan nama "Lainnya" di master_jenis_bukti
-                        $master = MasterJenisBukti::where('nama_bukti', 'Lainnya')->first();
-                        if ($master) {
-                            DB::table('persetujuan_asesmen_bukti')->insert([
-                                'id_persetujuan' => $persetujuan->id_persetujuan,
-                                'id_jenis_bukti' => $master->id_jenis_bukti,
-                                'dipilih' => true,
-                                'deskripsi' => $request->bukti_lainnya, // simpan teks lainnya
-                            ]);
-                        }
-                    } else {
-                        // Cari id berdasarkan nama bukti
-                        $master = MasterJenisBukti::where('nama_bukti', $namaBukti)->first();
-                        if ($master) {
-                            DB::table('persetujuan_asesmen_bukti')->insert([
-                                'id_persetujuan' => $persetujuan->id_persetujuan,
-                                'id_jenis_bukti' => $master->id_jenis_bukti,
-                                'dipilih' => true,
-                                'deskripsi' => null,
-                            ]);
-                        }
-                    }
-                }
-            }
+            // Proses bukti yang dipilih
+if ($request->has('bukti')) {
+    foreach ($request->bukti as $namaBukti) {
+        $master = MasterJenisBukti::where('nama_bukti', $namaBukti)->first();
+        if ($master) {
+            $deskripsi = ($namaBukti === 'Lainnya') ? $request->bukti_lainnya : null;
+            DB::table('persetujuan_asesmen_bukti')->insert([
+                'id_persetujuan' => $persetujuan->id_persetujuan,
+                'id_jenis_bukti' => $master->id_jenis_bukti,
+                'dipilih' => true,
+                'deskripsi' => $deskripsi,
+            ]);
+        }
+    }
+}
 
             DB::commit();
 
@@ -200,8 +182,6 @@ class PersetujuanAsesmenController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // Method ini tidak digunakan dalam form baru (create), karena form hanya untuk create.
-        // Bisa diabaikan atau disesuaikan jika diperlukan.
         abort(404);
     }
 
@@ -214,7 +194,6 @@ class PersetujuanAsesmenController extends Controller
         $user = Auth::user();
 
         if ($user->role === 'asesi') {
-            // Asesi menandatangani: hanya boleh jika status = 'draf'
             if ($persetujuan->status !== 'draf') {
                 return back()->with('error', 'Tidak dapat menandatangani pada status ini.');
             }
@@ -234,7 +213,6 @@ class PersetujuanAsesmenController extends Controller
             $persetujuan->update(['status' => 'menunggu_asesor']);
 
         } elseif ($user->role === 'asesor') {
-            // Asesor menandatangani: hanya boleh jika status = 'menunggu_asesor'
             if ($persetujuan->status !== 'menunggu_asesor') {
                 return back()->with('error', 'Tidak dapat menandatangani pada status ini.');
             }

@@ -67,73 +67,73 @@
             </div>
 
             <!-- Card Bukti yang akan dikumpulkan (sesuai dokumen) -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white border-0 pt-4 pb-0">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-file-earmark-check text-primary" viewBox="0 0 16 16">
-                                <path d="M10.854 7.854a.5.5 0 0 0-.708-.708L7.5 9.793 6.354 8.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3z"/>
-                                <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold mb-0">Bukti yang akan dikumpulkan</h5>
-                            <p class="text-secondary mb-0 small">Pilih bukti yang akan digunakan</p>
-                        </div>
-                    </div>
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white border-0 pt-4 pb-0">
+        <div class="d-flex align-items-center">
+            <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-file-earmark-check text-primary" viewBox="0 0 16 16">
+                    <path d="M10.854 7.854a.5.5 0 0 0-.708-.708L7.5 9.793 6.354 8.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3z"/>
+                    <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+                </svg>
+            </div>
+            <div>
+                <h5 class="fw-bold mb-0">Bukti yang akan dikumpulkan</h5>
+                <p class="text-secondary mb-0 small">Pilih bukti yang akan digunakan</p>
+            </div>
+        </div>
+    </div>
+    <div class="card-body pt-3">
+        <div class="row">
+            <!-- Kolom Kiri -->
+            <div class="col-md-6">
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="bukti[]" value="Hasil Verifikasi Portofolio" id="bukti_verifikasi" {{ in_array('Hasil Verifikasi Portofolio', old('bukti', [])) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="bukti_verifikasi">Hasil Verifikasi Portofolio</label>
                 </div>
-                <div class="card-body pt-3">
-                    <div class="row">
-                        <!-- Kolom Kiri -->
-                        <div class="col-md-6">
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" name="bukti[]" value="verifikasi_portofolio" id="bukti_verifikasi" {{ in_array('verifikasi_portofolio', old('bukti', [])) ? 'checked' : '' }}>
-                                <label class="form-check-label" for="bukti_verifikasi">Hasil Verifikasi Portofolio</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" name="bukti[]" value="observasi_langsung" id="bukti_observasi" {{ in_array('observasi_langsung', old('bukti', [])) ? 'checked' : '' }}>
-                                <label class="form-check-label" for="bukti_observasi">Hasil Observasi Langsung</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" name="bukti[]" value="pertanyaan_lisan" id="bukti_lisan" {{ in_array('pertanyaan_lisan', old('bukti', [])) ? 'checked' : '' }}>
-                                <label class="form-check-label" for="bukti_lisan">Hasil Pertanyaan Lisan</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" name="bukti[]" value="lainnya" id="bukti_lainnya" {{ in_array('lainnya', old('bukti', [])) ? 'checked' : '' }}>
-                                <label class="form-check-label" for="bukti_lainnya">Lainnya</label>
-                                <input type="text" name="bukti_lainnya" class="form-control form-control-sm mt-1 @error('bukti_lainnya') is-invalid @enderror" value="{{ old('bukti_lainnya') }}" placeholder="Pisahkan dengan koma jika lebih dari satu" style="{{ in_array('lainnya', old('bukti', [])) ? 'display:block;' : 'display:none;' }}">
-                                @error('bukti_lainnya')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <!-- Kolom Kanan -->
-                        <div class="col-md-6">
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" name="bukti[]" value="reviu_produk" id="bukti_reviu" {{ in_array('reviu_produk', old('bukti', [])) ? 'checked' : '' }}>
-                                <label class="form-check-label" for="bukti_reviu">Hasil Reviu Produk</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" name="bukti[]" value="kegiatan_terstruktur" id="bukti_kegiatan" {{ in_array('kegiatan_terstruktur', old('bukti', [])) ? 'checked' : '' }}>
-                                <label class="form-check-label" for="bukti_kegiatan">Hasil Kegiatan Terstruktur</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" name="bukti[]" value="pertanyaan_tertulis" id="bukti_tertulis" {{ in_array('pertanyaan_tertulis', old('bukti', [])) ? 'checked' : '' }}>
-                                <label class="form-check-label" for="bukti_tertulis">Hasil Pertanyaan Tertulis</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" name="bukti[]" value="pertanyaan_wawancara" id="bukti_wawancara" {{ in_array('pertanyaan_wawancara', old('bukti', [])) ? 'checked' : '' }}>
-                                <label class="form-check-label" for="bukti_wawancara">Hasil Pertanyaan Wawancara</label>
-                            </div>
-                        </div>
-                    </div>
-                    @error('bukti')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="bukti[]" value="Hasil Observasi Langsung" id="bukti_observasi" {{ in_array('Hasil Observasi Langsung', old('bukti', [])) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="bukti_observasi">Hasil Observasi Langsung</label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="bukti[]" value="Hasil Pertanyaan Lisan" id="bukti_lisan" {{ in_array('Hasil Pertanyaan Lisan', old('bukti', [])) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="bukti_lisan">Hasil Pertanyaan Lisan</label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="bukti[]" value="Hasil Reviu Produk" id="bukti_reviu" {{ in_array('Hasil Reviu Produk', old('bukti', [])) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="bukti_reviu">Hasil Reviu Produk</label>
+                </div>
+            </div>
+            <!-- Kolom Kanan -->
+            <div class="col-md-6">
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="bukti[]" value="Hasil Kegiatan Terstruktur" id="bukti_kegiatan" {{ in_array('Hasil Kegiatan Terstruktur', old('bukti', [])) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="bukti_kegiatan">Hasil Kegiatan Terstruktur</label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="bukti[]" value="Hasil Pertanyaan Tertulis" id="bukti_tertulis" {{ in_array('Hasil Pertanyaan Tertulis', old('bukti', [])) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="bukti_tertulis">Hasil Pertanyaan Tertulis</label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="bukti[]" value="Hasil Pertanyaan Wawancara" id="bukti_wawancara" {{ in_array('Hasil Pertanyaan Wawancara', old('bukti', [])) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="bukti_wawancara">Hasil Pertanyaan Wawancara</label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="bukti[]" value="Lainnya" id="bukti_lainnya" {{ in_array('Lainnya', old('bukti', [])) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="bukti_lainnya">Lainnya</label>
+                    <input type="text" name="bukti_lainnya" class="form-control form-control-sm mt-1 @error('bukti_lainnya') is-invalid @enderror" value="{{ old('bukti_lainnya') }}" placeholder="Pisahkan dengan koma jika lebih dari satu" style="{{ in_array('Lainnya', old('bukti', [])) ? 'display:block;' : 'display:none;' }}">
+                    @error('bukti_lainnya')
+                        <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
             </div>
+        </div>
+        @error('bukti')
+            <div class="text-danger small mt-2">{{ $message }}</div>
+        @enderror
+    </div>
+</div>
 
-            <!-- Card Pelaksanaan Asesmen (dengan TUK nama) -->
+            <!-- Card Pelaksanaan Asesmen -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-white border-0 pt-4 pb-0">
                     <div class="d-flex align-items-center">
@@ -145,27 +145,27 @@
                         </div>
                         <div>
                             <h5 class="fw-bold mb-0">Pelaksanaan asesmen disepakati pada:</h5>
-                            <p class="text-secondary mb-0 small">Tanggal, waktu, dan TUK</p>
+                            <p class="text-secondary mb-0 small">Tanggal, waktu, TUK, dan lokasi ruangan</p>
                         </div>
                     </div>
                 </div>
                 <div class="card-body pt-3">
                     <div class="row g-3">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Hari / Tanggal</label>
                             <input type="date" name="tgl_pelaksanaan" class="form-control @error('tgl_pelaksanaan') is-invalid @enderror" value="{{ old('tgl_pelaksanaan') }}" required>
                             @error('tgl_pelaksanaan')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Waktu</label>
                             <input type="time" name="waktu" class="form-control @error('waktu') is-invalid @enderror" value="{{ old('waktu') }}" required>
                             @error('waktu')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">TUK</label>
                             <select name="id_tuk" id="id_tuk" class="form-select @error('id_tuk') is-invalid @enderror" required>
                                 <option value="">-- Pilih TUK --</option>
@@ -177,6 +177,13 @@
                                 <option value="lainnya" {{ old('id_tuk') == 'lainnya' ? 'selected' : '' }}>Lainnya...</option>
                             </select>
                             @error('id_tuk')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Lokasi (Ruang)</label>
+                            <input type="text" name="lokasi" class="form-control @error('lokasi') is-invalid @enderror" value="{{ old('lokasi') }}" placeholder="Contoh: Ruang 101 / Lab Komputer" required>
+                            @error('lokasi')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -230,18 +237,6 @@
                 </div>
             </div>
 
-            <!-- Card Setuju Asesmen -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="setuju_asesmen" value="1" id="setuju" {{ old('setuju_asesmen') ? 'checked' : '' }}>
-                        <label class="form-check-label" for="setuju">
-                            Saya setuju dengan pelaksanaan asesmen ini
-                        </label>
-                    </div>
-                </div>
-            </div>
-
             <!-- Tombol Aksi -->
             <div class="button-group mt-4">
                 <a href="{{ route('asesor.persetujuan_asesmen.index') }}" class="btn-back">
@@ -250,7 +245,7 @@
                     </svg>
                     Kembali
                 </a>
-                <button type="submit" id="btnSubmit" class="btn-next" disabled>
+                <button type="submit" class="btn-next">
                     Simpan Draf
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-save ms-2" viewBox="0 0 16 16">
                         <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v4.5h2V2h2v12H2V2h2v4.5h2V2a1 1 0 0 0-1-1H2z"/>
@@ -431,7 +426,7 @@
         }
     </style>
 
-    <!-- Script untuk toggle TUK baru, toggle input Lainnya, dan kontrol tombol submit -->
+    <!-- Script untuk toggle TUK baru dan toggle input Lainnya -->
     <script>
         (function() {
             'use strict';
@@ -475,17 +470,6 @@
                 lainnyaCheckbox.addEventListener('change', toggleLainnyaText);
                 toggleLainnyaText(); // inisialisasi
             }
-
-            // Kontrol tombol submit berdasarkan checkbox setuju
-            const setujuCheckbox = document.getElementById('setuju');
-            const btnSubmit = document.getElementById('btnSubmit');
-
-            function toggleSubmitButton() {
-                btnSubmit.disabled = !setujuCheckbox.checked;
-            }
-
-            setujuCheckbox.addEventListener('change', toggleSubmitButton);
-            toggleSubmitButton(); // inisialisasi
 
             // Bootstrap-like validation
             const forms = document.querySelectorAll('.needs-validation');

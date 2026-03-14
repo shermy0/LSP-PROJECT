@@ -125,15 +125,23 @@
                 </div>
                 <div>
                     <h5 class="fw-bold mb-0">Tempat Uji Kompetensi (TUK)</h5>
-                    <p class="text-secondary mb-0 small">Lokasi pelaksanaan asesmen</p>
+                    <p class="text-secondary mb-0 small">Informasi lengkap TUK</p>
                 </div>
             </div>
         </div>
         <div class="card-body pt-3">
             <div class="row g-3">
-                <div class="col-md-12">
+                <div class="col-md-4">
                     <label class="form-label">Nama TUK</label>
                     <input type="text" class="form-control" value="{{ $persetujuan->tuk->nama_tuk ?? '-' }}" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Jenis TUK</label>
+                    <input type="text" class="form-control" value="{{ $persetujuan->tuk->jenis_tuk ?? '-' }}" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Alamat TUK</label>
+                    <input type="text" class="form-control" value="{{ $persetujuan->tuk->alamat_tuk ?? '-' }}" readonly>
                 </div>
             </div>
         </div>
@@ -216,32 +224,6 @@
             <p class="mb-3">Menyatakan tidak akan membuka hasil pekerjaan yang saya peroleh karena penugasan saya sebagai Asesor dalam pekerjaan Asesmen kepada siapapun atau organisasi apapun selain kepada pihak yang berwenang sehubungan dengan kewajiban saya sebagai Asesor yang ditugaskan oleh LSP.</p>
             <p class="fw-semibold">Asesi :</p>
             <p>Saya setuju mengikuti asesmen dengan pemahaman bahwa informasi yang dikumpulkan hanya digunakan untuk pengembangan profesional dan hanya dapat diakses oleh orang tertentu saja.</p>
-        </div>
-    </div>
-
-    <!-- Card Setuju Asesmen -->
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white border-0 pt-4 pb-0">
-            <div class="d-flex align-items-center">
-                <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-check-circle text-primary" viewBox="0 0 16 16">
-                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                        <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
-                    </svg>
-                </div>
-                <div>
-                    <h5 class="fw-bold mb-0">Setuju Asesmen</h5>
-                    <p class="text-secondary mb-0 small">Konfirmasi persetujuan</p>
-                </div>
-            </div>
-        </div>
-        <div class="card-body pt-3">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" disabled {{ $persetujuan->setuju_asesmen ? 'checked' : '' }}>
-                <label class="form-check-label">
-                    Saya setuju dengan pelaksanaan asesmen ini
-                </label>
-            </div>
         </div>
     </div>
 

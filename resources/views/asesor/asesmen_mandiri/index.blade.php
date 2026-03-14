@@ -27,6 +27,16 @@
         </div>
     </div>
 
+    {{-- Tombol Kembali --}}
+    <div class="d-flex justify-content-start mb-3">
+        <a href="{{ route('form_pra_assesmen') }}" class="btn-back">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left me-2" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+            </svg>
+            Kembali ke Form Pra Asesmen
+        </a>
+    </div>
+
     {{-- Search & Table Card --}}
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white border-bottom-0 py-3">
@@ -271,6 +281,28 @@
         color: var(--primary);
     }
 
+    /* Tombol Back (outline) */
+    .btn-back {
+        background-color: #fff;
+        color: var(--secondary);
+        padding: 0.5rem 1.5rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: none;
+        border: 1.5px solid #dee2e6;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .btn-back:hover {
+        background-color: #f1f3f5;
+        color: #495057;
+        border-color: #ced4da;
+    }
+
     /* Custom Outline Button */
     .btn-outline-custom {
         border: 1.5px solid var(--primary);
@@ -443,6 +475,11 @@
         .search-wrapper {
             min-width: 100%;
             margin-top: 10px;
+        }
+
+        .btn-back {
+            width: 100%;
+            text-align: center;
         }
     }
 </style>
