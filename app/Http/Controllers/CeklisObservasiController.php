@@ -17,14 +17,28 @@ class CeklisObservasiController extends Controller
     /**
      * Halaman utama form ceklis observasi
      */
-    public function index()
+    public function index(Request $request)
     {
-        $asesi = Asesi::all();
-        $skema = SkemaSertifikasi::all();
+        $idAsesi = $request->get('id_asesi');
+        $idSkema = $request->get('id_skema');
 
-        return view('ceklis_observasi', compact('asesi', 'skema'));
+        if (!$idAsesi || !$idSkema) {
+            return redirect()->route('ceklisobservasi.pilih', ['id_skema' => $idSkema ?? 0])
+                ->with('error', 'Silakan pilih asesi terlebih dahulu.');
+        }
+
+        $asesi = Asesi::findOrFail($idAsesi);
+
+        return view('ceklis_observasi', compact('asesi'));
+    } 
+
+    public function pilihAsesi($id_skema)
+    {
+        $skema = SkemaSertifikasi::findOrFail($id_skema);
+        $asesi = Asesi::all(); // atau bisa difilter sesuai kebutuhan
+
+        return view('listasesiceklisobservasi', compact('skema', 'asesi'));
     }
-
     /**
      * Load data dinamis (KUK dan kelompok kerja berdasarkan skema)
      */
@@ -116,5 +130,74 @@ public function store(Request $request)
         return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
     }
 }
+
+public function tandatangan($id)
+{
+    $observasi = ObservasiCeklis::with([
+        'asesi', 
+        'skema', 
+        'asesor', 
+        'items.unit', 
+        'items.elemen', 
+        'items.kuk',
+        'persetujuan'   // <- tambahkan ini
+    ])->findOrFail($id);
+
+    return view('ceklis_observasi_tandatangan', compact('observasi'));
+}
+
+    // Menyimpan tanda tangan asesi
+    public function storeTandatangan(Request $request)
+    {
+        $request->validate([
+            'id_observasi' => 'required|exists:observasi_ceklis,id_observasi',
+            'ttd_asesi'    => 'required',
+            'tgl_ttd_asesi'=> 'required|date',
+        ]);
+
+        // Cari record persetujuan yang sudah dibuat saat asesor menyimpan
+        $persetujuan = ObservasiCeklisPersetujuan::where('id_observasi', $request->id_observasi)->first();
+
+        if (!$persetujuan) {
+            // Jika belum ada, buat baru (misal jika asesor belum sempat simpan ttd)
+            $persetujuan = new ObservasiCeklisPersetujuan();
+            $persetujuan->id_observasi = $request->id_observasi;
+        }
+
+        // Simpan gambar tanda tangan asesi
+        $image_parts = explode(";base64,", $request->ttd_asesi);
+        if (count($image_parts) < 2) {
+            return back()->with('error', 'Format tanda tangan tidak valid.');
+        }
+
+        $image_base64 = base64_decode($image_parts[1]);
+        $fileName = 'ttd_asesi_' . time() . '.png';
+        $filePath = 'public/ttd/' . $fileName;
+        Storage::put($filePath, $image_base64);
+
+        $persetujuan->tgl_ttd_asesi = $request->tgl_ttd_asesi;
+        $persetujuan->ttd_asesi = $fileName;
+        $persetujuan->save();
+
+        return redirect()->route('asesi.dashboard') // atau halaman sukses lain
+                        ->with('success', 'Tanda tangan asesi berhasil disimpan.');
+    }
+
+    public function tandatanganBySkemaAsesi($id_skema, $id_asesi)
+    {
+        // Ambil observasi terbaru berdasarkan id_observasi (desc)
+        $observasi = ObservasiCeklis::where('id_skema', $id_skema)
+                    ->where('id_asesi', $id_asesi)
+                    ->orderBy('id_observasi', 'desc')
+                    ->firstOrFail();
+    
+        // Panggil method tandatangan yang sudah ada
+        return $this->tandatangan($observasi->id_observasi);
+    }
+
+    public function persetujuan()
+    {
+        return $this->hasOne(ObservasiCeklisPersetujuan::class, 'id_observasi');
+    }
 
 }

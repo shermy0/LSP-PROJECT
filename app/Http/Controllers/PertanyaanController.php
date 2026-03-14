@@ -755,7 +755,41 @@ public function kelompokPekerjaanPG(Request $request, $id_skema, $id_pembuatan_p
 
         // ambil data pembuatan pertanyaan sesuai id
         $pembuatan_pertanyaan = PembuatanPertanyaan::find($id_pembuatan_pertanyaan);
+        $pembuatan = PembuatanPertanyaan::find($id_pembuatan_pertanyaan);
         $skema = Skema::find($id_skema);
+
+        switch ($pembuatan->jenis_pertanyaan) {
+
+            case 'esai':
+                $backUrl = route('pertanyaan.esai.kelompok', [
+                    'id_skema' => $id_skema
+                ]);
+                break;
+        
+            case 'pilihan_ganda':
+                $backUrl = route('pertanyaan.pg.kelompok.withId', [
+                    'id_skema' => $id_skema,
+                    'id_pembuatan_pertanyaan' => $id_pembuatan_pertanyaan
+                ]);
+                break;
+        
+                case 'pmo':
+                    $backUrl = route('pertanyaan.pmo.kelompok', [
+                        'id_skema' => $id_skema,
+                        'id_pembuatan' => $id_pembuatan_pertanyaan
+                    ]);
+                break;
+        
+            case 'lisan':
+                $backUrl = route('pertanyaan.lisan.kelompok', [
+                    'id_skema' => $id_skema,
+                    'id_pembuatan_pertanyaan' => $id_pembuatan_pertanyaan
+                ]);
+                break;
+        
+            default:
+                $backUrl = route('formasesmen');
+        }
 
         // cek apakah asesor sudah tanda tangan di tabel persetujuan
         $asesorSudahTTD = DB::table('pertanyaan_asesmen_persetujuan')
@@ -775,7 +809,9 @@ public function kelompokPekerjaanPG(Request $request, $id_skema, $id_pembuatan_p
             'pembuatan_pertanyaan',
             'skema',
             'id_skema',
-            'id_pembuatan_pertanyaan'
+            'id_pembuatan_pertanyaan',
+            'pembuatan',
+            'backUrl'
         ));
     }
 

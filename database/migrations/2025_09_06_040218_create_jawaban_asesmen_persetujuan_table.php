@@ -15,6 +15,7 @@ return new class extends Migration
             $table->longText('ttd_asesi')->nullable();
             $table->date('tgl_ttd_asesor')->nullable();
             $table->longText('ttd_asesor')->nullable();
+            $table->text('umpan_balik')->nullable();
             $table->timestamps();
 
             $table->foreign('id_jawaban')->references('id_jawaban')->on('jawaban_asesmen')->onDelete('cascade');

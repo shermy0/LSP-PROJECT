@@ -224,7 +224,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pertanyaan/pg/{id}/edit', [PertanyaanController::class, 'editPG'])->name('pertanyaan.pg.edit');
     Route::put('/pertanyaan/pg/{id}', [PertanyaanController::class, 'updatePG'])->name('pertanyaan.pg.update');
     Route::delete('/pertanyaan/pg/{id}', [PertanyaanController::class, 'destroyPG'])->name('pertanyaan.pg.destroy');
-    Route::get('/pertanyaan/{id_skema}/kelompok-pg', [PertanyaanController::class, 'kelompokPekerjaan'])
+    Route::get('/pertanyaan/{id_skema}/kelompok-pg', [PertanyaanController::class, 'kelompokPekerjaanPG'])
         ->name('pertanyaan.pg.kelompok')
         ->defaults('jenis', 'pilihan_ganda');
     Route::get('/pertanyaan/pg/kelompok/{id_skema}/{id_pembuatan_pertanyaan?}', [PertanyaanController::class, 'kelompokPekerjaanPG'])
@@ -441,4 +441,31 @@ Route::post('/form-asesmen/{id_skema}/jawaban-pmo/{id_pembuatan}/{id_asesi}', [P
         Route::put('/update', [ProfileAsesorController::class, 'update'])->name('profile.update');
     });
 
+    // ================== ASESOR LIHAT JAWABAN ASESI ==================
+    Route::get('/asesor/skema', [JawabanController::class, 'indexSkema'])->name('asesor.skema.index');
+    Route::get('/asesor/skema/{id_skema}/jenis', [JawabanController::class, 'listJenis'])->name('asesor.skema.jenis');
+    Route::get('/asesor/skema/{id_skema}/jenis/{jenis}/asesi', [JawabanController::class, 'listAsesi'])->name('asesor.skema.jenis.asesi');
+    Route::get('/asesor/skema/{id_skema}/jenis/{jenis}/asesi/{id_asesi}', [JawabanController::class, 'viewJawaban'])->name('asesor.skema.jenis.asesi.jawaban');
+    Route::post('/asesor/pencapaian/store', [JawabanController::class,'storePencapaian']) ->name('asesor.pencapaian.store');
+
+    /*
+    |----------------------------------------------------------------------
+    | Ceklis Observasi
+    |----------------------------------------------------------------------
+    */
+   // Pilih asesi untuk skema tertentu (skema sudah ditentukan)
+    Route::get('/ceklis-observasi/pilih/{id_skema}', [CeklisObservasiController::class, 'pilihAsesi'])->name('ceklisobservasi.pilih');
+
+    // Halaman form ceklis observasi (dengan parameter id_asesi & id_skema)
+    Route::get('/ceklis-observasi', [CeklisObservasiController::class, 'index'])->name('ceklisobservasi.index');
+
+    // Proses simpan data
+    Route::post('/ceklis-observasi', [CeklisObservasiController::class, 'store'])->name('ceklisobservasi.store');
+
+    // Load data KUK berdasarkan skema (AJAX)
+    Route::get('/ceklisobservasi/data/{skemaId}', [CeklisObservasiController::class, 'loadData'])->name('ceklisobservasi.data');
+
+    Route::get('/ceklis-observasi/tandatangan/{id}', [CeklisObservasiController::class, 'tandatangan'])->name('ceklisobservasi.tandatangan');
+    Route::post('/ceklis-observasi/tandatangan', [CeklisObservasiController::class, 'storeTandatangan'])->name('ceklisobservasi.storeTandatangan'); 
+    Route::get('/ceklis-observasi/tandatangan/{id_skema}/{id_asesi}', [CeklisObservasiController::class, 'tandatanganBySkemaAsesi']) ->name('ceklisobservasi.tandatangan.bySkemaAsesi');
 }); // end middleware auth

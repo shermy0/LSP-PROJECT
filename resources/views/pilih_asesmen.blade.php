@@ -123,6 +123,34 @@
                         </button>
                     </div>
                 </div>
+                {{-- ===== TANDA TANGAN CEKLIS OBSERVASI ===== --}}
+                @php
+    $observasiSelesai   = $statusAsesmen[$skema->id_skema]['observasi_selesai'] ?? false;
+    $ttdObservasiSelesai = $statusAsesmen[$skema->id_skema]['ttd_observasi_selesai'] ?? false;
+@endphp
+<div class="assessment-card mb-3">
+    <div class="assessment-content {{ $ttdObservasiSelesai ? 'completed' : ($observasiSelesai ? 'pending' : 'locked') }}">
+        <div class="assessment-icon">
+            <i class="bi bi-clipboard-check-fill"></i>
+        </div>
+        <div class="assessment-info flex-grow-1">
+            <h6 class="fw-semibold mb-1">Tanda Tangan Ceklis Observasi</h6>
+            @if($ttdObservasiSelesai)
+                <span class="status-badge completed">Sudah Tanda Tangan — Terkunci</span>
+            @elseif($observasiSelesai)
+                <span class="status-badge pending">Asesor Sudah Menilai — Silakan Tanda Tangan</span>
+            @else
+                <span class="status-badge locked">Belum Dinilai Asesor</span>
+            @endif
+        </div>
+        <button onclick="konfirmasiMulaiTtdObservasi('{{ $skema->nama_skema }}', '{{ route('ceklisobservasi.tandatangan.bySkemaAsesi', ['id_skema' => $skema->id_skema, 'id_asesi' => $asesi->id_asesi]) }}')"
+            class="btn-assessment {{ $ttdObservasiSelesai || !$observasiSelesai ? 'disabled' : 'active' }}"
+            {{ $ttdObservasiSelesai || !$observasiSelesai ? 'disabled' : '' }}>
+            <i class="bi {{ $ttdObservasiSelesai ? 'bi-lock-fill' : ($observasiSelesai ? 'bi-pen-fill' : 'bi-lock-fill') }} me-2"></i>
+            {{ $ttdObservasiSelesai ? 'Terkunci' : ($observasiSelesai ? 'Tanda Tangan' : 'Terkunci') }}
+        </button>
+    </div>
+</div>
             </div>
         </div>
     @empty
@@ -184,6 +212,60 @@ function konfirmasiMulai(namaSkema, url, jenisAsesmen) {
                 Swal.close();
                 window.location.href = url;
             }, 800);
+        }
+
+        window.addEventListener('beforeunload', () => {
+            Swal.close();
+        });
+    });
+}
+
+function konfirmasiMulaiTtdObservasi(namaSkema, url) {
+    Swal.fire({
+        title: '⚠️ Tanda Tangan Ceklis Observasi',
+        html: `
+            <div style="text-align: left; padding: 10px 20px;">
+                <p class="mb-2"><strong>Skema:</strong> ${namaSkema}</p>
+                <p class="mb-3"><strong>Tanda Tangan Ceklis Observasi</strong></p>
+                <div class="alert alert-info mb-0" style="font-size: 0.9rem;">
+                    <i class="bi bi-info-circle me-1"></i>
+                    <strong>Perhatian:</strong>
+                    <ul class="mb-0 mt-2" style="padding-left: 20px;">
+                        <li>Anda akan menandatangani hasil observasi yang sudah dinilai asesor.</li>
+                        <li>Pastikan data yang ditampilkan sudah sesuai.</li>
+                        <li>Tanda tangan Anda akan disimpan sebagai bukti persetujuan.</li>
+                    </ul>
+                </div>
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: '<i class="bi bi-pen-fill me-1"></i> Ya, Tanda Tangan Sekarang!',
+        cancelButtonText: '<i class="bi bi-x-circle me-1"></i> Batal',
+        confirmButtonColor: '#198754',
+        cancelButtonColor: '#6c757d',
+        reverseButtons: true,
+        width: '600px',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        focusCancel: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Memuat Form Tanda Tangan...',
+                html: 'Mohon tunggu sebentar...',
+                icon: 'info',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            setTimeout(() => {
+                Swal.close();
+                window.location.href = url;
+            }, 1000);
         }
 
         window.addEventListener('beforeunload', () => {
