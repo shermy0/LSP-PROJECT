@@ -193,7 +193,6 @@
 
                             <div class="d-flex justify-content-end gap-2">
                                 <button type="button" class="btn-back" onclick="clearCanvasAdmin()">Hapus</button>
-                                <button type="button" class="btn-next" onclick="downloadTTDAdmin()">Unduh</button>
                             </div>
                         </div>
                     </div>
