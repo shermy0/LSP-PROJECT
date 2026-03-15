@@ -317,52 +317,46 @@ $ttdObservasiExists = DB::table('observasi_ceklis')
                     }
                 }
                 
-    
             // 🔹 Simpan tanda tangan (jika ada dan valid)
             if ($request->filled('ttd_asesi')) {
                 $ttdBase64 = $request->ttd_asesi;
-    
+
                 if (preg_match('/^data:image\/(\w+);base64,/', $ttdBase64)) {
                     $ttdData = preg_replace('#^data:image/\w+;base64,#i', '', $ttdBase64);
                     $ttdData = str_replace(' ', '+', $ttdData);
                     $imageData = base64_decode($ttdData);
-    
+
                     if ($imageData !== false) {
                         $jenis = $request->jenis;
                         $namaAsesi = \Str::slug($asesi->nama_lengkap, '_');
                         $tanggal = $request->tgl_ttd_asesi ?: date('Y-m-d');
                         $fileName = 'ttd_asesmen_' . $namaAsesi . '_' . $jenis . '_' . $tanggal . '.png';
                         $filePath = storage_path('app/public/ttd/' . $fileName);
-    
+
                         if (!file_exists(dirname($filePath))) {
                             mkdir(dirname($filePath), 0755, true);
                         }
-    
+
                         file_put_contents($filePath, $imageData);
-    
-                        // Ambil jawaban terakhir KHUSUS untuk jenis soal ini
-                        $lastJawaban = JawabanAsesmen::where('id_asesi', $idAsesi)
+
+                        // ✅ Ambil SEMUA jawaban jenis ini, bukan cuma yang terakhir
+                        $semuaJawaban = JawabanAsesmen::where('id_asesi', $idAsesi)
                             ->where('id_skema', $request->id_skema)
                             ->whereHas('pertanyaan', function($q) use ($request) {
                                 $q->where('jenis_pertanyaan', $request->jenis);
                             })
-                            ->orderBy('id_jawaban', 'desc')
-                            ->first();
-    
-                        if ($lastJawaban) {
-                            $existingPersetujuan = \DB::table('jawaban_asesmen_persetujuan')
-                                ->where('id_jawaban', $lastJawaban->id_jawaban)
-                                ->exists();
-    
-                            if (!$existingPersetujuan) {
-                                \DB::table('jawaban_asesmen_persetujuan')->insert([
-                                    'id_jawaban'    => $lastJawaban->id_jawaban,
+                            ->pluck('id_jawaban');
+
+                        foreach ($semuaJawaban as $id_jawaban) {
+                            \DB::table('jawaban_asesmen_persetujuan')->updateOrInsert(
+                                ['id_jawaban' => $id_jawaban],
+                                [
                                     'tgl_ttd_asesi' => $tanggal,
                                     'ttd_asesi'     => 'storage/ttd/' . $fileName,
-                                    'created_at'    => now(),
                                     'updated_at'    => now(),
-                                ]);
-                            }
+                                    'created_at'    => now(),
+                                ]
+                            );
                         }
                     }
                 }
@@ -634,87 +628,69 @@ $ttdObservasiExists = DB::table('observasi_ceklis')
         ));
     }
     
-    public function storePencapaian(Request $request)
-    {
-        Log::info('Data request:', $request->all());
-    
-        $id_skema = $request->id_skema;
-        $id_asesi = $request->id_asesi;
-        $jenis    = $request->jenis;
-    
-        $mapJenis = [
-            'pg'   => 'pilihan_ganda',
-            'esai' => 'esai',
-            'lisan'=> 'lisan',
-        ];
-    
-        $jenisDb = $mapJenis[$jenis] ?? $jenis;
-    
-    
-        // =================================================
-        // 1. SIMPAN PENCAPAIAN (HANYA ESAI / LISAN)
-        // =================================================
-        if ($jenisDb !== 'pilihan_ganda' && $request->pencapaian) {
-    
-            foreach ($request->pencapaian as $id_jawaban => $nilai) {
-    
-                JawabanAsesmen::where('id_jawaban', $id_jawaban)
-                    ->update([
-                        'pencapaian' => $nilai
-                    ]);
-    
-            }
-    
+  public function storePencapaian(Request $request)
+{
+    Log::info('Data request:', $request->all());
+
+    $id_skema = $request->id_skema;
+    $id_asesi = $request->id_asesi;
+    $jenis    = $request->jenis;
+
+    $mapJenis = [
+        'pg'   => 'pilihan_ganda',
+        'esai' => 'esai',
+        'lisan'=> 'lisan',
+    ];
+
+    $jenisDb = $mapJenis[$jenis] ?? $jenis;
+
+    Log::info('DEBUG', ['id_skema'=>$id_skema,'id_asesi'=>$id_asesi,'jenisDb'=>$jenisDb,'ada_ttd'=>$request->filled('ttd_asesor')]);
+
+    if ($jenisDb !== 'pilihan_ganda' && $request->pencapaian) {
+        foreach ($request->pencapaian as $id_jawaban => $nilai) {
+            JawabanAsesmen::where('id_jawaban', $id_jawaban)->update(['pencapaian' => $nilai]);
         }
-    
-    
-        // =================================================
-        // 2. SIMPAN UMPAN BALIK & TANDA TANGAN ASESOR
-        // =================================================
-        // ambil semua id jawaban
-        $jawabanList = JawabanAsesmen::where('id_asesi', $id_asesi)
-            ->where('id_skema', $id_skema)
-            ->whereHas('pertanyaan', function ($q) use ($jenisDb) {
-                $q->where('jenis_pertanyaan', $jenisDb);
-            })
-            ->pluck('id_jawaban');
-
-        $updateData = [];
-
-        // jika umpan balik diisi
-        if ($request->filled('umpan_balik')) {
-            $updateData['umpan_balik'] = $request->umpan_balik;
-        }
-
-        // jika tanda tangan baru dibuat
-        if ($request->filled('ttd_asesor')) {
-
-            try {
-
-                $ttdPath = $this->saveSignature(
-                    $request->ttd_asesor,
-                    $id_asesi,
-                    $jenisDb
-                );
-
-                $updateData['ttd_asesor'] = $ttdPath;
-                $updateData['tgl_ttd_asesor'] = now();
-
-            } catch (\Exception $e) {
-
-                Log::error('Gagal menyimpan tanda tangan: '.$e->getMessage());
-                return back()->with('error','Gagal menyimpan tanda tangan');
-            }
-        }
-
-        // jika ada data yang perlu diupdate
-        if (!empty($updateData)) {
-            JawabanAsesmenPersetujuan::whereIn('id_jawaban', $jawabanList)
-                ->update($updateData);
-        }
-    
-        return back()->with('success','Penilaian dan persetujuan berhasil disimpan');
     }
+
+    $jawabanList = JawabanAsesmen::where('id_asesi', $id_asesi)
+        ->where('id_skema', $id_skema)
+        ->whereHas('pertanyaan', function ($q) use ($jenisDb) {
+            $q->where('jenis_pertanyaan', $jenisDb);
+        })
+        ->pluck('id_jawaban');
+
+    Log::info('JAWABAN LIST', ['ids' => $jawabanList->toArray()]);
+
+    $updateData = [];
+
+    if ($request->filled('umpan_balik')) {
+        $updateData['umpan_balik'] = $request->umpan_balik;
+    }
+
+    if ($request->filled('ttd_asesor')) {
+        try {
+            $ttdPath = $this->saveSignature($request->ttd_asesor, $id_asesi, $jenisDb);
+            $updateData['ttd_asesor'] = $ttdPath;
+            $updateData['tgl_ttd_asesor'] = now();
+        } catch (\Exception $e) {
+            Log::error('Gagal menyimpan tanda tangan: '.$e->getMessage());
+            return back()->with('error','Gagal menyimpan tanda tangan');
+        }
+    }
+
+    Log::info('UPDATE DATA', ['data' => $updateData]);
+
+    if (!empty($updateData)) {
+        foreach ($jawabanList as $id_jawaban) {
+            JawabanAsesmenPersetujuan::updateOrCreate(
+                ['id_jawaban' => $id_jawaban],
+                $updateData
+            );
+        }
+    }
+
+    return back()->with('success','Penilaian dan persetujuan berhasil disimpan');
+}
     public function saveSignature($dataUrl, $id_asesi, $jenis)
     {
         if (empty($dataUrl)) {

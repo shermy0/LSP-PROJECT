@@ -31,91 +31,365 @@ class PertanyaanController extends Controller
     }
 
     // ================================
-    // CRUD LISAN
+    // LISAN - Halaman Utama (= pertanyaanPMO)
     // ================================
-    public function createLisan(Request $request)
+    public function pertanyaanLisan($id_skema)
     {
-        $jumlah = $request->query('jumlah', 5);
-        $id_skema = $request->query('id_skema');
-
         $skema = Skema::findOrFail($id_skema);
 
-        $pembuatan = PembuatanPertanyaan::create([
-            'id_skema' => $id_skema,
-            'timer' => $request->query('timer', 0),
-            'timescap' => now(),
-        ]);
+        $pembuatanList = PembuatanPertanyaan::where('id_skema', $id_skema)
+            ->where('jenis_pertanyaan', 'lisan')
+            ->orderByDesc('id_pembuatan_pertanyaan')
+            ->get();
 
-        $idKelompok = KelompokPekerjaan::where('id_skema', $id_skema)->value('id_kelompok') ?? null;
-
-        return view('input_lisan', [
-            'skema' => $skema,
-            'jumlah' => $jumlah,
-            'idPembuatanPertanyaan' => $pembuatan->id_pembuatan_pertanyaan,
-            'idKelompok' => $idKelompok
-        ]);
+        return view('lisan', compact('skema', 'pembuatanList'));
     }
 
-    public function storeLisan(Request $request)
+    // ================================
+    // LISAN - Kelompok Pekerjaan (= pertanyaanPMOKelompok)
+    // ================================
+    public function kelompokLisan(Request $request, $id_skema)
     {
-        $request->validate([
-            'id_skema' => 'required|exists:skema_sertifikasi,id_skema',
-            'id_asesor' => 'required|exists:asesor,id_asesor',
-            'id_kelompok' => 'nullable|exists:kelompok_pekerjaan,id_kelompok',
-            'id_pembuatan_pertanyaan' => 'nullable|exists:pembuatan_pertanyaan,id_pembuatan_pertanyaan',
-            'isi_pertanyaan.*' => 'required|string',
-            'kunci_jawaban.*' => 'nullable|string',
-        ]);
+        $skema        = Skema::findOrFail($id_skema);
+        $timer        = $request->query('timer', 30);
+        $baru         = $request->query('baru', 0);
+        $judul        = $request->query('judul');
+        $id_pembuatan = $request->query('id_pembuatan');
 
-        foreach ($request->isi_pertanyaan as $key => $isi) {
-            Pertanyaan::create([
-                'id_skema' => $request->id_skema,
-                'id_asesor' => $request->id_asesor,
-                'id_kelompok' => $request->id_kelompok,
-                'id_pembuatan_pertanyaan' => $request->id_pembuatan_pertanyaan,
-                'jenis_pertanyaan' => 'lisan',
-                'isi_pertanyaan' => $isi,
-                'kunci_jawaban' => $request->kunci_jawaban[$key] ?? null,
-            ]);
+        if ($baru) {
+            $pembuatan    = null;
+            $id_pembuatan = null;
+        } elseif ($id_pembuatan) {
+            $pembuatan = PembuatanPertanyaan::find($id_pembuatan);
+            $timer     = $pembuatan->timer ?? $timer;
+        } else {
+            $pembuatan    = null;
+            $id_pembuatan = null;
         }
 
-        return redirect()->route('lisan.crud', $request->id_skema)
-            ->with('success', 'Pertanyaan lisan berhasil ditambahkan!');
+        // Buat pembuatan baru jika ada judul (dari modal)
+        if ($judul && !$id_pembuatan) {
+            $pembuatan = PembuatanPertanyaan::create([
+                'id_skema'         => $id_skema,
+                'judul'            => $judul,
+                'timer'            => $timer,
+                'timescap'         => now(),
+                'jenis_pertanyaan' => 'lisan',
+            ]);
+            $id_pembuatan = $pembuatan->id_pembuatan_pertanyaan;
+        }
+
+        $kelompok = KelompokPekerjaan::with(['unitKompetensi' => function ($q) use ($id_skema) {
+            $q->where('unit_kompetensi.id_skema', $id_skema);
+        }])->where('id_skema', $id_skema)->get();
+
+        $soalList = $pembuatan
+            ? Pertanyaan::where('id_pembuatan_pertanyaan', $pembuatan->id_pembuatan_pertanyaan)
+                ->where('jenis_pertanyaan', 'lisan')
+                ->get()
+            : collect();
+
+        return view('kelompok_pekerjaan_lisan', [
+            'skema'        => $skema,
+            'kelompok'     => $kelompok,
+            'timer'        => $timer,
+            'judul'        => $judul,
+            'id_pembuatan' => $id_pembuatan,
+            'pembuatan'    => $pembuatan,
+            'baru'         => $baru,
+            'soalList'     => $soalList,
+        ]);
     }
 
+    // ================================
+    // LISAN - Form Input (= inputPMO)
+    // ================================
+
+    public function inputLisan(Request $request, $id_skema)
+    {
+        $timer        = $request->query('timer', 30);
+        $kelompok_id  = $request->query('kelompok_id');
+        $jumlah       = $request->query('jumlah', 5);
+        $id_pembuatan = $request->query('id_pembuatan');
+        $judul        = $request->query('judul', '');
+
+        $skema    = Skema::findOrFail($id_skema);
+        $kelompok = $kelompok_id ? KelompokPekerjaan::find($kelompok_id) : null;
+
+        $unitKompetensi = $kelompok_id
+            ? DB::table('unit_kompetensi')
+                ->join('hasil_asesmen', 'unit_kompetensi.id_unit', '=', 'hasil_asesmen.id_unit')
+                ->where('hasil_asesmen.id_kelompok', $kelompok_id)
+                ->select('unit_kompetensi.*')
+                ->distinct()
+                ->get()
+            : collect();
+
+        return view('input_lisan', [
+            'skema'          => $skema,
+            'timer'          => $timer,
+            'jumlah'         => $jumlah,
+            'kelompok'       => $kelompok,
+            'id_pembuatan'   => $id_pembuatan,
+            'judul'          => $judul,
+            'unitKompetensi' => $unitKompetensi,
+        ]);
+    }
+    // ================================
+    // LISAN - Simpan Pertanyaan (= storePertanyaanPMO)
+    // ================================
+    public function storePertanyaanLisan(Request $request, $id_skema)
+    {
+        $isiList      = $request->input('isi_pertanyaan', []);
+        $kunciList    = $request->input('kunci_jawaban', []);
+        $id_kelompok  = $request->input('id_kelompok');
+        $id_pembuatan = $request->input('id_pembuatan');
+        $timer        = $request->input('timer', 30);
+        $judul        = $request->input('judul');
+
+        $id_asesor = auth()->user()->asesor->id_asesor ?? null;
+
+        $adaSoalValid = false;
+        foreach ($isiList as $isi) {
+            if (!empty(trim($isi))) { $adaSoalValid = true; break; }
+        }
+
+        if (!$adaSoalValid) {
+            return back()->with('error', 'Tidak ada pertanyaan yang tersimpan.');
+        }
+
+        if (!$id_pembuatan) {
+            $pembuatan = PembuatanPertanyaan::create([
+                'id_skema'         => $id_skema,
+                'timer'            => $timer,
+                'jenis_pertanyaan' => 'lisan',
+                'timescap'         => now(),
+                'judul'            => filled($judul) ? $judul : 'Set Pertanyaan Lisan ' . date('Y-m-d H:i:s'),
+            ]);
+            $id_pembuatan = $pembuatan->id_pembuatan_pertanyaan;
+        }
+
+        $saved = 0;
+        foreach ($isiList as $key => $isi) {
+            if (empty(trim($isi))) continue;
+
+            Pertanyaan::create([
+                'id_skema'                => $id_skema,
+                'id_asesor'               => $id_asesor,
+                'id_kelompok'             => $id_kelompok,
+                'id_pembuatan_pertanyaan' => $id_pembuatan,
+                'jenis_pertanyaan'        => 'lisan',
+                'isi_pertanyaan'          => $isi,
+                'kunci_jawaban'           => $kunciList[$key] ?? null,
+            ]);
+            $saved++;
+        }
+
+        return redirect()->route('kelompok.lisan', [
+            'id_skema'     => $id_skema,
+            'id_pembuatan' => $id_pembuatan,
+        ])->with('success', "{$saved} pertanyaan lisan berhasil disimpan.");
+    }
+
+    // ================================
+    // LISAN - Edit Pertanyaan (= editPertanyaanPMO)
+    // ================================
     public function editLisan($id)
     {
         $pertanyaan = Pertanyaan::findOrFail($id);
-        return view('input_lisan_edit', compact('pertanyaan'));
+        $skema      = Skema::find($pertanyaan->id_skema);
+        return view('input_lisan_edit', compact('pertanyaan', 'skema'));
     }
 
+    // ================================
+    // LISAN - Update Pertanyaan
+    // ================================
     public function updateLisan(Request $request, $id)
     {
         $request->validate([
             'isi_pertanyaan' => 'required|string',
-            'kunci_jawaban' => 'nullable|string',
+            'kunci_jawaban'  => 'nullable|string',
         ]);
 
         $pertanyaan = Pertanyaan::findOrFail($id);
         $pertanyaan->update([
             'isi_pertanyaan' => $request->isi_pertanyaan,
-            'kunci_jawaban' => $request->kunci_jawaban
+            'kunci_jawaban'  => $request->kunci_jawaban,
         ]);
 
         return redirect()->route('lisan.crud', $pertanyaan->id_skema)
             ->with('success', 'Pertanyaan lisan berhasil diperbarui');
     }
 
+    // ================================
+    // LISAN - Hapus Pertanyaan (= destroyPertanyaanPMO)
+    // ================================
+    public function destroyLisan($id)
+    {
+        $pertanyaan = Pertanyaan::findOrFail($id);
+        $pertanyaan->delete();
+        return back()->with('success', 'Pertanyaan lisan berhasil dihapus!');
+    }
+
+    // ================================
+    // LISAN - CRUD List
+    // ================================
     public function crudLisan($id_skema)
     {
         $skema = Skema::findOrFail($id_skema);
 
-        $kelompok = KelompokPekerjaan::with(['pertanyaan' => function($q) {
+        $kelompok = KelompokPekerjaan::with(['pertanyaan' => function ($q) {
             $q->where('jenis_pertanyaan', 'lisan');
         }])->where('id_skema', $id_skema)->first();
 
         return view('lisan_crud', compact('skema', 'kelompok'));
     }
+
+    // ================================
+    // LISAN - Hapus Set (= destroySetPMO)
+    // ================================
+    public function destroySetLisan($id_pembuatan)
+    {
+        Pertanyaan::where('id_pembuatan_pertanyaan', $id_pembuatan)
+            ->where('jenis_pertanyaan', 'lisan')
+            ->delete();
+
+        PembuatanPertanyaan::findOrFail($id_pembuatan)->delete();
+
+        return back()->with('success', 'Set pertanyaan lisan berhasil dihapus.');
+    }
+
+    // ================================
+    // LISAN - Hasil Kelompok (= hasilKelompokPMO)
+    // ================================
+    public function hasilKelompokLisan($id_skema)
+    {
+        $skema = Skema::findOrFail($id_skema);
+
+        $pembuatanList = PembuatanPertanyaan::where('id_skema', $id_skema)
+            ->where('jenis_pertanyaan', 'lisan')
+            ->orderByDesc('id_pembuatan_pertanyaan')
+            ->get();
+
+        $kelompok = KelompokPekerjaan::with('unitKompetensi')
+            ->where('id_skema', $id_skema)
+            ->get();
+
+        return view('lisan.hasil_kelompok_lisan', compact('skema', 'pembuatanList', 'kelompok'));
+    }
+
+    // ================================
+    // LISAN - Pilih Asesi (= pilihAsesiPMO)
+    // ================================
+    public function pilihAsesiLisan($id_skema, $id_pembuatan, $id_kelompok)
+    {
+        $skema     = Skema::findOrFail($id_skema);
+        $pembuatan = PembuatanPertanyaan::findOrFail($id_pembuatan);
+        $kelompok  = KelompokPekerjaan::findOrFail($id_kelompok);
+
+        $id_asesor = Asesor::where('user_id', Auth::id())->value('id_asesor');
+
+        $asesiList = DB::table('asesi')
+            ->where('asesor_id', $id_asesor)
+            ->orderBy('nama_lengkap')
+            ->get();
+
+        // Ambil id pertanyaan lisan untuk set & kelompok ini
+        $lisanIds = Pertanyaan::where('id_pembuatan_pertanyaan', $id_pembuatan)
+            ->where('id_kelompok', $id_kelompok)
+            ->where('jenis_pertanyaan', 'lisan')
+            ->pluck('id_pertanyaan');
+
+        // Cek asesi yang sudah ada jawabannya
+        $sudahInputIds = DB::table('jawaban_asesmen')
+            ->whereIn('id_pertanyaan', $lisanIds)
+            ->whereNotNull('id_asesi')
+            ->pluck('id_asesi')
+            ->unique()
+            ->toArray();
+
+        return view('lisan.pilih_asesi_lisan', compact(
+            'skema', 'pembuatan', 'kelompok', 'asesiList', 'sudahInputIds'
+        ));
+    }
+
+    // ================================
+    // LISAN - Input Jawaban (= inputJawabanPMO)
+    // ================================
+    public function inputJawabanLisan($id_skema, $id_pembuatan, $id_kelompok, $id_asesi)
+    {
+        $skema     = Skema::findOrFail($id_skema);
+        $pembuatan = PembuatanPertanyaan::findOrFail($id_pembuatan);
+        $kelompok  = KelompokPekerjaan::find($id_kelompok);
+        $asesi     = DB::table('asesi')->where('id_asesi', $id_asesi)->first();
+
+        $pertanyaan = Pertanyaan::with(['jawabanAsesmen' => function ($q) use ($id_asesi) {
+            $q->where('id_asesi', $id_asesi);
+        }])
+        ->where('id_pembuatan_pertanyaan', $id_pembuatan)
+        ->where('id_kelompok', $id_kelompok)
+        ->where('jenis_pertanyaan', 'lisan')
+        ->get();
+
+        return view('lisan.input_jawaban_lisan', compact(
+            'skema', 'pembuatan', 'kelompok', 'asesi', 'pertanyaan'
+        ));
+    }
+
+    // ================================
+    // LISAN - Simpan Jawaban (= simpanJawabanPMO)
+    // ================================
+    public function simpanJawabanLisan(Request $request, $id_skema, $id_pembuatan, $id_asesi)
+{
+    $jawaban    = $request->input('jawaban', []);
+    $pencapaian = $request->input('pencapaian', []);
+    $allIds     = array_unique(array_merge(array_keys($jawaban), array_keys($pencapaian)));
+
+    foreach ($allIds as $id_pertanyaan) {
+        DB::table('jawaban_asesmen')->updateOrInsert(
+            ['id_pertanyaan' => $id_pertanyaan, 'id_asesi' => $id_asesi],
+            [
+                'id_skema'     => $id_skema,
+                'jawaban_text' => $jawaban[$id_pertanyaan] ?? null,
+                'pencapaian'   => $pencapaian[$id_pertanyaan] ?? null,
+                'id_asesi'     => $id_asesi,
+            ]
+        );
+    }
+
+    // ✅ TAMBAH INI — simpan TTD asesor ke persetujuan
+    if ($request->filled('ttd_asesor')) {
+        try {
+            $jawabanController = new JawabanController();
+            $ttdPath = $jawabanController->saveSignature($request->ttd_asesor, $id_asesi, 'lisan');
+
+            $jawabanList = DB::table('jawaban_asesmen')
+                ->join('pertanyaan', 'jawaban_asesmen.id_pertanyaan', '=', 'pertanyaan.id_pertanyaan')
+                ->where('jawaban_asesmen.id_asesi', $id_asesi)
+                ->where('jawaban_asesmen.id_skema', $id_skema)
+                ->where('pertanyaan.jenis_pertanyaan', 'lisan')
+                ->pluck('jawaban_asesmen.id_jawaban');
+
+           foreach ($jawabanList as $id_jawaban) {
+                DB::table('jawaban_asesmen_persetujuan')->updateOrInsert(
+                    ['id_jawaban' => $id_jawaban],
+                    [
+                        'ttd_asesor'     => $ttdPath,
+                        'tgl_ttd_asesor' => $request->input('tgl_ttd_asesor') ?? now()->toDateString(),
+                        'umpan_balik'    => $request->input('umpan_balik'), // ← tambah ini
+                        'updated_at'     => now(),
+                        'created_at'     => now(),
+                    ]
+                );
+            }
+        } catch (\Exception $e) {
+            \Log::error('Gagal simpan TTD asesor lisan: ' . $e->getMessage());
+        }
+    }
+
+    return redirect()->route('lisan.hasil.kelompok', ['id_skema' => $id_skema])
+        ->with('success', 'Jawaban lisan berhasil disimpan.');
+}
 
     // ================================
     // FORM ESAI
@@ -646,6 +920,32 @@ class PertanyaanController extends Controller
         $pembuatan = PembuatanPertanyaan::find($id_pembuatan_pertanyaan);
         $skema = Skema::find($id_skema);
 
+        switch ($pembuatan->jenis_pertanyaan) {
+            case 'esai':
+                $backUrl = route('pertanyaan.esai.kelompok', ['id_skema' => $id_skema]);
+                break;
+            case 'pilihan_ganda':
+                $backUrl = route('pertanyaan.pg.kelompok.withId', [
+                    'id_skema' => $id_skema,
+                    'id_pembuatan_pertanyaan' => $id_pembuatan_pertanyaan
+                ]);
+                break;
+            case 'pmo':
+                $backUrl = route('pertanyaan.pmo.kelompok', [
+                    'id_skema' => $id_skema,
+                    'id_pembuatan' => $id_pembuatan_pertanyaan
+                ]);
+                break;
+            case 'lisan':
+                $backUrl = route('kelompok.lisan', [
+                    'id_skema' => $id_skema,
+                    'id_pembuatan' => $id_pembuatan_pertanyaan
+                ]);
+                break;
+            default:
+                $backUrl = route('formasesmen');
+        }
+
         $asesorSudahTTD = DB::table('pertanyaan_asesmen_persetujuan')
             ->join('asesor', 'asesor.id_asesor', '=', 'pertanyaan_asesmen_persetujuan.id_asesor')
             ->where('pertanyaan_asesmen_persetujuan.id_pembuatan_pertanyaan', $id_pembuatan_pertanyaan)
@@ -1029,7 +1329,7 @@ class PertanyaanController extends Controller
     // ================================
     // Simpan Jawaban/Tanggapan PMO (Asesor input tanggapan asesi)
     // ================================
-        public function simpanJawabanPMO(Request $request, $id_skema, $id_pembuatan, $id_asesi)
+    public function simpanJawabanPMO(Request $request, $id_skema, $id_pembuatan, $id_asesi)
     {
         $jawaban    = $request->input('jawaban', []);
         $pencapaian = $request->input('pencapaian', []);
@@ -1060,17 +1360,26 @@ class PertanyaanController extends Controller
         $tgl_ttd_asesor = $request->input('tgl_ttd_asesor');
 
         if ($ttd_asesor) {
-            // Cari id_pmo by id_skema saja (pmo per skema, bukan per asesi)
             $pmo = DB::table('pmo')
                 ->where('id_skema', $id_skema)
                 ->first();
 
             if ($pmo) {
+                // ✅ Simpan TTD sebagai file, bukan raw base64
+                try {
+                    $jawabanController = new JawabanController();
+                    $ttdPath = $jawabanController->saveSignature($ttd_asesor, $id_asesi, 'pmo');
+                } catch (\Exception $e) {
+                    \Log::error('Gagal simpan TTD PMO: ' . $e->getMessage());
+                    $ttdPath = null;
+                }
+
                 DB::table('pmo_persetujuan')->updateOrInsert(
                     ['id_pmo' => $pmo->id_pmo],
                     [
-                        'ttd_asesor'     => $ttd_asesor,
+                        'ttd_asesor'     => $ttdPath,
                         'tgl_ttd_asesor' => $tgl_ttd_asesor,
+                        'umpan_balik'    => $request->input('umpan_balik'), // ← tambah ini
                     ]
                 );
             }
@@ -1191,8 +1500,6 @@ class PertanyaanController extends Controller
         $kelompok  = KelompokPekerjaan::find($id_kelompok);
         $asesi     = DB::table('asesi')->where('id_asesi', $id_asesi)->first();
 
-        // Join dengan pmo_tanggapan berdasarkan id_asesi agar tanggapan yang muncul
-        // adalah tanggapan spesifik untuk asesi ini
         $pertanyaan = DB::table('pmo_pertanyaan')
             ->leftJoin('pmo_tanggapan', function($join) use ($id_asesi) {
                 $join->on('pmo_pertanyaan.id_pmo_pertanyaan', '=', 'pmo_tanggapan.id_pmo_pertanyaan')
@@ -1230,13 +1537,11 @@ class PertanyaanController extends Controller
             ->orderBy('nama_lengkap')
             ->get();
 
-        // Ambil id_pmo_pertanyaan untuk set & kelompok ini
         $pmoIds = DB::table('pmo_pertanyaan')
             ->where('id_pembuatan_pertanyaan', $id_pembuatan)
             ->where('id_kelompok', $id_kelompok)
             ->pluck('id_pmo_pertanyaan');
 
-        // Cek asesi yang sudah ada tanggapannya di pmo_tanggapan
         $sudahInputIds = DB::table('pmo_tanggapan')
             ->whereIn('id_pmo_pertanyaan', $pmoIds)
             ->whereNotNull('id_asesi')
