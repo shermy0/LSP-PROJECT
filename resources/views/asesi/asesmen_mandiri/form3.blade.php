@@ -173,15 +173,6 @@ function saveTTD() {
     document.getElementById("ttd-asesi-input").value = dataURL;
 }
 
-// unduh tanda tangan
-function downloadTTD() {
-    const canvas = document.getElementById("ttd-asesi");
-    const link = document.createElement("a");
-    link.download = "tanda_tangan_asesi.png";
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-}
-
 window.onload = function () {
     initSignature("ttd-asesi");
 };

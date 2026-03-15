@@ -153,8 +153,6 @@
                                 <div class="mt-3 d-flex justify-content-center gap-2">
                                     <button type="button" class="btn btn-sm btn-danger"
                                         onclick="clearCanvas('ttd-asesor')">🗑 Hapus</button>
-                                    <button type="button" class="btn btn-sm btn-info" onclick="downloadTTD()">⬇
-                                        Unduh</button>
                                 </div>
                             </div>
                         </div>
