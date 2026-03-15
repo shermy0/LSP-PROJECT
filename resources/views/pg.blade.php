@@ -77,7 +77,7 @@
                                         : '-' }}
                                 </td>
                                 <td>
-                                <a href="{{ route('pertanyaan.pg.kelompok', [
+                                <a href="{{ route('pertanyaan.pg.kelompok.withId', [
                                     'id_skema' => $skema->id_skema,
                                     'id_pembuatan_pertanyaan' => $pembuatan->id_pembuatan_pertanyaan
                                 ]) }}" 

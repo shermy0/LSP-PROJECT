@@ -32,9 +32,12 @@
         </div>
         <div class="card-body">
             <ol class="list-group list-group-numbered">
-                <li class="list-group-item border-0 ps-0">Formulir ini diisi sebelum, saat, atau setelah asesmen observasi.</li>
-                <li class="list-group-item border-0 ps-0">Pertanyaan harus relevan dengan dimensi kompetensi dan tugas praktik.</li>
-                <li class="list-group-item border-0 ps-0">Saat pra-demonstrasi, pertanyaan bisa terkait K3, SOP, atau catatan.</li>
+                <li class="list-group-item border-0 ps-0">Formulir ini di isi oleh asesor kompetensi dapat sebelum, pada saat atau setelah melakukan asesmen dengan metode observasi demonstrasi.</li>
+                <li class="list-group-item border-0 ps-0">Pertanyaan dibuat dengan tujuan untuk menggali, dapat berisi pertanyaan yang berkaitan dengan dimensi kompetensi, batasan variabel dan aspek kritis yang relevan dengan skenario tugas dan praktik demonstrasi.</li>
+                <li class="list-group-item border-0 ps-0">Jika pertanyaan disampaikan sebelum asesi melakukan praktik demonstrasi, maka pertanyaan dibuat berkaitan dengan aspek K3L, SOP, penggunaan peralatan dan perlengkapan.</li>
+                <li class="list-group-item border-0 ps-0">Jika setelah asesi melakukan praktik demonstrasi terdapat item pertanyaan pendukung   observasi telah terpenuhi, maka pertanyaan tersebut tidak perlu ditanyakan lagi dan cukup memberi catatan bahwa sudah terpenuhi pada saat tugas praktek demonstrasi pada kolom tanggapan</li>
+                <li class="list-group-item border-0 ps-0">Jika pada saat observasi ada hal yang perlu dikonfirmasi sedangkan di instrumen daftar pertanyaan pendukung observasi tidak ada, maka asesor dapat memberikan pertanyaan dengan syarat pertanyaan harus berkaitan dengan tugas praktek demonstrasi. Jika dilakukan, asesor harus mencatat dalam instrumen pertanyaan pendukung observasi</li>
+                <li class="list-group-item border-0 ps-0">Tanggapan asesi ditulis pada kolom tanggapan.</li>
             </ol>
         </div>
     </div>

@@ -449,6 +449,62 @@
         transform: translateY(-2px);
     }
 
+    .section-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1.5px solid rgba(4,21,98,0.08);
+        box-shadow: 0 4px 24px rgba(4,21,98,0.07);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        animation: fadeUp 0.45s ease both;
+    }
+    .section-card-header {
+        background: var(--primary);
+        padding: 1.1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .section-card-header .hicon {
+        width: 38px; height: 38px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        color: #fff;
+    }
+    .section-card-header h6 {
+        color: #fff; font-weight: 700; font-size: 0.92rem; margin: 0;
+    }
+    .section-card-body { padding: 1.5rem; }
+    .field-label {
+        font-size: 0.72rem; font-weight: 700; color: var(--text-muted);
+        text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; display: block;
+    }
+    .textarea-custom {
+        width: 100%; padding: 12px 14px; border-radius: 10px;
+        border: 1.5px solid rgba(4,21,98,0.12); font-size: 0.88rem;
+        background: #f8faff; resize: vertical;
+    }
+    .btn-clear-sig {
+        display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px;
+        border-radius: 8px; border: 1.5px solid rgba(217,119,6,0.4);
+        background: rgba(217,119,6,0.07); color: #b45309; font-size: 0.8rem; font-weight: 700;
+        cursor: pointer; transition: all 0.2s ease; margin-top: 10px;
+    }
+    .btn-clear-sig:hover {
+        background: rgba(217,119,6,0.15); border-color: rgba(217,119,6,0.6);
+    }
+    #signature-pad {
+        border: 2px dashed rgba(4,21,98,0.2); border-radius: 12px;
+        background: #fff; cursor: crosshair; max-width: 100%;
+    }
+    .section-divider {
+        border: none; border-top: 2px dashed rgba(4,21,98,0.15); margin: 2rem 0;
+    }
+
     @keyframes fadeUp {
         from { opacity: 0; transform: translateY(22px); }
         to   { opacity: 1; transform: translateY(0); }
@@ -484,8 +540,12 @@
             </div>
 
             <div class="main-card-body">
-                <form action="{{ route('asesor.pencapaian.store') }}" method="POST">
+                <form action="{{ route('asesor.pencapaian.store') }}" method="POST" id="form-penilaian">
                     @csrf
+
+                    <input type="hidden" name="id_skema" value="{{ $id_skema }}">
+                    <input type="hidden" name="id_asesi" value="{{ $asesi->id_asesi }}">
+                    <input type="hidden" name="jenis" value="{{ $jenis }}">
 
                     @foreach($pertanyaan as $q)
                         @php $jawaban = $jawabanRaw[$q->id_pertanyaan] ?? null; @endphp
@@ -653,19 +713,195 @@
 
                         </div>
                     @endforeach
+                </div>
 
-                    @if($jenisDb === 'esai' || $jenisDb === 'lisan')
+                     @php
+                    $umpanBalik = $persetujuan->umpan_balik ?? '';
+                    $ttdAsesor = $persetujuan->ttd_asesor ?? null;
+                    @endphp
+
+                        {{-- Card Umpan Balik --}}
+                        <div class="main-card">
+                            <div class="main-card-header">
+                                <div class="header-icon">
+                                    <i class="bi bi-chat-dots"></i>
+                                </div>
+                                <h5>Umpan Balik</h5>
+                            </div>
+                            <div class="main-card-body">
+                            <textarea name="umpan_balik" class="textarea-custom" rows="4" placeholder="Tuliskan umpan balik untuk asesi...">{{ $umpanBalik }}</textarea>                            </div>
+                        </div>
+                        <h5>&nbsp;</h5>
+                        {{-- Card Tanda Tangan --}}
+                        <div class="main-card">
+                            <div class="main-card-header">
+                                <div class="header-icon">
+                                    <i class="bi bi-pen"></i>
+                                </div>
+                                <h5>Tanda Tangan</h5>
+                            </div>
+                            <div class="main-card-body signature-container">
+
+                            <center>
+
+                                {{-- tampilkan tanda tangan lama --}}
+                                @if(!empty($ttdAsesor))
+                                        <div id="ttd-view">
+                                        <img src="{{ asset('storage/'.$ttdAsesor) }}" width="260" class="mb-3" style="border:1px solid #ddd;border-radius:8px;">
+                                        <br>
+                                        <button type="button" class="btn-clear-sig" id="btn-edit-ttd">
+                                            <i class="bi bi-pen-fill"></i>Perbarui Tanda Tangan
+                                        </button>
+                                    </div>
+                                @endif
+
+                                {{-- canvas untuk tanda tangan --}}
+                                <div id="ttd-canvas-area" style="{{ !empty($ttdAsesor) ? 'display:none' : '' }}">                                    <canvas id="signature-pad" width="500" height="180"></canvas>
+                                    <br>
+                                    <button type="button" class="btn-clear-sig" id="clear-signature">
+                                        <i class="bi bi-eraser-fill"></i> Hapus
+                                    </button>
+                                    {{-- tombol batal hanya muncul jika sudah pernah ttd --}}
+                                    @if(!empty($persetujuan->ttd_asesor))
+                                        <button type="button" class="btn-clear-sig" id="btn-batal-ttd">
+                                            <i class="bi bi-arrow-left"></i> Batal
+                                        </button>
+                                    @endif
+                                </div>
+
+                            </center>
+
+                            <input type="hidden" name="ttd_asesor" id="ttd_asesor">
+
+                            </div>
+                        </div>
+
+                        
                         <div class="text-end mt-4">
                             <button type="submit" class="btn-save">
                                 <i class="bi bi-floppy2-fill"></i> Simpan Penilaian
                             </button>
                         </div>
-                    @endif
-
                 </form>
             </div>
         </div>
-
     </div>
-</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const canvas = document.getElementById('signature-pad');
+    const clearBtn = document.getElementById('clear-signature');
+    const form = document.getElementById('form-penilaian');
+    const ttdInput = document.getElementById('ttd_asesor');
+
+    const btnEdit = document.getElementById('btn-edit-ttd');
+    const btnBatal = document.getElementById('btn-batal-ttd');
+    const viewArea = document.getElementById('ttd-view');
+    const canvasArea = document.getElementById('ttd-canvas-area');
+
+    // cek apakah sudah ada ttd lama
+    const ttdLama = {!! !empty($ttdAsesor) ? 'true' : 'false' !!};
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    // =============================
+    // DRAW SIGNATURE
+    // =============================
+
+    canvas.addEventListener('mousedown', (e) => {
+        drawing = true;
+        ctx.beginPath();
+        ctx.moveTo(e.offsetX, e.offsetY);
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+        if (!drawing) return;
+
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#000';
+
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(e.offsetX, e.offsetY);
+    });
+
+    canvas.addEventListener('mouseup', () => drawing = false);
+    canvas.addEventListener('mouseleave', () => drawing = false);
+
+    // =============================
+    // CLEAR SIGNATURE
+    // =============================
+
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function () {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+    }
+
+    // =============================
+    // EDIT SIGNATURE
+    // =============================
+
+    if (btnEdit) {
+        btnEdit.addEventListener('click', function () {
+            viewArea.style.display = "none";
+            canvasArea.style.display = "block";
+        });
+    }
+
+    // =============================
+    // CANCEL EDIT SIGNATURE
+    // =============================
+
+    if (btnBatal) {
+        btnBatal.addEventListener('click', function () {
+
+            canvasArea.style.display = "none";
+            viewArea.style.display = "block";
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        });
+    }
+
+    // =============================
+    // FORM SUBMIT
+    // =============================
+
+    form.addEventListener('submit', function (e) {
+
+        const blank = document.createElement('canvas');
+        blank.width = canvas.width;
+        blank.height = canvas.height;
+
+        const isCanvasEmpty = canvas.toDataURL() === blank.toDataURL();
+
+        // jika belum ada ttd lama dan canvas kosong
+        if (!ttdLama && isCanvasEmpty) {
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Tanda Tangan Belum Diisi',
+                text: 'Silakan isi tanda tangan terlebih dahulu sebelum menyimpan.',
+                confirmButtonColor: '#041562'
+            });
+
+            e.preventDefault();
+            return;
+        }
+
+        // jika ada gambar baru dari canvas
+        if (!isCanvasEmpty) {
+            ttdInput.value = canvas.toDataURL('image/png');
+        }
+
+    });
+
+});
+</script>
 @endsection

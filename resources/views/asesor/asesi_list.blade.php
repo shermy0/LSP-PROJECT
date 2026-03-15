@@ -326,6 +326,24 @@
         font-size: 0.9rem;
     }
 
+    .review-badge{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        width:32px;
+        height:32px;
+        border-radius:8px;
+        background:#dcfce7;
+        color:#15803d;
+        font-size:16px;
+        margin-left:6px;
+    }
+
+    .review-belum{
+        background:#fee2e2;
+        color:#b91c1c;
+    }
+
     @keyframes fadeUp {
         from { opacity: 0; transform: translateY(24px); }
         to   { opacity: 1; transform: translateY(0); }
@@ -358,6 +376,10 @@
                     <h5>Data Asesi</h5>
                     <span>{{ count($dataAsesi) }} asesi terdaftar</span>
                 </div>
+                <div style="margin-left: auto; display: flex; align-items: center; gap: 15px; font-size: 0.8rem;">
+                    <span><span class="review-badge" style="background:#dcfce7; color:#15803d; width:24px; height:24px;"><i class="bi bi-check-lg"></i></span> Sudah direview</span>
+                    <span><span class="review-badge review-belum" style="width:24px; height:24px; background:#fa5f5f; color:#fff;"><i class="bi bi-x-lg"></i></span> Belum direview</span>
+                </div>
             </div>
 
             @if(count($dataAsesi) > 0)
@@ -367,7 +389,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Nama Asesi</th>
-                                <th>Status</th>
+                                <th>Status Asesmen</th>
                                 <th>Jawaban / Soal</th>
                                 <th>Aksi</th>
                             </tr>
@@ -405,11 +427,20 @@
                                             {{ $item['jumlah_jawaban'] }} / {{ $item['jumlah_pertanyaan'] }}
                                         </div>
                                     </td>
-                                    <td>
+                                    <td style="display:flex;align-items:center;gap:6px;">
                                         @if($item['jumlah_jawaban'] > 0)
                                             <a href="{{ route('asesor.skema.jenis.asesi.jawaban', [$id_skema, $jenis, $item['id_asesi']]) }}" class="btn-lihat">
                                                 <i class="bi bi-eye"></i> Lihat Jawaban
                                             </a>
+                                            @if($item['reviewed'])
+                                                <span class="review-badge" title="Sudah direview asesor">
+                                                    <i class="bi bi-check-lg"></i>
+                                                </span>
+                                            @else
+                                                <span class="review-badge review-belum" style="background:#fa5f5f; color:#fff;"  title="Belum direview">
+                                                    <i class="bi bi-x-lg"></i>
+                                                </span>
+                                            @endif
                                         @else
                                             <span class="no-jawaban">
                                                 <i class="bi bi-dash-circle"></i> Belum ada jawaban
