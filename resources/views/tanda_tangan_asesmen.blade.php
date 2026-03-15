@@ -3,7 +3,6 @@
 @section('konten')
 <div class="container mt-4">
     <h4 class="fw-bold text-center mb-4">FR.IA.07 – DPL – Tanda Tangan Pembuatan Asesmen</h4>
-
     {{-- Pesan sukses --}}
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -26,12 +25,13 @@
                         <input type="text" class="form-control" value="{{ $asesorLogin->nama_asesor }}" readonly>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">TanggalTanggal</label>
+                        <label class="form-label fw-bold">Tanggal</label>
                         <input type="date" 
-                        name="tgl_ttd_asesor" 
-                        class="form-control" 
-                        value="{{ date('Y-m-d') }}" 
-                        readonly>                    </div>
+                               name="tgl_ttd_asesor" 
+                               class="form-control" 
+                               value="{{ date('Y-m-d') }}" 
+                               readonly>
+                    </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Nomor MET</label>
                         <input type="text" class="form-control" value="{{ $asesorLogin->no_registrasi }}" readonly>
@@ -84,6 +84,7 @@
                 </tbody>
             </table>
         @endif
+    </div>
 </div>
 
 {{-- JS Signature Pad --}}
@@ -92,7 +93,6 @@
     let ctx = canvas.getContext('2d');
     let drawing = false;
 
-    // Set background putih
     ctx.fillStyle = "#fff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -105,7 +105,6 @@
         ctx.lineWidth = 2;
         ctx.lineCap = 'round';
         ctx.strokeStyle = '#000';
-
         ctx.lineTo(event.offsetX, event.offsetY);
         ctx.stroke();
         ctx.beginPath();
@@ -138,4 +137,16 @@
         document.getElementById('ttd_asesor').value = dataURL;
     }
 </script>
+<a href="{{ $backUrl }}"
+   style="position:fixed; bottom:20px; left:260px; z-index:9999;
+          background-color:#041562; color:#fff; border:none;
+          border-radius:50px; padding:10px 18px;
+          font-weight:600; font-size:0.85rem;
+          box-shadow:0 4px 12px rgba(0,0,0,0.2);
+          display:flex; align-items:center; gap:6px;
+          text-decoration:none; transition:opacity 0.2s;"
+   onmouseover="this.style.opacity='0.85'"
+   onmouseout="this.style.opacity='1'">
+    <i class="bi bi-arrow-left"></i> Kembali
+</a>
 @endsection

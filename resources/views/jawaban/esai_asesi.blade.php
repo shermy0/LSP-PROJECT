@@ -66,7 +66,7 @@
 
     {{-- ===== SOAL ===== --}}
     @if(isset($pertanyaan) && $pertanyaan->count() > 0)
-        <form id="jawabanForm" action="{{ route('jawaban.store') }}" method="POST" onsubmit="return validateAndSaveSignature()">
+        <form id="jawabanForm" action="{{ route('jawaban.store') }}" method="POST" onsubmit="return validateForm(event)">
             @csrf
             <input type="hidden" name="id_skema" value="{{ $id_skema }}">
             <input type="hidden" name="id_pembuatan_pertanyaan" value="{{ $id_pembuatan_pertanyaan }}">
@@ -160,16 +160,19 @@
                         <input type="date" id="tanggal-asesi" class="form-control" value="{{ date('Y-m-d') }}" readonly>
                     </div>
                     <div class="mb-3">
-                        <label>Tanda Tangan</label>
-                        <canvas id="ttd-asesi" width="400" height="150"></canvas>
+                        <label>Tanda Tangan <span class="text-danger">*</span></label>
+                        <canvas id="ttd-asesi" width="400" height="150" style="border: 2px solid #ddd; border-radius: 8px; width: 100%; background: white; cursor: crosshair;"></canvas>
+                        <small class="text-muted"><i class="fas fa-info-circle"></i> Gambar tanda tangan Anda di kotak di atas</small>
                     </div>
                     <div class="btns">
-                        <button type="button" class="btn btn-danger clear" onclick="clearCanvas()">Hapus</button>
+                        <button type="button" class="btn btn-danger clear" onclick="clearCanvas()">
+                            <i class="fas fa-eraser me-1"></i> Hapus
+                        </button>
                     </div>
                 </div>
 
                 <div class="mt-4 text-center">
-                    <button type="submit" class="btn btn-success">
+                    <button type="button" class="btn btn-success" id="submitWithConfirmation">
                         <i class="fas fa-check me-1"></i> Kirim Jawaban
                     </button>
                     <button type="button" class="btn btn-secondary ms-2" id="backToQuestionsBtn">
@@ -194,12 +197,37 @@ document.addEventListener("DOMContentLoaded", function() {
     let form = document.getElementById("jawabanForm");
     let timeUpShown = false;
 
+    // Fungsi deteksi canvas kosong (loop manual pixel) - konsisten dengan yang di global
     function isCanvasBlank(canvas) {
         const ctx = canvas.getContext('2d');
-        const pixelBuffer = new Uint32Array(
-            ctx.getImageData(0, 0, canvas.width, canvas.height).data.buffer
-        );
-        return !pixelBuffer.some(color => color !== 0 && color !== 0xFFFFFFFF);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        for (let i = 0; i < data.length; i += 4) {
+            // Jika ada pixel yang tidak putih (RGB ≠ 255 semua), maka tidak kosong
+            if (data[i] !== 255 || data[i+1] !== 255 || data[i+2] !== 255) {
+                return false;
+            }
+        }
+        return true; // semua putih = kosong
+    }
+
+    // Gunakan fungsi saveSignature dari global (tidak perlu didefinisikan ulang)
+
+    function checkUnansweredQuestions() {
+        const allQuestions = document.querySelectorAll('.soal-item');
+        let unanswered = [];
+        
+        allQuestions.forEach((soal, index) => {
+            const textarea = soal.querySelector('textarea.jawaban-textarea');
+            if (!textarea || textarea.value.trim() === '') {
+                unanswered.push(index + 1);
+            }
+        });
+        
+        return {
+            count: unanswered.length,
+            numbers: unanswered
+        };
     }
 
     function updateCountdown() {
@@ -214,15 +242,19 @@ document.addEventListener("DOMContentLoaded", function() {
 
             const mainCanvas = document.getElementById('ttd-asesi');
             const isSigned = !isCanvasBlank(mainCanvas);
-
-            console.log('Waktu habis! Status tanda tangan:', isSigned); // Debug
+            const unanswered = checkUnansweredQuestions();
 
             if (!isSigned) {
-                // BELUM TANDA TANGAN - TAMPILKAN POP-UP
+                // BELUM TANDA TANGAN - TAMPILKAN POP-UP DENGAN CANVAS
                 Swal.fire({
-                    title: 'Waktu Habis!',
+                    title: '⏰ WAKTU HABIS!',
                     html: `
-                        <p class="mb-3 text-danger fw-bold">⚠️ Anda harus tanda tangan terlebih dahulu sebelum mengirim jawaban!</p>
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <p class="mb-3 text-danger fw-bold" style="font-size: 1.2rem;">
+                                ⚠️ Anda BELUM menandatangani lembar jawaban!
+                            </p>
+                            <p class="mb-3">Silakan tanda tangan terlebih dahulu:</p>
+                        </div>
                         <div style="text-align: left; max-width: 450px; margin: 0 auto;">
                             <label class="fw-semibold mb-2">Nama Lengkap</label>
                             <input type="text" class="form-control mb-3" value="{{ $asesi->nama_lengkap }}" readonly>
@@ -234,26 +266,26 @@ document.addEventListener("DOMContentLoaded", function() {
                             <canvas id="popup-ttd-asesi" width="400" height="150" style="border: 2px solid #dc3545; border-radius: 8px; width: 100%; background: white; cursor: crosshair; display: block;"></canvas>
                             
                             <button type="button" class="btn btn-sm btn-danger mt-2 w-100" onclick="clearPopupCanvas()">
-                                <i class="fas fa-eraser"></i> Hapus Tanda Tangan
+                                <i class="fas fa-eraser me-2"></i>Hapus Tanda Tangan
                             </button>
-                            <p class="text-muted mt-2 small"><i class="fas fa-info-circle"></i> Gambar tanda tangan Anda di kotak putih di atas</p>
+                            <p class="text-muted mt-2 small">
+                                <i class="fas fa-info-circle me-1"></i> Gambar tanda tangan Anda di kotak putih di atas
+                            </p>
                         </div>
                     `,
                     icon: 'warning',
                     showCancelButton: false,
-                    confirmButtonText: '<i class="fas fa-paper-plane"></i> Kirim Jawaban Sekarang',
+                    confirmButtonText: '<i class="fas fa-paper-plane me-2"></i> Kirim Jawaban',
                     confirmButtonColor: '#198754',
                     allowOutsideClick: false,
                     allowEscapeKey: false,
                     width: '600px',
                     didOpen: () => {
-                        console.log('Pop-up terbuka, inisialisasi canvas...'); // Debug
                         initPopupCanvas();
                     },
                     preConfirm: () => {
                         const popupCanvas = document.getElementById('popup-ttd-asesi');
                         
-                        // Validasi apakah sudah tanda tangan
                         if (isCanvasBlank(popupCanvas)) {
                             Swal.showValidationMessage('❌ Tanda tangan belum diisi! Silakan gambar tanda tangan Anda.');
                             return false;
@@ -262,73 +294,85 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        console.log('Tanda tangan valid, memproses...'); // Debug
-                        
-                        // Salin tanda tangan dari popup ke canvas utama
                         const popupCanvas = document.getElementById('popup-ttd-asesi');
                         const mainCanvas = document.getElementById('ttd-asesi');
                         const mainCtx = mainCanvas.getContext('2d');
                         
-                        // Clear dan copy
                         mainCtx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
                         mainCtx.fillStyle = '#ffffff';
                         mainCtx.fillRect(0, 0, mainCanvas.width, mainCanvas.height);
                         mainCtx.drawImage(popupCanvas, 0, 0);
                         
-                        // Salin tanggal
                         document.getElementById('tanggal-asesi').value = document.getElementById('popup-tanggal-asesi').value;
                         
-                        // Simpan signature
-                        saveSignature();
+                        // Panggil saveSignature global
+                        if (typeof saveSignature === 'function') {
+                            saveSignature();
+                        }
                         
-                        // Tampilkan loading dan submit
-                        Swal.fire({
-                            title: 'Mengirim Jawaban...',
-                            html: 'Mohon tunggu sebentar...',
-                            icon: 'info',
-                            showConfirmButton: false,
-                            allowOutsideClick: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            }
-                        });
-                        
-                        // Submit form setelah delay singkat
-                        setTimeout(() => {
-                            console.log('Mengirim form...'); // Debug
-                            form.submit();
-                        }, 500);
+                        // Submit form
+                        form.submit();
                     }
                 });
                 
-            } else {
-                // SUDAH TANDA TANGAN - LANGSUNG KIRIM
-                console.log('Sudah tanda tangan, langsung kirim'); // Debug
-                saveSignature();
-                
+            } else if (unanswered.count > 0) {
+                // SUDAH TANDA TANGAN TAPI ADA SOAL BELUM DIJAWAB
                 Swal.fire({
-                    title: 'Waktu Habis!',
-                    text: 'Jawaban Anda akan otomatis dikirim.',
-                    icon: 'info',
+                    title: '⏰ WAKTU HABIS!',
+                    html: `
+                        <div style="text-align: center;">
+                            <p class="mb-3 text-warning fw-bold" style="font-size: 1.2rem;">
+                                ⚠️ Masih ada <span class="text-danger">${unanswered.count}</span> soal yang belum dijawab!
+                            </p>
+                            <p class="mb-3">Jawaban yang sudah diisi akan tetap disimpan.</p>
+                        </div>
+                    `,
+                    icon: 'warning',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                }).then(() => {
+                    if (typeof saveSignature === 'function') {
+                        saveSignature();
+                    }
+                    form.submit();
+                });
+            } else {
+                // SUDAH TANDA TANGAN DAN SEMUA SOAL TERJAWAB
+                Swal.fire({
+                    title: '⏰ WAKTU HABIS!',
+                    html: `
+                        <div style="text-align: center;">
+                            <p class="mb-3 text-success fw-bold" style="font-size: 1.2rem;">
+                                <i class="fas fa-check-circle me-2"></i>Semua soal telah dijawab dan tanda tangan sudah diisi!
+                            </p>
+                            <p class="mb-3">Jawaban Anda akan segera dikirim.</p>
+                            <div class="spinner-border text-success mb-3" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    `,
+                    icon: 'success',
                     showConfirmButton: false,
                     timer: 2000,
                     timerProgressBar: true,
                     allowOutsideClick: false,
                     allowEscapeKey: false
                 }).then(() => {
+                    if (typeof saveSignature === 'function') {
+                        saveSignature();
+                    }
                     form.submit();
                 });
             }
         }
     }
 
-    // Fungsi untuk inisialisasi canvas di pop-up
     window.initPopupCanvas = function() {
         const popupCanvas = document.getElementById('popup-ttd-asesi');
-        if (!popupCanvas) {
-            console.error('Canvas popup tidak ditemukan!');
-            return;
-        }
+        if (!popupCanvas) return;
         
         const popupCtx = popupCanvas.getContext('2d');
         
@@ -348,7 +392,6 @@ document.addEventListener("DOMContentLoaded", function() {
             const rect = popupCanvas.getBoundingClientRect();
             lastX = e.clientX - rect.left;
             lastY = e.clientY - rect.top;
-            console.log('Mulai menggambar:', lastX, lastY); // Debug
         }
 
         function draw(e) {
@@ -367,9 +410,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         function stopDrawing() {
-            if (isDrawing) {
-                console.log('Berhenti menggambar'); // Debug
-            }
             isDrawing = false;
         }
 
@@ -387,7 +427,6 @@ document.addEventListener("DOMContentLoaded", function() {
             isDrawing = true;
             lastX = touch.clientX - rect.left;
             lastY = touch.clientY - rect.top;
-            console.log('Touch start:', lastX, lastY); // Debug
         });
 
         popupCanvas.addEventListener('touchmove', e => {
@@ -411,11 +450,8 @@ document.addEventListener("DOMContentLoaded", function() {
             e.preventDefault();
             stopDrawing();
         });
-        
-        console.log('Canvas popup berhasil diinisialisasi!'); // Debug
     };
 
-    // Fungsi untuk hapus canvas di pop-up
     window.clearPopupCanvas = function() {
         const popupCanvas = document.getElementById('popup-ttd-asesi');
         if (!popupCanvas) return;
@@ -424,7 +460,6 @@ document.addEventListener("DOMContentLoaded", function() {
         popupCtx.clearRect(0, 0, popupCanvas.width, popupCanvas.height);
         popupCtx.fillStyle = '#ffffff';
         popupCtx.fillRect(0, 0, popupCanvas.width, popupCanvas.height);
-        console.log('Canvas popup dihapus'); // Debug
     };
 
     const timerInterval = setInterval(updateCountdown, 1000);
@@ -435,12 +470,72 @@ document.addEventListener("DOMContentLoaded", function() {
 
 <script>
 // =========================================================
+// Fungsi Validasi Form Utama
+// =========================================================
+function validateForm(event) {
+    // Cek semua soal sudah dijawab
+    const allQuestions = document.querySelectorAll('.soal-item');
+    let unanswered = [];
+    
+    allQuestions.forEach((soal, index) => {
+        const textarea = soal.querySelector('textarea.jawaban-textarea');
+        if (!textarea || textarea.value.trim() === '') {
+            unanswered.push(index + 1);
+        }
+    });
+    
+    if (unanswered.length > 0) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Ada Soal Belum Dijawab!',
+            html: `Nomor: <b>${unanswered.join(', ')}</b> belum dijawab.<br>Lengkapi dulu sebelum kirim.`,
+            icon: 'warning',
+            confirmButtonText: 'Kembali ke Soal',
+            confirmButtonColor: '#0d6efd'
+        });
+        return false;
+    }
+    
+    // Cek tanda tangan dengan metode loop manual (sama dengan isCanvasBlank di timer)
+    const canvas = document.getElementById('ttd-asesi');
+    const ctx = canvas.getContext('2d');
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+    
+    let isCanvasEmpty = true;
+    for (let i = 0; i < data.length; i += 4) {
+        // Jika ada pixel yang tidak putih (RGB ≠ 255 semua), maka tidak kosong
+        if (data[i] !== 255 || data[i+1] !== 255 || data[i+2] !== 255) {
+            isCanvasEmpty = false;
+            break;
+        }
+    }
+    
+    if (isCanvasEmpty) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Tanda Tangan Belum Diisi!',
+            text: 'Silakan isi tanda tangan sebelum mengirim.',
+            icon: 'warning',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#0d6efd'
+        });
+        return false;
+    }
+    
+    // Simpan tanda tangan ke hidden input
+    saveSignature();
+    return true;
+}
+
+// =========================================================
 // Navigasi dan Soal
 // =========================================================
 document.addEventListener('DOMContentLoaded', function () {
     const soalItems = document.querySelectorAll('.soal-item');
     const navButtons = document.querySelectorAll('.soal-nav');
     const signatureSection = document.getElementById('signature-section');
+    const form = document.getElementById('jawabanForm');
 
     function showSoal(index) {
         soalItems.forEach((item, i) => item.style.display = (i === index) ? '' : 'none');
@@ -483,12 +578,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Update status navigasi soal (warna tombol) - DIPERBARUI UNTUK ESAI
+    // Update status navigasi soal
     function updateNavigationStatus() {
         navButtons.forEach((btn, index) => {
-            // Cek apakah textarea sudah diisi (untuk esai)
             const textarea = soalItems[index].querySelector('textarea.jawaban-textarea');
-            const isAnswered = textarea && textarea.value.trim() !== '';  // Trim untuk menghindari spasi kosong
+            const isAnswered = textarea && textarea.value.trim() !== '';
 
             if (isAnswered) {
                 btn.classList.remove('btn-outline-primary');
@@ -500,40 +594,53 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Event listener untuk textarea agar update real-time saat diketik
+    // Event listener untuk textarea
     document.querySelectorAll('textarea.jawaban-textarea').forEach(textarea => {
-        textarea.addEventListener('input', updateNavigationStatus);  // Update saat mengetik
-        textarea.addEventListener('change', updateNavigationStatus); // Update saat blur/fokus
+        textarea.addEventListener('input', updateNavigationStatus);
+        textarea.addEventListener('change', updateNavigationStatus);
     });
 
-    // Panggil sekali saat load untuk status awal
     updateNavigationStatus();
 });
-
 
 // =========================================================
 // Tanda Tangan
 // =========================================================
 document.addEventListener('DOMContentLoaded', function () {
     const canvas = document.getElementById('ttd-asesi');
+    if (!canvas) return;
+    
     const ctx = canvas.getContext('2d');
+    
+    // Set background putih
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
     ctx.strokeStyle = '#000';
-    let isDrawing = false, lastX = 0, lastY = 0;
+    
+    let isDrawing = false;
+    let lastX = 0, lastY = 0;
 
-    function startDrawing(e) { isDrawing = true; [lastX, lastY] = [e.offsetX, e.offsetY]; }
+    function startDrawing(e) {
+        isDrawing = true;
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+    }
+    
     function draw(e) {
         if (!isDrawing) return;
+        
         ctx.beginPath();
         ctx.moveTo(lastX, lastY);
         ctx.lineTo(e.offsetX, e.offsetY);
         ctx.stroke();
+        
         [lastX, lastY] = [e.offsetX, e.offsetY];
     }
-    function stopDrawing() { isDrawing = false; }
+    
+    function stopDrawing() {
+        isDrawing = false;
+    }
 
     // Desktop
     canvas.addEventListener('mousedown', startDrawing);
@@ -544,28 +651,45 @@ document.addEventListener('DOMContentLoaded', function () {
     // Mobile
     canvas.addEventListener('touchstart', e => {
         e.preventDefault();
-        const t = e.touches[0], r = canvas.getBoundingClientRect();
-        startDrawing({ offsetX: t.clientX - r.left, offsetY: t.clientY - r.top });
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        startDrawing({ offsetX: touch.clientX - rect.left, offsetY: touch.clientY - rect.top });
     });
+    
     canvas.addEventListener('touchmove', e => {
         e.preventDefault();
-        const t = e.touches[0], r = canvas.getBoundingClientRect();
-        draw({ offsetX: t.clientX - r.left, offsetY: t.clientY - r.top });
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        draw({ offsetX: touch.clientX - rect.left, offsetY: touch.clientY - rect.top });
     });
-    canvas.addEventListener('touchend', e => { e.preventDefault(); stopDrawing(); });
+    
+    canvas.addEventListener('touchend', e => {
+        e.preventDefault();
+        stopDrawing();
+    });
 });
 
 function saveSignature() {
     const canvas = document.getElementById('ttd-asesi');
-    const blank = document.createElement('canvas');
-    blank.width = canvas.width;
-    blank.height = canvas.height;
-    if (canvas.toDataURL() !== blank.toDataURL()) {
+    const ctx = canvas.getContext('2d');
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+    
+    // Cek apakah canvas benar-benar kosong (metode loop manual)
+    let isCanvasEmpty = true;
+    for (let i = 0; i < data.length; i += 4) {
+        if (data[i] !== 255 || data[i+1] !== 255 || data[i+2] !== 255) {
+            isCanvasEmpty = false;
+            break;
+        }
+    }
+    
+    if (!isCanvasEmpty) {
         document.getElementById('ttd_asesi_data').value = canvas.toDataURL();
         document.getElementById('tgl_ttd_asesi_data').value = document.getElementById('tanggal-asesi').value;
-    } else {
-        document.getElementById('ttd_asesi_data').value = ''; // biar gak kirim kosong
+        return true;
     }
+    return false;
 }
 
 function clearCanvas() {
@@ -577,66 +701,200 @@ function clearCanvas() {
 }
 
 // =========================================================
-// Validasi Soal & TTD sebelum submit
+// Tombol Submit dengan Konfirmasi
 // =========================================================
-function validateAndSaveSignature() {
-    const allQuestions = document.querySelectorAll('.soal-item');
-    let unanswered = [];
-
-    // cek soal yang belum dijawab
-    allQuestions.forEach((soal, index) => {
-        if (!soal.querySelector('input[type="radio"]:checked')) unanswered.push(index + 1);
-    });
-
-    if (unanswered.length > 0) {
-        Swal.fire({
-            title: 'Ada Soal Belum Dijawab!',
-            html: `Nomor: <b>${unanswered.join(', ')}</b> belum dijawab.<br>Lengkapi dulu sebelum kirim.`,
-            icon: 'warning',
-            confirmButtonText: 'Kembali ke Soal',
-            confirmButtonColor: '#0d6efd'
+document.addEventListener('DOMContentLoaded', function() {
+    const submitBtn = document.getElementById('submitWithConfirmation');
+    const form = document.getElementById('jawabanForm');
+    
+    if (submitBtn) {
+        submitBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Cek soal yang belum dijawab
+            const allQuestions = document.querySelectorAll('.soal-item');
+            let unanswered = [];
+            
+            allQuestions.forEach((soal, index) => {
+                const textarea = soal.querySelector('textarea.jawaban-textarea');
+                if (!textarea || textarea.value.trim() === '') {
+                    unanswered.push(index + 1);
+                }
+            });
+            
+            if (unanswered.length > 0) {
+                Swal.fire({
+                    title: 'Ada Soal Belum Dijawab!',
+                    html: `<b>${unanswered.length}</b> soal belum dijawab.<br>Lengkapi dulu sebelum kirim.`,
+                    icon: 'warning',
+                    confirmButtonText: 'Kembali ke Soal',
+                    confirmButtonColor: '#0d6efd'
+                });
+                return;
+            }
+            
+            // Cek tanda tangan dengan metode loop manual
+            const canvas = document.getElementById('ttd-asesi');
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            
+            let isCanvasEmpty = true;
+            for (let i = 0; i < data.length; i += 4) {
+                if (data[i] !== 255 || data[i+1] !== 255 || data[i+2] !== 255) {
+                    isCanvasEmpty = false;
+                    break;
+                }
+            }
+            
+            if (isCanvasEmpty) {
+                Swal.fire({
+                    title: 'Tanda Tangan Belum Diisi!',
+                    text: 'Silakan isi tanda tangan sebelum mengirim.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#0d6efd'
+                });
+                return;
+            }
+            
+            // Hitung jumlah soal yang sudah dijawab
+            const totalSoal = allQuestions.length;
+            const terjawab = totalSoal - unanswered.length;
+            
+            // Tampilkan konfirmasi sebelum submit
+            Swal.fire({
+                title: 'Konfirmasi Pengiriman',
+                html: `
+                    <div style="text-align: left;">
+                        <p class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Semua soal telah dijawab: <b>${terjawab}/${totalSoal}</b></p>
+                        <p class="mb-2"><i class="fas fa-signature text-success me-2"></i>Tanda tangan sudah diisi</p>
+                        <p class="mb-3 text-muted">Pastikan semua jawaban Anda sudah benar sebelum mengirim.</p>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-paper-plane me-1"></i> Ya, Kirim Jawaban',
+                cancelButtonText: '<i class="fas fa-times me-1"></i> Batal',
+                confirmButtonColor: '#198754',
+                cancelButtonColor: '#6c757d',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Simpan signature
+                    saveSignature();
+                    
+                    // Tampilkan loading
+                    Swal.fire({
+                        title: 'Mengirim Jawaban...',
+                        html: 'Mohon tunggu sebentar...',
+                        icon: 'info',
+                        showConfirmButton: false,
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    
+                    // Submit form
+                    setTimeout(() => {
+                        form.submit();
+                    }, 500);
+                }
+            });
         });
-        return false;
     }
+});
 
-    // cek tanda tangan
-    const canvas = document.getElementById('ttd-asesi');
-    const blank = document.createElement('canvas');
-    blank.width = canvas.width;
-    blank.height = canvas.height;
-
-    if (canvas.toDataURL() === blank.toDataURL()) {
-        Swal.fire({
-            title: 'Tanda Tangan Belum Diisi!',
-            text: 'Silakan isi tanda tangan sebelum mengirim.',
-            icon: 'warning',
-            confirmButtonText: 'OK',
-            confirmButtonColor: '#0d6efd'
-        });
-        return false;
+// Mencegah submit via tombol Enter
+document.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
     }
-
-    saveSignature();
-    return true;
-}
+});
 </script>
-
 
 {{-- Style --}}
 <style>
-#soal-navigation-container{z-index:100;box-shadow:0 2px 10px rgba(0,0,0,0.1);top:0;}
-.soal-nav{min-width:40px;transition:all 0.2s ease;}
-.soal-container{box-shadow:0 0 15px rgba(0,0,0,0.05);min-height:300px;}
-.soal-number{color:#0d6efd;margin-right:5px;}
-.soal-text{color:#333;line-height:1.6;}
-.main-header{background:#eaf2ff;border-left:6px solid #0284C7;padding:12px 15px;border-radius:6px;font-weight:bold;margin-bottom:20px;font-size:1.2rem;}
-.card{background:#fff;border:1px solid #ddd;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.08);padding:25px;max-width:500px;margin:20px auto;}
-.card-title{font-weight:bold;margin-bottom:15px;font-size:1.1rem;color:#333;border-bottom:1px solid #eee;padding-bottom:10px;}
-.card canvas{border:1px solid #999;border-radius:6px;width:100%;height:150px;background-color:#fff;cursor:crosshair;}
-.btns{display:flex;justify-content:space-between;gap:10px;}
-.btns .btn{flex:1;font-weight:500;}
-.navigation-buttons button{min-width:120px;}
-.img-thumbnail{object-fit:contain;border:1px solid #ddd;border-radius:8px;padding:3px;background-color:#fff;}
+#soal-navigation-container {
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    top: 0;
+}
+.soal-nav {
+    min-width: 40px;
+    transition: all 0.2s ease;
+}
+.soal-nav.btn-success {
+    background-color: #198754;
+    border-color: #198754;
+    color: white;
+}
+.soal-container {
+    box-shadow: 0 0 15px rgba(0,0,0,0.05);
+    min-height: 300px;
+}
+.soal-number {
+    color: #0d6efd;
+    margin-right: 5px;
+}
+.soal-text {
+    color: #333;
+    line-height: 1.6;
+}
+.main-header {
+    background: #eaf2ff;
+    border-left: 6px solid #0284C7;
+    padding: 12px 15px;
+    border-radius: 6px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+}
+.card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    padding: 25px;
+    max-width: 500px;
+    margin: 20px auto;
+}
+.card-title {
+    font-weight: bold;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+.card canvas {
+    border: 2px solid #999;
+    border-radius: 6px;
+    width: 100%;
+    height: 150px;
+    background-color: #fff;
+    cursor: crosshair;
+}
+.btns {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+.btns .btn {
+    flex: 1;
+    font-weight: 500;
+}
+.navigation-buttons button {
+    min-width: 120px;
+}
+.img-thumbnail {
+    object-fit: contain;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 3px;
+    background-color: #fff;
+}
 </style>
 @endsection
 
@@ -662,4 +920,4 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 </script>
-@endpush
+@endpush 

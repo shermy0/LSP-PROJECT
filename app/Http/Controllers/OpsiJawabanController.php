@@ -69,45 +69,61 @@ class OpsiJawabanController extends Controller
         $request->validate([
             'id_pertanyaan' => 'required|array',
             'id_pertanyaan.*' => 'required|exists:pertanyaan,id_pertanyaan',
-            'opsi' => 'required|array',
             'kunci_jawaban' => 'required|array'
         ]);
-
+    
         try {
             DB::beginTransaction();
-
-            $pertanyaanIds = $request->id_pertanyaan;
-            $allOpsi = $request->opsi;
-            $allKunci = $request->kunci_jawaban;
-
-            $kodeOpsi = ['A', 'B', 'C', 'D', 'E'];
-
-            foreach ($pertanyaanIds as $index => $idPertanyaan) {
-                // Hapus opsi jawaban lama
+    
+            $kodeOpsi = ['A','B','C','D','E'];
+    
+            foreach ($request->id_pertanyaan as $i => $idPertanyaan) {
+    
+                // hapus opsi lama
                 OpsiJawaban::where('id_pertanyaan', $idPertanyaan)->delete();
-
-                // Simpan opsi jawaban baru
-                if (isset($allOpsi[$index])) {
-                    foreach ($allOpsi[$index] as $opsiIndex => $isiOpsi) {
-                        if ($opsiIndex < 5 && !empty($isiOpsi)) {
-                            OpsiJawaban::create([
-                                'id_pertanyaan' => $idPertanyaan,
-                                'kode_opsi' => $kodeOpsi[$opsiIndex],
-                                'isi_opsi' => $isiOpsi,
-                                'benar' => $kodeOpsi[$opsiIndex] == $allKunci[$index] ? 1 : 0
-                            ]);
-                        }
+    
+                for ($j = 0; $j < 5; $j++) {
+    
+                    $isiOpsi = null;
+    
+                    // ===== CEK OPSI TEKS =====
+                    if (!empty($request->opsi_text[$i][$j])) {
+                        $isiOpsi = $request->opsi_text[$i][$j];
+                    }
+    
+                    // ===== CEK OPSI GAMBAR =====
+                    if ($request->hasFile("opsi_gambar.$i.$j")) {
+    
+                        $file = $request->file("opsi_gambar.$i.$j");
+    
+                        $path = $file->store('opsi_jawaban','public');
+    
+                        $isiOpsi = $path;
+                    }
+    
+                    // simpan jika ada isi
+                    if ($isiOpsi) {
+    
+                        OpsiJawaban::create([
+                            'id_pertanyaan' => $idPertanyaan,
+                            'kode_opsi' => $kodeOpsi[$j],
+                            'isi_opsi' => $isiOpsi,
+                            'benar' => $kodeOpsi[$j] == $request->kunci_jawaban[$i] ? 1 : 0
+                        ]);
+    
                     }
                 }
             }
-
+    
             DB::commit();
-
-            return redirect()->back()->with('success', 'Semua opsi jawaban berhasil disimpan');
-
+    
+            return redirect()->back()->with('success','Semua opsi jawaban berhasil disimpan');
+    
         } catch (\Exception $e) {
+    
             DB::rollBack();
-            return redirect()->back()->with('error', 'Gagal menyimpan opsi jawaban: ' . $e->getMessage());
+    
+            return redirect()->back()->with('error','Gagal menyimpan opsi: '.$e->getMessage());
         }
     }
 

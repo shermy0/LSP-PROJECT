@@ -10,12 +10,16 @@ class PMO extends Model
     use HasFactory;
 
     protected $table = 'pmo';
-
+    protected $primaryKey = 'id_pmo'; // ✅ tambah ini
     protected $fillable = [
     'id_skema',
     'id_asesmen',
-    'id_tuk', // ✅ tambahkan ini
+    'id_tuk', 
     'id_kuk',
+    'id_asesor', 
+    'id_asesi', 
+    'umpan_balik_untuk_asesi',
+    'id_unit',
     ];
 
     public $timestamps = false; // biar ga error created_at / updated_at

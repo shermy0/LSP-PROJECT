@@ -7,8 +7,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\Pertanyaan;
 use App\Models\JawabanAsesmen;
+use App\Models\JawabanAsesmenPersetujuan;
 use App\Models\Asesi;
+use App\Models\Asesor;
 use App\Models\PembuatanPertanyaan;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class JawabanController extends Controller
 {
@@ -22,13 +26,13 @@ class JawabanController extends Controller
          if (!$user) {
              return redirect()->route('login')->withErrors(['error' => 'Silakan login terlebih dahulu.']);
          }
-     
+ 
          // Ambil data asesi login
          $asesi = Asesi::where('user_id', $user->id)->first();
          if (!$asesi) {
              return redirect()->route('login')->withErrors(['error' => 'Data Asesi tidak ditemukan.']);
          }
-     
+ 
          // Ambil semua skema yang terhubung dengan asesor dari asesi ini
          $skemaList = DB::table('asesor_skema')
              ->join('skema_sertifikasi', 'asesor_skema.skema_id', '=', 'skema_sertifikasi.id_skema')
@@ -41,10 +45,9 @@ class JawabanController extends Controller
              )
              ->orderBy('skema_sertifikasi.nama_skema')
              ->get();
-     
-         // Ambil status penyelesaian asesmen untuk setiap skema dan jenis
+ 
          $statusAsesmen = [];
-     
+ 
          foreach ($skemaList as $skema) {
              // Hitung jumlah pertanyaan per jenis untuk skema ini
              $jumlahPertanyaan = [
@@ -61,7 +64,7 @@ class JawabanController extends Controller
                      ->where('jenis_pertanyaan', 'lisan')
                      ->count(),
              ];
-     
+ 
              // Hitung jumlah jawaban per jenis untuk asesi dan skema ini
              $jumlahJawaban = [
                  'pilihan_ganda' => DB::table('jawaban_asesmen')
@@ -83,11 +86,11 @@ class JawabanController extends Controller
                      ->where('pertanyaan.jenis_pertanyaan', 'lisan')
                      ->count(),
              ];
-     
-             // Tentukan status dasar
+ 
+             // Tentukan status dasar lisan
              $statusLisanDasar = $jumlahJawaban['lisan'] >= $jumlahPertanyaan['lisan'] && $jumlahPertanyaan['lisan'] > 0;
-     
-             // 🔹 Tambahkan logika cek tanda tangan lisan (jika sudah ada di tabel persetujuan)
+ 
+             // Cek tanda tangan lisan
              $sudahTtdLisan = false;
              if ($statusLisanDasar) {
                  $sudahTtdLisan = DB::table('jawaban_asesmen_persetujuan')
@@ -98,114 +101,141 @@ class JawabanController extends Controller
                      ->where('pertanyaan.jenis_pertanyaan', 'lisan')
                      ->exists();
              }
-     
+ 
+             // ===== CEKLIS OBSERVASI =====
+            // Cek apakah ada observasi (ceklis observasi) untuk skema dan asesi ini
+$observasiExists = DB::table('observasi_ceklis')
+->where('id_skema', $skema->id_skema)
+->where('id_asesi', $asesi->id_asesi)
+->exists();
+
+// Cek apakah sudah ada tanda tangan asesi di tabel persetujuan observasi
+$ttdObservasiExists = false;
+if ($observasiExists) {
+$ttdObservasiExists = DB::table('observasi_ceklis')
+    ->join('observasi_ceklis_persetujuan', 'observasi_ceklis.id_observasi', '=', 'observasi_ceklis_persetujuan.id_observasi')
+    ->where('observasi_ceklis.id_skema', $skema->id_skema)
+    ->where('observasi_ceklis.id_asesi', $asesi->id_asesi)
+    ->whereNotNull('observasi_ceklis_persetujuan.ttd_asesi')
+    ->exists();
+}
              // Simpan status ke array
              $statusAsesmen[$skema->id_skema] = [
-                 'pilihan_ganda' => $jumlahJawaban['pilihan_ganda'] >= $jumlahPertanyaan['pilihan_ganda'] && $jumlahPertanyaan['pilihan_ganda'] > 0,
-                 'esai' => $jumlahJawaban['esai'] >= $jumlahPertanyaan['esai'] && $jumlahPertanyaan['esai'] > 0,
-                 'lisan' => $statusLisanDasar,
-                 'ttd_lisan_selesai' => $sudahTtdLisan, // tambahan untuk view
+                 'pilihan_ganda'          => $jumlahJawaban['pilihan_ganda'] >= $jumlahPertanyaan['pilihan_ganda'] && $jumlahPertanyaan['pilihan_ganda'] > 0,
+                 'esai'                   => $jumlahJawaban['esai'] >= $jumlahPertanyaan['esai'] && $jumlahPertanyaan['esai'] > 0,
+                 'lisan'                  => $statusLisanDasar,
+                 'ttd_lisan_selesai'      => $sudahTtdLisan,
+                 'observasi_selesai'      => $observasiExists,
+             'ttd_observasi_selesai'  => $ttdObservasiExists,
              ];
          }
-     
+ 
          return view('pilih_asesmen', compact('asesi', 'skemaList', 'statusAsesmen'));
      }
      
 
-    public function show($id_skema, $jenis)
-    {
-        $user = auth()->user();
-        if (!$user) {
-            return redirect()->route('login')->withErrors(['error' => 'Silakan login terlebih dahulu.']);
-        }
-    
-        $asesi = Asesi::where('user_id', $user->id)->first();
-        if (!$asesi) {
-            return redirect()->route('login')->withErrors(['error' => 'Data Asesi tidak ditemukan.']);
-        }
-        $id_asesi = $asesi->id_asesi;
-    
-        // mapping alias URL ke nilai DB
-        $mapJenis = [
-            'pg' => 'pilihan_ganda',
-            'pilihan_ganda' => 'pilihan_ganda',
-            'esai' => 'esai',
-            'lisan' => 'lisan',
-        ];
-        if (!isset($mapJenis[$jenis])) {
-            abort(404, 'Jenis pertanyaan tidak valid');
-        }
-        $jenisDb = $mapJenis[$jenis];
-    
-        // ambil pertanyaan lengkap dengan id_pembuatan_pertanyaan
-        $pertanyaan = Pertanyaan::where('id_skema', $id_skema)
-            ->where('jenis_pertanyaan', $jenisDb)
-            ->with(['opsiJawaban' => fn($q) => $q->orderBy('kode_opsi')])
-            ->get();
-    
-        if ($pertanyaan->isEmpty()) {
-            return view("jawaban.$jenisDb" , compact(
-                'pertanyaan',
-                'id_skema',
-                'asesi',
-                'id_asesi'
-            ));
-        }
-    
-        // ambil jawaban lama user
-        $jawabanRaw = JawabanAsesmen::where('id_asesi', $id_asesi)
-            ->where('id_skema', $id_skema)
-            ->get();
-    
-        $jawaban = [];
-        foreach ($jawabanRaw as $j) {
-            $jawaban[$j->id_pertanyaan] = $j->jawaban_opsi ?? $j->jawaban_text;
-        }
+   public function show($id_skema, $jenis)
+{
+    $user = auth()->user();
+    if (!$user) {
+        return redirect()->route('login')->withErrors(['error' => 'Silakan login terlebih dahulu.']);
+    }
 
-        $skema = DB::table('skema_sertifikasi')->where('id_skema', $id_skema)->first();
-    
-        // kumpulkan semua id_pembuatan_pertanyaan dari pertanyaan
-        $idsPembuatan = $pertanyaan->pluck('id_pembuatan_pertanyaan')->unique();
-    
-        // ambil semua pembuatan pertanyaan terkait
-        $pembuatanList = PembuatanPertanyaan::whereIn('id_pembuatan_pertanyaan', $idsPembuatan)->get();
-    
-        // ambil 1 pembuatan pertanyaan
-        $pembuatan = $pembuatanList->first();
-        $id_pembuatan_pertanyaan = $pembuatan?->id_pembuatan_pertanyaan;
-        $timer = $pembuatan?->timer ?? 0; // menit
-        $timescap = $pembuatan?->timescap;
-    
-        // hitung sisa waktu (dalam detik)
-        $sisaDetik = $timer * 60;
-        if ($timescap) {
-            $endTime = \Carbon\Carbon::parse($timescap)->addMinutes($timer);
-            $sisaDetik = now()->diffInSeconds($endTime, false);
-            if ($sisaDetik < 0) {
-                $sisaDetik = 0; // sudah habis
-            }
-        }
-    
-        // pilih view
-        $viewMap = [
-            'pilihan_ganda' => 'jawaban.pg_asesi',
-            'esai' => 'jawaban.esai_asesi',
-            'lisan' => 'jawaban.lisan_asesi',
-        ];
-    
+    $asesi = Asesi::where('user_id', $user->id)->first();
+    if (!$asesi) {
+        return redirect()->route('login')->withErrors(['error' => 'Data Asesi tidak ditemukan.']);
+    }
+    $id_asesi = $asesi->id_asesi;
+
+    // Mapping alias URL ke nama jenis di DB
+    $mapJenis = [
+        'pg' => 'pilihan_ganda',
+        'pilihan_ganda' => 'pilihan_ganda',
+        'esai' => 'esai',
+        'lisan' => 'lisan',
+    ];
+    if (!isset($mapJenis[$jenis])) {
+        abort(404, 'Jenis pertanyaan tidak valid');
+    }
+    $jenisDb = $mapJenis[$jenis];
+
+    // Ambil pertanyaan lengkap dengan opsi jawaban
+    $pertanyaan = Pertanyaan::where('id_skema', $id_skema)
+        ->where('jenis_pertanyaan', $jenisDb)
+        ->with(['opsiJawaban' => fn($q) => $q->orderBy('kode_opsi')])
+        ->get();
+
+    // Map jenis ke view blade
+    $viewMap = [
+        'pilihan_ganda' => 'jawaban.pg_asesi',
+        'esai' => 'jawaban.esai_asesi',
+        'lisan' => 'jawaban.lisan_asesi', // perbaikan: gunakan view soal lisan biasa
+    ];
+
+    // Ambil skema (selalu)
+    $skema = DB::table('skema_sertifikasi')->where('id_skema', $id_skema)->first();
+
+    // Jika tidak ada pertanyaan, tetap kirim semua variabel ke view
+    if ($pertanyaan->isEmpty()) {
+        $timer = 0;
+        $timescap = null;
+        $sisaDetik = 0;
+        $id_pembuatan_pertanyaan = null;
+
         return view($viewMap[$jenisDb], compact(
             'pertanyaan',
-            'jawaban',
             'id_skema',
-            'timer',
-            'timescap',
             'asesi',
             'id_asesi',
-            'id_pembuatan_pertanyaan',
+            'timer',
+            'timescap',
             'sisaDetik',
+            'id_pembuatan_pertanyaan',
             'skema'
         ));
     }
+
+    // Ambil jawaban lama user
+    $jawabanRaw = JawabanAsesmen::where('id_asesi', $id_asesi)
+        ->where('id_skema', $id_skema)
+        ->get();
+
+    $jawaban = [];
+    foreach ($jawabanRaw as $j) {
+        $jawaban[$j->id_pertanyaan] = $j->jawaban_opsi ?? $j->jawaban_text;
+    }
+
+    // Kumpulkan semua id_pembuatan_pertanyaan
+    $idsPembuatan = $pertanyaan->pluck('id_pembuatan_pertanyaan')->unique();
+
+    // Ambil semua pembuatan pertanyaan terkait
+    $pembuatanList = PembuatanPertanyaan::whereIn('id_pembuatan_pertanyaan', $idsPembuatan)->get();
+    $pembuatan = $pembuatanList->first();
+
+    $id_pembuatan_pertanyaan = $pembuatan?->id_pembuatan_pertanyaan;
+    $timer = $pembuatan?->timer ?? 0; // menit
+    $timescap = $pembuatan?->timescap;
+
+    // Hitung sisa waktu dalam detik
+    $sisaDetik = $timer * 60;
+    if ($timescap) {
+        $endTime = \Carbon\Carbon::parse($timescap)->addMinutes($timer);
+        $sisaDetik = max(0, now()->diffInSeconds($endTime, false));
+    }
+
+    return view($viewMap[$jenisDb], compact(
+        'pertanyaan',
+        'jawaban',
+        'id_skema',
+        'timer',
+        'timescap',
+        'asesi',
+        'id_asesi',
+        'id_pembuatan_pertanyaan',
+        'sisaDetik',
+        'skema'
+    ));
+}
 
     /**
      * Simpan atau update jawaban user
@@ -404,4 +434,314 @@ class JawabanController extends Controller
             return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan saat memeriksa status jawaban. Silakan coba lagi atau hubungi admin.']);
         }
     }    
+
+    //asesor
+    protected function getAsesor()
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return redirect()->route('login')->withErrors(['error' => 'Silakan login.']);
+        }
+
+        $asesor = Asesor::where('user_id', $user->id)->first();
+        if (!$asesor) {
+            abort(403, 'Anda bukan asesor.');
+        }
+        return $asesor;
+    }
+
+    /**
+     * Tampilkan daftar skema yang dimiliki asesor.
+     */
+    public function indexSkema()
+    {
+        $asesor = $this->getAsesor();
+
+        $skemaList = DB::table('asesor_skema')
+            ->join('skema_sertifikasi', 'asesor_skema.skema_id', '=', 'skema_sertifikasi.id_skema')
+            ->where('asesor_skema.asesor_id', $asesor->id_asesor)
+            ->select('skema_sertifikasi.id_skema', 'skema_sertifikasi.nama_skema', 'skema_sertifikasi.kode_skema')
+            ->orderBy('skema_sertifikasi.nama_skema')
+            ->get();
+
+        return view('asesor.skema_index', compact('skemaList'));
+    }
+
+    /**
+     * Tampilkan pilihan jenis pertanyaan untuk skema tertentu.
+     */
+    public function listJenis($id_skema)
+    {
+        $asesor = $this->getAsesor();
+
+        // Pastikan skema ini milik asesor
+        $skema = DB::table('asesor_skema')
+            ->join('skema_sertifikasi', 'asesor_skema.skema_id', '=', 'skema_sertifikasi.id_skema')
+            ->where('asesor_skema.asesor_id', $asesor->id_asesor)
+            ->where('skema_sertifikasi.id_skema', $id_skema)
+            ->select('skema_sertifikasi.id_skema', 'skema_sertifikasi.nama_skema')
+            ->first();
+
+        if (!$skema) {
+            abort(404, 'Skema tidak ditemukan atau bukan milik Anda.');
+        }
+
+        return view('asesor.jenis_index', compact('skema'));
+    }
+
+    /**
+     * Tampilkan daftar asesi yang telah mengerjakan (atau terdaftar) untuk skema & jenis tertentu.
+     */
+    public function listAsesi($id_skema, $jenis)
+    {
+        $asesor = $this->getAsesor();
+
+        // Mapping jenis dari URL ke nilai DB
+        $mapJenis = [
+            'pg' => 'pilihan_ganda',
+            'pilihan_ganda' => 'pilihan_ganda',
+            'esai' => 'esai',
+            'lisan' => 'lisan',
+        ];
+        if (!isset($mapJenis[$jenis])) {
+            abort(404, 'Jenis pertanyaan tidak valid');
+        }
+        $jenisDb = $mapJenis[$jenis];
+
+        // Ambil semua asesi yang berada di bawah asesor ini
+        $asesiList = Asesi::where('asesor_id', $asesor->id_asesor)->get();
+
+        // Untuk setiap asesi, hitung status pengerjaan jenis soal ini
+        $dataAsesi = [];
+        foreach ($asesiList as $asesi) {
+            $jumlahPertanyaan = Pertanyaan::where('id_skema', $id_skema)
+                ->where('jenis_pertanyaan', $jenisDb)
+                ->count();
+
+                $jumlahJawaban = JawabanAsesmen::where('id_asesi', $asesi->id_asesi)
+                ->where('id_skema', $id_skema)
+                ->whereHas('pertanyaan', function ($q) use ($jenisDb) {
+                    $q->where('jenis_pertanyaan', $jenisDb);
+                })
+                ->where(function ($q) {
+                    $q->whereNotNull('jawaban_opsi')
+                      ->orWhereNotNull('jawaban_text');
+                })
+                ->count();
+
+                $status = ($jumlahJawaban > 0) ? 'selesai' : 'belum';
+            
+                $review = DB::table('jawaban_asesmen_persetujuan')
+                ->join('jawaban_asesmen','jawaban_asesmen_persetujuan.id_jawaban','=','jawaban_asesmen.id_jawaban')
+                ->join('pertanyaan','jawaban_asesmen.id_pertanyaan','=','pertanyaan.id_pertanyaan')
+                ->where('jawaban_asesmen.id_asesi', $asesi->id_asesi)
+                ->where('jawaban_asesmen.id_skema', $id_skema)
+                ->where('pertanyaan.jenis_pertanyaan', $jenisDb)
+                ->whereNotNull('jawaban_asesmen_persetujuan.ttd_asesor')
+                ->exists();
+
+            $dataAsesi[] = [
+                'id_asesi' => $asesi->id_asesi,
+                'nama' => $asesi->nama_lengkap,
+                'status' => $status,
+                'jumlah_pertanyaan' => $jumlahPertanyaan,
+                'jumlah_jawaban' => $jumlahJawaban,
+                'reviewed' => $review
+            ];
+        }
+
+        $skema = DB::table('skema_sertifikasi')->where('id_skema', $id_skema)->first(['nama_skema']);
+
+        return view('asesor.asesi_list', compact('dataAsesi', 'id_skema', 'jenis', 'skema', 'jenisDb'));
+    }
+
+    /**
+     * Tampilkan jawaban seorang asesi untuk skema & jenis tertentu.
+     */
+    public function viewJawaban($id_skema, $jenis, $id_asesi)
+    {
+        $asesor = $this->getAsesor();
+
+        // Mapping jenis
+        $mapJenis = [
+            'pg' => 'pilihan_ganda',
+            'pilihan_ganda' => 'pilihan_ganda',
+            'esai' => 'esai',
+            'lisan' => 'lisan',
+        ];
+        if (!isset($mapJenis[$jenis])) {
+            abort(404);
+        }
+        $jenisDb = $mapJenis[$jenis];
+
+        // Pastikan asesi ini adalah binaan asesor
+        $asesi = Asesi::where('id_asesi', $id_asesi)
+            ->where('asesor_id', $asesor->id_asesor)
+            ->firstOrFail();
+
+        // Ambil semua pertanyaan untuk skema & jenis ini, lengkap dengan opsi (untuk pg)
+        $pertanyaan = Pertanyaan::where('id_skema', $id_skema)
+            ->where('jenis_pertanyaan', $jenisDb)
+            ->with(['opsiJawaban' => function ($q) {
+                $q->orderBy('kode_opsi');
+            }])
+            ->get();
+
+        if ($pertanyaan->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada pertanyaan untuk jenis ini.');
+        }
+
+        // Ambil jawaban asesi
+        $jawabanRaw = JawabanAsesmen::where('id_asesi', $id_asesi)
+            ->where('id_skema', $id_skema)
+            ->get()
+            ->keyBy('id_pertanyaan');
+
+        // Data tambahan: untuk pg, kita ingin tahu opsi mana yang benar
+        $kunciJawaban = [];
+        if ($jenisDb === 'pilihan_ganda') {
+            foreach ($pertanyaan as $p) {
+                $benar = $p->opsiJawaban->firstWhere('benar', 1);
+                $kunciJawaban[$p->id_pertanyaan] = $benar ? $benar->id_opsi : null;
+            }
+        }
+
+        $skema = DB::table('skema_sertifikasi')->where('id_skema', $id_skema)->first(['nama_skema']);
+
+        $persetujuan = DB::table('jawaban_asesmen_persetujuan')
+        ->join('jawaban_asesmen', 'jawaban_asesmen_persetujuan.id_jawaban', '=', 'jawaban_asesmen.id_jawaban')
+        ->join('pertanyaan', 'jawaban_asesmen.id_pertanyaan', '=', 'pertanyaan.id_pertanyaan')
+        ->where('jawaban_asesmen.id_asesi', $id_asesi)
+        ->where('jawaban_asesmen.id_skema', $id_skema)
+        ->where('pertanyaan.jenis_pertanyaan', $jenisDb)
+        ->select(
+            'jawaban_asesmen_persetujuan.umpan_balik',
+            'jawaban_asesmen_persetujuan.ttd_asesor',
+            'jawaban_asesmen_persetujuan.tgl_ttd_asesor'
+        )
+        ->first();
+
+        return view('asesor.jawaban_show', compact(
+            'pertanyaan',
+            'jawabanRaw',
+            'asesi',
+            'skema',
+            'jenisDb',
+            'kunciJawaban',
+            'id_skema',
+            'jenis',
+            'persetujuan'
+        ));
+    }
+    
+    public function storePencapaian(Request $request)
+    {
+        Log::info('Data request:', $request->all());
+    
+        $id_skema = $request->id_skema;
+        $id_asesi = $request->id_asesi;
+        $jenis    = $request->jenis;
+    
+        $mapJenis = [
+            'pg'   => 'pilihan_ganda',
+            'esai' => 'esai',
+            'lisan'=> 'lisan',
+        ];
+    
+        $jenisDb = $mapJenis[$jenis] ?? $jenis;
+    
+    
+        // =================================================
+        // 1. SIMPAN PENCAPAIAN (HANYA ESAI / LISAN)
+        // =================================================
+        if ($jenisDb !== 'pilihan_ganda' && $request->pencapaian) {
+    
+            foreach ($request->pencapaian as $id_jawaban => $nilai) {
+    
+                JawabanAsesmen::where('id_jawaban', $id_jawaban)
+                    ->update([
+                        'pencapaian' => $nilai
+                    ]);
+    
+            }
+    
+        }
+    
+    
+        // =================================================
+        // 2. SIMPAN UMPAN BALIK & TANDA TANGAN ASESOR
+        // =================================================
+        // ambil semua id jawaban
+        $jawabanList = JawabanAsesmen::where('id_asesi', $id_asesi)
+            ->where('id_skema', $id_skema)
+            ->whereHas('pertanyaan', function ($q) use ($jenisDb) {
+                $q->where('jenis_pertanyaan', $jenisDb);
+            })
+            ->pluck('id_jawaban');
+
+        $updateData = [];
+
+        // jika umpan balik diisi
+        if ($request->filled('umpan_balik')) {
+            $updateData['umpan_balik'] = $request->umpan_balik;
+        }
+
+        // jika tanda tangan baru dibuat
+        if ($request->filled('ttd_asesor')) {
+
+            try {
+
+                $ttdPath = $this->saveSignature(
+                    $request->ttd_asesor,
+                    $id_asesi,
+                    $jenisDb
+                );
+
+                $updateData['ttd_asesor'] = $ttdPath;
+                $updateData['tgl_ttd_asesor'] = now();
+
+            } catch (\Exception $e) {
+
+                Log::error('Gagal menyimpan tanda tangan: '.$e->getMessage());
+                return back()->with('error','Gagal menyimpan tanda tangan');
+            }
+        }
+
+        // jika ada data yang perlu diupdate
+        if (!empty($updateData)) {
+            JawabanAsesmenPersetujuan::whereIn('id_jawaban', $jawabanList)
+                ->update($updateData);
+        }
+    
+        return back()->with('success','Penilaian dan persetujuan berhasil disimpan');
+    }
+    public function saveSignature($dataUrl, $id_asesi, $jenis)
+    {
+        if (empty($dataUrl)) {
+            throw new \Exception('Data URL tanda tangan kosong');
+        }
+    
+        if (!preg_match('/^data:image\/(\w+);base64,/', $dataUrl, $type)) {
+            throw new \Exception('Format data URL tidak valid');
+        }
+    
+        $data = substr($dataUrl, strpos($dataUrl, ',') + 1);
+        $type = strtolower($type[1]);
+    
+        if (!in_array($type, ['png', 'jpg', 'jpeg'])) {
+            throw new \Exception('Tipe gambar tidak didukung: ' . $type);
+        }
+    
+        $data = base64_decode($data);
+        if ($data === false) {
+            throw new \Exception('Gagal decode base64');
+        }
+    
+        $filename = 'ttd_asesor_' . $id_asesi . '_' . $jenis . '_' . time() . '.' . $type;
+        $path = 'ttd/' . $filename;
+    
+        Storage::disk('public')->put($path, $data);
+    
+        return $path;
+    }
 }

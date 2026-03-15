@@ -143,7 +143,7 @@
                             <div class="card-header bg-light fw-semibold text-center">Asesor <span
                                     class="text-danger">*</span></div>
                             <div class="card-body text-center">
-                                <p><strong>Nama:</strong> {{ Auth::user()->name ?? '-' }}</p>
+                                <p><strong>Nama:</strong> {{ Auth::user()?->name ?? "" ?? '-' }}</p>
                                 <p><strong>Tanggal:</strong> {{ date('Y-m-d') }}</p>
                                 <canvas id="ttd-asesor" class="ttd-box"></canvas>
                                 <input type="hidden" name="ttd_asesor" id="ttd-asesor-input" required>

@@ -49,12 +49,14 @@ public function pertanyaanPG($id_skema)
 {
     // cari skema berdasarkan ID
     $skema = Skema::findOrFail($id_skema);
-       // ambil semua pembuatan pertanyaan untuk skema ini
-       $pembuatanList = PembuatanPertanyaan::where('id_skema', $id_skema)
-       ->orderBy('id_pembuatan_pertanyaan', 'desc')
-       ->get();
 
-    return view('pg', compact('skema', 'pembuatanList')); // pastikan view pg.blade.php ada
+    // ambil hanya pembuatan pertanyaan jenis pilihan_ganda
+    $pembuatanList = PembuatanPertanyaan::where('id_skema', $id_skema)
+        ->where('jenis_pertanyaan', 'pilihan_ganda')
+        ->orderBy('id_pembuatan_pertanyaan', 'desc')
+        ->get();
+
+    return view('pg', compact('skema', 'pembuatanList'));
 }
 
 public function showSkema($id_skema)

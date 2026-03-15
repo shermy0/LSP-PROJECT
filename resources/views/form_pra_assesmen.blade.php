@@ -19,7 +19,7 @@
         <div class="card-body">
 
             {{-- Jika role Asesi --}}
-            @if(Auth::user()->role == 'asesi')
+            @if(Auth::check() && Auth::user()->role == 'asesi')
                 @php $status = $permohonan->status ?? null; @endphp
 
                 {{-- FR.APL.01 Permohonan Sertifikasi --}}
@@ -172,7 +172,7 @@
             @endif
 
             {{-- Jika role Asesor --}}
-            @if(Auth::user()->role == 'asesor')
+            @if(Auth::check() && Auth::user()->role == 'asesor')
                 <a href="{{ route('asesor.asesmen_mandiri.index') }}"
                    class="pra-item d-flex justify-content-between align-items-center mb-3 p-3 text-decoration-none">
                     <div class="d-flex align-items-start">

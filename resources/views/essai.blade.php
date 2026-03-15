@@ -142,15 +142,6 @@
         </div>
     </div>
 </div>
-
-            <div class="modal-body pt-2">
-                <input type="number" class="form-control mb-2" min="1" max="15" value="5">
-                <small class="text-danger">note: maksimal 15 pertanyaan</small>
-            </div>
-            <div class="modal-footer border-0">
-                <button type="button" class="btn w-100 text-white" style="background-color:#003366; font-weight:bold;">
-                    Simpan
-                </button>
             </div>
         </div>
     </div>

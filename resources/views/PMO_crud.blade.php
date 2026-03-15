@@ -1,7 +1,7 @@
 @extends('master')
-
 @section('konten')
 <div class="container mt-4">
+
     {{-- Header --}}
     <div class="p-3 mb-4 rounded shadow-sm" style="background-color:#041562; color:white;">
         <h4 class="fw-bold mb-0">
@@ -12,7 +12,6 @@
         </h4>
     </div>
 
-    {{-- Pesan sukses/error --}}
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
@@ -20,50 +19,103 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
-    @php $no = 1; @endphp
+    @php $currentKelompok = null; $nomorPerKelompok = 0; @endphp
 
-    @forelse($pertanyaanList as $pertanyaan => $list)
-        @php
-            // Ambil satu record utama
-            $p = $list->first();
+    @forelse($pertanyaanList as $p)
+    @php
+        $unitIds = json_decode($p->id_unit, true) ?? [$p->id_unit];
+        $units   = $unitList->whereIn('id_unit', $unitIds);
+    @endphp
 
-            // Gabungkan semua unit yang terkait dengan pertanyaan ini
-            $namaUnit = $list->map(function ($item) use ($unitList) {
-                $unit = $unitList->firstWhere('id_unit', $item->id_unit);
-                return $unit ? $unit->judul_unit : 'Unit tidak ditemukan';
-            })->implode(', ');
-        @endphp
+    @if($currentKelompok !== $p->id_kelompok)
+        @php $currentKelompok = $p->id_kelompok; $nomorPerKelompok = 0; @endphp
+        <div class="d-flex align-items-center mb-3 mt-4">
+            <div class="flex-grow-1 border-top" style="border-color:#041562!important;"></div>
+            <span class="mx-3 fw-bold px-3 py-1 rounded-pill text-white"
+                  style="background-color:#041562; font-size:0.9rem;">
+                📁 {{ $p->nama_kelompok ?? 'Tanpa Kelompok' }}
+            </span>
+            <div class="flex-grow-1 border-top" style="border-color:#041562!important;"></div>
+        </div>
+    @endif
+    @php $nomorPerKelompok++; @endphp
 
-        <div class="card mb-3 border-0 shadow-sm">
-            <div class="card-body">
-                <p class="mb-1">
-                    <strong>{{ $no++ }}. Pertanyaan:</strong> {{ $p->pertanyaan }}
-                </p>
-
-                @if($p->deskripsi_pertanyaan)
-                    <p class="text-success mb-1"><strong>Deskripsi:</strong> {{ $p->deskripsi_pertanyaan }}</p>
-                @endif
-
-                <p class="text-primary mb-2"><strong>Unit:</strong> {{ $namaUnit }}</p>
-
-                <div class="d-flex gap-2">
-                    <a href="{{ route('pmo.pertanyaan.edit', [$pmo->id_pmo, $p->id_pmo_pertanyaan]) }}" class="btn btn-sm btn-warning">Edit</a>
-                    <form action="{{ route('pmo.pertanyaan.destroy', [$pmo->id_pmo, $p->id_pmo_pertanyaan]) }}" method="POST" onsubmit="return confirm('Yakin mau hapus pertanyaan ini?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
-                    </form>
+    <div class="card mb-3 border-0 shadow-sm rounded-3">
+        <div class="card-body p-4">
+            <div class="row g-0">
+                <div class="col-auto me-3">
+                    <span class="fw-bold text-white rounded-circle d-flex align-items-center justify-content-center"
+                        style="width:32px;height:32px;background-color:#041562;font-size:0.85rem;">
+                        {{ $nomorPerKelompok }}
+                    </span>
+                </div>
+                <div class="col">
+                    <p class="fw-semibold mb-2" style="color:#041562; font-size:1rem;">
+                        {{ $p->pertanyaan }}
+                    </p>
+                    @if($p->deskripsi_pertanyaan)
+                        <p class="text-muted small mb-2">
+                            <i class="bi bi-info-circle me-1"></i>{{ $p->deskripsi_pertanyaan }}
+                        </p>
+                    @endif
+                    <div class="p-2 rounded-2 mb-3" style="background-color:#f4f6fb; border-left: 3px solid #041562;">
+                        <p class="text-muted small fw-semibold mb-1">Unit Kompetensi:</p>
+                        @foreach($units as $unit)
+                            <div class="d-flex align-items-start gap-2 mb-1">
+                                <i class="bi bi-check-circle-fill mt-1 flex-shrink-0" style="color:#041562; font-size:0.75rem;"></i>
+                                <span style="font-size:0.85rem; color:#333;">{{ $unit->judul_unit }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('pmo.pertanyaan.edit', [$pmo->id_pmo, $p->id_pmo_pertanyaan]) }}"
+                           class="btn btn-sm btn-warning px-3">
+                            <i class="bi bi-pencil me-1"></i>Edit
+                        </a>
+                        <form action="{{ route('pmo.pertanyaan.destroy', [$pmo->id_pmo, $p->id_pmo_pertanyaan]) }}"
+                              method="POST"
+                              onsubmit="return confirm('Yakin mau hapus pertanyaan ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-danger px-3">
+                                <i class="bi bi-trash me-1"></i>Hapus
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
     @empty
-        <p class="text-muted">Belum ada pertanyaan pada PMO ini.</p>
+        <div class="text-center text-muted py-5">
+            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+            Belum ada pertanyaan pada PMO ini.
+        </div>
     @endforelse
+
 </div>
 
-<a href="{{ route('pertanyaan.pmo.kelompok', ['id_skema' => $pmo->id_skema]) }}" 
-   class="btn btn-secondary fw-bold" 
-   style="position: fixed; bottom: 20px; right: 20px; z-index: 999;">
-   &laquo; Kembali ke Kelompok Pekerjaan
+{{-- Kembali ke halaman PMO (TTD sudah dipindah ke kelompok) --}}
+{{-- Kembali dinamis: kalau dari crud (ada id_pembuatan) → ke kelompok, kalau tidak → ke PMO list --}}
+@php
+    $backUrl = $id_pembuatan
+        ? route('pertanyaan.pmo.kelompok', [
+            'id_skema'     => $pmo->id_skema,
+            'id_pembuatan' => $id_pembuatan,
+          ])
+        : route('formasesmen.pmo', ['id_skema' => $pmo->id_skema]);
+@endphp
+<a href="{{ $backUrl }}"
+   style="position:fixed; bottom:20px; left:260px; z-index:9999;
+          background-color:#041562; color:#fff; border:none;
+          border-radius:50px; padding:10px 18px;
+          font-weight:600; font-size:0.85rem;
+          box-shadow:0 4px 12px rgba(0,0,0,0.2);
+          display:flex; align-items:center; gap:6px;
+          text-decoration:none; transition:opacity 0.2s;"
+   onmouseover="this.style.opacity='0.85'"
+   onmouseout="this.style.opacity='1'">
+    <i class="bi bi-arrow-left"></i> Kembali
 </a>
+
 @endsection

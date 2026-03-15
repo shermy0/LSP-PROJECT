@@ -25,10 +25,6 @@
                class="accordion-header d-block p-3 border rounded text-dark text-decoration-none">
                 <i class="fa-solid fa-stop me-2"></i> Pertanyaan Esai
             </a>
-            <h2 class="accordion-header p-3 border rounded">
-                <a href="{{ route('pertanyaan.esai') }}" class="text-dark text-decoration-none">
-                    <i class="fa-solid fa-stop me-2"></i> Pertanyaan Esai
-                </a>
             </h2>
         </div>
 
@@ -72,10 +68,10 @@
                 <li>
                     <!-- Direct ke view PMO.blade.php -->
                     <li>
-                        <a class="dropdown-item" 
-                        href="{{ route('formasesmen.pmo', ['id_skema' => $skema->id_skema]) }}">
-                            Pertanyaan PMO
-                        </a>
+                      <a class="dropdown-item"
+                       href="{{ route('formasesmen.pmo', ['id_skema' => $skema->id_skema]) }}">
+                        Pertanyaan PMO
+                    </a>
                      </li>
                 <li>
                     <a class="dropdown-item">

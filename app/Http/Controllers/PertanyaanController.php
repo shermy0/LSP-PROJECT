@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Auth;
-use App\Models\JawabanPMO; // pastikan model JawabanPMO sudah ada
 
 
 class PertanyaanController extends Controller
@@ -31,7 +30,7 @@ class PertanyaanController extends Controller
         return view('pertanyaan.index', compact('pertanyaan'));
     }
 
-// ================================
+    // ================================
     // CRUD LISAN
     // ================================
     public function createLisan(Request $request)
@@ -41,7 +40,6 @@ class PertanyaanController extends Controller
 
         $skema = Skema::findOrFail($id_skema);
 
-        // Buat record pembuatan pertanyaan
         $pembuatan = PembuatanPertanyaan::create([
             'id_skema' => $id_skema,
             'timer' => $request->query('timer', 0),
@@ -114,12 +112,10 @@ class PertanyaanController extends Controller
 
         $kelompok = KelompokPekerjaan::with(['pertanyaan' => function($q) {
             $q->where('jenis_pertanyaan', 'lisan');
-        }])->where('id_skema', $id_skema)->first(); // <── pakai first()
+        }])->where('id_skema', $id_skema)->first();
 
         return view('lisan_crud', compact('skema', 'kelompok'));
     }
-    
-     
 
     // ================================
     // FORM ESAI
@@ -134,149 +130,129 @@ class PertanyaanController extends Controller
         return view('input_esai', compact('skema', 'jumlah'));
     }
 
-  public function storeEsai(Request $request)
-{
-    $request->validate([
-        'id_skema'         => 'required|integer',
-        'id_asesor'        => 'required|integer',
-        'id_kelompok'      => 'required|integer',
-        'isi_pertanyaan.*' => 'required|string',
-        'kunci_jawaban.*'  => 'nullable|string',
-        'file.*'           => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
-        'timer'            => 'required|integer',
-        'judul'            => 'nullable|string',
-    ]);
-
-    $id_skema    = $request->id_skema;
-    $id_asesor   = $request->id_asesor;
-    $id_kelompok = $request->id_kelompok;
-
-    // ✅ gunakan id_pembuatan_pertanyaan
-    if ($request->filled('id_pembuatan_pertanyaan')) {
-        $pembuatan = PembuatanPertanyaan::findOrFail($request->id_pembuatan_pertanyaan);
-        $pembuatan->update([
-            'judul'            => $request->judul ?? 'Pertanyaan Esai ' . now()->format('d-m-Y H:i'),
-            'timer'            => $request->timer,
-            'timescap'         => now(),
-            'jenis_pertanyaan' => 'esai',
+    public function storeEsai(Request $request)
+    {
+        $request->validate([
+            'id_skema'         => 'required|integer',
+            'id_asesor'        => 'required|integer',
+            'id_kelompok'      => 'required|integer',
+            'isi_pertanyaan.*' => 'required|string',
+            'kunci_jawaban.*'  => 'nullable|string',
+            'file.*'           => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
+            'timer'            => 'required|integer',
+            'judul'            => 'nullable|string',
         ]);
-    } else {
-        $pembuatan = PembuatanPertanyaan::create([
-            'id_skema'         => $id_skema,
-            'judul'            => $request->judul ?? 'Pertanyaan Esai ' . now()->format('d-m-Y H:i'),
-            'timer'            => $request->timer,
-            'timescap'         => now(),
-            'jenis_pertanyaan' => 'esai',
-        ]);
-    }
 
-    // Simpan pertanyaan
-    foreach ($request->isi_pertanyaan as $key => $isi) {
-        $pertanyaan = new Pertanyaan();
-        $pertanyaan->id_skema                 = $id_skema;
-        $pertanyaan->id_kelompok              = $id_kelompok;
-        $pertanyaan->id_asesor                = $id_asesor;
-        $pertanyaan->id_pembuatan_pertanyaan  = $pembuatan->id_pembuatan_pertanyaan; // ✅ pakai kolom ini
-        $pertanyaan->jenis_pertanyaan         = 'esai';
-        $pertanyaan->isi_pertanyaan           = $isi;
-        $pertanyaan->kunci_jawaban            = $request->kunci_jawaban[$key] ?? null;
+        $id_skema    = $request->id_skema;
+        $id_asesor   = $request->id_asesor;
+        $id_kelompok = $request->id_kelompok;
 
-        if ($request->hasFile("file.$key")) {
-            $file = $request->file("file.$key");
-            $filePath = $file->store('uploads/pertanyaan', 'public');
-            $pertanyaan->file_path = $filePath;
-            $pertanyaan->file_type = $file->getClientOriginalExtension();
+        if ($request->filled('id_pembuatan_pertanyaan')) {
+            $pembuatan = PembuatanPertanyaan::findOrFail($request->id_pembuatan_pertanyaan);
+            $pembuatan->update([
+                'judul'            => $request->filled('judul') ? $request->judul : $pembuatan->judul,
+                'timer'            => $request->timer,
+                'timescap'         => now(),
+                'jenis_pertanyaan' => 'esai',
+            ]);
+        } else {
+            $pembuatan = PembuatanPertanyaan::create([
+                'id_skema'         => $id_skema,
+                'judul'            => $request->filled('judul') ? $request->judul : 'Pertanyaan Esai',
+                'timer'            => $request->timer,
+                'timescap'         => now(),
+                'jenis_pertanyaan' => 'esai',
+            ]);
         }
 
-        $pertanyaan->save();
+        foreach ($request->isi_pertanyaan as $key => $isi) {
+            $pertanyaan = new Pertanyaan();
+            $pertanyaan->id_skema                = $id_skema;
+            $pertanyaan->id_kelompok             = $id_kelompok;
+            $pertanyaan->id_asesor               = $id_asesor;
+            $pertanyaan->id_pembuatan_pertanyaan = $pembuatan->id_pembuatan_pertanyaan;
+            $pertanyaan->jenis_pertanyaan        = 'esai';
+            $pertanyaan->isi_pertanyaan          = $isi;
+            $pertanyaan->kunci_jawaban           = $request->kunci_jawaban[$key] ?? null;
+
+            if ($request->hasFile("file.$key")) {
+                $file = $request->file("file.$key");
+                $pertanyaan->file_path = $file->store('uploads/pertanyaan', 'public');
+                $pertanyaan->file_type = $file->getClientOriginalExtension();
+            }
+
+            $pertanyaan->save();
+        }
+
+        return redirect()->route('esai.crud', [
+            'id_skema'    => $id_skema,
+            'id_kelompok' => $id_kelompok,
+        ])->with('success', 'Semua pertanyaan esai berhasil disimpan!');
     }
 
-    return redirect()->route('esai.crud', [
-        'id_skema'    => $id_skema,
-        'id_kelompok' => $id_kelompok,
-    ])->with('success', 'Semua pertanyaan esai berhasil disimpan!');
-}
-public function crudEsai($id_skema, $id_kelompok)
-{
-    $skema = Skema::findOrFail($id_skema);
-
-    $pertanyaan = Pertanyaan::where('id_skema', $id_skema)
-        ->where('id_kelompok', $id_kelompok)
-        ->where('jenis_pertanyaan', 'esai')
-        ->get();
-
-    $firstPertanyaan = $pertanyaan->first();
-
-    $pembuatan_pertanyaan = null;
-    if ($firstPertanyaan && $firstPertanyaan->id_pembuatan_pertanyaan) {
-        $pembuatan_pertanyaan = PembuatanPertanyaan::find($firstPertanyaan->id_pembuatan_pertanyaan);
-    }
-
-    $pembuatanList = PembuatanPertanyaan::where('id_skema', $id_skema)
-        ->where('jenis_pertanyaan', 'esai')
-        ->orderBy('timescap', 'desc')
-        ->get();
-
-    return view('esai_crud', compact(
-        'id_skema',
-        'id_kelompok',
-        'skema',
-        'pertanyaan',
-        'firstPertanyaan',
-        'pembuatan_pertanyaan',
-        'pembuatanList'
-    ));
-}
-
-
-
-
-
-   public function editEsai($id)
-{
-    $pertanyaan = Pertanyaan::findOrFail($id);
-    $skema = Skema::find($pertanyaan->id_skema);
-
-    return view('input_esai_edit', [
-        'pertanyaan' => $pertanyaan,
-        'skema'      => $skema,
-        'id_skema'   => $pertanyaan->id_skema,
-        'id_kelompok'=> $pertanyaan->id_kelompok
-    ]);
-
-    
-}
-    public function updateEsai(Request $request, $id)
-{
-    $pertanyaan = Pertanyaan::findOrFail($id);
-
-    $request->validate([
-        'isi_pertanyaan' => 'required|string',
-        'kunci_jawaban'  => 'nullable|string',
-        'file'           => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
-    ]);
-
-    if ($request->hasFile('file') && $request->file('file')->isValid()) {
-        $file = $request->file('file');
-        $filePath = $file->store('uploads/pertanyaan', 'public');
-        $pertanyaan->file_path = $filePath;
-        $pertanyaan->file_type = $file->getClientOriginalExtension();
-    }
-
-    $pertanyaan->isi_pertanyaan = $request->isi_pertanyaan;
-    $pertanyaan->kunci_jawaban  = $request->kunci_jawaban;
-    $pertanyaan->save();
-
-    return redirect()->route('esai.crud', [
-        'id_skema'    => $pertanyaan->id_skema,
-        'id_kelompok' => $pertanyaan->id_kelompok
-    ])->with('success', 'Pertanyaan esai berhasil diupdate!');
-}
-
-    public function destroyEsai($id)
+    public function crudEsai($id_skema, $id_kelompok)
     {
-        $pertanyaan = Pertanyaan::findOrFail($id);
-        $id_skema   = $pertanyaan->id_skema;
+        $skema = Skema::findOrFail($id_skema);
+
+        $pertanyaan = Pertanyaan::where('id_skema', $id_skema)
+            ->where('id_kelompok', $id_kelompok)
+            ->where('jenis_pertanyaan', 'esai')
+            ->get();
+
+        $firstPertanyaan = $pertanyaan->first();
+
+        $pembuatan_pertanyaan = null;
+        if ($firstPertanyaan && $firstPertanyaan->id_pembuatan_pertanyaan) {
+            $pembuatan_pertanyaan = PembuatanPertanyaan::find($firstPertanyaan->id_pembuatan_pertanyaan);
+        }
+
+        $pembuatanList = PembuatanPertanyaan::where('id_skema', $id_skema)
+            ->where('jenis_pertanyaan', 'esai')
+            ->orderBy('timescap', 'desc')
+            ->get();
+
+        return view('esai_crud', compact(
+            'id_skema',
+            'id_kelompok',
+            'skema',
+            'pertanyaan',
+            'firstPertanyaan',
+            'pembuatan_pertanyaan',
+            'pembuatanList'
+        ));
+    }
+
+    public function editPertanyaanEsai($id_pertanyaan)
+    {
+        $pertanyaan = Pertanyaan::findOrFail($id_pertanyaan);
+        return view('input_esai_edit', compact('pertanyaan'));
+    }
+
+    public function updatePertanyaanEsai(Request $request, $id_pertanyaan)
+    {
+        $pertanyaan = Pertanyaan::findOrFail($id_pertanyaan);
+
+        if ($request->hasFile('file') && $request->file('file')->isValid()) {
+            if ($pertanyaan->file_path && \Storage::disk('public')->exists($pertanyaan->file_path)) {
+                \Storage::disk('public')->delete($pertanyaan->file_path);
+            }
+            $pertanyaan->file_path = $request->file('file')->store('pertanyaan_files', 'public');
+            $pertanyaan->file_type = $request->file('file')->getClientOriginalExtension();
+        }
+
+        $pertanyaan->isi_pertanyaan = $request->isi_pertanyaan;
+        $pertanyaan->kunci_jawaban  = $request->kunci_jawaban;
+        $pertanyaan->save();
+
+        return redirect()->route('esai.crud', [
+            'id_skema'    => $pertanyaan->id_skema,
+            'id_kelompok' => $pertanyaan->id_kelompok,
+        ])->with('success', 'Pertanyaan berhasil diperbarui!');
+    }
+
+    public function deletePertanyaanEsai($id_pertanyaan)
+    {
+        $pertanyaan = Pertanyaan::findOrFail($id_pertanyaan);
 
         if ($pertanyaan->file_path && \Storage::disk('public')->exists($pertanyaan->file_path)) {
             \Storage::disk('public')->delete($pertanyaan->file_path);
@@ -284,78 +260,66 @@ public function crudEsai($id_skema, $id_kelompok)
 
         $pertanyaan->delete();
 
-       return redirect()->route('esai.crud', [
-    'id_skema'   => $id_skema,
-    'id_kelompok'=> $pertanyaan->id_kelompok
-])->with('success', 'Pertanyaan esai berhasil dihapus!');
+        return back()->with('success', 'Pertanyaan berhasil dihapus!');
     }
 
- // ================================
-// FORM PILIHAN GANDA (PG)
-// ================================
-public function createPG(Request $request)
-{
+    // ================================
+    // FORM PILIHAN GANDA (PG)
+    // ================================
+    public function createPG(Request $request)
+    {
+        $request->validate([
+            'jumlah' => 'required|integer|min:1|max:20',
+            'id_skema' => 'required|exists:skema_sertifikasi,id_skema',
+            'id_kelompok' => 'required|exists:kelompok_pekerjaan,id_kelompok',
+            'timer' => 'required|integer|min:1',
+            'id_pembuatan_pertanyaan' => 'nullable|exists:pembuatan_pertanyaan,id_pembuatan_pertanyaan'
+        ]);
 
-    $request->validate([
-        'jumlah' => 'required|integer|min:1|max:20',
-        'id_skema' => 'required|exists:skema_sertifikasi,id_skema',
-        'id_kelompok' => 'required|exists:kelompok_pekerjaan,id_kelompok',
-        'timer' => 'required|integer|min:1',
-        'id_pembuatan_pertanyaan' => 'nullable|exists:pembuatan_pertanyaan,id_pembuatan_pertanyaan'
-    ]);
+        $jumlah = $request->query('jumlah', 5);
+        $id_skema = $request->query('id_skema');
+        $id_kelompok = $request->query('id_kelompok');
+        $timer = $request->query('timer', 30);
+        $id_pembuatan = $request->query('id_pembuatan_pertanyaan');
 
-    $jumlah = $request->query('jumlah', 5);
-    $id_skema = $request->query('id_skema');
-    $id_kelompok = $request->query('id_kelompok');
-    $timer = $request->query('timer', 30);
-    $id_pembuatan = $request->query('id_pembuatan_pertanyaan');
+        $skema = Skema::findOrFail($id_skema);
+        $kelompok = KelompokPekerjaan::findOrFail($id_kelompok);
 
-    $skema = Skema::findOrFail($id_skema);
-    $kelompok = KelompokPekerjaan::findOrFail($id_kelompok);
+        if ($id_pembuatan) {
+            $pembuatan = PembuatanPertanyaan::findOrFail($id_pembuatan);
+            $timer = $pembuatan->timer;
+        }
 
-
-
-    // Jika ada id_pembuatan_pertanyaan, ambil timer dari database
-    if ($id_pembuatan) {
-        $pembuatan = PembuatanPertanyaan::findOrFail($id_pembuatan);
-        $timer = $pembuatan->timer;
-    }
-
-    return view('pertanyaan.input_pg', [
-        'skema' => $skema,
-        'kelompok' => $kelompok,
-        'jumlah' => $jumlah,
-        'timer' => $timer,
-        'id_pembuatan_pertanyaan' => $id_pembuatan
-    ]);
-}
-
-public function storePMO(Request $request, $id_pmo)
-{
-    // Validasi input
-    $request->validate([
-        'pertanyaan' => 'required|string',
-        'id_unit' => 'required|array',
-    ]);
-
-    // Simpan ke tabel pmo_pertanyaan
-    foreach ($request->id_unit as $id_unit) {
-        \App\Models\PMO::create([
-            'id_pmo' => $id_pmo,
-            'id_unit' => $id_unit,
-            'pertanyaan' => $request->pertanyaan,
-            'deskripsi_pertanyaan' => $request->deskripsi_pertanyaan,
+        return view('pertanyaan.input_pg', [
+            'skema' => $skema,
+            'kelompok' => $kelompok,
+            'jumlah' => $jumlah,
+            'timer' => $timer,
+            'id_pembuatan_pertanyaan' => $id_pembuatan
         ]);
     }
 
-    // Redirect kembali dengan pesan sukses
-    return redirect()->back()->with('success', 'Pertanyaan PMO berhasil disimpan!');
-}
+    public function storePMO(Request $request, $id_pmo)
+    {
+        $request->validate([
+            'pertanyaan' => 'required|string',
+            'id_unit' => 'required|array',
+        ]);
+
+        foreach ($request->id_unit as $id_unit) {
+            \App\Models\PMO::create([
+                'id_pmo' => $id_pmo,
+                'id_unit' => $id_unit,
+                'pertanyaan' => $request->pertanyaan,
+                'deskripsi_pertanyaan' => $request->deskripsi_pertanyaan,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Pertanyaan PMO berhasil disimpan!');
+    }
 
     public function storePG(Request $request)
     {
-
-
         try {
             $validated = $request->validate([
                 'id_skema' => 'required|exists:skema_sertifikasi,id_skema',
@@ -363,16 +327,16 @@ public function storePMO(Request $request, $id_pmo)
                 'id_pembuatan_pertanyaan' => 'nullable|exists:pembuatan_pertanyaan,id_pembuatan_pertanyaan',
                 'timer' => 'required|integer|min:1',
                 'isi_pertanyaan' => 'required|array|min:1',
-                'isi_pertanyaan.*' => 'required|string|min:5',
+                'isi_pertanyaan.*' => 'required|string|min:1',
                 'jenis_opsi' => 'required|array',
-                'jenis_opsi.*' => 'required|array|min:5',
+                'jenis_opsi.*' => 'required|array|min:1',
                 'jenis_opsi.*.*' => 'required|string|in:text,gambar',
                 'opsi_text' => 'nullable|array',
                 'opsi_text.*' => 'nullable|array',
                 'opsi_text.*.*' => 'nullable|string',
                 'opsi_gambar' => 'nullable|array',
                 'opsi_gambar.*' => 'nullable|array',
-                'opsi_gambar.*.*' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+                'opsi_gambar.*.*' => 'nullable|file|mimes:jpg,jpeg,png',
                 'kunci_jawaban' => 'required|array',
                 'kunci_jawaban.*' => 'required|string|in:A,B,C,D,E',
                 'file.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
@@ -384,22 +348,16 @@ public function storePMO(Request $request, $id_pmo)
 
         DB::beginTransaction();
         try {
-
-
-            // 🔹 LOGIKA TIMER SAMA PERSIS DENGAN ESAI
             if ($request->filled('id_pembuatan_pertanyaan')) {
-                // Mode LANJUTKAN - gunakan timer yang sudah ada di database
                 $pembuatan = PembuatanPertanyaan::findOrFail($request->id_pembuatan_pertanyaan);
                 $pembuatan->update([
                     'timescap'         => now(),
                     'jenis_pertanyaan' => 'pilihan_ganda',
-                    // Timer tidak diubah, tetap pakai yang lama
                 ]);
             } else {
-                // Mode SELANJUTKAN - buat record baru dengan timer dari input
                 $pembuatan = PembuatanPertanyaan::create([
                     'id_skema'         => $request->id_skema,
-                    'timer'            => $request->timer, // Timer dari input modal
+                    'timer'            => $request->timer,
                     'timescap'         => now(),
                     'jenis_pertanyaan' => 'pilihan_ganda',
                 ]);
@@ -407,13 +365,9 @@ public function storePMO(Request $request, $id_pmo)
 
             $id_asesor = auth()->user()->asesor->id_asesor;
 
-            // Simpan pertanyaan dan opsi
             foreach ($request->isi_pertanyaan as $i => $isi) {
                 if (empty(trim($isi))) continue;
 
-            
-
-                // Handle file pertanyaan
                 $filePath = null;
                 $fileType = null;
                 if ($request->hasFile("file.$i") && $request->file("file.$i")->isValid()) {
@@ -422,7 +376,6 @@ public function storePMO(Request $request, $id_pmo)
                     $fileType = $file->getClientOriginalExtension();
                 }
 
-                // Simpan pertanyaan
                 $pertanyaan = Pertanyaan::create([
                     'id_skema'                => $request->id_skema,
                     'id_kelompok'             => $request->id_kelompok,
@@ -435,10 +388,9 @@ public function storePMO(Request $request, $id_pmo)
                     'kunci_jawaban'           => $request->kunci_jawaban[$i],
                 ]);
 
-                // Simpan opsi jawaban
                 if (isset($request->jenis_opsi[$i])) {
                     foreach ($request->jenis_opsi[$i] as $j => $jenis) {
-                        $kode = chr(65 + $j); // A, B, C, D, E
+                        $kode = chr(65 + $j);
                         $isiOpsi = null;
 
                         if ($jenis === 'text') {
@@ -477,223 +429,210 @@ public function storePMO(Request $request, $id_pmo)
         }
     }
 
+    public function crudPG($id_skema, $id_kelompok)
+    {
+        $skema = Skema::findOrFail($id_skema);
 
+        $pertanyaan = Pertanyaan::where('jenis_pertanyaan', 'pilihan_ganda')
+            ->where('id_skema', $id_skema)
+            ->where('id_kelompok', $id_kelompok)
+            ->with(['opsiJawaban' => function ($query) {
+                $query->orderBy('kode_opsi');
+            }])
+            ->get();
 
+        $pembuatan_pertanyaan = $pertanyaan->isNotEmpty()
+            ? PembuatanPertanyaan::find($pertanyaan->first()->id_pembuatan_pertanyaan)
+            : null;
 
-public function crudPG($id_skema, $id_kelompok)
-{
-    // Ambil data skema
-    $skema = Skema::findOrFail($id_skema);
-
-    // Ambil semua pertanyaan PG beserta opsi jawabannya
-    $pertanyaan = Pertanyaan::where('jenis_pertanyaan', 'pilihan_ganda')
-        ->where('id_skema', $id_skema)
-        ->where('id_kelompok', $id_kelompok)
-        ->with(['opsiJawaban' => function ($query) {
-            $query->orderBy('kode_opsi'); // urutkan opsi A, B, C, D
-        }])
-        ->get();
-
-    // Ambil data pembuatan pertanyaan (hanya kalau ada pertanyaan)
-    $pembuatan_pertanyaan = $pertanyaan->isNotEmpty()
-        ? PembuatanPertanyaan::find($pertanyaan->first()->id_pembuatan_pertanyaan)
-        : null;
-
-        // Ambil semua asesor (kalau perlu ditampilkan di view)
         $asesor = DB::table('asesor')
-        ->leftJoin('pertanyaan_asesmen_persetujuan', function($join) use ($pembuatan_pertanyaan) {
-            $join->on('asesor.id_asesor', '=', 'pertanyaan_asesmen_persetujuan.id_asesor')
-                 ->where('pertanyaan_asesmen_persetujuan.id_pembuatan_pertanyaan', $pembuatan_pertanyaan->id_pembuatan_pertanyaan);
-        })
-        ->select(
-            'asesor.id_asesor',
-            'asesor.nama_asesor',
-            'asesor.no_registrasi',
-            'pertanyaan_asesmen_persetujuan.tgl_ttd_asesor'
-        )
-        ->orderBy('asesor.nama_asesor')
-        ->get();
+            ->leftJoin('pertanyaan_asesmen_persetujuan', function($join) use ($pembuatan_pertanyaan) {
+                $join->on('asesor.id_asesor', '=', 'pertanyaan_asesmen_persetujuan.id_asesor')
+                     ->where('pertanyaan_asesmen_persetujuan.id_pembuatan_pertanyaan', $pembuatan_pertanyaan->id_pembuatan_pertanyaan);
+            })
+            ->select(
+                'asesor.id_asesor',
+                'asesor.nama_asesor',
+                'asesor.no_registrasi',
+                'pertanyaan_asesmen_persetujuan.tgl_ttd_asesor'
+            )
+            ->orderBy('asesor.nama_asesor')
+            ->get();
 
-    // Kirim data ke view
-    return view('pertanyaan.pg_crud', compact(
-        'pertanyaan',
-        'skema',
-        'id_kelompok',
-        'pembuatan_pertanyaan',
-        'asesor'
-    ));
-}
+        return view('pertanyaan.pg_crud', compact(
+            'pertanyaan',
+            'skema',
+            'id_kelompok',
+            'pembuatan_pertanyaan',
+            'asesor'
+        ));
+    }
 
+    public function editPG($id)
+    {
+        $pertanyaan = Pertanyaan::with(['opsiJawaban' => function($query) {
+            $query->orderBy('kode_opsi');
+        }])->findOrFail($id);
+        
+        $skema = Skema::find($pertanyaan->id_skema);
 
-public function editPG($id)
-{
-    $pertanyaan = Pertanyaan::with(['opsiJawaban' => function($query) {
-        $query->orderBy('kode_opsi'); // Urutkan berdasarkan kode A, B, C, D, E
-    }])->findOrFail($id);
-    
-    $skema = Skema::find($pertanyaan->id_skema);
+        return view('pertanyaan.input_pg_edit', compact('pertanyaan', 'skema'));
+    }
 
-    return view('pertanyaan.input_pg_edit', compact('pertanyaan', 'skema'));
-}
+    public function updatePG(Request $request, $id)
+    {
+        $pertanyaan = Pertanyaan::findOrFail($id);
 
-public function updatePG(Request $request, $id)
-{
-    $pertanyaan = Pertanyaan::findOrFail($id);
+        $request->validate([
+            'isi_pertanyaan' => 'required|string',
+            'kunci_jawaban' => 'required|string|in:A,B,C,D,E',
+            'jenis_opsi' => 'required|array|min:2',
+            'jenis_opsi.*' => 'required|string|in:text,gambar',
+            'opsi_text' => 'required|array',
+            'opsi_text.*' => 'nullable|string',
+            'opsi_gambar.*' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+            'opsi_gambar_lama.*' => 'nullable|string',
+            'file' => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
+            'hapus_file' => 'nullable',
+        ]);
 
-    $request->validate([
-        'isi_pertanyaan' => 'required|string',
-        'kunci_jawaban' => 'required|string|in:A,B,C,D,E',
-        'jenis_opsi' => 'required|array|min:2',
-        'jenis_opsi.*' => 'required|string|in:text,gambar',
-        'opsi_text' => 'required|array',
-        'opsi_text.*' => 'nullable|string',
-        'opsi_gambar.*' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
-        'opsi_gambar_lama.*' => 'nullable|string',
-        'file' => 'nullable|mimes:jpg,jpeg,png,pdf,docx,mp3,mp4|max:5120',
-        'hapus_file' => 'nullable',
-    ]);
-
-    DB::beginTransaction();
-    try {
-        // File pertanyaan
-        if ($request->hasFile('file')) {
-            if ($pertanyaan->file_path && \Storage::disk('public')->exists($pertanyaan->file_path)) {
-                \Storage::disk('public')->delete($pertanyaan->file_path);
+        DB::beginTransaction();
+        try {
+            if ($request->hasFile('file')) {
+                if ($pertanyaan->file_path && \Storage::disk('public')->exists($pertanyaan->file_path)) {
+                    \Storage::disk('public')->delete($pertanyaan->file_path);
+                }
+                $file = $request->file('file');
+                $pertanyaan->file_path = $file->store('uploads/pertanyaan', 'public');
+                $pertanyaan->file_type = $file->getClientOriginalExtension();
+            } elseif ($request->has('hapus_file')) {
+                if ($pertanyaan->file_path && \Storage::disk('public')->exists($pertanyaan->file_path)) {
+                    \Storage::disk('public')->delete($pertanyaan->file_path);
+                }
+                $pertanyaan->file_path = null;
+                $pertanyaan->file_type = null;
             }
-            $file = $request->file('file');
-            $pertanyaan->file_path = $file->store('uploads/pertanyaan', 'public');
-            $pertanyaan->file_type = $file->getClientOriginalExtension();
-        } elseif ($request->has('hapus_file')) {
-            if ($pertanyaan->file_path && \Storage::disk('public')->exists($pertanyaan->file_path)) {
-                \Storage::disk('public')->delete($pertanyaan->file_path);
-            }
-            $pertanyaan->file_path = null;
-            $pertanyaan->file_type = null;
-        }
 
-        // Update pertanyaan
-        $pertanyaan->isi_pertanyaan = $request->isi_pertanyaan;
-        $pertanyaan->kunci_jawaban = $request->kunci_jawaban;
-        $pertanyaan->save();
+            $pertanyaan->isi_pertanyaan = $request->isi_pertanyaan;
+            $pertanyaan->kunci_jawaban = $request->kunci_jawaban;
+            $pertanyaan->save();
 
-        // Hapus opsi lama
-        $opsiLama = OpsiJawaban::where('id_pertanyaan', $id)->get();
-        foreach ($opsiLama as $opsi) {
-            if ($opsi->isi_opsi && str_contains($opsi->isi_opsi, 'uploads/opsi_jawaban') && 
-                \Storage::disk('public')->exists($opsi->isi_opsi)) {
-                \Storage::disk('public')->delete($opsi->isi_opsi);
-            }
-        }
-        OpsiJawaban::where('id_pertanyaan', $id)->delete();
-
-        // Simpan opsi baru
-        foreach ($request->jenis_opsi as $j => $jenis) {
-            $kode = chr(65 + $j);
-            $isiOpsi = null;
-
-            if ($jenis === 'text') {
-                $isiOpsi = $request->opsi_text[$j] ?? '';
-            } elseif ($jenis === 'gambar') {
-                if ($request->hasFile("opsi_gambar.$j") && $request->file("opsi_gambar.$j")->isValid()) {
-                    $fileOpsi = $request->file("opsi_gambar.$j");
-                    $fileName = "opsi_{$id}_{$kode}_" . now()->format('YmdHis') . "." . $fileOpsi->getClientOriginalExtension();
-                    $isiOpsi = $fileOpsi->storeAs("uploads/opsi_jawaban", $fileName, "public");
-                } elseif (!empty($request->opsi_gambar_lama[$j])) {
-                    $isiOpsi = $request->opsi_gambar_lama[$j];
+            $opsiLama = OpsiJawaban::where('id_pertanyaan', $id)->get();
+            foreach ($opsiLama as $opsi) {
+                if ($opsi->isi_opsi && str_contains($opsi->isi_opsi, 'uploads/opsi_jawaban') && 
+                    \Storage::disk('public')->exists($opsi->isi_opsi)) {
+                    \Storage::disk('public')->delete($opsi->isi_opsi);
                 }
             }
+            OpsiJawaban::where('id_pertanyaan', $id)->delete();
 
-            OpsiJawaban::create([
-                'id_pertanyaan' => $id,
-                'kode_opsi' => $kode,
-                'isi_opsi' => $isiOpsi ?? '',
-                'benar' => ($request->kunci_jawaban == $kode) ? 1 : 0,
-            ]);
+            foreach ($request->jenis_opsi as $j => $jenis) {
+                $kode = chr(65 + $j);
+                $isiOpsi = null;
+
+                if ($jenis === 'text') {
+                    $isiOpsi = $request->opsi_text[$j] ?? '';
+                } elseif ($jenis === 'gambar') {
+                    if ($request->hasFile("opsi_gambar.$j") && $request->file("opsi_gambar.$j")->isValid()) {
+                        $fileOpsi = $request->file("opsi_gambar.$j");
+                        $fileName = "opsi_{$id}_{$kode}_" . now()->format('YmdHis') . "." . $fileOpsi->getClientOriginalExtension();
+                        $isiOpsi = $fileOpsi->storeAs("uploads/opsi_jawaban", $fileName, "public");
+                    } elseif (!empty($request->opsi_gambar_lama[$j])) {
+                        $isiOpsi = $request->opsi_gambar_lama[$j];
+                    }
+                }
+
+                OpsiJawaban::create([
+                    'id_pertanyaan' => $id,
+                    'kode_opsi' => $kode,
+                    'isi_opsi' => $isiOpsi ?? '',
+                    'benar' => ($request->kunci_jawaban == $kode) ? 1 : 0,
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('pg.crud', [
+                'id_skema' => $pertanyaan->id_skema,
+                'id_kelompok' => $pertanyaan->id_kelompok
+            ])->with('success', 'Pertanyaan PG berhasil diupdate!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal update: '.$e->getMessage())->withInput();
+        }
+    }
+
+    public function destroyPG($id)
+    {
+        $pertanyaan = Pertanyaan::findOrFail($id);
+
+        if ($pertanyaan->file_path && \Storage::disk('public')->exists($pertanyaan->file_path)) {
+            \Storage::disk('public')->delete($pertanyaan->file_path);
         }
 
-        DB::commit();
+        OpsiJawaban::where('id_pertanyaan', $id)->delete();
+        $pertanyaan->delete();
+
         return redirect()->route('pg.crud', [
             'id_skema' => $pertanyaan->id_skema,
             'id_kelompok' => $pertanyaan->id_kelompok
-        ])->with('success', 'Pertanyaan PG berhasil diupdate!');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return back()->with('error', 'Gagal update: '.$e->getMessage())->withInput();
-    }
-}
-
-
-public function destroyPG($id)
-{
-    $pertanyaan = Pertanyaan::findOrFail($id);
-
-    if ($pertanyaan->file_path && \Storage::disk('public')->exists($pertanyaan->file_path)) {
-        \Storage::disk('public')->delete($pertanyaan->file_path);
+        ])->with('success', 'Pertanyaan PG berhasil dihapus!');
     }
 
-    OpsiJawaban::where('id_pertanyaan', $id)->delete();
-    $pertanyaan->delete();
+    public function kelompokPekerjaan(Request $request, $id_skema, $jenis = null)
+    {
+        $jenis = $jenis ?? $request->query('jenis', 'esai');
+        $judul = $request->query('judul');
+        $timer = $request->query('timer');
+        $idPembuatan = $request->query('id_pembuatan_pertanyaan');
 
-    return redirect()->route('pg.crud', [
-        'id_skema' => $pertanyaan->id_skema,
-        'id_kelompok' => $pertanyaan->id_kelompok
-    ])->with('success', 'Pertanyaan PG berhasil dihapus!');
-}
-
-
-public function kelompokPekerjaan(Request $request, $id_skema, $jenis = null)
-{
-    $jenis = $jenis ?? $request->query('jenis', 'esai');
-    $judul = $request->query('judul');                  // bisa null
-    $timer = $request->query('timer');                  // bisa null
-    $idPembuatan = $request->query('id_pembuatan_pertanyaan'); // ✅ ubah ke nama kolom sebenarnya
-
-    // kalau user klik "Lanjutkan"
-    if ($idPembuatan) {
-        $pembuatan = PembuatanPertanyaan::find($idPembuatan);
-        if (!$pembuatan) {
-            return back()->with('error', 'Data pembuatan pertanyaan tidak ditemukan.');
+        if ($idPembuatan) {
+            $pembuatan = PembuatanPertanyaan::find($idPembuatan);
+            if (!$pembuatan) {
+                return back()->with('error', 'Data pembuatan pertanyaan tidak ditemukan.');
+            }
+            $timer = $pembuatan->timer;
+        } else if ($judul) {
+            $pembuatan = PembuatanPertanyaan::create([
+                'id_skema'         => $id_skema,
+                'judul'            => $judul,
+                'timer'            => $timer ?? 30,
+                'timescap'         => now(),
+                'jenis_pertanyaan' => $jenis,
+            ]);
+        } else {
+            $pembuatan = PembuatanPertanyaan::where('id_skema', $id_skema)
+                            ->where('jenis_pertanyaan', $jenis)
+                            ->latest('id_pembuatan_pertanyaan')
+                            ->first();
+            if (!$pembuatan) {
+                return back()->with('error', 'Belum ada pembuatan pertanyaan sebelumnya.');
+            }
+            $timer = $pembuatan->timer;
         }
-        $timer = $pembuatan->timer; // ambil timer dari record lama
-    } 
-    // kalau user klik "Buat Baru"
-    else if ($judul) {
-        $pembuatan = PembuatanPertanyaan::create([
-            'id_skema' => $id_skema,
-            'judul' => $judul,
-            'timer' => $timer ?? 30,
-            'timescap' => now(),
-            'jenis_pertanyaan' => $jenis,
+
+        $kelompok = KelompokPekerjaan::with(['unitKompetensi' => function ($q) use ($id_skema) {
+            $q->where('unit_kompetensi.id_skema', $id_skema);
+        }])->where('id_skema', $id_skema)->get();
+
+        $skema = Skema::find($id_skema);
+
+        $soalList = $pembuatan
+            ? Pertanyaan::where('id_pembuatan_pertanyaan', $pembuatan->id_pembuatan_pertanyaan)
+                ->with('kelompok')
+                ->get()
+            : collect();
+
+        return view('kelompok_pekerjaan_essai', [
+            'kelompok'  => $kelompok,
+            'timer'     => $timer,
+            'id_skema'  => $id_skema,
+            'jenis'     => $jenis,
+            'judul'     => $judul,
+            'skema'     => $skema,
+            'pembuatan' => $pembuatan,
+            'soalList'  => $soalList,
         ]);
-    } 
-    // kalau buka halaman tanpa judul baru / lanjutkan
-    else {
-        $pembuatan = PembuatanPertanyaan::where('id_skema', $id_skema)
-                        ->where('jenis_pertanyaan', $jenis)
-                        ->latest('id_pembuatan_pertanyaan')
-                        ->first();
-        if (!$pembuatan) {
-            return back()->with('error', 'Belum ada pembuatan pertanyaan sebelumnya.');
-        }
-        $timer = $pembuatan->timer;
     }
-
-    $kelompok = KelompokPekerjaan::with(['unitKompetensi' => function ($q) use ($id_skema) {
-        $q->where('unit_kompetensi.id_skema', $id_skema);
-    }])->where('id_skema', $id_skema)->get();
-
-    $skema = Skema::find($id_skema);
-
-    return view('kelompok_pekerjaan_essai', [
-        'kelompok' => $kelompok,
-        'timer' => $timer,
-        'id_skema' => $id_skema,
-        'jenis' => $jenis,
-        'judul' => $judul,
-        'skema' => $skema,
-        'pembuatan' => $pembuatan,
-    ]);
-}
 
     // ================================
     // FORM TANDA TANGAN ASESOR
@@ -703,11 +642,10 @@ public function kelompokPekerjaan(Request $request, $id_skema, $jenis = null)
         $user = auth()->user(); 
         $asesorLogin = Asesor::where('user_id', $user->id)->first();
 
-        // ambil data pembuatan pertanyaan sesuai id
         $pembuatan_pertanyaan = PembuatanPertanyaan::find($id_pembuatan_pertanyaan);
+        $pembuatan = PembuatanPertanyaan::find($id_pembuatan_pertanyaan);
         $skema = Skema::find($id_skema);
 
-        // cek apakah asesor sudah tanda tangan di tabel persetujuan
         $asesorSudahTTD = DB::table('pertanyaan_asesmen_persetujuan')
             ->join('asesor', 'asesor.id_asesor', '=', 'pertanyaan_asesmen_persetujuan.id_asesor')
             ->where('pertanyaan_asesmen_persetujuan.id_pembuatan_pertanyaan', $id_pembuatan_pertanyaan)
@@ -725,7 +663,9 @@ public function kelompokPekerjaan(Request $request, $id_skema, $jenis = null)
             'pembuatan_pertanyaan',
             'skema',
             'id_skema',
-            'id_pembuatan_pertanyaan'
+            'id_pembuatan_pertanyaan',
+            'pembuatan',
+            'backUrl'
         ));
     }
 
@@ -741,33 +681,21 @@ public function kelompokPekerjaan(Request $request, $id_skema, $jenis = null)
             'ttd_asesor'              => 'required'
         ]);
     
-        // decode base64 ke file gambar
         $ttdData = $validated['ttd_asesor'];
-
-        // Ambil data asesor langsung dari DB (lebih aman daripada hidden input)
         $asesor = Asesor::findOrFail($validated['id_asesor']);
-        
-        // Bikin nama file rapi, ganti spasi dengan underscore
         $slugNama = str_replace(' ', '_', strtolower($asesor->nama_asesor));
-        
         $idPembuatan = $validated['id_pembuatan_pertanyaan'];
 
-        // Nama file dengan id_pembuatan_pertanyaan + tanggal unik
         $ttdFileName = 'ttd_asesor_pertanyaan_asesmen_persetujuan_' 
                      . $slugNama . '_idpembuatan_' . $idPembuatan . '_' . date('Ymd') . '.png';
         
-        // Path penyimpanan (pastikan folder storage/app/public/ttd sudah ada)
         $path = storage_path('app/public/ttd/' . $ttdFileName);
         
-        // Hapus prefix base64
         $ttdData = str_replace('data:image/png;base64,', '', $ttdData);
         $ttdData = str_replace(' ', '+', $ttdData);
         
-        // Simpan file
         \File::put($path, base64_decode($ttdData));
-        
-    
-        // cek apakah sudah ada
+
         $existing = DB::table('pertanyaan_asesmen_persetujuan')
             ->where('id_pembuatan_pertanyaan', $validated['id_pembuatan_pertanyaan'])
             ->where('id_asesor', $validated['id_asesor'])
@@ -793,162 +721,198 @@ public function kelompokPekerjaan(Request $request, $id_skema, $jenis = null)
                         ->with('success', 'TTD Asesor berhasil disimpan!');
     }
 
-   // ================================
+    // ================================
     // TAMPILAN PMO (Buat Pertanyaan)
     // ================================
-public function createPMO(Request $request)
-{
-    $jumlah = $request->query('jumlah', 5);
-    $id_skema = $request->query('id_skema');
+    public function createPMO(Request $request)
+    {
+        $jumlah = $request->query('jumlah', 5);
+        $id_skema = $request->query('id_skema');
 
-    $skema = Skema::findOrFail($id_skema);
+        $skema = Skema::findOrFail($id_skema);
 
-    // simpan record baru
-    $pembuatan = PembuatanPertanyaan::create([
-        'id_skema'         => $id_skema,
-        'timer'            => $request->query('timer', 0),
-        'jenis_pertanyaan' => 'pmo', // ✅ ini wajib string
-        'timescap'         => now(),
-    ]);
-    
-
-    // ambil kelompok pertama (atau sesuai logic kamu)
-    $idKelompok = KelompokPekerjaan::where('id_skema', $id_skema)->value('id_kelompok');
-
-    // redirect ke inputPMO, bawa query param
-        return redirect()->route('input.pmo', [
-        'id_skema'    => $id_skema,
-        'kelompok_id' => $idKelompok,
-        'timer'       => $request->query('timer', 30),
-        'jumlah'      => $jumlah,
-    ]);
-
-
-}
-
-public function crudPMO($id_pmo)
-{
-    $pmo = DB::table('pmo')->where('id_pmo', $id_pmo)->first();
-    $skema = DB::table('skema_sertifikasi')->where('id_skema', $pmo->id_skema)->first();
-    
-    $pertanyaanList = DB::table('pmo_pertanyaan')
-        ->where('id_pmo', $id_pmo)
-        ->get()
-        ->groupBy('id_unit');
-
-    $unitList = DB::table('unit_kompetensi')->get();
-
-    return view('PMO_crud', compact('pmo', 'skema', 'pertanyaanList', 'unitList'));
-}
-
-// Edit pertanyaan PMO
-public function editPertanyaanPMO($id_pmo, $id)
-{
-    // Ambil data PMO
-    $pmo = DB::table('pmo')->where('id_pmo', $id_pmo)->first();
-
-    // Ambil pertanyaan yang akan diedit
-    $pertanyaan = DB::table('pmo_pertanyaan')->where('id_pmo_pertanyaan', $id)->first();
-
-    if (!$pertanyaan) {
-        return redirect()->route('crud', $id_pmo)
-                         ->with('error', 'Pertanyaan tidak ditemukan.');
-    }
-
-    // Ambil daftar unit dari tabel unit_kompetensi
-    $unitList = DB::table('unit_kompetensi')->get();
-
-    // Kirim ke view
-    return view('edit_pertanyaan_PMO', [
-        'pmo' => $pmo,
-        'pertanyaan' => $pertanyaan,
-        'unitList' => $unitList,  // ⚡ harus ada ini
-    ]);
-}
-
-// ================================
-// Update Pertanyaan PMO
-// ================================
-public function updatePertanyaanPMO(Request $request, $id_pmo_pertanyaan)
-{
-    $request->validate([
-        'pertanyaan' => 'required|string',
-        'deskripsi_pertanyaan' => 'nullable|string',
-        'id_unit' => 'required|array', // 🔥 ubah jadi array (bisa pilih banyak unit)
-        'id_pmo'  => 'required|integer',
-    ]);
-
-    $pertanyaan = DB::table('pmo_pertanyaan')
-        ->where('id_pmo_pertanyaan', $id_pmo_pertanyaan)
-        ->first();
-
-    if (!$pertanyaan) {
-        return redirect()->back()->with('error', 'Pertanyaan tidak ditemukan.');
-    }
-
-    // simpan data
-    DB::table('pmo_pertanyaan')
-        ->where('id_pmo_pertanyaan', $id_pmo_pertanyaan)
-        ->update([
-            'id_unit' => json_encode($request->id_unit), // 🔥 simpan sebagai JSON
-            'id_pmo' => $request->id_pmo,
-            'pertanyaan' => $request->pertanyaan,
-            'deskripsi_pertanyaan' => $request->deskripsi_pertanyaan,
-            'updated_at' => now(),
+        $pembuatan = PembuatanPertanyaan::create([
+            'id_skema'         => $id_skema,
+            'timer'            => $request->query('timer', 0),
+            'jenis_pertanyaan' => 'pmo',
+            'timescap'         => now(),
         ]);
 
-    return redirect()->route('pmo.crud', $request->id_pmo)
-                     ->with('success', 'Pertanyaan PMO berhasil diperbarui!');
-}
+        $idKelompok = KelompokPekerjaan::where('id_skema', $id_skema)->value('id_kelompok');
 
-
-// ================================
-// Hapus Pertanyaan PMO
-// ================================
-public function destroyPertanyaanPMO($id_pmo_pertanyaan)
-{
-    $pertanyaan = DB::table('pmo_pertanyaan')->where('id_pmo_pertanyaan', $id_pmo_pertanyaan)->first();
-
-    if (!$pertanyaan) {
-        return redirect()->back()->with('error', 'Pertanyaan tidak ditemukan.');
+        return redirect()->route('input.pmo', [
+            'id_skema'    => $id_skema,
+            'kelompok_id' => $idKelompok,
+            'timer'       => $request->query('timer', 30),
+            'jumlah'      => $jumlah,
+        ]);
     }
 
-    DB::table('pmo_pertanyaan')->where('id_pmo_pertanyaan', $id_pmo_pertanyaan)->delete();
+    public function crudPMO($id_pmo)
+    {
+        $pmo = DB::table('pmo')->where('id_pmo', $id_pmo)->first();
 
-    return redirect()->route('pmo.crud', $pertanyaan->id_pmo)->with('success', 'Pertanyaan berhasil dihapus');
-}
+        if (!$pmo) {
+            return redirect()->back()->with('error', 'PMO tidak ditemukan.');
+        }
 
+        $skema = DB::table('skema_sertifikasi')->where('id_skema', $pmo->id_skema)->first();
+        $id_pembuatan = request()->query('id_pembuatan');
+
+        $query = DB::table('pmo_pertanyaan')
+            ->leftJoin('kelompok_pekerjaan', 'pmo_pertanyaan.id_kelompok', '=', 'kelompok_pekerjaan.id_kelompok')
+            ->where('pmo_pertanyaan.id_pmo', $id_pmo)
+            ->select('pmo_pertanyaan.*', 'kelompok_pekerjaan.nama_kelompok')
+            ->orderBy('pmo_pertanyaan.id_kelompok');
+
+        if ($id_pembuatan) {
+            $query->where('pmo_pertanyaan.id_pembuatan_pertanyaan', $id_pembuatan);
+        }
+
+        $pertanyaanList = $query->get();
+        $unitList       = DB::table('unit_kompetensi')->get();
+        $kelompokList   = DB::table('kelompok_pekerjaan')->where('id_skema', $pmo->id_skema)->get();
+
+        return view('PMO_crud', compact('pmo', 'skema', 'pertanyaanList', 'unitList', 'kelompokList', 'id_pembuatan'));
+    }
+
+    // ================================
+    // Edit Pertanyaan PMO
+    // ================================
+    public function editPertanyaanPMO($id_pmo, $id)
+    {
+        $pmo        = DB::table('pmo')->where('id_pmo', $id_pmo)->first();
+        $pertanyaan = DB::table('pmo_pertanyaan')->where('id_pmo_pertanyaan', $id)->first();
+
+        if (!$pertanyaan) {
+            return redirect()->route('pmo.crud', $id_pmo)
+                             ->with('error', 'Pertanyaan tidak ditemukan.');
+        }
+
+        // Ambil unit berdasarkan kelompok pertanyaan ini
+        $unitList = DB::table('unit_kompetensi')
+            ->join('hasil_asesmen', 'unit_kompetensi.id_unit', '=', 'hasil_asesmen.id_unit')
+            ->where('hasil_asesmen.id_kelompok', $pertanyaan->id_kelompok)
+            ->select('unit_kompetensi.*')
+            ->distinct()
+            ->get();
+
+        return view('edit_pertanyaan_PMO', [
+            'pmo'        => $pmo,
+            'pertanyaan' => $pertanyaan,
+            'unitList'   => $unitList,
+        ]);
+    }
+
+    // ================================
+    // Update Pertanyaan PMO
+    // ================================
+    public function updatePertanyaanPMO(Request $request, $id_pmo_pertanyaan)
+    {
+        $request->validate([
+            'pertanyaan'           => 'required|string',
+            'deskripsi_pertanyaan' => 'nullable|string',
+            'id_unit'              => 'required|array',
+            'id_pmo'               => 'required|integer',
+        ]);
+
+        $pertanyaan = DB::table('pmo_pertanyaan')
+            ->where('id_pmo_pertanyaan', $id_pmo_pertanyaan)
+            ->first();
+
+        if (!$pertanyaan) {
+            return redirect()->back()->with('error', 'Pertanyaan tidak ditemukan.');
+        }
+
+        DB::table('pmo_pertanyaan')
+            ->where('id_pmo_pertanyaan', $id_pmo_pertanyaan)
+            ->update([
+                'id_unit'              => json_encode($request->id_unit),
+                'id_pmo'               => $request->id_pmo,
+                'pertanyaan'           => $request->pertanyaan,
+                'deskripsi_pertanyaan' => $request->deskripsi_pertanyaan,
+            ]);
+
+        return redirect()->route('pmo.crud', $request->id_pmo)
+                         ->with('success', 'Pertanyaan PMO berhasil diperbarui!');
+    }
+
+    // ================================
+    // Hapus Pertanyaan PMO
+    // ================================
+    public function destroyPertanyaanPMO($id_pmo_pertanyaan)
+    {
+        $pertanyaan = DB::table('pmo_pertanyaan')->where('id_pmo_pertanyaan', $id_pmo_pertanyaan)->first();
+
+        if (!$pertanyaan) {
+            return redirect()->back()->with('error', 'Pertanyaan tidak ditemukan.');
+        }
+
+        DB::table('pmo_pertanyaan')->where('id_pmo_pertanyaan', $id_pmo_pertanyaan)->delete();
+
+        return redirect()->route('pmo.crud', $pertanyaan->id_pmo)->with('success', 'Pertanyaan berhasil dihapus');
+    }
 
     // ================================
     // Simpan Pertanyaan PMO Baru
     // ================================
-public function storePertanyaanPMO(Request $request, $id_pmo)
-{
-    $id_skema = $request->input('id_skema');
-    $id_kelompok = $request->input('id_kelompok');
-    $pertanyaan = $request->input('pertanyaan');
-    $deskripsi = $request->input('deskripsi_pertanyaan');
-    $selectedUnits = $request->input('id_unit', []);
+    public function storePertanyaanPMO(Request $request, $id_pmo)
+    {
+        $pertanyaanList = $request->input('pertanyaan', []);
+        $deskripsiList  = $request->input('deskripsi_pertanyaan', []);
+        $unitPerSoal    = $request->input('id_unit', []);
+        $id_kelompok    = $request->input('id_kelompok');
+        $id_pembuatan   = $request->input('id_pembuatan');
+        $timer          = $request->input('timer', 30);
+        $judul          = $request->input('judul');
 
-    // Cek kalau gak ada unit dipilih
-    if (empty($selectedUnits)) {
-        return back()->with('error', 'Pilih minimal satu unit kompetensi.');
+        $pmo = DB::table('pmo')->where('id_pmo', $id_pmo)->first();
+
+        $adaSoalValid = false;
+        foreach ($pertanyaanList as $i => $pertanyaan) {
+            if (!empty(trim($pertanyaan)) && !empty($unitPerSoal[$i] ?? [])) {
+                $adaSoalValid = true;
+                break;
+            }
+        }
+
+        if (!$adaSoalValid) {
+            return back()->with('error', 'Tidak ada pertanyaan yang tersimpan. Pastikan setiap pertanyaan memilih minimal 1 unit kompetensi.');
+        }
+
+        if (!$id_pembuatan && $pmo) {
+            $pembuatanBaru = PembuatanPertanyaan::create([
+                'id_skema'         => $pmo->id_skema,
+                'timer'            => $timer,
+                'jenis_pertanyaan' => 'pmo',
+                'timescap'         => now(),
+                'judul'            => filled($request->input('judul')) ? $request->input('judul') : 'Set Pertanyaan PMO ' . date('Y-m-d H:i:s'),
+            ]);
+            $id_pembuatan = $pembuatanBaru->id_pembuatan_pertanyaan;
+        }
+
+        $saved = 0;
+        foreach ($pertanyaanList as $i => $pertanyaan) {
+            if (empty(trim($pertanyaan))) continue;
+
+            $selectedUnits = $unitPerSoal[$i] ?? [];
+            if (empty($selectedUnits)) continue;
+
+            DB::table('pmo_pertanyaan')->insert([
+                'id_pmo'                  => $id_pmo,
+                'id_pembuatan_pertanyaan' => $id_pembuatan,
+                'id_kelompok'             => $id_kelompok,
+                'id_unit'                 => json_encode($selectedUnits),
+                'pertanyaan'              => $pertanyaan,
+                'deskripsi_pertanyaan'    => $deskripsiList[$i] ?? null,
+            ]);
+
+            $saved++;
+        }
+
+        return redirect()->route('pmo.crud', ['id_pmo' => $id_pmo, 'id_pembuatan' => $id_pembuatan])
+                         ->with('success', "{$saved} pertanyaan PMO berhasil disimpan.");
     }
-
-    // Loop unit yang dicentang
-    foreach ($selectedUnits as $id_unit) {
-       DB::table('pmo_pertanyaan')->insert([
-        'id_pmo' => $id_pmo,
-        'id_unit' => $id_unit,
-        'pertanyaan' => $pertanyaan,
-        'deskripsi_pertanyaan' => $deskripsi,
-        ]);
-    }
-
-    return redirect()->route('pmo.crud', $id_pmo)
-                     ->with('success', 'Pertanyaan PMO berhasil disimpan untuk unit yang dipilih.');
-}
-
 
     // ================================
     // Simpan Tanggapan PMO
@@ -956,17 +920,16 @@ public function storePertanyaanPMO(Request $request, $id_pmo)
     public function tanggapanPMO(Request $request, $id_pmo_pertanyaan)
     {
         $request->validate([
-            'id_pmo' => 'required|exists:pmo,id_pmo',
-            'tanggapan' => 'required|string',
+            'id_pmo'     => 'required|exists:pmo,id_pmo',
+            'tanggapan'  => 'required|string',
             'pencapaian' => 'nullable|string',
         ]);
 
         DB::table('pmo_tanggapan')->updateOrInsert(
             ['id_pmo_pertanyaan' => $id_pmo_pertanyaan, 'id_pmo' => $request->id_pmo],
             [
-                'tanggapan' => $request->tanggapan,
+                'tanggapan'  => $request->tanggapan,
                 'pencapaian' => $request->pencapaian,
-                'updated_at' => now()
             ]
         );
 
@@ -979,20 +942,19 @@ public function storePertanyaanPMO(Request $request, $id_pmo)
     public function persetujuanPMO(Request $request, $id_pmo)
     {
         $request->validate([
-            'tgl_ttd_asesi' => 'nullable|date',
-            'ttd_asesi' => 'nullable|string',
+            'tgl_ttd_asesi'  => 'nullable|date',
+            'ttd_asesi'      => 'nullable|string',
             'tgl_ttd_asesor' => 'nullable|date',
-            'ttd_asesor' => 'nullable|string',
+            'ttd_asesor'     => 'nullable|string',
         ]);
 
         DB::table('pmo_persetujuan')->updateOrInsert(
             ['id_pmo' => $id_pmo],
             [
-                'tgl_ttd_asesi' => $request->tgl_ttd_asesi,
-                'ttd_asesi' => $request->ttd_asesi,
+                'tgl_ttd_asesi'  => $request->tgl_ttd_asesi,
+                'ttd_asesi'      => $request->ttd_asesi,
                 'tgl_ttd_asesor' => $request->tgl_ttd_asesor,
-                'ttd_asesor' => $request->ttd_asesor,
-                'updated_at' => now()
+                'ttd_asesor'     => $request->ttd_asesor,
             ]
         );
 
@@ -1006,16 +968,26 @@ public function storePertanyaanPMO(Request $request, $id_pmo)
     {
         $skema = Skema::findOrFail($id_skema);
 
-        // Semua pembuatan pertanyaan PMO untuk skema ini
-        $pembuatanList = PembuatanPertanyaan::where('id_skema', $id_skema)
-                                            ->where('jenis_pertanyaan', 'pmo')
-                                             ->get();
+        $pmo = DB::table('pmo')->where('id_skema', $id_skema)->latest('id_pmo')->first();
+
+        $idPunyaSoal = collect();
+        if ($pmo) {
+            $idPunyaSoal = DB::table('pmo_pertanyaan')
+                ->where('id_pmo', $pmo->id_pmo)
+                ->whereNotNull('id_pembuatan_pertanyaan')
+                ->pluck('id_pembuatan_pertanyaan')
+                ->unique();
+        }
+
+        $pembuatanList = PembuatanPertanyaan::whereIn('id_pembuatan_pertanyaan', $idPunyaSoal)
+                                            ->orderByDesc('id_pembuatan_pertanyaan')
+                                            ->get();
 
         return view('PMO', compact('skema', 'pembuatanList'));
     }
 
     // ================================
-    // Tampilkan Jawaban PMO
+    // Tampilkan Jawaban PMO (kelompok)
     // ================================
     public function jawabanPMO($id_skema, $id_pembuatan)
     {
@@ -1031,226 +1003,336 @@ public function storePertanyaanPMO(Request $request, $id_pmo)
                     ->where('id_skema', $id_skema)
                     ->get();
 
+        $unitList = DB::table('unit_kompetensi')->get();
+
+        $soalPerKelompok = collect();
+        if ($id_pembuatan) {
+            $soalPerKelompok = DB::table('pmo_pertanyaan')
+                ->where('id_pembuatan_pertanyaan', $id_pembuatan)
+                ->get()
+                ->groupBy('id_kelompok');
+        }
+
         $timer = $pembuatanList->first()->timer ?? 0;
 
-        return view('jawaban_kelompok_PMO', compact('skema', 'pembuatanList', 'pertanyaan', 'kelompok', 'timer'));
+        return view('jawaban_kelompok_PMO', compact(
+            'skema', 
+            'pembuatanList',
+            'pertanyaan', 
+            'kelompok', 
+            'timer', 
+            'soalPerKelompok',
+            'unitList'
+        ));
     }
 
     // ================================
-    // Simpan Jawaban PMO
+    // Simpan Jawaban/Tanggapan PMO (Asesor input tanggapan asesi)
     // ================================
-public function simpanJawabanPMO(Request $request, $id_skema, $id_pembuatan)
-{
-    $jawaban = $request->input('jawaban', []);
-
-    foreach($jawaban as $id_pmo_pertanyaan => $isi) {
-        // Bisa pakai updateOrInsert supaya jika sudah ada jawaban, update
-        DB::table('pmo_tanggapan')->updateOrInsert(
-            ['id_pmo_pertanyaan' => $id_pmo_pertanyaan],
-            [
-                'jawaban' => $isi,
-                'updated_at' => now(),  // kalau tabel ada timestamp
-            ]
-        );
-    }
-
-    return redirect()->back()->with('success', 'Jawaban berhasil disimpan.');
-}
-
-
-       public function tampilJawabanPMO($id_skema, $id_pembuatan)
+        public function simpanJawabanPMO(Request $request, $id_skema, $id_pembuatan, $id_asesi)
     {
-        $skema = Skema::findOrFail($id_skema); // pastikan id_skema valid
-        $pembuatan = PembuatanPertanyaan::findOrFail($id_pembuatan); // pastikan id_pembuatan valid
-        $kelompok = KelompokPekerjaan::with('unitKompetensi')->where('id_skema', $id_skema)->get();
-        $pertanyaan = Pertanyaan::where('id_pembuatan_pertanyaan', $id_pembuatan)->get();
-        $timer = $pembuatan->timer ?? 30;
+        $jawaban    = $request->input('jawaban', []);
+        $pencapaian = $request->input('pencapaian', []);
+        $allIds     = array_unique(array_merge(array_keys($jawaban), array_keys($pencapaian)));
+
+        foreach ($allIds as $id_pmo_pertanyaan) {
+            $pmopertanyaan = DB::table('pmo_pertanyaan')
+                ->where('id_pmo_pertanyaan', $id_pmo_pertanyaan)
+                ->first();
+            if (!$pmopertanyaan) continue;
+
+            $unitIds = json_decode($pmopertanyaan->id_unit, true) ?? [];
+
+            DB::table('pmo_tanggapan')->updateOrInsert(
+                ['id_pmo_pertanyaan' => $id_pmo_pertanyaan, 'id_asesi' => $id_asesi],
+                [
+                    'id_pmo'     => $pmopertanyaan->id_pmo,
+                    'id_unit'    => $unitIds[0] ?? null,
+                    'tanggapan'  => $jawaban[$id_pmo_pertanyaan] ?? null,
+                    'pencapaian' => $pencapaian[$id_pmo_pertanyaan] ?? null,
+                    'id_asesi'   => $id_asesi,
+                ]
+            );
+        }
+
+       // ===== Simpan TTD Asesor ke pmo_persetujuan =====
+        $ttd_asesor     = $request->input('ttd_asesor');
+        $tgl_ttd_asesor = $request->input('tgl_ttd_asesor');
+
+        if ($ttd_asesor) {
+            // Cari id_pmo by id_skema saja (pmo per skema, bukan per asesi)
+            $pmo = DB::table('pmo')
+                ->where('id_skema', $id_skema)
+                ->first();
+
+            if ($pmo) {
+                DB::table('pmo_persetujuan')->updateOrInsert(
+                    ['id_pmo' => $pmo->id_pmo],
+                    [
+                        'ttd_asesor'     => $ttd_asesor,
+                        'tgl_ttd_asesor' => $tgl_ttd_asesor,
+                    ]
+                );
+            }
+        }
+
+        return redirect()->route('pmo.hasil.kelompok', [
+            'id_skema' => $id_skema,
+        ])->with('success', 'Tanggapan PMO berhasil disimpan.');
+    }
+
+    public function tampilJawabanPMO($id_skema, $id_pembuatan)
+    {
+        $skema     = Skema::findOrFail($id_skema);
+        $pembuatan = PembuatanPertanyaan::findOrFail($id_pembuatan);
+        $kelompok  = KelompokPekerjaan::with('unitKompetensi')->where('id_skema', $id_skema)->get();
+        $timer     = $pembuatan->timer ?? 30;
+
+        $pmo = DB::table('pmo')->where('id_skema', $id_skema)->first();
+
+        if (!$pmo) {
+            $id_asesor = \App\Models\Asesor::where('user_id', Auth::id())->value('id_asesor');
+            $pmo = (object) ['id_pmo' => DB::table('pmo')->insertGetId([
+                'id_skema'  => $id_skema,
+                'id_tuk'    => 1,
+                'id_asesor' => $id_asesor,
+            ])];
+        }
+
+        $pertanyaan = DB::table('pmo_pertanyaan')
+            ->where('id_pmo', $pmo->id_pmo)
+            ->get();
 
         return view('jawaban_PMO', compact('skema', 'kelompok', 'pertanyaan', 'pembuatan', 'timer'));
     }
-    public function pertanyaanPMOKelompok($id_skema, $id_pembuatan = null, Request $request)
-{
-    $skema = Skema::findOrFail($id_skema);
-    $kelompok = KelompokPekerjaan::where('id_skema', $id_skema)->get();
-    $timer = $request->query('timer', 30); // default 30 jika tidak ada
 
-    return view('kelompok_pekerjaan_PMO', compact('skema', 'kelompok', 'timer', 'id_pembuatan'));
-}
+    public function pertanyaanPMOKelompok(Request $request, $id_skema, $id_pembuatan = null)
+    {
+        $skema    = Skema::findOrFail($id_skema);
+        $timer    = $request->query('timer', 30);
+        $id_pmo   = $request->query('id_pmo');
+        $baru     = $request->query('baru', 0);
+        $judul    = $request->query('judul');
 
-public function inputPMO(Request $request, $id_skema)
-{
-    $timer = $request->query('timer', 30);
-    $kelompok_id = $request->query('kelompok_id');
-    $jumlah = $request->query('jumlah'); // dari popup SweetAlert
+        if (!$id_pembuatan) {
+            $id_pembuatan = $request->query('id_pembuatan');
+        }
 
-    // 🔹 Cek dulu apakah sudah ada PMO untuk skema ini
-    $pmo = PMO::where('id_skema', $id_skema)->first();
+        if ($baru) {
+            $pembuatan    = null;
+            $id_pembuatan = null;
+        } elseif ($id_pembuatan) {
+            $pembuatan = PembuatanPertanyaan::find($id_pembuatan);
+        } else {
+            $pembuatan    = null;
+            $id_pembuatan = null;
+        }
 
-    // 🔹 Kalau belum ada, baru buat
-    if (!$pmo) {
-      $pmo = PMO::create([
-    'id_skema'   => $id_skema,
-    'id_asesmen' => $request->id_asesmen ?? 7,
-    'id_tuk'     => 1,
-    'id_kuk'     => $request->id_kuk,
-    'id_asesor'  => Auth::id(), // ✅ otomatis isi dari user login
-    ]);
-    }
+        $kelompok = KelompokPekerjaan::with('unitKompetensi')
+                    ->where('id_skema', $id_skema)
+                    ->get();
 
-    // 🔹 Ambil data kelompok pekerjaan
-    $kelompok = KelompokPekerjaan::with('unitKompetensi')
-        ->when($kelompok_id, function ($query) use ($kelompok_id) {
-            $query->where('id_kelompok', $kelompok_id);
-        })
-        ->get();
+        $soalPerKelompok = collect();
+        if ($id_pembuatan) {
+            $soalPerKelompok = DB::table('pmo_pertanyaan')
+                ->where('id_pembuatan_pertanyaan', $id_pembuatan)
+                ->get()
+                ->groupBy('id_kelompok');
+        }
 
-    // 🔹 Kalau sudah pilih jumlah pertanyaan → arahkan ke form input pertanyaan
-    if ($jumlah) {
-        return view('input_PMO', [
-            'skema' => Skema::findOrFail($id_skema),
-            'kelompok' => $kelompok,
-            'timer' => $timer,
-            'id_pmo' => $pmo->id_pmo, // ⚡ Penting: dikirim ke view
+        $unitList = DB::table('unit_kompetensi')->get();
+
+        return view('kelompok_pekerjaan_PMO', [
+            'skema'           => $skema,
+            'kelompok'        => $kelompok,
+            'timer'           => $timer,
+            'judul'           => $judul,   
+            'id_pembuatan'    => $id_pembuatan,
+            'id_pmo'          => $id_pmo,
+            'pembuatan'       => $pembuatan,
+            'baru'            => $baru, 
+            'soalPerKelompok' => $soalPerKelompok,
+            'unitList'        => $unitList,
         ]);
     }
 
-    // 🔹 Kalau belum pilih jumlah pertanyaan, tampilkan daftar kelompok
-    return view('kelompok_pekerjaan_PMO', [
-        'skema' => Skema::findOrFail($id_skema),
-        'pmo' => $pmo,
-        'kelompok' => $kelompok,
-        'timer' => $timer,
-    ]);
-}
+    // ================================
+    // Hasil Kelompok PMO (pilih set & kelompok)
+    // ================================
+    public function hasilKelompokPMO($id_skema)
+    {
+        $skema = Skema::findOrFail($id_skema);
+        $pmo   = DB::table('pmo')->where('id_skema', $id_skema)->latest('id_pmo')->first();
 
+        $idPunyaSoal = $pmo
+            ? DB::table('pmo_pertanyaan')
+                ->where('id_pmo', $pmo->id_pmo)
+                ->whereNotNull('id_pembuatan_pertanyaan')
+                ->pluck('id_pembuatan_pertanyaan')
+                ->unique()
+            : collect();
 
- public function kelompokPMO($id_skema, Request $request)
-{
-    $skema = Skema::findOrFail($id_skema);
-    $timer = $request->get('timer', 30);
+        $pembuatanList = PembuatanPertanyaan::whereIn('id_pembuatan_pertanyaan', $idPunyaSoal)
+                                            ->orderByDesc('id_pembuatan_pertanyaan')
+                                            ->get();
 
-    // Ambil atau buat pembuatan pertanyaan PMO
-    $id_pembuatan = $request->get('id_pembuatan');
-    if ($id_pembuatan) {
+        $kelompok = KelompokPekerjaan::with('unitKompetensi')->where('id_skema', $id_skema)->get();
+
+        return view('PMO.hasil_kelompok_PMO', compact('skema', 'pembuatanList', 'kelompok'));
+    }
+
+    // ================================
+    // Input Jawaban PMO (asesor isi tanggapan per asesi)
+    // ================================
+    public function inputJawabanPMO($id_skema, $id_pembuatan, $id_kelompok, $id_asesi)
+    {
+        $skema     = Skema::findOrFail($id_skema);
         $pembuatan = PembuatanPertanyaan::findOrFail($id_pembuatan);
-    } else {
-        $pembuatan = PembuatanPertanyaan::create([
-            'id_skema' => $id_skema,
-            'timer'    => $timer,
-            'jenis_pertanyaan' => 'pmo',
-            'timescap' => now(),
-            'judul' => 'Pertanyaan PMO ' . $skema->nama_skema, // tambahan
-        ]);
-    }
+        $kelompok  = KelompokPekerjaan::find($id_kelompok);
+        $asesi     = DB::table('asesi')->where('id_asesi', $id_asesi)->first();
 
-    $kelompok = KelompokPekerjaan::with('unitKompetensi')
-                ->where('id_skema', $id_skema)
-                ->get();
-
-    return view('kelompok_pekerjaan_PMO', [
-        'skema'     => $skema,
-        'pembuatan' => $pembuatan,
-        'kelompok'  => $kelompok,
-        'timer'     => $timer,
-        'id_pmo'    => $pembuatan->id_pembuatan_pertanyaan,
-    ]);
-}
-
-public function dataPesertaUji()
-{
-    $user = Auth::user();
-    $asesi = DB::table('asesi')->where('nama_lengkap', $user->name)->first();
-
-    if (!$asesi) {
-        return view('peserta_uji', ['dataPeserta' => collect(), 'rekap' => collect()]);
-    }
-
-    // ambil semua jawaban peserta
-    $dataPeserta = DB::table('jawaban_asesmen as ja')
-        ->join('asesi as a', 'ja.id_asesi', '=', 'a.id_asesi')
-        ->join('skema_sertifikasi as s', 'ja.id_skema', '=', 's.id_skema')
-        ->join('pertanyaan as p', 'ja.id_pertanyaan', '=', 'p.id_pertanyaan')
-        ->leftJoin('opsi_jawaban as o', 'ja.jawaban_opsi', '=', 'o.id_opsi')
-        ->select(
-            'ja.id_jawaban',
-            's.nama_skema',
-            'p.isi_pertanyaan',
-            'p.jenis_pertanyaan',
-            'ja.jawaban_text',
-            'o.isi_opsi',
-            'ja.pencapaian'
-        )
-        ->where('ja.id_asesi', $asesi->id_asesi)
-        ->get();
-
-    // buat rekap per skema & jenis pertanyaan
-    $rekap = $dataPeserta
-        ->groupBy(fn($item) => $item->nama_skema . '|' . $item->jenis_pertanyaan)
-        ->map(function ($group) {
-            $skema = $group->first()->nama_skema;
-            $jenis = $group->first()->jenis_pertanyaan;
-
-            $dinilai = $group->whereNotNull('pencapaian');
-            $total = $dinilai->count();
-            $benar = $dinilai->where('pencapaian', 1)->count();
-            $salah = $dinilai->where('pencapaian', 0)->count();
-
-            return [
-                'skema'      => $skema,
-                'jenis'      => $jenis,
-                'total'      => $total ?: '-',
-                'benar'      => $total ? $benar : '-',
-                'salah'      => $total ? $salah : '-',
-                'persentase' => $total > 0 ? round(($benar / $total) * 100) : null,
-            ];
-        })
-        ->values();
-
-    return view('peserta_uji', compact('dataPeserta', 'rekap'));
-}
-
-public function detailJawaban($skema, $jenis)
-{
-    $user = Auth::user();
-    $asesi = DB::table('asesi')->where('nama_lengkap', $user->name)->first();
-
-    if (!$asesi) {
-        return view('detail_jawaban', ['dataPeserta' => collect(), 'skema' => $skema, 'jenis' => $jenis]);
-    }
-
-    if ($jenis === 'pilihan_ganda') {
-        $dataPeserta = DB::table('jawaban_asesmen as ja')
-            ->join('asesi as a', 'ja.id_asesi', '=', 'a.id_asesi')
-            ->join('skema_sertifikasi as s', 'ja.id_skema', '=', 's.id_skema')
-            ->join('pertanyaan as p', 'ja.id_pertanyaan', '=', 'p.id_pertanyaan')
-            ->leftJoin('opsi_jawaban as o', 'ja.jawaban_opsi', '=', 'o.id_opsi')
+        // Join dengan pmo_tanggapan berdasarkan id_asesi agar tanggapan yang muncul
+        // adalah tanggapan spesifik untuk asesi ini
+        $pertanyaan = DB::table('pmo_pertanyaan')
+            ->leftJoin('pmo_tanggapan', function($join) use ($id_asesi) {
+                $join->on('pmo_pertanyaan.id_pmo_pertanyaan', '=', 'pmo_tanggapan.id_pmo_pertanyaan')
+                     ->where('pmo_tanggapan.id_asesi', '=', $id_asesi);
+            })
+            ->where('pmo_pertanyaan.id_pembuatan_pertanyaan', $id_pembuatan)
+            ->where('pmo_pertanyaan.id_kelompok', $id_kelompok)
             ->select(
-                'ja.id_jawaban',
-                's.nama_skema',
-                'p.id_pertanyaan',
-                'p.isi_pertanyaan',
-                'p.file_path',
-                'p.file_type',
-                'p.jenis_pertanyaan',
-                'ja.jawaban_text',
-                'ja.jawaban_opsi',
-                'o.isi_opsi as jawaban_opsi_isi',
-                'o.id_opsi as jawaban_opsi_id',
-                'ja.pencapaian'
+                'pmo_pertanyaan.*',
+                'pmo_tanggapan.tanggapan',
+                'pmo_tanggapan.pencapaian'
             )
-            ->where('ja.id_asesi', $asesi->id_asesi)
-            ->where('s.nama_skema', $skema)
-            ->where('p.jenis_pertanyaan', $jenis)
             ->get();
 
-        // Ambil semua opsi untuk setiap pertanyaan
-        foreach ($dataPeserta as $peserta) {
-            $peserta->semua_opsi = DB::table('opsi_jawaban')
-                ->where('id_pertanyaan', $peserta->id_pertanyaan)
-                ->select('id_opsi', 'kode_opsi', 'isi_opsi', 'benar')
-                ->get();
+        $unitList = DB::table('unit_kompetensi')->get();
+
+        return view('PMO.input_jawaban_PMO', compact(
+            'skema', 'pembuatan', 'kelompok', 'asesi', 'pertanyaan', 'unitList'
+        ));
+    }
+
+    // ================================
+    // Pilih Asesi PMO
+    // ================================
+    public function pilihAsesiPMO($id_skema, $id_pembuatan, $id_kelompok)
+    {
+        $skema     = Skema::findOrFail($id_skema);
+        $pembuatan = PembuatanPertanyaan::findOrFail($id_pembuatan);
+        $kelompok  = KelompokPekerjaan::findOrFail($id_kelompok);
+
+        $id_asesor = Asesor::where('user_id', Auth::id())->value('id_asesor');
+
+        $asesiList = DB::table('asesi')
+            ->where('asesor_id', $id_asesor)
+            ->orderBy('nama_lengkap')
+            ->get();
+
+        // Ambil id_pmo_pertanyaan untuk set & kelompok ini
+        $pmoIds = DB::table('pmo_pertanyaan')
+            ->where('id_pembuatan_pertanyaan', $id_pembuatan)
+            ->where('id_kelompok', $id_kelompok)
+            ->pluck('id_pmo_pertanyaan');
+
+        // Cek asesi yang sudah ada tanggapannya di pmo_tanggapan
+        $sudahInputIds = DB::table('pmo_tanggapan')
+            ->whereIn('id_pmo_pertanyaan', $pmoIds)
+            ->whereNotNull('id_asesi')
+            ->pluck('id_asesi')
+            ->unique()
+            ->toArray();
+
+        return view('PMO.pilih_asesi_PMO', compact(
+            'skema', 'pembuatan', 'kelompok', 'asesiList', 'sudahInputIds'
+        ));
+    }
+
+    public function inputPMO(Request $request, $id_skema)
+    {
+        $timer              = $request->query('timer', 30);
+        $kelompok_id        = $request->query('kelompok_id');
+        $jumlah             = $request->query('jumlah');
+        $id_pmo_param       = $request->query('id_pmo');
+        $id_pembuatan_param = $request->query('id_pembuatan');
+
+        $id_asesor = Asesor::where('user_id', Auth::id())->value('id_asesor');
+
+        if ($id_pmo_param) {
+            $pmo = PMO::where('id_pmo', $id_pmo_param)->first();
+        } else {
+            $pmo = PMO::where('id_skema', $id_skema)->latest('id_pmo')->first();
         }
-    } else {
+
+        if (!$pmo) {
+            $skemaData = DB::table('skema_sertifikasi')->where('id_skema', $id_skema)->first();
+
+            $id_unit = DB::table('unit_kompetensi')
+                ->join('hasil_asesmen', 'unit_kompetensi.id_unit', '=', 'hasil_asesmen.id_unit')
+                ->where('hasil_asesmen.id_kelompok', $kelompok_id)
+                ->value('unit_kompetensi.id_unit');
+
+            $id_asesi = DB::table('hasil_asesmen')
+                ->where('id_kelompok', $kelompok_id)
+                ->whereNotNull('id_asesi')
+                ->value('id_asesi');
+
+            if (!$id_asesi) {
+                return back()->with('error', 'Tidak ada asesi ditemukan untuk kelompok ini.');
+            }
+
+            $pmo = PMO::create([
+                'id_skema'  => $id_skema,
+                'id_unit'   => $id_unit ?? 1,
+                'id_tuk'    => $skemaData->id_tuk ?? 1,
+                'id_kuk'    => $skemaData->id_kuk ?? 1,
+                'id_asesor' => $id_asesor,
+                'id_asesi'  => $id_asesi,
+            ]);
+        }
+
+        $unitKompetensi = DB::table('unit_kompetensi')
+            ->join('hasil_asesmen', 'unit_kompetensi.id_unit', '=', 'hasil_asesmen.id_unit')
+            ->where('hasil_asesmen.id_kelompok', $kelompok_id)
+            ->select('unit_kompetensi.*')
+            ->distinct()
+            ->get();
+
+        $kelompok = $kelompok_id ? KelompokPekerjaan::find($kelompok_id) : null;
+
+        return view('input_PMO', [
+            'skema'          => Skema::findOrFail($id_skema),
+            'unitKompetensi' => $unitKompetensi,
+            'timer'          => $timer,
+            'id_pmo'         => $pmo->id_pmo,
+            'jumlah'         => $jumlah,
+            'kelompok'       => $kelompok,
+            'id_pembuatan'   => $id_pembuatan_param,
+            'judul'          => $request->query('judul', ''),
+        ]);
+    }
+
+    public function destroySetPMO($id_pembuatan)
+    {
+        DB::table('pmo_pertanyaan')
+            ->where('id_pembuatan_pertanyaan', $id_pembuatan)
+            ->delete();
+
+        PembuatanPertanyaan::findOrFail($id_pembuatan)->delete();
+
+        return back()->with('success', 'Set pertanyaan berhasil dihapus.');
+    }
+
+    public function dataPesertaUji()
+    {
+        $user  = Auth::user();
+        $asesi = DB::table('asesi')->where('nama_lengkap', $user->name)->first();
+
+        if (!$asesi) {
+            return view('peserta_uji', ['dataPeserta' => collect(), 'rekap' => collect()]);
+        }
+
         $dataPeserta = DB::table('jawaban_asesmen as ja')
             ->join('asesi as a', 'ja.id_asesi', '=', 'a.id_asesi')
             ->join('skema_sertifikasi as s', 'ja.id_skema', '=', 's.id_skema')
@@ -1259,30 +1341,104 @@ public function detailJawaban($skema, $jenis)
             ->select(
                 'ja.id_jawaban',
                 's.nama_skema',
-                'p.id_pertanyaan',
                 'p.isi_pertanyaan',
-                'p.file_path',
-                'p.file_type',
                 'p.jenis_pertanyaan',
                 'ja.jawaban_text',
                 'o.isi_opsi',
                 'ja.pencapaian'
             )
             ->where('ja.id_asesi', $asesi->id_asesi)
-            ->where('s.nama_skema', $skema)
-            ->where('p.jenis_pertanyaan', $jenis)
             ->get();
+
+        $rekap = $dataPeserta
+            ->groupBy(fn($item) => $item->nama_skema . '|' . $item->jenis_pertanyaan)
+            ->map(function ($group) {
+                $skema = $group->first()->nama_skema;
+                $jenis = $group->first()->jenis_pertanyaan;
+
+                $dinilai    = $group->whereNotNull('pencapaian');
+                $total      = $dinilai->count();
+                $benar      = $dinilai->where('pencapaian', 1)->count();
+                $salah      = $dinilai->where('pencapaian', 0)->count();
+
+                return [
+                    'skema'      => $skema,
+                    'jenis'      => $jenis,
+                    'total'      => $total ?: '-',
+                    'benar'      => $total ? $benar : '-',
+                    'salah'      => $total ? $salah : '-',
+                    'persentase' => $total > 0 ? round(($benar / $total) * 100) : null,
+                ];
+            })
+            ->values();
+
+        return view('peserta_uji', compact('dataPeserta', 'rekap'));
     }
 
-    return view('detail_jawaban', compact('dataPeserta', 'skema', 'jenis'));
-}
+    public function detailJawaban($skema, $jenis)
+    {
+        $user  = Auth::user();
+        $asesi = DB::table('asesi')->where('nama_lengkap', $user->name)->first();
 
+        if (!$asesi) {
+            return view('detail_jawaban', ['dataPeserta' => collect(), 'skema' => $skema, 'jenis' => $jenis]);
+        }
 
+        if ($jenis === 'pilihan_ganda') {
+            $dataPeserta = DB::table('jawaban_asesmen as ja')
+                ->join('asesi as a', 'ja.id_asesi', '=', 'a.id_asesi')
+                ->join('skema_sertifikasi as s', 'ja.id_skema', '=', 's.id_skema')
+                ->join('pertanyaan as p', 'ja.id_pertanyaan', '=', 'p.id_pertanyaan')
+                ->leftJoin('opsi_jawaban as o', 'ja.jawaban_opsi', '=', 'o.id_opsi')
+                ->select(
+                    'ja.id_jawaban',
+                    's.nama_skema',
+                    'p.id_pertanyaan',
+                    'p.isi_pertanyaan',
+                    'p.file_path',
+                    'p.file_type',
+                    'p.jenis_pertanyaan',
+                    'ja.jawaban_text',
+                    'ja.jawaban_opsi',
+                    'o.isi_opsi as jawaban_opsi_isi',
+                    'o.id_opsi as jawaban_opsi_id',
+                    'ja.pencapaian'
+                )
+                ->where('ja.id_asesi', $asesi->id_asesi)
+                ->where('s.nama_skema', $skema)
+                ->where('p.jenis_pertanyaan', $jenis)
+                ->get();
 
+            foreach ($dataPeserta as $peserta) {
+                $peserta->semua_opsi = DB::table('opsi_jawaban')
+                    ->where('id_pertanyaan', $peserta->id_pertanyaan)
+                    ->select('id_opsi', 'kode_opsi', 'isi_opsi', 'benar')
+                    ->get();
+            }
+        } else {
+            $dataPeserta = DB::table('jawaban_asesmen as ja')
+                ->join('asesi as a', 'ja.id_asesi', '=', 'a.id_asesi')
+                ->join('skema_sertifikasi as s', 'ja.id_skema', '=', 's.id_skema')
+                ->join('pertanyaan as p', 'ja.id_pertanyaan', '=', 'p.id_pertanyaan')
+                ->leftJoin('opsi_jawaban as o', 'ja.jawaban_opsi', '=', 'o.id_opsi')
+                ->select(
+                    'ja.id_jawaban',
+                    's.nama_skema',
+                    'p.id_pertanyaan',
+                    'p.isi_pertanyaan',
+                    'p.file_path',
+                    'p.file_type',
+                    'p.jenis_pertanyaan',
+                    'ja.jawaban_text',
+                    'o.isi_opsi',
+                    'ja.pencapaian'
+                )
+                ->where('ja.id_asesi', $asesi->id_asesi)
+                ->where('s.nama_skema', $skema)
+                ->where('p.jenis_pertanyaan', $jenis)
+                ->get();
+        }
 
-
-
-
-
-
+        return view('detail_jawaban', compact('dataPeserta', 'skema', 'jenis'));
+    }
 }
