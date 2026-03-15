@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Asesor;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-
+use Illuminate\Support\Facades\DB; // <-- Tambahkan ini
 use App\Models\Asesi;
+use App\Models\Asesor;
 use App\Models\AsesmenMandiriMaster;
 use App\Models\AsesmenMandiriJawaban;
 use App\Models\AsesmenMandiriPersetujuan;
@@ -16,14 +16,23 @@ use App\Models\AsesmenMandiriPersetujuan;
 class AsesmenMandiriController extends Controller
 {
     /**
-     * List semua asesi yang sudah mengisi asesmen mandiri
+     * List semua asesi yang sudah mengisi asesmen mandiri dan ditugaskan ke asesor ini.
      */
     public function index()
     {
-        $asesi = DB::table('asesi')
-            ->join('users', 'asesi.user_id', '=', 'users.id')
-            ->select('asesi.asesi_id', 'asesi.nama_lengkap', 'users.email')
-            ->get();
+        $user = Auth::user();
+        $asesor = Asesor::where('user_id', $user->id)->first();
+
+        if (!$asesor) {
+            return redirect()->back()->with('error', 'Data asesor tidak ditemukan.');
+        }
+
+        // Ambil asesi yang ditugaskan ke asesor ini dan memiliki asesmen mandiri
+        $asesi = Asesi::where('asesor_id', $asesor->id_asesor)
+            ->whereHas('asesmenMandiriMaster')
+            ->with('user')
+            ->orderBy('updated_at', 'desc')
+            ->paginate(10);
 
         return view('asesor.asesmen_mandiri.index', compact('asesi'));
     }
@@ -31,11 +40,23 @@ class AsesmenMandiriController extends Controller
     /**
      * Detail asesmen mandiri untuk verifikasi
      */
-    public function show($asesi_id)
+    public function show($id_asesi)
     {
-        $asesi = Asesi::with('user')->findOrFail($asesi_id);
+        $user = Auth::user();
+        $asesor = Asesor::where('user_id', $user->id)->first();
 
-        $asesmen = AsesmenMandiriMaster::where('asesi_id', $asesi_id)
+        if (!$asesor) {
+            abort(403, 'Anda bukan asesor.');
+        }
+
+        $asesi = Asesi::with('user')->findOrFail($id_asesi);
+
+        // Pastikan asesi ini ditugaskan ke asesor yang login
+        if ($asesi->asesor_id != $asesor->id_asesor) {
+            abort(403, 'Anda tidak berhak mengakses asesi ini.');
+        }
+
+        $asesmen = AsesmenMandiriMaster::where('id_asesi', $id_asesi)
             ->latest('id_asesmen_mandiri')
             ->first();
 
@@ -44,23 +65,25 @@ class AsesmenMandiriController extends Controller
                 ->with('error', 'Asesi belum mengisi asesmen mandiri.');
         }
 
-        // 🔹 Jawaban asesi
         $jawaban = AsesmenMandiriJawaban::where('id_asesmen_mandiri', $asesmen->id_asesmen_mandiri)
             ->with(['dokumen', 'kuk'])
             ->get()
             ->keyBy('id_kuk');
 
-        // 🔹 Ambil skema permohonan terakhir
         $permohonan = DB::table('permohonan')
-            ->join('skema_sertifikasi', 'permohonan.skema_id', '=', 'skema_sertifikasi.id_skema')
-            ->where('asesi_id', $asesi_id)
-            ->latest('id_permohonan')
-            ->select('skema_sertifikasi.nama_skema as skema', 'permohonan.skema_id')
+            ->join('skema_sertifikasi', 'permohonan.id_skema', '=', 'skema_sertifikasi.id_skema')
+            ->where('permohonan.id_asesi', $id_asesi)
+            ->latest('permohonan.id_permohonan')
+            ->select('skema_sertifikasi.nama_skema as skema', 'permohonan.id_skema')
             ->first();
 
-        // 🔹 Ambil struktur skema (unit → elemen → kuk)
+        if (!$permohonan) {
+            return redirect()->route('asesor.asesmen_mandiri.index')
+                ->with('error', 'Data permohonan tidak ditemukan.');
+        }
+
         $units = DB::table('unit_kompetensi')
-            ->where('id_skema', $permohonan->id_skema ?? 0)
+            ->where('id_skema', $permohonan->id_skema)
             ->get();
 
         $elemen = DB::table('elemen_kompetensi')
@@ -72,7 +95,6 @@ class AsesmenMandiriController extends Controller
             ->whereIn('id_elemen', $elemen->pluck('id_elemen'))
             ->get();
 
-        // 🔹 Ambil persetujuan (tanda tangan asesi jika ada)
         $persetujuan = AsesmenMandiriPersetujuan::where('id_asesmen_mandiri', $asesmen->id_asesmen_mandiri)->first();
 
         return view('asesor.asesmen_mandiri.show', compact(
@@ -90,14 +112,25 @@ class AsesmenMandiriController extends Controller
     /**
      * Simpan hasil verifikasi asesor
      */
-    public function verifikasiStore(Request $request, $asesi_id)
+    public function verifikasiStore(Request $request, $id_asesi)
     {
-        // 🔹 Sesuaikan validasi dengan enum tabel
+        $user = Auth::user();
+        $asesor = Asesor::where('user_id', $user->id)->first();
+
+        if (!$asesor) {
+            abort(403, 'Anda bukan asesor.');
+        }
+
+        $asesi = Asesi::findOrFail($id_asesi);
+        if ($asesi->asesor_id != $asesor->id_asesor) {
+            abort(403, 'Anda tidak berhak memverifikasi asesi ini.');
+        }
+
         $request->validate([
             'rekomendasi' => 'required|in:Dapat Dilanjutkan,Tidak Dapat Dilanjutkan',
         ]);
 
-        $asesmen = AsesmenMandiriMaster::where('asesi_id', $asesi_id)
+        $asesmen = AsesmenMandiriMaster::where('id_asesi', $id_asesi)
             ->latest('id_asesmen_mandiri')
             ->first();
 
@@ -105,7 +138,6 @@ class AsesmenMandiriController extends Controller
             return back()->with('error', 'Asesi belum mengisi asesmen mandiri.');
         }
 
-        // 🔹 Simpan tanda tangan asesor sebagai file
         $fileName = null;
         if ($request->filled('ttd_asesor')) {
             $image = str_replace('data:image/png;base64,', '', $request->ttd_asesor);
@@ -114,13 +146,11 @@ class AsesmenMandiriController extends Controller
             Storage::disk('public')->put($fileName, base64_decode($image));
         }
 
-        // 🔹 Update rekomendasi di master
         $asesmen->update([
             'id_asesor'   => Auth::id(),
             'rekomendasi' => $request->rekomendasi,
         ]);
 
-        // 🔹 Simpan/update persetujuan
         AsesmenMandiriPersetujuan::updateOrCreate(
             ['id_asesmen_mandiri' => $asesmen->id_asesmen_mandiri],
             [

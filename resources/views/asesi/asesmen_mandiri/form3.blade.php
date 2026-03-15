@@ -3,178 +3,466 @@
 @section('title', 'Tanda Tangan Asesi')
 
 @section('konten')
-<div class="container my-5">
-    <div class="ttd-container">
-        <div class="ttd-header">Tanda Tangan Asesi</div>
-        <div class="ttd-card">
-            <div class="ttd-card-title">Asesi</div>
-
-            <form id="ttd-form" method="POST" action="{{ route('asesi.asesmen_mandiri.ttd.store') }}">
-                @csrf
-
-                <label for="nama-asesi" class="ttd-label">Nama Lengkap</label>
-                <input type="text" name="nama_asesi" id="nama-asesi" class="ttd-input"
-                       value="{{ Auth::user()->name }}" readonly>
-
-                <label for="tanggal-asesi" class="ttd-label">Tanggal</label>
-                <!-- tanggal dibuat readonly -->
-                <input type="date" name="tgl_ttd_asesi" id="tanggal-asesi" class="ttd-input"
-                       value="{{ date('Y-m-d') }}" readonly>
-
-                <label for="ttd-asesi" class="ttd-label">Tanda Tangan</label>
-                <canvas id="ttd-asesi" class="ttd-canvas"
-                        width="400" height="200"></canvas>
-
-                <!-- Hidden input untuk simpan base64 -->
-                <input type="hidden" name="ttd_asesi" id="ttd-asesi-input">
-
-                <div class="ttd-btns mt-3">
-                    <button type="button" class="btn-clear"
-                            onclick="clearCanvas('ttd-asesi')">Hapus</button>
+<div class="container-fluid px-4 py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-gradient text-white rounded-circle mb-3" style="width: 70px; height: 70px; box-shadow: 0 10px 20px rgba(11,47,124,0.3);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">
+                        <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z"/>
+                    </svg>
                 </div>
-            </form>
+                <h1 class="display-6 fw-bold text-dark">Tanda Tangan Asesi</h1>
+                <p class="text-secondary">Form Asesmen FR.APL.02 – Konfirmasi akhir asesmen mandiri</p>
+            </div>
+
+            <!-- Card Tanda Tangan Asesi -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-person-check text-primary" viewBox="0 0 16 16">
+                                <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zm1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514zM11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
+                                <path d="M8.256 14a4.474 4.474 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10c.26 0 .507.009.74.025.226-.341.496-.65.804-.918C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4s1 1 1 1h5.256z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0">Tanda Tangan Asesi</h5>
+                            <p class="text-secondary mb-0 small">Konfirmasi akhir asesmen mandiri dengan tanda tangan digital</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body pt-3">
+                    <form id="ttd-form" method="POST" action="{{ route('asesi.asesmen_mandiri.ttd.store') }}">
+                        @csrf
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Nama Lengkap</label>
+                                <input type="text" name="nama_asesi" id="nama-asesi" class="form-control"
+                                       value="{{ Auth::user()->name }}" readonly>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Tanggal</label>
+                                <input type="date" name="tgl_ttd_asesi" id="tanggal-asesi" class="form-control"
+                                       value="{{ date('Y-m-d') }}" readonly>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Tanda Tangan <span class="text-danger">*</span></label>
+                                <div class="canvas-wrapper">
+                                    <canvas id="ttd-asesi" class="ttd-canvas"
+                                            width="400" height="200"></canvas>
+                                    <span class="canvas-placeholder">Tanda tangan di sini</span>
+                                </div>
+                                <input type="hidden" name="ttd_asesi" id="ttd-asesi-input" required>
+                                <div class="invalid-feedback">Tanda tangan wajib diisi.</div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-3">
+                            <button type="button" class="btn btn-outline-danger rounded-pill px-4" onclick="clearCanvas('ttd-asesi')">
+                                <i class="bi bi-eraser me-1"></i>Hapus
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tombol navigasi -->
+            <div class="button-group mt-4">
+                <a href="{{ route('asesi.asesmen_mandiri.form2') }}" class="btn-back">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left me-2" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                    </svg>
+                    Kembali
+                </a>
+                <button type="submit" class="btn-next" form="ttd-form">
+                    Simpan dan Kirim
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send ms-2" viewBox="0 0 16 16">
+                        <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
+                    </svg>
+                </button>
+            </div>
         </div>
     </div>
+</div>
 
-    <div class="action-buttons mt-4">
-        <a href="{{ route('asesi.asesmen_mandiri.form2') }}" class="btn-back">Kembali</a>
-        <button type="submit" class="btn-submit" form="ttd-form" onclick="saveTTD()">Simpan & Kirim</button>
+<!-- Modal Peringatan Tanda Tangan -->
+<div class="modal fade" id="ttdWarningModal" tabindex="-1" aria-labelledby="ttdWarningModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem; overflow: hidden;">
+            <div class="modal-header bg-primary text-white border-0 py-3" style="background: linear-gradient(135deg, #0b2f7c, #08205c);">
+                <h5 class="modal-title fw-bold" id="ttdWarningModalLabel">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-exclamation-triangle-fill me-2" viewBox="0 0 16 16">
+                        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                    </svg>
+                    Tanda Tangan Diperlukan
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <div class="my-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#0b2f7c" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                        <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/>
+                    </svg>
+                </div>
+                <p class="fs-5 mb-2">Anda belum menandatangani formulir ini.</p>
+                <p class="text-secondary mb-0">Silakan tanda tangan pada area yang tersedia sebelum melanjutkan.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center pb-4">
+                <button type="button" class="btn btn-primary px-5 py-2 rounded-pill" style="background: linear-gradient(135deg, #0b2f7c, #08205c); border: none; box-shadow: 0 8px 18px rgba(11,47,124,0.3);" data-bs-dismiss="modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-lg me-2" viewBox="0 0 16 16">
+                        <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/>
+                    </svg>
+                    Mengerti
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
 <style>
+    /* ===== VARIABEL & RESET dengan warna utama #0b2f7c ===== */
+    :root {
+        --primary: #0b2f7c;
+        --primary-dark: #08205c;
+        --primary-light: #1a3e9c;
+        --secondary: #6c757d;
+        --success: #198754;
+        --danger: #dc3545;
+        --light: #f8f9fa;
+        --dark: #212529;
+        --font-sans: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    }
+
     body {
-        font-family: 'Poppins', sans-serif;
-        background: #f9f9fb;
-    }
-    .container {
-        max-width: 850px;
+        font-family: var(--font-sans);
+        background-color: #f1f4f9;
     }
 
-    .ttd-container {
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-        padding: 25px;
+    .container-fluid {
+        max-width: 1280px;
+        margin: 0 auto;
     }
-    .ttd-header {
-        font-size: 18px;
+
+    /* ===== CARD STYLE ===== */
+    .card {
+        border-radius: 1.25rem;
+        overflow: hidden;
+        transition: all 0.2s ease;
+        background: #ffffff;
+    }
+
+    .card:hover {
+        box-shadow: 0 1rem 2rem rgba(0,0,0,0.08) !important;
+    }
+
+    .card-header {
+        background: transparent;
+        padding-bottom: 0;
+    }
+
+    /* ===== WARNA UTAMA #0b2f7c ===== */
+    .bg-primary {
+        background-color: var(--primary) !important;
+    }
+
+    .bg-primary.bg-gradient {
+        background: linear-gradient(145deg, var(--primary), var(--primary-dark)) !important;
+    }
+
+    .bg-primary.bg-opacity-10 {
+        background-color: rgba(11,47,124,0.1) !important;
+    }
+
+    .text-primary {
+        color: var(--primary) !important;
+    }
+
+    /* ===== FORM ELEMENTS ===== */
+    .form-label {
         font-weight: 600;
-        margin-bottom: 20px;
-        color: #041562;
-    }
-    .ttd-card-title {
-        font-size: 16px;
-        font-weight: 500;
-        margin-bottom: 15px;
-        color: #333;
+        font-size: 0.9rem;
+        color: #1e293b;
+        margin-bottom: 0.3rem;
     }
 
-    /* Label & Input */
-    .ttd-label {
-        font-weight: 500;
-        font-size: 14px;
-        margin-top: 10px;
-        display: block;
-        color: #333;
+    .form-control {
+        border: 1.5px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 0.6rem 1rem;
+        font-size: 0.95rem;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        background-color: #fff;
     }
-    .ttd-input {
-        width: 100%;
-        padding: 10px 12px;
-        margin-top: 5px;
-        margin-bottom: 15px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 14px;
-        background: #f9f9f9;
-    }
-    .ttd-input:focus {
+
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(11,47,124,0.15);
         outline: none;
-        border-color: #041562;
-        background: #fff;
     }
 
-    /* Canvas */
+    .form-control:read-only {
+        background-color: #f8f9fa;
+    }
+
+    /* ===== CANVAS ===== */
+    .canvas-wrapper {
+        position: relative;
+        background: white;
+        border-radius: 1rem;
+        overflow: hidden;
+        border: 2px dashed #d0d9e8;
+    }
+
     .ttd-canvas {
-        border: 2px dashed #ccc;
-        border-radius: 8px;
-        background: #fff;
-        cursor: crosshair;
         display: block;
-        margin-top: 8px;
+        width: 100%;
+        height: 200px;
+        background: #ffffff;
+        cursor: crosshair;
+        touch-action: none;
     }
 
-    /* Buttons */
-    .ttd-btns {
-        display: flex;
-        gap: 10px;
+    .canvas-placeholder {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #9aa9b9;
+        font-size: 0.9rem;
+        background: rgba(255,255,255,0.7);
+        padding: 4px 12px;
+        border-radius: 40px;
+        pointer-events: none;
+        backdrop-filter: blur(2px);
     }
-    .btn-clear, .btn-download, .btn-back, .btn-submit {
-        padding: 10px 20px;
-        border-radius: 8px;
+
+    /* ===== BUTTONS ===== */
+    .btn-next {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: #fff;
+        padding: 0.7rem 1.8rem;
+        border-radius: 2rem;
         font-weight: 600;
-        font-size: 14px;
+        font-size: 1rem;
         border: none;
         cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 18px rgba(11,47,124,0.3);
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-next:hover {
+        background: linear-gradient(135deg, var(--primary-dark), #061944);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 22px rgba(11,47,124,0.35);
         color: #fff;
     }
-    .btn-clear { background: #d9534f; }
-    .btn-clear:hover { background: #c9302c; }
-    .btn-download { background: #17a2b8; }
-    .btn-download:hover { background: #117a8b; }
-    .btn-back { background: #6c757d; text-decoration: none; line-height: 36px; }
-    .btn-back:hover { background: #5a6268; }
-    .btn-submit { background: #041562; }
-    .btn-submit:hover { background: #06208a; }
 
-    .action-buttons {
+    .btn-back {
+        background-color: #fff;
+        color: var(--secondary);
+        padding: 0.7rem 1.8rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        text-decoration: none;
+        border: 1.5px solid #dee2e6;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .btn-back:hover {
+        background-color: #f1f3f5;
+        color: #495057;
+        border-color: #ced4da;
+    }
+
+    .btn-outline-danger {
+        border: 1.5px solid var(--danger);
+        color: var(--danger);
+        background: transparent;
+        padding: 0.5rem 1.5rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .btn-outline-danger:hover {
+        background-color: var(--danger);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(220,53,69,0.3);
+    }
+
+    .button-group {
         display: flex;
         justify-content: flex-end;
-        gap: 12px;
+        gap: 0.75rem;
+    }
+
+    /* ===== MODAL ===== */
+    .modal-content {
+        border-radius: 1.5rem;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+        .button-group {
+            justify-content: center;
+        }
+        .canvas-placeholder {
+            font-size: 0.8rem;
+            padding: 2px 8px;
+        }
     }
 </style>
 
 <script>
+// Inisialisasi canvas tanda tangan
 function initSignature(canvasId) {
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext("2d");
     let drawing = false;
 
-    canvas.addEventListener("mousedown", (e) => {
+    function resizeCanvas() {
+        const container = canvas.parentElement;
+        const cssWidth = container.clientWidth;
+        const cssHeight = 200;
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = Math.round(cssWidth * ratio);
+        canvas.height = Math.round(cssHeight * ratio);
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(ratio, ratio);
+
+        // Isi dengan putih
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, cssWidth, cssHeight);
+
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#000';
+    }
+
+    window.addEventListener('resize', () => {
+        // Simpan gambar sebelumnya
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        resizeCanvas();
+        // Kembalikan gambar
+        ctx.putImageData(imgData, 0, 0);
+    });
+
+    resizeCanvas();
+
+    canvas.addEventListener('mousedown', (e) => {
+        e.preventDefault();
         drawing = true;
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+        const y = (e.clientY - rect.top) * (canvas.height / rect.height);
         ctx.beginPath();
-        ctx.moveTo(e.offsetX, e.offsetY);
+        ctx.moveTo(x / (canvas.width / rect.width), y / (canvas.height / rect.height));
     });
 
-    canvas.addEventListener("mousemove", (e) => {
-        if (drawing) {
-            ctx.lineTo(e.offsetX, e.offsetY);
-            ctx.strokeStyle = "#000000"; // warna hitam
-            ctx.lineWidth = 2;
-            ctx.stroke();
-        }
+    canvas.addEventListener('mousemove', (e) => {
+        if (!drawing) return;
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+        const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+        ctx.lineTo(x / (canvas.width / rect.width), y / (canvas.height / rect.height));
+        ctx.stroke();
     });
 
-    canvas.addEventListener("mouseup", () => drawing = false);
-    canvas.addEventListener("mouseleave", () => drawing = false);
+    canvas.addEventListener('mouseup', () => drawing = false);
+    canvas.addEventListener('mouseleave', () => drawing = false);
+
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        drawing = true;
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        const x = (touch.clientX - rect.left) * (canvas.width / rect.width);
+        const y = (touch.clientY - rect.top) * (canvas.height / rect.height);
+        ctx.beginPath();
+        ctx.moveTo(x / (canvas.width / rect.width), y / (canvas.height / rect.height));
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+        if (!drawing) return;
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        const x = (touch.clientX - rect.left) * (canvas.width / rect.width);
+        const y = (touch.clientY - rect.top) * (canvas.height / rect.height);
+        ctx.lineTo(x / (canvas.width / rect.width), y / (canvas.height / rect.height));
+        ctx.stroke();
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', () => drawing = false);
 }
 
-// clear canvas
 function clearCanvas(canvasId) {
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const container = canvas.parentElement;
+    const cssWidth = container.clientWidth;
+    const cssHeight = 200;
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+
+    canvas.width = Math.round(cssWidth * ratio);
+    canvas.height = Math.round(cssHeight * ratio);
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(ratio, ratio);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, cssWidth, cssHeight);
+
+    document.getElementById('ttd-asesi-input').value = '';
 }
 
-// simpan base64 ke input hidden sebelum submit
 function saveTTD() {
     const canvas = document.getElementById("ttd-asesi");
     const dataURL = canvas.toDataURL("image/png");
     document.getElementById("ttd-asesi-input").value = dataURL;
 }
 
-window.onload = function () {
+document.addEventListener('DOMContentLoaded', function() {
     initSignature("ttd-asesi");
-};
+});
+
+document.getElementById('ttd-form').addEventListener('submit', function(e) {
+    const canvas = document.getElementById('ttd-asesi');
+    const ctx = canvas.getContext('2d');
+    const pixelData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    let isBlank = true;
+    for (let i = 0; i < pixelData.length; i += 4) {
+        // Periksa apakah pixel bukan putih (R,G,B tidak semuanya 255)
+        if (pixelData[i] !== 255 || pixelData[i+1] !== 255 || pixelData[i+2] !== 255) {
+            isBlank = false;
+            break;
+        }
+    }
+    if (isBlank) {
+        e.preventDefault();
+        const modalEl = document.getElementById('ttdWarningModal');
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+        return false;
+    }
+    saveTTD();
+});
 </script>
 @endsection

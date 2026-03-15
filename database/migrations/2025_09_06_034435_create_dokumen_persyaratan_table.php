@@ -12,8 +12,8 @@ return new class extends Migration
             $table->id('id_dokumen');
 
             // 🔗 Relasi ke permohonan dan jenis dokumen
-            $table->unsignedBigInteger('permohonan_id');
-            $table->unsignedBigInteger('jenis_dokumen_id');
+            $table->unsignedBigInteger('id_permohonan');
+            $table->unsignedBigInteger('id_jenis_dokumen');
 
             // 📄 Informasi status dan bukti
             $table->string('nama_file')->nullable();      // nama file asli
@@ -26,11 +26,11 @@ return new class extends Migration
             $table->timestamps();
 
             // ✅ Foreign keys
-            $table->foreign('permohonan_id')
+            $table->foreign('id_permohonan')
                 ->references('id_permohonan')->on('permohonan')
                 ->onDelete('cascade');
 
-            $table->foreign('jenis_dokumen_id')
+            $table->foreign('id_jenis_dokumen')
                 ->references('id_jenis_dokumen')->on('jenis_dokumen')
                 ->onDelete('cascade');
         });

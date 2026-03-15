@@ -14,12 +14,12 @@
                         <i class="bi bi-journal-check fs-3"></i>
                     </div>
                     <div>
-                        <h4 class="mb-1 fw-bold" style="color: #041562;">Daftar Permohonan Asesi</h4>
+                        <h4 class="mb-1 fw-bold" style="color: #0b2f7c;">Daftar Permohonan Asesi</h4>
                         <p class="mb-0 text-muted">Berikut daftar pengajuan FR.APL.01 oleh Asesi</p>
                     </div>
                 </div>
                 <div class="search-wrapper">
-                    <input type="text" id="searchInput" class="form-control search-input" 
+                    <input type="text" id="searchInput" class="form-control search-input"
                            placeholder="Cari asesi berdasarkan nama, email, atau NIK...">
                     <i class="bi bi-search search-icon"></i>
                 </div>
@@ -32,7 +32,7 @@
         <div class="card-header bg-white border-bottom-0 py-3">
             <div class="row align-items-center g-3">
                 <div class="col-md-6">
-                    <h6 class="mb-1 fw-semibold" style="color: #041562;">
+                    <h6 class="mb-1 fw-semibold" style="color: #0b2f7c;">
                         <i class="bi bi-list-ul me-2"></i>Daftar Pengajuan
                     </h6>
                     <small class="text-muted">Formulir FR.APL.01 - Permohonan Sertifikasi Kompetensi</small>
@@ -94,7 +94,7 @@
                                 </td>
 
                                 <td class="text-center">
-                                    <a href="{{ route('admin.permohonan.show', $a->id_asesi) }}" 
+                                    <a href="{{ route('admin.permohonan.show', $a->id_asesi) }}"
                                        class="btn btn-sm btn-outline-custom">
                                         <i class="bi bi-eye me-1"></i>Detail
                                     </a>
@@ -202,20 +202,22 @@
 <style>
     /* Primary Color Variables */
     :root {
-        --primary-dark: #041562;
-        --primary-light: #E9F1FF;
+        --primary-dark: #0b2f7c;
+        --primary-light: rgba(11, 47, 124, 0.1);
+        --primary-soft: #e9effa;
     }
 
     /* Header Card */
     .header-card {
         border-left: 4px solid var(--primary-dark);
+        border-radius: 1.25rem;
     }
 
     /* Icon Box */
     .icon-box {
         width: 60px;
         height: 60px;
-        background: var(--primary-light);
+        background: var(--primary-soft);
         border-radius: 12px;
         display: flex;
         align-items: center;
@@ -231,6 +233,7 @@
         transition: all 0.3s ease;
         padding: 6px 12px;
         font-size: 14px;
+        border-radius: 2rem;
     }
 
     .btn-outline-custom:hover {
@@ -238,7 +241,7 @@
         border-color: var(--primary-dark);
         color: white;
         transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(4, 21, 98, 0.2);
+        box-shadow: 0 2px 8px rgba(11, 47, 124, 0.2);
     }
 
     /* Search Wrapper */
@@ -249,15 +252,15 @@
 
     .search-input {
         padding-left: 40px;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 2rem;
         transition: all 0.3s ease;
         height: 44px;
     }
 
     .search-input:focus {
         border-color: var(--primary-dark);
-        box-shadow: 0 0 0 3px rgba(4, 21, 98, 0.1);
+        box-shadow: 0 0 0 3px rgba(11, 47, 124, 0.15);
     }
 
     .search-icon {
@@ -273,7 +276,7 @@
     .avatar-circle {
         width: 40px;
         height: 40px;
-        background: var(--primary-light);
+        background: var(--primary-soft);
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -287,16 +290,16 @@
     .badge-id {
         display: inline-block;
         padding: 6px 12px;
-        background: var(--primary-light);
+        background: var(--primary-soft);
         color: var(--primary-dark);
-        border-radius: 6px;
+        border-radius: 2rem;
         font-weight: 600;
         font-size: 13px;
     }
 
     /* Table Styling */
     table thead {
-        background-color: var(--primary-light);
+        background-color: var(--primary-soft);
         color: var(--primary-dark);
     }
 
@@ -315,7 +318,7 @@
     }
 
     .table-hover tbody tr:hover {
-        background-color: #f8f9ff;
+        background-color: #f8faff;
     }
 
     /* Empty State */
@@ -326,9 +329,9 @@
 
     /* Pagination Custom */
     .pagination .page-link {
-        border-radius: 6px;
+        border-radius: 2rem;
         margin: 0 3px;
-        border: 1px solid #dee2e6;
+        border: 1.5px solid #e2e8f0;
         color: var(--primary-dark);
         font-weight: 500;
         min-width: 36px;
@@ -337,7 +340,7 @@
     }
 
     .pagination .page-link:hover {
-        background-color: var(--primary-light);
+        background-color: var(--primary-soft);
         border-color: var(--primary-dark);
         color: var(--primary-dark);
     }
@@ -365,6 +368,12 @@
         transition: all 0.3s ease;
     }
 
+    /* Card styles consistency */
+    .card {
+        border-radius: 1.25rem;
+        background: #ffffff;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
         .icon-box {
@@ -390,7 +399,7 @@
             font-size: 11px;
             padding: 4px 8px;
         }
-        
+
         .search-wrapper {
             min-width: 100%;
             margin-top: 10px;

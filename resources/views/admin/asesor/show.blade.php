@@ -32,7 +32,7 @@
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
 
-            {{-- ROW 1 --}}
+            {{-- ROW 1: Nama Asesor --}}
             <div class="row mb-4">
                 <div class="col-md-3 fw-semibold text-muted">Nama Asesor</div>
                 <div class="col-md-9 text-dark fw-bold">
@@ -40,7 +40,7 @@
                 </div>
             </div>
 
-            {{-- ROW 2 --}}
+            {{-- ROW 2: NIP --}}
             <div class="row mb-4">
                 <div class="col-md-3 fw-semibold text-muted">NIP</div>
                 <div class="col-md-9">
@@ -48,7 +48,7 @@
                 </div>
             </div>
 
-            {{-- ROW 3 --}}
+            {{-- ROW 3: Email --}}
             <div class="row mb-4">
                 <div class="col-md-3 fw-semibold text-muted">Email</div>
                 <div class="col-md-9">
@@ -56,7 +56,7 @@
                 </div>
             </div>
 
-            {{-- ROW 4 --}}
+            {{-- ROW 4: Telepon --}}
             <div class="row mb-4">
                 <div class="col-md-3 fw-semibold text-muted">Telepon</div>
                 <div class="col-md-9">
@@ -64,13 +64,13 @@
                 </div>
             </div>
 
-            {{-- ROW 5 --}}
+            {{-- ROW 5: Bidang Keahlian (dari Jurusan) --}}
             <div class="row mb-4">
                 <div class="col-md-3 fw-semibold text-muted">Bidang Keahlian</div>
                 <div class="col-md-9">
-                    @if($asesor->bidang_keahlian)
+                    @if($asesor->jurusan)
                         <span class="badge-keahlian px-3 py-2">
-                            {{ $asesor->bidang_keahlian }}
+                            {{ $asesor->jurusan->nama_jurusan }}
                         </span>
                     @else
                         <span class="text-muted">-</span>
@@ -78,7 +78,7 @@
                 </div>
             </div>
 
-            {{-- ROW 6 --}}
+            {{-- ROW 6: No. Registrasi --}}
             <div class="row mb-4">
                 <div class="col-md-3 fw-semibold text-muted">No. Registrasi</div>
                 <div class="col-md-9">
@@ -86,7 +86,7 @@
                 </div>
             </div>
 
-            {{-- ROW 7: Created --}}
+            {{-- ROW 7: Dibuat Pada --}}
             <div class="row mb-4">
                 <div class="col-md-3 fw-semibold text-muted">Dibuat Pada</div>
                 <div class="col-md-9">
@@ -94,11 +94,27 @@
                 </div>
             </div>
 
-            {{-- ROW 8: Updated --}}
+            {{-- ROW 8: Terakhir Diperbarui --}}
             <div class="row mb-4">
                 <div class="col-md-3 fw-semibold text-muted">Terakhir Diperbarui</div>
                 <div class="col-md-9">
                     {{ \Carbon\Carbon::parse($asesor->updated_at)->format('d M Y, H:i') }}
+                </div>
+            </div>
+
+            {{-- ROW 9: Skema yang Diampu --}}
+            <div class="row mb-4">
+                <div class="col-md-3 fw-semibold text-muted">Skema yang Diampu</div>
+                <div class="col-md-9">
+                    @if($asesor->skemas && $asesor->skemas->count() > 0)
+                        @foreach($asesor->skemas as $skema)
+                            <span class="badge-keahlian px-3 py-2 me-2 mb-2 d-inline-block">
+                                {{ $skema->nama_skema }}
+                            </span>
+                        @endforeach
+                    @else
+                        <span class="text-muted">Belum ada skema</span>
+                    @endif
                 </div>
             </div>
 
@@ -157,4 +173,3 @@
 </style>
 
 @endsection
-

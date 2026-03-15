@@ -10,12 +10,14 @@ class DokumenPersyaratan extends Model
     use HasFactory;
 
     protected $table = 'dokumen_persyaratan';
+
     protected $primaryKey = 'id_dokumen';
+
     public $timestamps = true;
 
     protected $fillable = [
-        'permohonan_id',
-        'jenis_dokumen_id',
+        'id_permohonan',
+        'id_jenis_dokumen',
         'nama_file',
         'path_file',
         'ada',
@@ -24,36 +26,56 @@ class DokumenPersyaratan extends Model
     ];
 
     // ===============================
-    // 🔗 RELASI ELOQUENT
+    // 🔗 RELASI
     // ===============================
 
     /**
-     * Dokumen ini milik permohonan tertentu
+     * Relasi ke tabel permohonan
      */
     public function permohonan()
     {
-        return $this->belongsTo(Permohonan::class, 'permohonan_id', 'id_permohonan');
+        return $this->belongsTo(
+            Permohonan::class,
+            'id_permohonan',
+            'id_permohonan'
+        );
     }
 
     /**
-     * Jenis dokumen (master dokumen)
+     * Relasi ke master jenis dokumen
      */
     public function jenisDokumen()
     {
-        return $this->belongsTo(JenisDokumen::class, 'jenis_dokumen_id', 'id_jenis_dokumen');
+        return $this->belongsTo(
+            JenisDokumen::class,
+            'id_jenis_dokumen',
+            'id_jenis_dokumen'
+        );
     }
 
     // ===============================
-    // 🧩 ACCESSOR (Opsional)
+    // ACCESSOR
     // ===============================
 
     /**
-     * URL file dokumen (jika disimpan di storage Laravel)
+     * Mengambil URL file dokumen
      */
     public function getFileUrlAttribute()
     {
-        return $this->path_file
-            ? asset('storage/' . $this->path_file)
-            : null;
+        if ($this->path_file) {
+            return asset('storage/' . $this->path_file);
+        }
+
+        return null;
+    }
+
+    /**
+     * Mengambil nama dokumen dari relasi
+     */
+    public function getNamaDokumenAttribute()
+    {
+        return $this->jenisDokumen
+            ? $this->jenisDokumen->nama_dokumen
+            : 'Dokumen #' . $this->id_jenis_dokumen;
     }
 }

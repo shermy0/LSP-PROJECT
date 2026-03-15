@@ -28,6 +28,6 @@ class JenisDokumen extends Model
      */
     public function dokumenPersyaratan()
     {
-        return $this->hasMany(DokumenPersyaratan::class, 'jenis_dokumen_id', 'id_jenis_dokumen');
+        return $this->hasMany(DokumenPersyaratan::class, 'id_jenis_dokumen', 'id_jenis_dokumen');
     }
 }

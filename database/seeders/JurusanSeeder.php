@@ -8,52 +8,58 @@ use Carbon\Carbon;
 
 class JurusanSeeder extends Seeder
 {
-    /**
-     * Jalankan seeder untuk tabel jurusan.
-     */
     public function run(): void
     {
-        DB::table('jurusan')->insert([
+        $jurusan = [
             [
-                'kode_jurusan' => 'DKV-01',
-                'nama_jurusan' => 'Desain Komunikasi Visual',
-                'deskripsi' => 'Program studi desain komunikasi visual untuk media cetak dan digital',
+                'kode_jurusan' => 'AKL',
+                'nama_jurusan' => 'AKUNTANSI DAN KEUANGAN LEMBAGA',
+                'deskripsi' => 'Program studi akuntansi dan keuangan lembaga',
                 'status' => 'aktif',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
             ],
             [
-                'kode_jurusan' => 'RPL-01',
-                'nama_jurusan' => 'Rekayasa Perangkat Lunak',
-                'deskripsi' => 'Program studi pengembangan perangkat lunak dan aplikasi',
+                'kode_jurusan' => 'BDP',
+                'nama_jurusan' => 'BISNIS DARING DAN PEMASARAN',
+                'deskripsi' => 'Program studi bisnis daring dan pemasaran',
                 'status' => 'aktif',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
             ],
             [
-                'kode_jurusan' => 'TKJ-01',
-                'nama_jurusan' => 'Teknik Komputer dan Jaringan',
-                'deskripsi' => 'Program studi jaringan komputer dan administrasi sistem',
+                'kode_jurusan' => 'DKV',
+                'nama_jurusan' => 'DESAIN KOMUNIKASI VISUAL',
+                'deskripsi' => 'Program studi desain komunikasi visual',
                 'status' => 'aktif',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
             ],
             [
-                'kode_jurusan' => 'MM-01',
-                'nama_jurusan' => 'Multimedia',
-                'deskripsi' => 'Program studi produksi konten multimedia interaktif',
+                'kode_jurusan' => 'MPL',
+                'nama_jurusan' => 'MANAJEMEN PERKANTORAN DAN LAYANAN BISNIS',
+                'deskripsi' => 'Program studi manajemen perkantoran dan layanan bisnis',
                 'status' => 'aktif',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
             ],
             [
-                'kode_jurusan' => 'AK-01',
-                'nama_jurusan' => 'Akuntansi',
-                'deskripsi' => 'Program studi akuntansi dan keuangan',
+                'kode_jurusan' => 'PPL',
+                'nama_jurusan' => 'PENGEMBANGAN PERANGKAT LUNAK DAN GIM',
+                'deskripsi' => 'Program studi pengembangan perangkat lunak dan gim',
                 'status' => 'aktif',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
             ],
-        ]);
+            [
+                'kode_jurusan' => 'TKJ',
+                'nama_jurusan' => 'TEKNIK KOMPUTER DAN JARINGAN',
+                'deskripsi' => 'Program studi teknik komputer dan jaringan',
+                'status' => 'aktif',
+            ],
+        ];
+
+        foreach ($jurusan as $data) {
+            DB::table('jurusan')->updateOrInsert(
+                ['nama_jurusan' => $data['nama_jurusan']],
+                [
+                    'kode_jurusan' => $data['kode_jurusan'],
+                    'deskripsi' => $data['deskripsi'],
+                    'status' => $data['status'],
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]
+            );
+        }
     }
 }

@@ -453,6 +453,15 @@
                             <span class="label">Penugasan Asesor</span>
                         </a>
                     </li>
+
+                    <li>
+                        <a href="{{ route('admin.banding-asesmen.index') }}"
+                            class="{{ request()->routeIs('admin.banding-asesmen.index') ? 'active' : '' }}" title="Daftar Banding Asesmen"
+                            data-label="Daftar Banding Asesmen">
+                            <span class="iicon"><i class="bi bi-person-lines-fill"></i></span>
+                            <span class="label">Daftar Banding Assesmen</span>
+                        </a>
+                    </li>
                 @endif
 
 

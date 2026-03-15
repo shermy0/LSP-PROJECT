@@ -4,60 +4,80 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\AsesmenMandiriMaster;
 
 class Permohonan extends Model
 {
     use HasFactory;
 
+    // Sesuaikan dengan migration Anda
     protected $table = 'permohonan';
     protected $primaryKey = 'id_permohonan';
+    public $incrementing = true;
     public $timestamps = true;
 
+    // Gunakan nama kolom persis seperti pada migration/tabel
     protected $fillable = [
-        'asesi_id',
-        'admin_id',
-        'skema_id',
+        'id_asesi',
+        'id_admin',
+        'id_skema',
+        'id_tujuan',
         'tgl_permohonan',
-        'tujuan_asesmen',
         'status',
-        'catatan'
+        'catatan',
+    ];
+
+    // Jika Anda ingin otomatis cast tanggal
+    protected $dates = [
+        'tgl_permohonan',
+        'created_at',
+        'updated_at',
     ];
 
     // ===============================
-    // 🔗 RELASI ELOQUENT
+    // RELASI ELOQUENT (sesuaikan class target jika berbeda namespace)
     // ===============================
 
-    /**
-     * Asesi yang mengajukan permohonan ini
-     */
     public function asesi()
     {
-        return $this->belongsTo(Asesi::class, 'asesi_id', 'id_asesi');
+        // Asesi model diasumsikan bernama Asesi dan primary key di tabel asesi adalah id_asesi
+        return $this->belongsTo(Asesi::class, 'id_asesi', 'id_asesi');
     }
 
-    /**
-     * Admin yang memproses atau memverifikasi permohonan
-     */
     public function admin()
     {
-        return $this->belongsTo(Admin::class, 'admin_id', 'id_admin');
+        // Admin model diasumsikan bernama Admin dan primary key id_admin
+        return $this->belongsTo(Admin::class, 'id_admin', 'id_admin');
     }
 
-    /**
-     * Skema sertifikasi yang diajukan dalam permohonan ini
-     */
     public function skema()
     {
-        return $this->belongsTo(SkemaSertifikasi::class, 'skema_id', 'id_skema');
+        // Skema model diasumsikan bernama SkemaSertifikasi dan pk id_skema
+        return $this->belongsTo(SkemaSertifikasi::class, 'id_skema', 'id_skema');
     }
 
-    // ===============================
-    // 🧩 OPTIONAL: ACCESSOR / MUTATOR
-    // ===============================
+    // app/Models/Permohonan.php
+    public function persetujuan()
+    {
+        return $this->hasOne(PersetujuanAsesmen::class, 'id_permohonan', 'id_permohonan');
+    }
 
-    /**
-     * Format tanggal agar tampil lebih mudah dibaca (opsional)
-     */
+    public function asesmenMandiriMaster()
+    {
+        return $this->hasOne(AsesmenMandiriMaster::class, 'id_permohonan', 'id_permohonan');
+    }
+
+    public function penyesuaianWajar()
+{
+    return $this->hasOne(PenyesuaianWajar::class, 'id_permohonan', 'id_permohonan');
+}
+
+public function asesor()
+{
+    return $this->belongsTo(Asesor::class, 'id_asesor', 'id_asesor');
+}
+
+    // Accessor opsional untuk format tanggal
     public function getTglPermohonanFormattedAttribute()
     {
         return $this->tgl_permohonan

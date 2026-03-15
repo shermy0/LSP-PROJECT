@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Asesor;
+use App\Models\Jurusan;
+use App\Models\SkemaSertifikasi;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -17,27 +19,33 @@ class AsesorController extends Controller
 {
     public function index()
     {
-        // paginate agar rapi; ubah ke get() bila mau semua
-        $asesor = Asesor::orderBy('updated_at', 'desc')->paginate(15);
-        return view('admin.asesor.index', compact('asesor'));
+        $asesor = Asesor::with(['jurusan', 'skemas'])
+            ->orderBy('updated_at', 'desc')
+            ->paginate(15);
+
+        $daftarSkema = SkemaSertifikasi::all(); // ganti nama variabel
+
+        return view('admin.asesor.index', compact('asesor', 'daftarSkema'));
     }
 
     public function show($id)
     {
-        $asesor = Asesor::findOrFail($id);
+        $asesor = Asesor::with(['jurusan', 'skemas'])->findOrFail($id);
         return view('admin.asesor.show', compact('asesor'));
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'nama_asesor'     => 'required|string|max:255',
-            'nip'             => 'nullable|string|max:100|unique:asesor,nip',
-            'email'           => 'nullable|email|max:255',
-            'telepon'         => 'nullable|string|max:30',
-            'bidang_keahlian' => 'nullable|string|max:255',
-            'no_registrasi'   => 'nullable|string|max:100|unique:asesor,no_registrasi',
-            'create_account'  => 'nullable|in:1',
+            'nama_asesor' => 'required|string|max:255',
+            'nip' => 'nullable|string|max:100|unique:asesor,nip',
+            'email' => 'nullable|email|max:255',
+            'telepon' => 'nullable|string|max:30',
+            'id_jurusan' => 'nullable|exists:jurusan,id_jurusan',
+            'no_registrasi' => 'nullable|string|max:100|unique:asesor,no_registrasi',
+            'create_account' => 'nullable|in:1',
+            'skema_ids' => 'nullable|array',
+            'skema_ids.*' => 'exists:skema_sertifikasi,id_skema',
         ]);
 
         // tambahan validasi: jika create_account dicentang => email wajib & unik di users
@@ -73,8 +81,7 @@ class AsesorController extends Controller
                     'name' => $request->nama_asesor,
                     'email' => $request->email,
                     'password' => Hash::make($plainPassword),
-                    // jika tabel users punya kolom role, tambahkan. Sesuaikan jika berbeda:
-                    'role' => 'asesor',
+                    'role' => 'asesor', // pastikan kolom role ada di tabel users
                 ]);
 
                 $userId = $user->id;
@@ -83,25 +90,28 @@ class AsesorController extends Controller
                 try {
                     Mail::to($request->email)->send(new AsesorCredentialsMail($user, $plainPassword));
                 } catch (\Exception $e) {
-                    // log error tapi jangan rollback hanya karena email gagal
-                    \Log::error('Failed to send asesor credentials email: '.$e->getMessage());
+                    \Log::error('Failed to send asesor credentials email: ' . $e->getMessage());
                 }
             }
 
-            // simpan data asesor
+            // simpan data asesor dengan id_jurusan
             $asesor = Asesor::create([
                 'user_id' => $userId,
                 'nama_asesor' => $request->nama_asesor,
                 'nip' => $request->nip,
                 'email' => $request->email,
                 'telepon' => $request->telepon,
-                'bidang_keahlian' => $request->bidang_keahlian,
+                'id_jurusan' => $request->id_jurusan,
                 'no_registrasi' => $request->no_registrasi,
             ]);
 
+            // sync skema yang dipilih
+            if ($request->has('skema_ids')) {
+                $asesor->skemas()->sync($request->skema_ids);
+            }
+
             DB::commit();
 
-            // Redirect dan kembalikan password sementara via session (hanya sekali tampil)
             if ($plainPassword) {
                 return redirect()->route('admin.asesor.index')
                     ->with('success', 'Asesor berhasil ditambahkan dan akun dibuat.')
@@ -114,7 +124,7 @@ class AsesorController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Error create asesor: '.$e->getMessage());
+            \Log::error('Error create asesor: ' . $e->getMessage());
             return redirect()->back()
                 ->with('error', 'Terjadi kesalahan saat menyimpan data.')
                 ->withInput();
