@@ -11,7 +11,8 @@ use App\Http\Controllers\FormAsesmenController;
 use App\Http\Controllers\Asesi\PermohonanController;
 use App\Http\Controllers\Admin\Form1AdminController;
 use App\Http\Controllers\Admin\PenugasanController;
-use App\Http\Controllers\BandingAsesmenController;
+// Hapus use BandingAsesmenController global karena tidak digunakan
+// use App\Http\Controllers\BandingAsesmenController;
 use App\Http\Controllers\FormPraAsesmenController;
 use App\Http\Controllers\Asesi\AsesmenMandiriController as AsesiAsesmenMandiriController;
 use App\Http\Controllers\Asesor\AsesmenMandiriController as AsesorAsesmenMandiriController;
@@ -28,11 +29,6 @@ Route::post('/login', [AuthController::class, 'login']);
 // register
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('register.store');
-
-// ================== BANDING ASESMEN ==================
-Route::get('/banding-asesmen', [BandingAsesmenController::class, 'index'])->name('banding.index');
-Route::post('/banding-asesmen', [BandingAsesmenController::class, 'store'])->name('banding.store');
-Route::post('/simpan-asesor', [BandingAsesmenController::class, 'simpanAsesor'])->name('simpan.asesor');
 
 // ================== REDIRECT DEFAULT ==================
 Route::get('/', function () {
@@ -104,6 +100,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/penugasan', [PenugasanController::class, 'index'])->name('penugasan.index');
         Route::get('/penugasan/{id}/edit', [PenugasanController::class, 'edit'])->name('penugasan.edit');
         Route::put('/penugasan/{id}', [PenugasanController::class, 'update'])->name('penugasan.update');
+
+        // ===== BANDING ASESMEN UNTUK ADMIN =====
+        Route::resource('banding-asesmen', \App\Http\Controllers\Admin\BandingAsesmenController::class)
+            ->only(['index', 'show']);
+
+        // ===== DOWNLOAD PDF BANDING =====
+        Route::get('/banding-asesmen/{id}/download', [\App\Http\Controllers\Admin\BandingAsesmenController::class, 'downloadPdf'])->name('banding-asesmen.download');
     });
 
     // ================== ASESMEN MANDIRI (FR.APL.02) ==================
@@ -162,6 +165,15 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [AsesiPenyesuaianWajarController::class, 'index'])->name('index');
         Route::get('/{id}', [AsesiPenyesuaianWajarController::class, 'show'])->name('show');
         Route::post('/{id}/signature', [AsesiPenyesuaianWajarController::class, 'storeSignature'])->name('signature');
+    });
+
+    // ================== BANDING ASESMEN (FR.AK.04) UNTUK ASESI ==================
+    Route::prefix('asesi/banding-asesmen')->name('asesi.banding_asesmen.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Asesi\BandingAsesmenController::class, 'index'])->name('index');
+        Route::get('/create/{id_permohonan}', [\App\Http\Controllers\Asesi\BandingAsesmenController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Asesi\BandingAsesmenController::class, 'store'])->name('store');
+        Route::get('/{id}', [\App\Http\Controllers\Asesi\BandingAsesmenController::class, 'show'])->name('show');
+        Route::post('/{id}/signature', [\App\Http\Controllers\Asesi\BandingAsesmenController::class, 'storeSignature'])->name('signature');
     });
 
     // ================== PRA ASESMEN ==================

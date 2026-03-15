@@ -4,113 +4,222 @@
 
 @section('konten')
 <div class="container-fluid px-4 py-4">
-    <div class="bg-transparent">
-        <!-- Header dengan sentuhan lebih elegan (warna #0b2f7c) -->
-        <div class="text-center mb-5">
-            <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width:70px; height:70px; background: linear-gradient(145deg, #0b2f7c, #1a3e9c); box-shadow: 0 10px 20px rgba(11,47,124,0.3);">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    <!-- Header dengan gaya baru (lingkaran gradien) -->
+    <div class="text-center mb-5">
+        <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-gradient text-white rounded-circle mb-3" style="width: 70px; height: 70px; box-shadow: 0 10px 20px rgba(11,47,124,0.3);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-file-text" viewBox="0 0 16 16">
+                <path d="M5 4a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zM5 8a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm0 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1H5z"/>
+                <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm10-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1z"/>
+            </svg>
+        </div>
+        <h1 class="display-6 fw-bold text-dark">Detail Permohonan Sertifikasi</h1>
+        <p class="text-secondary">FR.APL.02 — Rincian Data Pemohon</p>
+    </div>
+
+    <form id="permohonanForm" action="{{ route('admin.permohonan.update', $permohonan->id_permohonan) }}" method="POST" class="needs-validation" novalidate>
+        @csrf
+
+        {{-- Data Pribadi --}}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 pt-4 pb-0">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-person-circle text-primary" viewBox="0 0 16 16">
+                            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Data Pribadi</h5>
+                        <p class="text-secondary mb-0 small">Rincian identitas pemohon</p>
+                    </div>
+                </div>
             </div>
-            <h1 class="h3 fw-bold" style="color: #0b2f7c;">Detail Permohonan Sertifikasi</h1>
-            <p class="text-secondary-emphasis bg-light d-inline-block px-4 py-2 rounded-pill fs-6"><span class="fw-semibold">FR.APL.02</span> — Rincian Data Pemohon</p>
+            <div class="card-body pt-3">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Nama Lengkap</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $asesi->nama_lengkap ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">NIK / No. Identitas</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $asesi->nik ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Tempat Lahir</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $asesi->tempat_lahir ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Tanggal Lahir</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ isset($asesi->tgl_lahir) ? \Carbon\Carbon::parse($asesi->tgl_lahir)->format('d M Y') : '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Jenis Kelamin</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $asesi->jenis_kelamin == 'L' ? 'Laki-laki' : ($asesi->jenis_kelamin == 'P' ? 'Perempuan' : '-') }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Kebangsaan</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $asesi->kebangsaan ?? '-' }}</p>
+                    </div>
+                    <div class="col-12">
+                        <hr class="my-2">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Alamat Rumah</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $asesi->alamat_rumah ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Kode Pos Rumah</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $asesi->kode_pos_rumah ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Telp. Rumah</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $asesi->telepon_rumah ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">HP (No. Seluler)</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $asesi->telepon_hp ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Email Pribadi</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $asesi->email ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Kualifikasi Pendidikan</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $asesi->kualifikasi_pendidikan ?? ($asesi->pendidikan_terakhir ?? '-') }}</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <form id="permohonanForm" action="{{ route('admin.permohonan.update', $permohonan->id_permohonan) }}" method="POST" class="needs-validation" novalidate>
-            @csrf
-
-            {{-- Data Pribadi --}}
-            <div class="unit-header">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary rounded-pill px-3 py-1 fs-6">1</span>
-                    <p class="mb-1 fw-semibold fs-5">Data Pribadi</p>
-                </div>
-                <p class="mb-0 text-secondary">Rincian identitas pemohon</p>
-            </div>
-
-            <div class="question-box mb-4">
-                <div class="ps-2 data-grid">
-                    <p><strong>Nama Lengkap:</strong> {{ $asesi->nama_lengkap ?? '-' }}</p>
-                    <p><strong>NIK / No. Identitas:</strong> {{ $asesi->nik ?? '-' }}</p>
-                    <p><strong>Tempat Lahir:</strong> {{ $asesi->tempat_lahir ?? '-' }}</p>
-                    <p><strong>Tanggal Lahir:</strong> {{ isset($asesi->tgl_lahir) ? \Carbon\Carbon::parse($asesi->tgl_lahir)->format('d M Y') : '-' }}</p>
-                    <p><strong>Jenis Kelamin:</strong> {{ $asesi->jenis_kelamin == 'L' ? 'Laki-laki' : ($asesi->jenis_kelamin == 'P' ? 'Perempuan' : '-') }}</p>
-                    <p><strong>Kebangsaan:</strong> {{ $asesi->kebangsaan ?? '-' }}</p>
-
-                    <hr class="full-width my-3">
-
-                    <p><strong>Alamat Rumah:</strong> {{ $asesi->alamat_rumah ?? '-' }}</p>
-                    <p><strong>Kode Pos Rumah:</strong> {{ $asesi->kode_pos_rumah ?? '-' }}</p>
-                    <p><strong>Telp. Rumah:</strong> {{ $asesi->telepon_rumah ?? '-' }}</p>
-                    <p><strong>HP (No. Seluler):</strong> {{ $asesi->telepon_hp ?? '-' }}</p>
-                    <p><strong>Email Pribadi:</strong> {{ $asesi->email ?? '-' }}</p>
-
-                    <hr class="full-width my-3">
-
-                    <p><strong>Kualifikasi Pendidikan:</strong> {{ $asesi->kualifikasi_pendidikan ?? ($asesi->pendidikan_terakhir ?? '-') }}</p>
+        {{-- Data Pekerjaan --}}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 pt-4 pb-0">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-building text-primary" viewBox="0 0 16 16">
+                            <path d="M4 2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-6 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-6 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
+                            <path d="M1 2a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2zm1 0v12h10V2H2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Data Pekerjaan</h5>
+                        <p class="text-secondary mb-0 small">Informasi pekerjaan / institusi saat ini</p>
+                    </div>
                 </div>
             </div>
+            <div class="card-body pt-3">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Nama Institusi / Perusahaan</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $asesi->nama_institusi ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Jabatan / Status</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $asesi->jabatan ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Alamat Kantor / Sekolah</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $asesi->alamat_kantor ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Kode Pos Kantor</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $asesi->kode_pos_kantor ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Telp. Kantor</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $asesi->telepon_kantor ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Fax Kantor</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $asesi->fax_kantor ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Email Kantor</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $asesi->email_kantor ?? '-' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            {{-- Data Pekerjaan --}}
-            <div class="unit-header">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary rounded-pill px-3 py-1 fs-6">2</span>
-                    <p class="mb-1 fw-semibold fs-5">Data Pekerjaan</p>
+        {{-- Data Sertifikasi --}}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 pt-4 pb-0">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-patch-check text-primary" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M10.354 6.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                            <path d="M14 8.5V6.127c0-.353-.145-.69-.402-.938l-3.73-3.53A1.5 1.5 0 0 0 8.812 1H4.5A1.5 1.5 0 0 0 3 2.5v11A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-1.959a2.5 2.5 0 0 0 .5-1.488V9.5h-.5v.042a2 2 0 0 1-2 2h-.5V9.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5v2h-.5a2 2 0 0 1-2-2v-.5h.042a2 2 0 0 1 1.488-.5H8.5v-.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5v.5h-.5a2 2 0 0 1-2-2V4.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v.5h2.5a.5.5 0 0 1 .5.5v.5h.5a2 2 0 0 1 2 2v.5h.5a2 2 0 0 1 2 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Data Sertifikasi</h5>
+                        <p class="text-secondary mb-0 small">Skema & status permohonan</p>
+                    </div>
                 </div>
-                <p class="mb-0 text-secondary">Informasi pekerjaan / institusi saat ini</p>
             </div>
+            <div class="card-body pt-3">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Skema Sertifikasi</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $skema->nama_skema ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Jenjang</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $skema->jenjang ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Judul Sertifikasi</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $skema->judul_skema ?? $skema->nama_skema ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Nomor Skema</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ $skema->kode_skema ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Tujuan Asesmen</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">
+                            @if(isset($permohonan->id_tujuan))
+                                {{ \DB::table('tujuan_asesmen')->where('id_tujuan', $permohonan->id_tujuan)->value('nama_tujuan') ?? ($permohonan->tujuan_asesmen ?? '-') }}
+                            @else
+                                {{ $permohonan->tujuan_asesmen ?? '-' }}
+                            @endif
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Tanggal Permohonan</label>
+                        <p class="fw-semibold border p-2 rounded bg-light">{{ isset($permohonan->tgl_permohonan) ? \Carbon\Carbon::parse($permohonan->tgl_permohonan)->format('d M Y') : '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Status</label>
+                        <p>
+                            <span class="badge bg-{{ $permohonan->status=='Diajukan' ? 'warning text-dark' : ($permohonan->status=='Diterima' ? 'success' : ($permohonan->status=='Diperiksa' ? 'info text-dark' : 'danger')) }} px-3 py-2 fs-6">
+                                {{ $permohonan->status ?? '-' }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            <div class="question-box mb-4">
-                <div class="ps-2 data-grid">
-                    <p><strong>Nama Institusi / Perusahaan:</strong> {{ $asesi->nama_institusi ?? '-' }}</p>
-                    <p><strong>Jabatan / Status:</strong> {{ $asesi->jabatan ?? '-' }}</p>
-                    <p><strong>Alamat Kantor / Sekolah:</strong> {{ $asesi->alamat_kantor ?? '-' }}</p>
-                    <p><strong>Kode Pos Kantor:</strong> {{ $asesi->kode_pos_kantor ?? '-' }}</p>
-                    <p><strong>Telp. Kantor:</strong> {{ $asesi->telepon_kantor ?? '-' }}</p>
-                    <p><strong>Fax Kantor:</strong> {{ $asesi->fax_kantor ?? '-' }}</p>
-                    <p><strong>Email Kantor:</strong> {{ $asesi->email_kantor ?? '-' }}</p>
+        {{-- Daftar Unit Kompetensi --}}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 pt-4 pb-0">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-list-check text-primary" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Daftar Unit Kompetensi</h5>
+                        <p class="text-secondary mb-0 small">Unit kompetensi pemohon</p>
+                    </div>
                 </div>
             </div>
-
-            {{-- Data Sertifikasi --}}
-            <div class="unit-header">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary rounded-pill px-3 py-1 fs-6">3</span>
-                    <p class="mb-1 fw-semibold fs-5">Data Sertifikasi</p>
-                </div>
-                <p class="mb-0 text-secondary">Skema & status permohonan</p>
-            </div>
-            <div class="question-box mb-4">
-                <div class="ps-2 data-grid">
-                    <p><strong>Skema Sertifikasi:</strong> {{ $skema->nama_skema ?? '-' }}</p>
-                    <p><strong>Jenjang:</strong> {{ $skema->jenjang ?? '-' }}</p>
-                    <p><strong>Judul Sertifikasi:</strong> {{ $skema->judul_skema ?? $skema->nama_skema ?? '-' }}</p>
-                    <p><strong>Nomor Skema:</strong> {{ $skema->kode_skema ?? '-' }}</p>
-                    <p><strong>Tujuan Asesmen:</strong>
-                        @if(isset($permohonan->id_tujuan))
-                            {{ \DB::table('tujuan_asesmen')->where('id_tujuan', $permohonan->id_tujuan)->value('nama_tujuan') ?? ($permohonan->tujuan_asesmen ?? '-') }}
-                        @else
-                            {{ $permohonan->tujuan_asesmen ?? '-' }}
-                        @endif
-                    </p>
-                    <p><strong>Tanggal Permohonan:</strong> {{ isset($permohonan->tgl_permohonan) ? \Carbon\Carbon::parse($permohonan->tgl_permohonan)->format('d M Y') : '-' }}</p>
-                    <p><strong>Status:</strong>
-                        <span class="badge bg-{{ $permohonan->status=='Diajukan' ? 'warning text-dark' : ($permohonan->status=='Diterima' ? 'success' : ($permohonan->status=='Diperiksa' ? 'info text-dark' : 'danger')) }} px-3 py-2 fs-6">
-                            {{ $permohonan->status ?? '-' }}
-                        </span>
-                    </p>
-                </div>
-            </div>
-
-            {{-- Daftar Unit Kompetensi --}}
-            <div class="unit-header">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary rounded-pill px-3 py-1 fs-6">4</span>
-                    <p class="mb-1 fw-semibold fs-5">Daftar Unit Kompetensi</p>
-                </div>
-                <p class="mb-0 text-secondary">Unit kompetensi pemohon</p>
-            </div>
-            <div class="question-box mb-4">
+            <div class="card-body pt-3">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
+                    <table class="table table-hover align-middle">
                         <thead class="table-light">
                             <tr>
                                 <th>No</th>
@@ -134,18 +243,26 @@
                     </table>
                 </div>
             </div>
+        </div>
 
-            {{-- Bukti Kelengkapan --}}
-            <div class="unit-header">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary rounded-pill px-3 py-1 fs-6">5</span>
-                    <p class="mb-1 fw-semibold fs-5">Bukti Kelengkapan</p>
+        {{-- Bukti Kelengkapan --}}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 pt-4 pb-0">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-files text-primary" viewBox="0 0 16 16">
+                            <path d="M13 0H6a2 2 0 0 0-2 2 2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2 2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm0 13V4a2 2 0 0 0-2-2H5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1zM3 4a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Bukti Kelengkapan</h5>
+                        <p class="text-secondary mb-0 small">Lampiran dokumen pemohon</p>
+                    </div>
                 </div>
-                <p class="mb-0 text-secondary">Lampiran dokumen pemohon</p>
             </div>
-            <div class="question-box mb-4">
+            <div class="card-body pt-3">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
+                    <table class="table table-hover align-middle">
                         <thead class="table-light text-center">
                             <tr>
                                 <th>No</th>
@@ -197,49 +314,57 @@
                     </table>
                 </div>
             </div>
+        </div>
 
-            {{-- Tanda Tangan Persetujuan --}}
-            <div class="unit-header">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary rounded-pill px-3 py-1 fs-6">6</span>
-                    <p class="mb-1 fw-semibold fs-5">Tanda Tangan Persetujuan</p>
+        {{-- Tanda Tangan Persetujuan --}}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 pt-4 pb-0">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-pen text-primary" viewBox="0 0 16 16">
+                            <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Tanda Tangan Persetujuan</h5>
+                        <p class="text-secondary mb-0 small">TTD Asesi & Admin</p>
+                    </div>
                 </div>
-                <p class="mb-0 text-secondary">TTD Asesi & Admin</p>
             </div>
-            <div class="question-box mb-4">
+            <div class="card-body pt-3">
                 <div class="row g-4">
                     <!-- Asesi (read-only image) -->
                     <div class="col-md-6">
-                        <div class="bg-light p-4 rounded-4 h-100 d-flex flex-column">
-                            <p class="mb-3 fw-semibold fs-5 text-primary"><i class="bi bi-person-circle me-2"></i>Asesi</p>
+                        <div class="bg-light p-4 rounded-4 h-100">
+                            <h6 class="fw-bold mb-3">Asesi</h6>
                             <p><strong>Tanggal:</strong> {{ $persetujuan->tgl_ttd_asesi ?? '-' }}</p>
                             @if(!empty($persetujuan->ttd_asesi))
-                                <div class="mt-2 text-center border rounded-3 p-3 bg-white">
+                                <div class="text-center border rounded p-3 bg-white">
                                     <img src="{{ asset('storage/' . $persetujuan->ttd_asesi) }}" alt="TTD Asesi"
-                                         class="img-fluid" style="max-height:150px; object-fit:contain;">
+                                         class="img-fluid" style="max-height:150px;">
                                 </div>
                             @else
-                                <div class="text-muted fst-italic border rounded-3 p-4 text-center bg-white">Belum ada tanda tangan asesi</div>
+                                <p class="text-muted fst-italic">Belum ada tanda tangan asesi</p>
                             @endif
                         </div>
                     </div>
 
-                    <!-- Admin (interactive canvas) -->
+                    <!-- Admin (interactive canvas dengan desain baru) -->
                     <div class="col-md-6">
-                        <div class="bg-light p-4 rounded-4 h-100 d-flex flex-column">
-                            <p class="mb-3 fw-semibold fs-5 text-primary"><i class="bi bi-shield-lock me-2"></i>Admin</p>
+                        <div class="bg-light p-4 rounded-4 h-100">
+                            <h6 class="fw-bold mb-3">Admin</h6>
                             <div class="mb-3">
-                                <label for="tanggal-admin" class="form-label fw-medium">Tanggal</label>
+                                <label for="tanggal-admin" class="form-label fw-medium">Tanggal <span class="text-danger">*</span></label>
                                 <input type="date" id="tanggal-admin" name="tanggal_admin" class="form-control"
                                        value="{{ old('tanggal_admin', date('Y-m-d')) }}" required>
                                 <div class="invalid-feedback">Tanggal admin wajib diisi.</div>
                             </div>
 
-                            <div class="mb-3 grow d-flex flex-column">
+                            <div class="mb-3">
                                 <label class="form-label fw-medium">Tanda Tangan Admin <span class="text-danger">*</span></label>
-                                <div class="canvas-wrapper border-2 border-primary" style="border: 2px dashed #0b2f7c; border-radius: 16px; background: white; padding: 4px;">
-                                    <canvas id="ttd-admin" style="width:100%; height:160px; border-radius: 12px; background: #fff; cursor: crosshair;"></canvas>
-                                    <span class="canvas-placeholder" style="color: #aaa; bottom: 20px;">Tanda tangan admin di sini</span>
+                                <div class="canvas-wrapper">
+                                    <canvas id="ttd-admin" class="ttd-canvas" width="400" height="160"></canvas>
+                                    <span class="canvas-placeholder">Tanda tangan di sini</span>
                                 </div>
                                 <input type="hidden" name="ttd_admin" id="ttd_admin_data" value="{{ old('ttd_admin', $persetujuan->ttd_admin ?? $permohonan->ttd_admin ?? '') }}">
                                 <div class="invalid-feedback">Tanda tangan admin wajib diisi.</div>
@@ -253,19 +378,28 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            {{-- Keputusan Permohonan --}}
-            <div class="unit-header">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary rounded-pill px-3 py-1 fs-6">7</span>
-                    <p class="mb-1 fw-semibold fs-5">Keputusan Permohonan</p>
+        {{-- Keputusan Permohonan --}}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 pt-4 pb-0">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-check2-circle text-primary" viewBox="0 0 16 16">
+                            <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0z"/>
+                            <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Keputusan Permohonan</h5>
+                        <p class="text-secondary mb-0 small">Pilih status dan catatan</p>
+                    </div>
                 </div>
-                <p class="mb-0 text-secondary">Pilih status dan catatan</p>
             </div>
-            <div class="question-box mb-4">
+            <div class="card-body pt-3">
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold fs-6">Status Keputusan</label>
+                        <label class="form-label fw-semibold fs-6">Status Keputusan <span class="text-danger">*</span></label>
                         <div class="d-flex gap-4 mt-2">
                             <div class="form-check">
                                 <input class="form-check-input" type="radio"
@@ -290,14 +424,14 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            {{-- Tombol aksi --}}
-            <div class="d-flex justify-content-end gap-3 mt-4 mb-5">
-                <a href="{{ route('admin.permohonan.index') }}" class="btn btn-outline-secondary rounded-pill px-5 py-2 fw-semibold">Kembali</a>
-                <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-semibold" style="background: #0b2f7c; border: none;">Simpan Keputusan</button>
-            </div>
-        </form>
-    </div>
+        {{-- Tombol aksi --}}
+        <div class="d-flex justify-content-end gap-3 mt-4 mb-5">
+            <a href="{{ route('admin.permohonan.index') }}" class="btn btn-outline-secondary rounded-pill px-5 py-2 fw-semibold">Kembali</a>
+            <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-semibold">Simpan Keputusan</button>
+        </div>
+    </form>
 </div>
 
 {{-- Modal Preview --}}
@@ -315,143 +449,202 @@
     </div>
 </div>
 
-{{-- Modal Alert untuk TTD Admin --}}
-<div class="modal fade" id="ttdAlertModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0 shadow">
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill me-2"></i>Tanda Tangan Diperlukan</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
-      </div>
-      <div class="modal-body p-4">
-        <p class="fs-6">Silakan isi tanda tangan admin terlebih dahulu sebelum menyimpan keputusan.</p>
-      </div>
-      <div class="modal-footer justify-content-center border-0">
-        <button type="button" class="btn btn-primary px-5 rounded-pill" data-bs-dismiss="modal">Mengerti</button>
-      </div>
+{{-- Modal Alert untuk TTD Admin (desain baru) --}}
+<div class="modal fade" id="ttdWarningModal" tabindex="-1" aria-labelledby="ttdWarningModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem; overflow: hidden;">
+            <div class="modal-header bg-primary text-white border-0 py-3" style="background: linear-gradient(135deg, #0b2f7c, #08205c);">
+                <h5 class="modal-title fw-bold" id="ttdWarningModalLabel">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-exclamation-triangle-fill me-2" viewBox="0 0 16 16">
+                        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                    </svg>
+                    Tanda Tangan Diperlukan
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <div class="my-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#0b2f7c" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                        <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/>
+                    </svg>
+                </div>
+                <p class="fs-5 mb-2">Anda belum menandatangani.</p>
+                <p class="text-secondary mb-0">Silakan tanda tangan pada area yang tersedia sebelum melanjutkan.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center pb-4">
+                <button type="button" class="btn btn-primary px-5 py-2 rounded-pill" style="background: linear-gradient(135deg, #0b2f7c, #08205c); border: none; box-shadow: 0 8px 18px rgba(11,47,124,0.3);" data-bs-dismiss="modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-lg me-2" viewBox="0 0 16 16">
+                        <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/>
+                    </svg>
+                    Mengerti
+                </button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
-{{-- STYLE ditingkatkan dengan tema #0b2f7c --}}
+{{-- STYLE disesuaikan dengan tema #0b2f7c dan gaya halaman sebelumnya --}}
 <style>
-    /* === VARIABEL WARNA UTAMA #0b2f7c === */
     :root {
         --primary: #0b2f7c;
         --primary-dark: #08205c;
-        --primary-light: #e9effa;
-        --primary-soft: #f0f5ff;
+        --primary-light: #1a3e9c;
+        --secondary: #6c757d;
+        --success: #198754;
+        --danger: #dc3545;
+        --light: #f8f9fa;
+        --dark: #212529;
+        --font-sans: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     }
 
     body {
-        font-family: 'Inter', 'Poppins', system-ui, sans-serif;
-        background: #f8fafd;
+        font-family: var(--font-sans);
+        background-color: #f1f4f9;
     }
 
-    /* === UNIT HEADER (lebih elegan) === */
-    .unit-header {
-        background: linear-gradient(90deg, var(--primary-light) 0%, #f1f7fe 100%);
-        border-left: 8px solid var(--primary);
-        border-radius: 20px 20px 20px 8px;
-        padding: 1.25rem 1.5rem;
-        margin-bottom: 1.25rem;
-        box-shadow: 0 6px 14px rgba(11,47,124,0.08);
+    .container-fluid {
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+
+    .card {
+        border-radius: 1.25rem;
+        overflow: hidden;
+        transition: all 0.2s ease;
+        background: #ffffff;
+    }
+
+    .card:hover {
+        box-shadow: 0 1rem 2rem rgba(0,0,0,0.08) !important;
+    }
+
+    .card-header {
+        background: transparent;
+        padding-bottom: 0;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #1e293b;
+        margin-bottom: 0.3rem;
+    }
+
+    .form-control, .form-select {
+        border: 1.5px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 0.6rem 1rem;
+        font-size: 0.95rem;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        background-color: #fff;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(11,47,124,0.15);
+        outline: none;
+    }
+
+    .form-control:read-only {
+        background-color: #f8f9fa;
+    }
+
+    .bg-primary {
+        background-color: var(--primary) !important;
+    }
+
+    .bg-primary.bg-gradient {
+        background: linear-gradient(145deg, var(--primary), var(--primary-dark)) !important;
+    }
+
+    .bg-primary.bg-opacity-10 {
+        background-color: rgba(11,47,124,0.1) !important;
+    }
+
+    .text-primary {
+        color: var(--primary) !important;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: #fff;
+        border: none;
+        box-shadow: 0 8px 18px rgba(11,47,124,0.3);
         transition: all 0.2s;
     }
-    .unit-header:hover {
-        box-shadow: 0 8px 20px rgba(11,47,124,0.15);
-        border-left-width: 10px;
-    }
-    .unit-header .badge {
-        background: var(--primary) !important;
-        font-size: 0.9rem;
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, var(--primary-dark), #061944);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 22px rgba(11,47,124,0.35);
+        color: #fff;
     }
 
-    /* === QUESTION BOX (card modern) === */
-    .question-box {
-        border: none;
-        border-radius: 28px;
-        padding: 1.75rem;
-        margin-bottom: 2rem;
-        background: #ffffff;
-        box-shadow: 0 15px 35px -10px rgba(11,47,124,0.1);
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .question-box:hover {
-        box-shadow: 0 20px 40px -8px rgba(11,47,124,0.18);
-    }
-
-    /* === GRID DATA (dua kolom untuk field) === */
-    .data-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem 2rem;
-    }
-    .data-grid p {
-        margin: 0;
-        background: #f8fbfe;
-        padding: 0.75rem 1.25rem;
-        border-radius: 18px;
-        border: 1px solid #eef4fa;
-        transition: 0.1s;
-        display: flex;
-        align-items: baseline;
-        gap: 6px;
-        font-size: 0.95rem;
-    }
-    .data-grid p:hover {
-        background: #eef4fa;
-        border-color: #b8d3f0;
-    }
-    .data-grid p strong {
-        color: var(--primary);
+    .btn-outline-secondary {
+        border: 1.5px solid #dee2e6;
+        color: var(--secondary);
+        background: #fff;
+        border-radius: 2rem;
         font-weight: 600;
-        min-width: 130px;
-        flex-shrink: 0;
-    }
-    .data-grid hr.full-width {
-        grid-column: 1 / -1;
-        margin: 0.5rem 0;
-        border: 0;
-        border-top: 2px dashed #cbd5e1;
-        opacity: 0.6;
+        transition: all 0.2s;
     }
 
-    /* === TABEL (lebih rapi) === */
-    .table {
-        border-radius: 20px;
-        overflow: hidden;
-        border-collapse: separate;
-        border-spacing: 0;
+    .btn-outline-secondary:hover {
+        background-color: #f1f3f5;
+        color: #495057;
+        border-color: #ced4da;
     }
-    .table thead th {
-        background: #eef2f7;
-        color: var(--primary);
+
+    .btn-outline-danger {
+        border: 1.5px solid var(--danger);
+        color: var(--danger);
+        background: transparent;
+        padding: 0.5rem 1.5rem;
+        border-radius: 2rem;
         font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.85rem;
-        letter-spacing: 0.3px;
-        padding: 1rem 0.75rem;
-        border-bottom: 2px solid #cbd5e1;
+        transition: all 0.2s;
+        text-decoration: none;
     }
-    .table tbody td {
-        padding: 1rem 0.75rem;
-        vertical-align: middle;
-        background: white;
-        border-bottom: 1px solid #e2e8f0;
-    }
-    .table-hover tbody tr:hover td {
-        background: var(--primary-soft);
+    .btn-outline-danger:hover {
+        background-color: var(--danger);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(220,53,69,0.3);
     }
 
-    /* === CANVAS TTD === */
+    .btn-outline-success {
+        border: 1.5px solid var(--success);
+        color: var(--success);
+        background: transparent;
+        padding: 0.5rem 1.5rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    .btn-outline-success:hover {
+        background-color: var(--success);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(25,135,84,0.3);
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.8rem;
+    }
+
     .canvas-wrapper {
         position: relative;
+        width: 100%;
         background: white;
-        border-radius: 20px;
+        border-radius: 1rem;
         overflow: hidden;
+        border: 2px dashed #d0d9e8;
     }
-    #ttd-admin {
+
+    .ttd-canvas {
         display: block;
         width: 100%;
         height: 160px;
@@ -459,6 +652,7 @@
         cursor: crosshair;
         touch-action: none;
     }
+
     .canvas-placeholder {
         position: absolute;
         bottom: 10px;
@@ -473,105 +667,16 @@
         backdrop-filter: blur(2px);
     }
 
-    /* === BUTTONS === */
-    .btn-primary {
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        border: none;
-        box-shadow: 0 8px 18px rgba(11,47,124,0.3);
-    }
-    .btn-primary:hover {
-        background: linear-gradient(135deg, var(--primary-dark), #061944);
-        transform: translateY(-2px);
-        box-shadow: 0 12px 22px rgba(11,47,124,0.35);
-    }
-
-    .btn-outline-primary {
-        border-color: var(--primary);
-        color: var(--primary);
-    }
-    .btn-outline-primary:hover {
-        background-color: var(--primary);
-        border-color: var(--primary);
-        color: white;
-    }
-
-    .btn-outline-secondary {
-        border-color: #6c757d;
-        color: #6c757d;
-    }
-    .btn-outline-secondary:hover {
-        background-color: #6c757d;
-        color: white;
-    }
-
-    .btn-outline-danger {
-        border-color: #dc3545;
-        color: #dc3545;
-    }
-    .btn-outline-danger:hover {
-        background-color: #dc3545;
-        color: white;
-    }
-
-    .btn-outline-success {
-        border-color: #28a745;
-        color: #28a745;
-    }
-    .btn-outline-success:hover {
-        background-color: #28a745;
-        color: white;
-    }
-
-    /* === RADIO & FORM CUSTOM === */
-    .form-check-input:checked {
-        background-color: var(--primary);
-        border-color: var(--primary);
-    }
-    .form-check-input:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 0.2rem rgba(11,47,124,0.15);
-    }
-    .form-control, .form-select {
-        border-radius: 50px;
-        padding: 0.6rem 1.2rem;
-        border: 1.5px solid #dde3eb;
-    }
-    .form-control:focus, .form-select:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(11,47,124,0.15);
-    }
-    .invalid-feedback {
-        font-size: 0.85rem;
-        background: #fce8e8;
-        padding: 0.3rem 1rem;
-        border-radius: 30px;
-        margin-top: 0.3rem;
-        display: inline-block;
-    }
-
-    /* === BADGE STATUS === */
-    .badge.bg-warning { background: #ffc107; color: #1e293b; }
-    .badge.bg-success { background: #28a745; }
-    .badge.bg-info { background: #17a2b8; color: white; }
-    .badge.bg-danger { background: #dc3545; }
-
-    /* === RESPONSIF === */
     @media (max-width: 768px) {
-        .data-grid {
-            grid-template-columns: 1fr;
-        }
-        .unit-header .badge {
-            font-size: 0.8rem;
-        }
-        .question-box {
-            padding: 1.2rem;
+        .button-group {
+            justify-content: center;
         }
     }
 </style>
 
-{{-- SCRIPTS (tetap sama seperti sebelumnya, hanya warna di canvas border disesuaikan) --}}
+{{-- SCRIPT untuk canvas admin (diadaptasi dari halaman sebelumnya) --}}
 <script>
-    // Preview dokumen
+    // Fungsi preview dokumen
     function openPreview(url, ext) {
         let content = '';
         ext = (ext || '').toLowerCase();
@@ -586,25 +691,26 @@
         new bootstrap.Modal(document.getElementById('previewModal')).show();
     }
 
-    // === TTD Admin (fungsi lengkap) ===
-    (function () {
+    // Inisialisasi canvas tanda tangan admin
+    (function() {
         const canvas = document.getElementById('ttd-admin');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        const placeholder = document.querySelector('.canvas-placeholder');
-        const VISIBLE_HEIGHT = 160;
+        const placeholder = document.querySelector('.canvas-wrapper .canvas-placeholder');
         let drawing = false;
+        const VISIBLE_HEIGHT = 160;
         let blankDataURL = null;
 
-        function resizeCanvasAndPrepareBlankAdmin() {
-            const cssWidth = canvas.clientWidth;
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const cssWidth = container.clientWidth;
             const cssHeight = VISIBLE_HEIGHT;
             const ratio = Math.max(window.devicePixelRatio || 1, 1);
 
             canvas.width = Math.round(cssWidth * ratio);
             canvas.height = Math.round(cssHeight * ratio);
 
-            ctx.setTransform(1,0,0,1,0,0);
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.scale(ratio, ratio);
 
             ctx.fillStyle = "#ffffff";
@@ -612,13 +718,12 @@
 
             ctx.lineWidth = 2;
             ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
             ctx.strokeStyle = '#000';
 
             blankDataURL = canvas.toDataURL();
         }
 
-        function getPointerPosAdmin(evt) {
+        function getPointerPos(evt) {
             const rect = canvas.getBoundingClientRect();
             let clientX, clientY;
             if (evt.touches && evt.touches.length > 0) {
@@ -628,37 +733,65 @@
                 clientX = evt.clientX;
                 clientY = evt.clientY;
             }
-            return { x: clientX - rect.left, y: clientY - rect.top };
+            return {
+                x: (clientX - rect.left) * (canvas.width / rect.width),
+                y: (clientY - rect.top) * (canvas.height / rect.height)
+            };
         }
 
-        function startDrawingAdmin(evt) {
+        function startDrawing(evt) {
             evt.preventDefault();
             drawing = true;
-            const pos = getPointerPosAdmin(evt);
+            const pos = getPointerPos(evt);
             ctx.beginPath();
-            ctx.moveTo(pos.x, pos.y);
-            placeholder.style.display = 'none';
+            ctx.moveTo(pos.x / (canvas.width / canvas.clientWidth), pos.y / (canvas.height / canvas.clientHeight));
+            if (placeholder) placeholder.style.display = 'none';
         }
-        function drawMoveAdmin(evt) {
+
+        function drawMove(evt) {
             if (!drawing) return;
             evt.preventDefault();
-            const pos = getPointerPosAdmin(evt);
-            ctx.lineTo(pos.x, pos.y);
+            const pos = getPointerPos(evt);
+            ctx.lineTo(pos.x / (canvas.width / canvas.clientWidth), pos.y / (canvas.height / canvas.clientHeight));
             ctx.stroke();
         }
-        function stopDrawingAdmin(evt) {
-            if (!drawing) return;
-            evt.preventDefault();
+
+        function stopDrawing() {
             drawing = false;
             ctx.beginPath();
         }
 
-        function clearCanvasAdmin() {
-            const cssWidth = canvas.clientWidth;
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', drawMove);
+        window.addEventListener('mouseup', stopDrawing);
+
+        canvas.addEventListener('touchstart', startDrawing, { passive: false });
+        canvas.addEventListener('touchmove', drawMove, { passive: false });
+        window.addEventListener('touchend', stopDrawing);
+
+        window.addEventListener('resize', () => {
+            const prev = canvas.toDataURL();
+            resizeCanvas();
+            if (prev !== blankDataURL) {
+                const img = new Image();
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0, canvas.clientWidth, VISIBLE_HEIGHT);
+                };
+                img.src = prev;
+            }
+        });
+
+        resizeCanvas();
+
+        window.clearCanvasAdmin = function() {
+            const cssWidth = canvas.parentElement.clientWidth;
             const cssHeight = VISIBLE_HEIGHT;
             const ratio = Math.max(window.devicePixelRatio || 1, 1);
 
-            ctx.setTransform(1,0,0,1,0,0);
+            canvas.width = Math.round(cssWidth * ratio);
+            canvas.height = Math.round(cssHeight * ratio);
+
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.scale(ratio, ratio);
 
             ctx.fillStyle = "#ffffff";
@@ -666,32 +799,29 @@
 
             blankDataURL = canvas.toDataURL();
             document.getElementById('ttd_admin_data').value = '';
-            placeholder.style.display = 'block';
-        }
+            if (placeholder) placeholder.style.display = 'block';
+        };
 
-        function isCanvasBlankAdmin() {
+        window.isCanvasBlankAdmin = function() {
             return canvas.toDataURL() === blankDataURL;
-        }
+        };
 
-        function saveAdminTTD(required = true) {
+        window.saveAdminTTD = function(required = true) {
             const prev = document.getElementById('ttd_admin_data').value;
             if (prev && prev.trim().length > 0) {
                 return true;
             }
             if (isCanvasBlankAdmin()) {
                 if (required) {
-                    new bootstrap.Modal(document.getElementById('ttdAlertModal')).show();
-                    return false;
-                } else {
-                    document.getElementById('ttd_admin_data').value = '';
-                    return true;
+                    new bootstrap.Modal(document.getElementById('ttdWarningModal')).show();
                 }
+                return false;
             }
             document.getElementById('ttd_admin_data').value = canvas.toDataURL('image/png');
             return true;
-        }
+        };
 
-        function downloadTTDAdmin() {
+        window.downloadTTDAdmin = function() {
             let dataUrl = '';
             if (!isCanvasBlankAdmin()) {
                 dataUrl = canvas.toDataURL('image/png');
@@ -702,7 +832,7 @@
                 }
             }
             if (!dataUrl) {
-                new bootstrap.Modal(document.getElementById('ttdAlertModal')).show();
+                new bootstrap.Modal(document.getElementById('ttdWarningModal')).show();
                 return;
             }
             const link = document.createElement('a');
@@ -710,34 +840,7 @@
             link.download = `Admin_${tanggal}_tanda_tangan.png`;
             link.href = dataUrl;
             link.click();
-        }
-
-        canvas.addEventListener('mousedown', startDrawingAdmin);
-        canvas.addEventListener('mousemove', drawMoveAdmin);
-        window.addEventListener('mouseup', stopDrawingAdmin);
-
-        canvas.addEventListener('touchstart', function(e){ startDrawingAdmin(e); }, { passive: false });
-        canvas.addEventListener('touchmove', function(e){ drawMoveAdmin(e); }, { passive: false });
-        window.addEventListener('touchend', stopDrawingAdmin);
-
-        window.addEventListener('resize', function () {
-            const prev = canvas.toDataURL();
-            resizeCanvasAndPrepareBlankAdmin();
-            if (prev && prev !== blankDataURL) {
-                const img = new Image();
-                img.onload = function () {
-                    ctx.drawImage(img, 0, 0, canvas.clientWidth, VISIBLE_HEIGHT);
-                };
-                img.src = prev;
-            }
-        });
-
-        resizeCanvasAndPrepareBlankAdmin();
-
-        window.clearCanvasAdmin = clearCanvasAdmin;
-        window.downloadTTDAdmin = downloadTTDAdmin;
-        window.saveAdminTTD = saveAdminTTD;
-        window.isCanvasBlankAdmin = isCanvasBlankAdmin;
+        };
     })();
 
     // Atur required catatan berdasarkan status (wajib jika ditolak)
@@ -758,7 +861,7 @@
         if (diterima && ditolak && catatan) {
             diterima.addEventListener('change', setCatatanRequired);
             ditolak.addEventListener('change', setCatatanRequired);
-            setCatatanRequired(); // inisialisasi
+            setCatatanRequired();
         }
     })();
 

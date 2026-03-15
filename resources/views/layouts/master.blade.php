@@ -53,6 +53,8 @@
                     <li><i class="bi bi-house-door-fill"></i><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                     <li><i class="bi bi-person-lines-fill"></i><a href="{{ route('admin.permohonan.index') }}">Daftar
                             Permohonan</a></li>
+                    <li><i class="bi bi-person-lines-fill"></i><a href="{{ route('admin.banding-asesmen.index') }}">Daftar
+                            Banding Asesmen</a></li>
                 @endif
 
                 @if(Auth::user()->role == 'asesor')

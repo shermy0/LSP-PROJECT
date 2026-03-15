@@ -147,7 +147,7 @@
                                         </ul>
                                     </div>
                                     <div class="modal-footer">
-                                        <a href="{{ route('asesi.permohonan.form1') }}" class="btn btn-primary">Isi Ulang Permohonan</a>
+                                        <a href="{{ route('asesi.permohonan.form1') }}" class="btn btn-primary">Perbaiki Permohonan</a>
                                         <button class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                                     </div>
                                 </div>
@@ -249,29 +249,73 @@
                             </a>
                         @endif
 
-                        {{-- FR.AK.07 - PENYESUAIAN WAJAR (hanya muncul jika persetujuan sudah selesai dan data tersedia) --}}
-                        @if(isset($penyesuaianWajar) && $penyesuaianWajar && $persetujuan && $persetujuan->status === 'selesai')
+                        {{-- FR.AK.07 - PENYESUAIAN WAJAR (muncul jika persetujuan sudah selesai) --}}
+                        @if($persetujuan && $persetujuan->status === 'selesai')
                             @php
-                                $pwStatus = $penyesuaianWajar->status;
-                                $pwLabel = $pwStatus == 'selesai' ? 'Selesai' : ($pwStatus == 'menunggu_asesor' ? 'Menunggu TTD Asesor' : ($pwStatus == 'menunggu_asesi' ? 'Menunggu TTD Anda' : 'Draf'));
-                                $pwBadge = $pwStatus == 'selesai' ? 'bg-success' : ($pwStatus == 'menunggu_asesor' ? 'bg-warning text-dark' : ($pwStatus == 'menunggu_asesi' ? 'bg-info' : 'bg-secondary'));
-                                $pwHref = route('asesi.penyesuaian_wajar.show', $penyesuaianWajar->id_penyesuaian);
+                                $pwData = $penyesuaianWajar ?? null;
+                                $pwStatus = $pwData ? $pwData->status : null;
+                                $pwLabel = $pwStatus == 'selesai' ? 'Selesai' : ($pwStatus == 'menunggu_asesor' ? 'Menunggu TTD Asesor' : ($pwStatus == 'menunggu_asesi' ? 'Menunggu TTD Anda' : ($pwStatus == 'draf' ? 'Draf (Asesor)' : 'Belum dibuat')));
+                                $pwBadge = $pwStatus == 'selesai' ? 'bg-success' : ($pwStatus == 'menunggu_asesor' ? 'bg-warning text-dark' : ($pwStatus == 'menunggu_asesi' ? 'bg-info' : ($pwStatus == 'draf' ? 'bg-secondary' : 'bg-secondary')));
+                                $pwHref = $pwData ? route('asesi.penyesuaian_wajar.show', $pwData->id_penyesuaian) : '#';
+                                $pwIconClass = $pwData ? 'bg-info bg-opacity-10 text-info' : 'bg-secondary bg-opacity-10 text-secondary';
+                                $pwIcon = $pwData ? 'bi-folder-check' : 'bi-folder';
                             @endphp
-                            <a href="{{ $pwHref }}" class="pra-item mt-2">
+                            <a href="{{ $pwHref }}" class="pra-item mt-2 {{ $pwData && $pwData->status == 'selesai' ? : '' }}">
                                 <div class="d-flex align-items-center">
-                                    <div class="icon-wrap me-3 bg-info bg-opacity-10 text-info">
-                                        <i class="bi bi-folder-check"></i>
+                                    <div class="icon-wrap me-3 {{ $pwIconClass }}">
+                                        <i class="bi {{ $pwIcon }}"></i>
                                     </div>
                                     <div>
                                         <h6 class="mb-1 fw-semibold text-dark">FR.AK.07 Penyesuaian Wajar</h6>
                                         <small class="text-muted">
-                                            Terakhir diupdate: {{ $penyesuaianWajar->updated_at ? \Carbon\Carbon::parse($penyesuaianWajar->updated_at)->format('d M Y') : '-' }}
+                                            @if($pwData)
+                                                Terakhir diupdate: {{ $pwData->updated_at ? \Carbon\Carbon::parse($pwData->updated_at)->format('d M Y') : '-' }}
+                                            @else
+                                                Asesor belum membuat penyesuaian.
+                                            @endif
                                         </small>
                                     </div>
                                 </div>
                                 <span class="badge {{ $pwBadge }}">{{ $pwLabel }}</span>
                             </a>
                         @endif
+
+                        {{-- FR.AK.04 - BANDING ASESMEN (hanya muncul jika penyesuaian wajar sudah selesai) --}}
+@if(isset($penyesuaianWajar) && $penyesuaianWajar && $penyesuaianWajar->status === 'selesai')
+    @if(isset($banding) && $banding)
+        {{-- Sudah mengajukan banding --}}
+        <a href="{{ route('asesi.banding_asesmen.show', $banding->id_banding) }}" class="pra-item mt-2">
+            <div class="d-flex align-items-center">
+                <div class="icon-wrap me-3 bg-success bg-opacity-10 text-white">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div>
+                    <h6 class="mb-1 fw-semibold text-dark">FR.AK.04 Banding Asesmen</h6>
+                    <small class="text-muted">
+                        Diajukan pada: {{ \Carbon\Carbon::parse($banding->tgl_banding)->format('d M Y') }}
+                    </small>
+                </div>
+            </div>
+            <span class="badge bg-success">Sudah diajukan</span>
+        </a>
+    @else
+        {{-- Belum mengajukan banding --}}
+        <a href="{{ route('asesi.banding_asesmen.create', $penyesuaianWajar->id_permohonan) }}" class="pra-item mt-2">
+            <div class="d-flex align-items-center">
+                <div class="icon-wrap me-3 bg-danger bg-opacity-10 text-danger">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <h6 class="mb-1 fw-semibold text-dark">FR.AK.04 Banding Asesmen</h6>
+                    <small class="text-muted">
+                        Ajukan banding jika proses asesmen tidak sesuai
+                    </small>
+                </div>
+            </div>
+            <span class="badge bg-danger">Ajukan Banding</span>
+        </a>
+    @endif
+@endif
                     @endif
                 @endif
 
@@ -455,6 +499,10 @@
             transform: translateY(-1px);
             border-color: var(--primary-light);
             text-decoration: none;
+        }
+
+        .pra-item.completed-item {
+            border-color: var(--success);
         }
 
         .icon-wrap {

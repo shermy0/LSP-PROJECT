@@ -72,6 +72,11 @@ class Permohonan extends Model
     return $this->hasOne(PenyesuaianWajar::class, 'id_permohonan', 'id_permohonan');
 }
 
+public function asesor()
+{
+    return $this->belongsTo(Asesor::class, 'id_asesor', 'id_asesor');
+}
+
     // Accessor opsional untuk format tanggal
     public function getTglPermohonanFormattedAttribute()
     {
