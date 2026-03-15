@@ -31,8 +31,6 @@
                 <div class="ttd-btns mt-3">
                     <button type="button" class="btn-clear"
                             onclick="clearCanvas('ttd-asesi')">Hapus</button>
-                    <button type="button" class="btn-download"
-                            onclick="downloadTTD()">Unduh</button>
                 </div>
             </form>
         </div>
