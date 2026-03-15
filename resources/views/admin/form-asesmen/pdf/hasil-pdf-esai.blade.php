@@ -83,8 +83,13 @@
 <tr>
     <td class="center">{{ $i + 1 }}.</td>
     <td class="space">{{ $j->jawaban_text ?? $j->jawaban ?? '' }}</td>
-    <td class="checkbox">{{ isset($j->tercapai) && $j->tercapai ? '☑' : '☐' }}</td>
-    <td class="checkbox">{{ isset($j->tercapai) && !$j->tercapai ? '☑' : '☐' }}</td>
+    <td class="checkbox">
+    {{ isset($j->pencapaian) && $j->pencapaian == 1 ? '☑' : '☐' }}
+</td>
+
+<td class="checkbox">
+    {{ isset($j->pencapaian) && $j->pencapaian == 0 ? '☑' : '☐' }}
+</td>
 </tr>
 @empty
     @for($i = 1; $i <= 3; $i++)
@@ -105,7 +110,7 @@
     <tr>
         <td width="30%" class="bold">Umpan balik untuk asesi</td>
         <td width="70%">
-            {{ $hasil->umpan_balik ?? 'Aspek pengetahuan seluruh unit kompetensi yang diujikan (tercapai / belum tercapai)*' }}
+            {{ $umpanBalik ?? 'Aspek pengetahuan seluruh unit kompetensi yang diujikan (tercapai / belum tercapai)*' }}
         </td>
     </tr>
 </table>

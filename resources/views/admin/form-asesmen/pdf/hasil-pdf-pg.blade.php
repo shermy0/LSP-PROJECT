@@ -139,9 +139,7 @@
     <tr>
         <td width="30%" class="bold">Umpan balik untuk asesi</td>
         <td width="70%">
-            {{ $hasil->umpan_balik ?? 'Aspek pengetahuan seluruh unit kompetensi yang diujikan (tercapai / belum tercapai)*' }}
-        </td>
-    </tr>
+{{ $umpanBalik ?? 'Aspek pengetahuan seluruh unit kompetensi yang diujikan (tercapai / belum tercapai)*' }}    </tr>
 </table>
 
 <br>

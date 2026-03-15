@@ -922,3 +922,10 @@ Route::get('/admin/form-asesmen/{skemaId}/{tipe}/asesi',
 Route::get('/admin/form-asesmen/{skemaId}/{asesiId}/{tipe}/hasil',
     [FormAsesmenAdminController::class, 'hasil']
 )->name('admin.formasesmen.hasil');
+
+// ================== ASESOR LIHAT JAWABAN ASESI ==================
+    Route::get('/asesor/skema', [JawabanController::class, 'indexSkema'])->name('asesor.skema.index');
+    Route::get('/asesor/skema/{id_skema}/jenis', [JawabanController::class, 'listJenis'])->name('asesor.skema.jenis');
+    Route::get('/asesor/skema/{id_skema}/jenis/{jenis}/asesi', [JawabanController::class, 'listAsesi'])->name('asesor.skema.jenis.asesi');
+    Route::get('/asesor/skema/{id_skema}/jenis/{jenis}/asesi/{id_asesi}', [JawabanController::class, 'viewJawaban'])->name('asesor.skema.jenis.asesi.jawaban');
+    Route::post('/asesor/pencapaian/store', [JawabanController::class,'storePencapaian']) ->name('asesor.pencapaian.store');

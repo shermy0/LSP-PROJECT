@@ -139,8 +139,7 @@ Tidak ada pertanyaan lisan
 </td>
 
 <td width="70%">
-{{ $hasil->umpan_balik ?? 'Aspek pengetahuan seluruh unit kompetensi yang diujikan (tercapai / belum tercapai).' }}
-</td>
+{{ $umpanBalik ?? 'Aspek pengetahuan seluruh unit kompetensi yang diujikan (tercapai / belum tercapai)*' }}</td>
 
 </tr>
 

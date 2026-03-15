@@ -225,12 +225,14 @@ if ($tipe === 'praktik') {
             ->where('id_asesor', $asesi->asesor_id)
             ->first();
 
-        // ======================
-        // DATA HASIL
-        // ======================
-        $hasil = DB::table('hasil_asesmen')
-            ->where('id_asesi', $asesiId)
-            ->first();
+// ======================
+// DATA HASIL (nilai dari asesor)
+// ======================
+$hasil = DB::table('jawaban_asesmen')
+    ->where('id_skema', $skemaId)
+    ->where('id_asesi', $asesiId)
+    ->select('id_jawaban','id_pertanyaan','pencapaian')
+    ->get();
 
         // ======================
         // HEADER & TTD
@@ -248,11 +250,13 @@ if ($tipe === 'praktik') {
             ->first();
         $ttdAsesi = $ttdAsesiFile ? asset('storage/ttd/' . basename($ttdAsesiFile)) : null;
 
-        $ttdAsesorFile = collect(glob(storage_path('app/public/ttd/ttd_asesor_*.png')))
-            ->sortByDesc(fn($file) => filemtime($file))
-            ->first();
-        $ttdAsesor = $ttdAsesorFile ? asset('storage/ttd/' . basename($ttdAsesorFile)) : null;
+$namaAsesorFile = strtolower(str_replace(' ', '_', $asesor->nama_asesor));
 
+$ttdAsesorFile = collect(glob(storage_path('app/public/ttd/*'.$namaAsesorFile.'*.png')))
+    ->sortByDesc(fn($file) => filemtime($file))
+    ->first();
+
+$ttdAsesor = $ttdAsesorFile ? asset('storage/ttd/' . basename($ttdAsesorFile)) : null;
         // ======================
         // VIEW DEFAULT UNTUK TIPE LAIN
         // ======================
@@ -408,7 +412,12 @@ if ($tipe === 'pmo') {
         if (!in_array($tipe, ['esai', 'pg', 'lisan', 'praktik'])) abort(400, 'Tipe jawaban tidak valid.');
 
         $asesor = DB::table('asesor')->where('id_asesor', $asesi->asesor_id)->first();
-        $hasil = DB::table('hasil_asesmen')->where('id_asesi', $asesiId)->first();
+
+$hasil = DB::table('jawaban_asesmen')
+    ->where('id_skema', $skemaId)
+    ->where('id_asesi', $asesiId)
+    ->select('id_jawaban','id_pertanyaan','pencapaian')
+    ->get();
 
         $judulSkema = $skema->nama_skema ?? '-';
         $nomorSertifikat = $skema->kode_skema ?? '-';
@@ -423,11 +432,13 @@ if ($tipe === 'pmo') {
             ->first();
         $ttdAsesi = $ttdAsesiFile ? public_path('storage/ttd/' . basename($ttdAsesiFile)) : null;
 
-        $ttdAsesorFile = collect(glob(storage_path('app/public/ttd/ttd_asesor_*.png')))
-            ->sortByDesc(fn($file) => filemtime($file))
-            ->first();
-        $ttdAsesor = $ttdAsesorFile ? public_path('storage/ttd/' . basename($ttdAsesorFile)) : null;
+$namaAsesorFile = strtolower(str_replace(' ', '_', $asesor->nama_asesor));
 
+$ttdAsesorFile = collect(glob(storage_path('app/public/ttd/*'.$namaAsesorFile.'*.png')))
+    ->sortByDesc(fn($file) => filemtime($file))
+    ->first();
+
+$ttdAsesor = $ttdAsesorFile ? asset('storage/ttd/' . basename($ttdAsesorFile)) : null;
         if (!isset($view)) {
             if ($tipe === 'esai') $view = 'admin.form-asesmen.pdf.hasil-pdf-esai';
             elseif ($tipe === 'pg') $view = 'admin.form-asesmen.pdf.hasil-pdf-pg';

@@ -141,16 +141,35 @@
 </tr>
 </thead>
 <tbody>
+
 @forelse($jawabanEsai as $i => $j)
 <tr>
+
 <td class="text-center">{{ $i+1 }}</td>
-<td style="height:90px;">{{ $j->jawaban_text ?? $j->jawaban ?? '' }}</td>
-<td class="checkbox-cell">☐</td>
-<td class="checkbox-cell">☐</td>
+
+<td style="height:90px;">
+{{ $j->jawaban_text ?? $j->jawaban ?? '' }}
+</td>
+
+<td class="checkbox-cell">
+@if($j->pencapaian == 1)
+✔
+@endif
+</td>
+
+<td class="checkbox-cell">
+@if($j->pencapaian == 0)
+✔
+@endif
+</td>
+
 </tr>
 @empty
-<tr><td colspan="4" class="text-center">Belum ada jawaban</td></tr>
+<tr>
+<td colspan="4" class="text-center">Belum ada jawaban</td>
+</tr>
 @endforelse
+
 </tbody>
 </table>
 @endif
@@ -179,22 +198,30 @@
 {{-- ================= PMO ================= --}}
 @if($tipe === 'pmo')
 <div class="section-title text-center">PMO</div>
+
 @foreach($unit as $u)
 <div class="mb-3">
+
 <strong>{{ $u->kode_unit ?? '-' }} – {{ $u->nama_unit ?? '-' }}</strong>
+
 <table class="table table-bordered">
+
 <tr>
 <th>Pertanyaan</th>
 <th>Pencapaian</th>
 <th>Tanggapan</th>
 </tr>
+
 @foreach($pmoPertanyaan[$u->id_unit] ?? [] as $p)
+
 <tr>
 <td>{{ $p->pertanyaan ?? '-' }}</td>
 <td>{{ $p->pencapaian ?? '-' }}</td>
 <td>{{ $p->tanggapan ?? '-' }}</td>
 </tr>
+
 @endforeach
+
 </table>
 </div>
 @endforeach
@@ -206,7 +233,7 @@
 <tr>
 <td width="35%"><strong>Umpan balik</strong></td>
 <td width="65%">
-{{ $hasil->umpan_balik ?? 'Aspek pengetahuan seluruh unit kompetensi yang diujikan (tercapai / belum tercapai).' }}
+Aspek pengetahuan seluruh unit kompetensi yang diujikan (tercapai / belum tercapai).
 </td>
 </tr>
 </table>
@@ -218,39 +245,39 @@
 <tr>
 
 <td width="50%" style="padding:25px">
-    
-    <strong>Asesi</strong><br>
-    Nama : {{ $asesi->name ?? '-' }}<br>
-    Tanggal : {{ $tanggalTTD }}
 
-    <div class="signature-area mt-3">
-        @if($ttdAsesi)
-            <img src="{{ $ttdAsesi }}" class="signature-img">
-        @else
-            <div class="signature-box"></div>
-        @endif
-    </div>
+<strong>Asesi</strong><br>
+Nama : {{ $asesi->name ?? '-' }}<br>
+Tanggal : {{ $tanggalTTD }}
 
-    <div class="signature-label">Tanda tangan</div>
+<div class="signature-area mt-3">
+@if($ttdAsesi)
+<img src="{{ $ttdAsesi }}" class="signature-img">
+@else
+<div class="signature-box"></div>
+@endif
+</div>
+
+<div class="signature-label">Tanda tangan</div>
 
 </td>
 
 <td width="50%" style="padding:25px">
 
-    <strong>Asesor</strong><br>
-    Nama : {{ $namaTTD }}<br>
-    No. Reg : {{ $asesor->no_registrasi ?? '-' }}<br>
-    Tanggal : {{ $tanggalTTD }}
+<strong>Asesor</strong><br>
+Nama : {{ $namaTTD }}<br>
+No. Reg : {{ $asesor->no_registrasi ?? '-' }}<br>
+Tanggal : {{ $tanggalTTD }}
 
-    <div class="signature-area mt-3">
-        @if($ttdAsesor)
-            <img src="{{ $ttdAsesor }}" class="signature-img">
-        @else
-            <div class="signature-box"></div>
-        @endif
-    </div>
+<div class="signature-area mt-3">
+@if($ttdAsesor)
+<img src="{{ $ttdAsesor }}" class="signature-img">
+@else
+<div class="signature-box"></div>
+@endif
+</div>
 
-    <div class="signature-label">Tanda tangan</div>
+<div class="signature-label">Tanda tangan</div>
 
 </td>
 
@@ -260,7 +287,7 @@
 {{-- ================= DOWNLOAD PDF ================= --}}
 <div class="text-end mt-3">
 <a href="{{ route('admin.formasesmen.hasil.pdf', ['skemaId'=>$skema->id_skema, 'asesiId'=>$asesi->id_asesi, 'tipe'=>$tipe]) }}" class="btn btn-danger">
-    <i class="bi bi-file-earmark-pdf"></i> Download PDF
+<i class="bi bi-file-earmark-pdf"></i> Download PDF
 </a>
 </div>
 
