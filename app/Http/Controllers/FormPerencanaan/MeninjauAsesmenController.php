@@ -77,7 +77,20 @@ class MeninjauAsesmenController extends Controller
             ->select('asesor.id_asesor', 'asesor.nama_asesor')
             ->get();
 
-        return view('form_perencanaan.meninjau_asesmen.ninjau_asesmen', compact('skema', 'asesors'));
+        $asesor_terpilih = request()->query('asesor_id') 
+            ?? session('asesor_terpilih') 
+            ?? ($asesors->first()->id_asesor ?? null);
+
+
+        $meninjau = DB::table('meninjau_asesmen')
+            ->where('skema_id', $id_skema)
+            ->where('asesor_id', $asesor_terpilih)
+            ->first();
+
+        return view(
+            'form_perencanaan.meninjau_asesmen.ninjau_asesmen',
+            compact('skema','asesors','asesor_terpilih','meninjau')
+        );
     }
 
     /**
@@ -223,31 +236,31 @@ class MeninjauAsesmenController extends Controller
             ],
             [
                 // Rencana Asesmen
-                'rencana_valid' => $request->has('rencana_validitas'),
+                'rencana_valid' => $request->has('rencana_valid'),
                 'rencana_reliabel' => $request->has('rencana_reliabel'),
                 'rencana_fleksibel' => $request->has('rencana_fleksibel'),
                 'rencana_adil' => $request->has('rencana_adil'),
 
                 // Persiapan
-                'persiapan_valid' => $request->has('persiapan_validitas'),
+                'persiapan_valid' => $request->has('persiapan_valid'),
                 'persiapan_reliabel' => $request->has('persiapan_reliabel'),
                 'persiapan_fleksibel' => $request->has('persiapan_fleksibel'),
                 'persiapan_adil' => $request->has('persiapan_adil'),
 
                 // Implementasi
-                'implementasi_valid' => $request->has('implementasi_validitas'),
+                'implementasi_valid' => $request->has('implementasi_valid'),
                 'implementasi_reliabel' => $request->has('implementasi_reliabel'),
                 'implementasi_fleksibel' => $request->has('implementasi_fleksibel'),
                 'implementasi_adil' => $request->has('implementasi_adil'),
 
                 // Keputusan
-                'keputusan_valid' => $request->has('keputusan_validitas'),
+                'keputusan_valid' => $request->has('keputusan_valid'),
                 'keputusan_reliabel' => $request->has('keputusan_reliabel'),
                 'keputusan_fleksibel' => $request->has('keputusan_fleksibel'),
                 'keputusan_adil' => $request->has('keputusan_adil'),
 
                 // Umpan balik
-                'umpan_valid' => $request->has('umpan_validitas'),
+                'umpan_valid' => $request->has('umpan_valid'),
                 'umpan_reliabel' => $request->has('umpan_reliabel'),
                 'umpan_fleksibel' => $request->has('umpan_fleksibel'),
                 'umpan_adil' => $request->has('umpan_adil'),
@@ -396,27 +409,27 @@ class MeninjauAsesmenController extends Controller
             'asesor_id' => $asesorId,
         ],
         [
-            'rencana_valid' => $request->has('rencana_validitas'),
+            'rencana_valid' => $request->has('rencana_valid'),
             'rencana_reliabel' => $request->has('rencana_reliabel'),
             'rencana_fleksibel' => $request->has('rencana_fleksibel'),
             'rencana_adil' => $request->has('rencana_adil'),
 
-            'persiapan_valid' => $request->has('persiapan_validitas'),
+            'persiapan_valid' => $request->has('persiapan_valid'),
             'persiapan_reliabel' => $request->has('persiapan_reliabel'),
             'persiapan_fleksibel' => $request->has('persiapan_fleksibel'),
             'persiapan_adil' => $request->has('persiapan_adil'),
 
-            'implementasi_valid' => $request->has('implementasi_validitas'),
+            'implementasi_valid' => $request->has('implementasi_valid'),
             'implementasi_reliabel' => $request->has('implementasi_reliabel'),
             'implementasi_fleksibel' => $request->has('implementasi_fleksibel'),
             'implementasi_adil' => $request->has('implementasi_adil'),
 
-            'keputusan_valid' => $request->has('keputusan_validitas'),
+            'keputusan_valid' => $request->has('keputusan_valid'),
             'keputusan_reliabel' => $request->has('keputusan_reliabel'),
             'keputusan_fleksibel' => $request->has('keputusan_fleksibel'),
             'keputusan_adil' => $request->has('keputusan_adil'),
 
-            'umpan_valid' => $request->has('umpan_validitas'),
+            'umpan_valid' => $request->has('umpan_valid'),
             'umpan_reliabel' => $request->has('umpan_reliabel'),
             'umpan_fleksibel' => $request->has('umpan_fleksibel'),
             'umpan_adil' => $request->has('umpan_adil'),

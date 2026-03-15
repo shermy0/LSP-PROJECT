@@ -17,7 +17,7 @@
         <span>Form Perencanaan</span>
     @endisset
 </li>
-            <li class="breadcrumb-item active" aria-current="page">FR.AK.01</li>
+            <li class="breadcrumb-item active" aria-current="page">FR.AK.05</li>
         </ol>
     </nav>
     <div class="container mt-4">
@@ -104,7 +104,10 @@
         <div class="col-md-6">
             <div class="mapa-box">
                 <label for="tanggalAsesmen" class="form-label">Tanggal Asesmen</label>
-                <input type="date" class="form-control" id="tanggalAsesmen">
+                <input type="date"
+                        class="form-control"
+                        id="tanggalAsesmen"
+                        name="tanggal_asesmen">
             </div>
         </div>
     </div>
@@ -150,6 +153,7 @@
     <input type="hidden" name="asesor_id" id="asesor_id_hidden">
     <input type="hidden" name="skema_id" id="skema_id_hidden" value="{{ $skema->id_skema }}">
     <input type="hidden" name="no_registrasi" id="no_registrasi_hidden">
+    <input type="hidden" name="tanggal_asesmen" id="tanggal_asesmen_hidden">
 
     <div class="card mapa-card">
         <div class="judul-box">
@@ -186,6 +190,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const asesiTableBody = document.getElementById('asesiTableBody');
     const asesorIdHidden = document.getElementById('asesor_id_hidden');
     const noRegHidden    = document.getElementById('no_registrasi_hidden');
+    const tanggalInput = document.getElementById('tanggalAsesmen');
+const tanggalHidden = document.getElementById('tanggal_asesmen_hidden');
     const simpanForm     = document.getElementById('simpan-lanjut-form');
 
     // auto-trigger jika ada asesor terakhir dipilih
@@ -206,6 +212,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.querySelector('textarea[name="aspek_positif_negatif"]').value = '';
             document.querySelector('textarea[name="penolakan"]').value = '';
             document.querySelector('textarea[name="saran_perbaikan"]').value = '';
+            document.getElementById('tanggalAsesmen').value = catatan?.tgl_laporan ? catatan.tgl_laporan.split(' ')[0] : '';
             return;
         }
 
@@ -269,6 +276,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // validasi sebelum submit
     simpanForm.addEventListener('submit', function(e) {
+            tanggalHidden.value = tanggalInput.value;
+
         let valid = true;
 
         // cek kalau asesor belum dipilih

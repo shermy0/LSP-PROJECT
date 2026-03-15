@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Isi tabel prinsip asesmen
             prinsipTableBody.innerHTML = '';
             aspekPrinsip.forEach((aspek, i) => {
-                const prefix = ['rencana', 'pertukar', 'implementasi', 'keputusan', 'umpan'][i];
+                const prefix = ['rencana', 'persiapan', 'implementasi', 'keputusan', 'umpan'][i];
                 prinsipTableBody.innerHTML += `
                     <tr>
                         <td>${aspek.nama}</td>

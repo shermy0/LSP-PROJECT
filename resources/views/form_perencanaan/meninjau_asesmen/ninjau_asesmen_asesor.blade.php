@@ -5,11 +5,15 @@
 
 <div class="card-box">
     <!-- Breadcrumb -->
+    
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('formperencanaan.index') }}">Daftar Skema</a></li>
             <li class="breadcrumb-item"><a href="{{ route('formperencanaan.show', $skema->id_skema) }}">Form Perencanaan</a></li>
-            <li class="breadcrumb-item active" aria-current="page">FR.AK.06</li>
+<li class="breadcrumb-item active">
+    <a href="{{ route('laporan.show', $skema->id_skema) }}">FR.AK.01</a>
+</li>
+            <li class="breadcrumb-item active" aria-current="page">Catatan & Tanda Tangan Asesor</li>
         </ol>
     </nav>
 </div>
@@ -22,7 +26,7 @@
         ->first();
 @endphp
 
-<form action="{{ route('form_perencanaan.ninjau_asesmen_asesor.simpan', $asesor_terpilih) }}" method="POST" id="laporan-asesmen-form">
+<form action="{{ route('form_perencanaan.laporan_asesmen.laporan_asesor.store', $skema->id_skema) }}" method="POST" id="laporan-asesmen-form">
     @csrf
     <div class="mapa-card">
         <h5>Asesor</h5>
@@ -102,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
         hiddenInput.value = '';
     });
 
-    // SweetAlert simpan
+    // SweetAlert simpan + reload
     document.getElementById("laporan-asesmen-form").addEventListener("submit", function(e){
         e.preventDefault();
 
@@ -117,12 +121,14 @@ document.addEventListener("DOMContentLoaded", () => {
             icon: "success",
             showCancelButton: true,
             confirmButtonText: "Tetap di Halaman",
-                cancelButtonText: "Ke Form Perencanaan"
-            }).then((result) => {
-                if (result.dismiss === Swal.DismissReason.cancel) {
-                    window.location.href = "{{ route('formperencanaan.show', $skema->id_skema) }}";
-                }
-            });
+            cancelButtonText: "Ke Form Perencanaan"
+        }).then((result) => {
+            if(result.isConfirmed){
+                e.target.submit();
+            } else {
+                window.location.href = "{{ route('formperencanaan.show', $skema->id_skema) }}";
+            }
+        });
     });
 });
 
@@ -145,7 +151,11 @@ function hapusTtd(id, url) {
             .then(res => res.json())
             .then(res => {
                 if(res.success){
-                    Swal.fire('Terhapus!', res.message, 'success').then(()=>location.reload());
+                    Swal.fire('Terhapus!', res.message, 'success').then(()=>{
+                        // reload halaman tapi tetap di asesor saat ini
+                        const currentAsesor = "{{ $asesor_terpilih }}";
+                        window.location.href = "{{ route('form_perencanaan.laporan_asesmen.laporan_asesor', $skema->id_skema) }}?asesor_id=" + currentAsesor;
+                    });
                 } else {
                     Swal.fire('Gagal!', res.message, 'error');
                 }
@@ -157,6 +167,5 @@ function hapusTtd(id, url) {
         }
     });
 }
-
 </script>
 @endsection

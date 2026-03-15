@@ -7,7 +7,7 @@
 </head>
 <body>
 
-<h3>FR.MAPA.02 – PETA INSTRUMEN ASESSMEN</h3>
+<h3>FR.AK.05 - LAPORAN ASESMEN</h3>
 
 <!-- Bagian Header -->
 <table style="width:100%; border-collapse: collapse; font-size:12px;">
@@ -51,6 +51,11 @@
         <td  colspan="2" style="border:1px solid #000; padding:6px; font-weight:bold">Tanggal</td>
         <td style="border:1px solid #000; padding:6px;">:</td>
         <td style="border:1px solid #000; padding:6px;">
+            @if(!empty($laporan->tgl_laporan))
+            {{ \Carbon\Carbon::parse($laporan->tgl_laporan)->translatedFormat('d F Y') }}
+            @else
+                -
+            @endif
         </td>
     </tr>
 </table>

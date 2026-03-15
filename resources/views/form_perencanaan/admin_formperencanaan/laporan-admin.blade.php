@@ -243,6 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('aspek_positif_negatif').value = '';
             document.getElementById('penolakan').value = '';
             document.getElementById('saran_perbaikan').value = '';
+            document.getElementById('tanggalAsesmen').value = '';
 
             // reset bagian bawah (tanda tangan asesor)
             document.getElementById('catatan_asesor').value = '';
@@ -299,7 +300,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('catatan_asesor').value = catatan?.catatan || '';
                 document.getElementById('nama_asesor_view').value = asesorSelect.options[asesorSelect.selectedIndex].text;
                 document.getElementById('no_registrasi_view').value = asesorSelect.options[asesorSelect.selectedIndex].dataset.no || '';
-                document.getElementById('tanggal_asesmen_view').value = catatan?.tgl_laporan?.split('T')[0] || '';
+
+                const tanggal = catatan?.tgl_laporan?.split('T')[0] || '';
+
+                document.getElementById('tanggalAsesmen').value = tanggal;
+                document.getElementById('tanggal_asesmen_view').value = tanggal;
 
                 const ttdImg = document.getElementById('ttd_asesor');
                 const noTtdText = document.getElementById('no_ttd_text');

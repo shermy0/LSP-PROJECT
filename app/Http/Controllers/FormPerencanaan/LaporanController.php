@@ -203,7 +203,7 @@ public function store(Request $request)
             'aspek_positif_negatif' => $request->input('aspek_positif_negatif'),
             'penolakan'             => $request->input('penolakan'),
             'saran_perbaikan'       => $request->input('saran_perbaikan'),
-            'tgl_laporan'           => now(),
+            'tgl_laporan'           => $request->tanggal_asesmen,
             'updated_at'            => now(),
             'created_at'            => now(),
         ]

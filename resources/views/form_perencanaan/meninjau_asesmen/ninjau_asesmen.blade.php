@@ -64,8 +64,9 @@
                         <select class="form-control" id="nama_asesor" name="asesor_id" >
                             <option value="">-- Pilih Asesor --</option>
                             @foreach($asesors as $asesor)
-                            <option value="{{ $asesor->id_asesor }}">
-                                {{ $asesor->nama_asesor }}
+                            <option value="{{ $asesor->id_asesor }}"
+                                {{ old('asesor_id', $meninjau->asesor_id ?? '') == $asesor->id_asesor ? 'selected' : '' }}>
+                                    {{ $asesor->nama_asesor }}
                             </option>
                             @endforeach
                         </select>
@@ -75,7 +76,9 @@
                 <div class="col-md-6">
                     <div class="mapa-box">
                         <label for="tanggalAsesmen" class="form-label">Tanggal Asesmen</label>
-                        <input type="date" class="form-control" id="tanggalAsesmen" name="tanggal_asesmen" >
+                        <input type="date" class="form-control" id="tanggalAsesmen"
+                        name="tanggal_asesmen"
+                        value="{{ old('tanggal_asesmen', $meninjau->tanggal_asesmen ?? '') }}">
                     </div>
                 </div>
             </div>
@@ -115,7 +118,12 @@
             </div>
 
             @php
-                $prinsip = ['Validitas', 'Reliabel', 'Fleksibel', 'Adil'];
+                $prinsip = [
+                        'valid' => 'Validitas',
+                        'reliabel' => 'Reliabel',
+                        'fleksibel' => 'Fleksibel',
+                        'adil' => 'Adil'
+                    ];
                 $aspek = [
                     'rencana' => [1, 1, 1, 1],
                     'persiapan' => [1, 1, 1, 1],
@@ -141,16 +149,21 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($aspek as $prefix => $cols)
-                            <tr>
-                                <td>{{ ucfirst($prefix) }} asesmen</td>
-                                @foreach($cols as $i => $enabled)
-                                <td class="text-center">
-                                    <input type="checkbox" name="{{ $prefix }}_{{ strtolower($prinsip[$i]) }}" value="1" {{ $enabled ? '' : 'disabled' }}>
-                                </td>
-                                @endforeach
-                            </tr>
+                        @foreach($aspek as $prefix => $cols)
+                        <tr>
+                            <td>{{ ucfirst($prefix) }} asesmen</td>
+
+                            @foreach(array_keys($prinsip) as $key)
+                            <td class="text-center">
+                                <input type="checkbox"
+                                name="{{ $prefix }}_{{ $key }}"
+                                value="1"
+                                {{ old($prefix.'_'.$key, $meninjau->{$prefix.'_'.$key} ?? false) ? 'checked' : '' }}>
+                            </td>
                             @endforeach
+
+                        </tr>
+                        @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -159,7 +172,7 @@
             <!-- Rekomendasi Peningkatan 1 -->
             <div class="card-box mb-4">
                 <label for="rekomendasi1" class="fw-semibold mb-1 d-block">Rekomendasi 1</label>
-                <textarea id="rekomendasi1" name="rekomendasi1" class="form-control mt-1" rows="3" placeholder="Masukkan teks"></textarea>
+                <textarea id="rekomendasi1" name="rekomendasi1" class="form-control mt-1" rows="3" placeholder="Masukkan teks">{{ old('rekomendasi1', $meninjau->rekomendasi1 ?? '') }}</textarea>
             </div>
 
             @php
@@ -193,27 +206,27 @@
                                 <td>{{ $judul }}</td>
                                 <td>
                                     @foreach ($options as $opt)
-                                    <label><input type="checkbox" name="{{ $prefix }}_task[]" value="{{ $opt }}"> {{ $opt }}</label><br>
+                                    <label><input type="checkbox"name="{{ $prefix }}_task[]"value="{{ $opt }}"{{ in_array($opt, explode(',', $meninjau->{$prefix.'_task'} ?? '')) ? 'checked' : '' }}></label><br>
                                     @endforeach
                                 </td>
                                 <td>
                                     @foreach ($options as $opt)
-                                    <label><input type="checkbox" name="{{ $prefix }}_task_mgmt[]" value="{{ $opt }}"> {{ $opt }}</label><br>
+                                    <label><input type="checkbox" name="{{ $prefix }}_task_mgmt[]"value="{{ $opt }}"{{ in_array($opt, explode(',', $meninjau->{$prefix.'_task_mgmt'} ?? '')) ? 'checked' : '' }}></label><br>
                                     @endforeach
                                 </td>
                                 <td>
                                     @foreach ($options as $opt)
-                                    <label><input type="checkbox" name="{{ $prefix }}_contingency[]" value="{{ $opt }}"> {{ $opt }}</label><br>
+                                    <label><input type="checkbox" name="{{ $prefix }}_contingency[]" value="{{ $opt }}"{{ in_array($opt, explode(',', $meninjau->{$prefix.'_contingency'} ?? '')) ? 'checked' : '' }}></label><br>
                                     @endforeach
                                 </td>
                                 <td>
                                     @foreach ($options as $opt)
-                                    <label><input type="checkbox" name="{{ $prefix }}_jobrole[]" value="{{ $opt }}"> {{ $opt }}</label><br>
+                                    <label><input type="checkbox" name="{{ $prefix }}_jobrole[]" value="{{ $opt }}"{{ in_array($opt, explode(',', $meninjau->{$prefix.'_contingency'} ?? '')) ? 'checked' : '' }}></label><br>
                                     @endforeach
                                 </td>
                                 <td>
                                     @foreach ($options as $opt)
-                                    <label><input type="checkbox" name="{{ $prefix }}_transfer[]" value="{{ $opt }}"> {{ $opt }}</label><br>
+                                    <label><input type="checkbox" name="{{ $prefix }}_transfer[]" value="{{ $opt }}"{{ in_array($opt, explode(',', $meninjau->{$prefix.'_contingency'} ?? '')) ? 'checked' : '' }}></label><br>
                                     @endforeach
                                 </td>
                             </tr>
@@ -226,7 +239,7 @@
             <!-- Rekomendasi Peningkatan 2 -->
             <div class="card-box mb-4">
                 <label for="rekomendasi2" class="fw-semibold mb-1 d-block">Rekomendasi 2</label>
-                <textarea id="rekomendasi2" name="rekomendasi2" class="form-control mt-1" rows="3" placeholder="Masukkan teks"></textarea>
+                <textarea id="rekomendasi2" name="rekomendasi2" class="form-control mt-1" rows="3" placeholder="Masukkan teks">{{ old('rekomendasi2', $meninjau->rekomendasi2 ?? '') }}</textarea>
             </div>
 
             <!-- Simpan dan Lanjut -->

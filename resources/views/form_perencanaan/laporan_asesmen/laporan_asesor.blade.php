@@ -11,7 +11,7 @@
             <li class="breadcrumb-item"><a href="{{ route('formperencanaan.index') }}">Daftar Skema</a></li>
             <li class="breadcrumb-item"><a href="{{ route('formperencanaan.show', $skema->id_skema) }}">Form Perencanaan</a></li>
 <li class="breadcrumb-item active">
-    <a href="{{ route('laporan.show', $skema->id_skema) }}">FR.AK.01</a>
+    <a href="{{ route('laporan.show', $skema->id_skema) }}">FR.AK.05</a>
 </li>
             <li class="breadcrumb-item active" aria-current="page">Catatan & Tanda Tangan Asesor</li>
         </ol>
