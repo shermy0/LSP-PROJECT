@@ -668,6 +668,7 @@ Route::post('/form-asesmen/{id_skema}/jawaban-pmo/{id_pembuatan}/{id_asesi}', [P
         Route::put('/update', [ProfileAsesorController::class, 'update'])->name('profile.update');
     });
 
+
 }); // end middleware auth
 
     // ASESMEN MANDIRI (ASESOR)
@@ -950,4 +951,4 @@ Route::get('/admin/form-asesmen/{skemaId}/{asesiId}/{tipe}/hasil',
     Route::post('/ceklis-observasi/tandatangan', [CeklisObservasiController::class, 'storeTandatangan'])->name('ceklisobservasi.storeTandatangan'); 
     Route::get('/ceklis-observasi/tandatangan/{id_skema}/{id_asesi}', [CeklisObservasiController::class, 'tandatanganBySkemaAsesi']) ->name('ceklisobservasi.tandatangan.bySkemaAsesi');
     Route::get('/ttd/asesor/{filename}', [App\Http\Controllers\CeklisObservasiController::class, 'showTtdAsesor'])->name('ttd.asesor');
-}); // end middleware auth
+

@@ -231,12 +231,14 @@ Asesi <strong>belum mengerjakan</strong> penilaian pilihan ganda.
 <tr>
 <td width="35%"><strong>Umpan balik</strong></td>
 <td width="65%">
-Aspek pengetahuan seluruh unit kompetensi yang diujikan
-(tercapai / belum tercapai). <br><br>
-
-Tuliskan unit/elemen/KUK jika belum tercapai:
-..........................................................................</td>
-</tr>
+@if(!empty($umpanBalik))
+    {{ $umpanBalik }}
+@else
+    Aspek pengetahuan seluruh unit kompetensi yang diujikan (tercapai / belum tercapai).<br><br>
+    Tuliskan unit/elemen/KUK jika belum tercapai:
+    ..........................................................................
+@endif
+</td>
 </table>
 
 {{-- ================= TANDA TANGAN ================= --}}

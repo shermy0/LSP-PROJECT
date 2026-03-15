@@ -231,10 +231,10 @@
 <div class="section-title">Umpan Balik untuk Asesi</div>
 <table class="table table-bordered">
 <tr>
-<td width="35%"><strong>Umpan balik</strong></td>
-<td width="65%">
-Aspek pengetahuan seluruh unit kompetensi yang diujikan (tercapai / belum tercapai).
-</td>
+    <td width="35%"><strong>Umpan balik</strong></td>
+    <td width="65%">
+        {{ $umpanBalik ?? 'Aspek pengetahuan seluruh unit kompetensi yang diujikan (tercapai / belum tercapai).' }}
+    </td>
 </tr>
 </table>
 
