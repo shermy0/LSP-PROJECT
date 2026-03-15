@@ -152,6 +152,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/create/{id_permohonan}', [AsesorPenyesuaianWajarController::class, 'create'])->name('create');
         Route::post('/', [AsesorPenyesuaianWajarController::class, 'store'])->name('store');
         Route::get('/{id}', [AsesorPenyesuaianWajarController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [AsesorPenyesuaianWajarController::class, 'edit'])->name('edit');
         Route::put('/{id}', [AsesorPenyesuaianWajarController::class, 'update'])->name('update');
         Route::post('/{id}/signature', [AsesorPenyesuaianWajarController::class, 'storeSignature'])->name('signature');
     });

@@ -2,21 +2,30 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class PenyesuaianWajarPotensi extends Model
 {
+    use HasFactory;
+
     protected $table = 'penyesuaian_wajar_potensi';
     protected $primaryKey = 'id_potensi';
-    public $timestamps = false;
+    public $timestamps = true;
+
     protected $fillable = [
         'id_penyesuaian',
-        'potensi',
+        'teks_potensi',
         'dipilih',
     ];
 
-    public function penyesuaian()
+    protected $casts = [
+        'dipilih' => 'boolean',
+    ];
+
+    // Relasi balik ke penyesuaian wajar
+    public function penyesuaianWajar()
     {
-        return $this->belongsTo(PenyesuaianWajar::class, 'id_penyesuaian');
+        return $this->belongsTo(PenyesuaianWajar::class, 'id_penyesuaian', 'id_penyesuaian');
     }
 }

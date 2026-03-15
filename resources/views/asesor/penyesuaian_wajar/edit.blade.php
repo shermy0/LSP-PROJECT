@@ -1,11 +1,12 @@
 @extends('master')
 
-@section('title', 'FR.AK.07 - Penyesuaian Wajar')
+@section('title', 'FR.AK.07 - Edit Penyesuaian Wajar')
 
 @section('konten')
 <div class="container-fluid px-4 py-4">
-    <form action="{{ route('asesor.penyesuaian_wajar.store') }}" method="POST" novalidate>
+    <form action="{{ route('asesor.penyesuaian_wajar.update', $penyesuaian->id_penyesuaian) }}" method="POST" novalidate>
         @csrf
+        @method('PUT')
         <input type="hidden" name="id_permohonan" value="{{ $permohonan->id_permohonan }}">
 
         <!-- Header -->
@@ -16,8 +17,8 @@
                     <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
                 </svg>
             </div>
-            <h1 class="display-6 fw-bold text-dark">Penyesuaian Wajar dan Beralasan</h1>
-            <p class="text-secondary">FR.AK.07 – Isi data sesuai kebutuhan asesi</p>
+            <h1 class="display-6 fw-bold text-dark">Edit Penyesuaian Wajar dan Beralasan</h1>
+            <p class="text-secondary">FR.AK.07 – Ubah data sesuai kebutuhan asesi</p>
         </div>
 
         <!-- Informasi Skema dan Asesi -->
@@ -56,41 +57,17 @@
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Nama Asesor</label>
-                        <input type="text" class="form-control" value="{{ Auth::user()->name }}" readonly>
+                        <input type="text" class="form-control" value="{{ $penyesuaian->asesor->user->name ?? $penyesuaian->asesor->nama_asesor ?? '-' }}" readonly>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Nama Asesi</label>
-                        <input type="text" class="form-control" value="{{ $permohonan->asesi->nama_lengkap }}" readonly>
+                        <input type="text" class="form-control" value="{{ $penyesuaian->asesi->user->name ?? $penyesuaian->asesi->nama_asesi ?? '-' }}" readonly>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Tanggal</label>
                         <input type="date" class="form-control" value="{{ date('Y-m-d') }}" readonly>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- PANDUAN BAGI ASESOR (style diperbaiki) -->
-        <div class="card border-0 shadow-sm mb-4 border-start border-4 border-primary">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-question-circle text-primary" viewBox="0 0 16 16">
-                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                            <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h5 class="fw-bold mb-0">Panduan Bagi Asesor</h5>
-                        <p class="text-secondary mb-0 small">Petunjuk pengisian formulir</p>
-                    </div>
-                </div>
-                <ul class="mb-0 ps-3" style="list-style-type: disc;">
-                    <li>Formulir ini dapat digunakan (sebelum pra asesmen, saat pelaksanaan pra asesmen, setelah pra asesmen)* jika ada asesi yang mempunyai keterbatasan sesuai karakteristik yang dimilikinya sehingga diperlukan penyesuaian yang wajar dan beralasan, jika rencana asesmen dan perangkat asesmen tidak sesuai dengan acuan pembanding, potensi asesi dan konteks asesi, jika asesi merasa keletihan, sakit, serta jika kondisi alam, listrik padam,........</li>
-                    <li>Coretlah pada tanda * yang tidak sesuai.</li>
-                    <li>Berilah tanda √ pada kotak '☐' pada kolom potensi asesi</li>
-                    <li>Berilah tanda √ Ya atau Tidak pada tanda ** sesuai pilihan, jika jawaban Ya selanjutnya pada kolom keterangan berilah tanda √ di kotak '☐' yang tersedia, pilihan boleh lebih dari satu.</li>
-                </ul>
             </div>
         </div>
 
@@ -118,10 +95,11 @@
                         'Pekerja berpengalaman, dimana berasal dari industri/tempat kerja yang dalam operasionalnya belum berbasis kompetensi.',
                         'Pelatihan / belajar mandiri atau otodidak.'
                     ];
+                    $selectedPotensi = $penyesuaian->potensi->pluck('teks_potensi')->toArray();
                 @endphp
                 @foreach($potensiList as $index => $text)
                     <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" name="potensi[{{ $text }}]" value="1" id="potensi{{ $index }}">
+                        <input class="form-check-input" type="checkbox" name="potensi[{{ $text }}]" value="1" id="potensi{{ $index }}" {{ in_array($text, $selectedPotensi) ? 'checked' : '' }}>
                         <label class="form-check-label" for="potensi{{ $index }}">
                             {{ $text }}
                         </label>
@@ -130,7 +108,7 @@
             </div>
         </div>
 
-        <!-- Tabel Modifikasi (Item 1-8) dengan tambahan input Lainnya -->
+        <!-- Tabel Modifikasi (Item 1-8) -->
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-white border-0 pt-4 pb-0">
                 <div class="d-flex align-items-center">
@@ -157,377 +135,430 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @php
+                                $itemLabels = [
+                                    1 => 'Keterbatasan asesi terhadap persyaratan bahasa, literasi, numerasi.',
+                                    2 => 'Penyediaan dukungan pembaca, penerjemah, pelayan, penulis.',
+                                    3 => 'Penggunaan teknologi adaptif atau peralatan khusus. (Tidak dapat menggunakan teknologi adaptif (misal: mengoperasikan komputer dan printer, peralatan digital dsb).',
+                                    4 => 'Pelaksanaan asesmen secara fleksibel karena alasan keletihan atau keperluan pengobatan.',
+                                    5 => 'Penyediaan peralatan asesmen berupa braille, audio/video-tape.',
+                                    6 => 'Penyesuaian tempat fisik/lingkungan asesmen',
+                                    7 => 'Pertimbangan umur/usia lanjut/gender asesi. (Adanya perbedaan usia dengan asesor yang lebih muda).',
+                                    8 => 'Pertimbangan budaya/tradisi/agama.',
+                                ];
+                                $items = $penyesuaian->items->keyBy('nomor_item');
+                            @endphp
+
                             <!-- Item 1 -->
                             <tr>
                                 <td class="align-middle text-center">1</td>
-                                <td class="align-middle">Keterbatasan asesi terhadap persyaratan bahasa, literasi, numerasi.</td>
+                                <td class="align-middle">{{ $itemLabels[1] }}</td>
                                 <td class="align-middle">
+                                    @php $item = $items->get(1); @endphp
                                     <div class="form-check">
-                                        <input class="form-check-input item-radio" type="radio" name="items[1][dipilih]" value="1" id="item1_ya" data-item="1">
+                                        <input class="form-check-input item-radio" type="radio" name="items[1][dipilih]" value="1" id="item1_ya" data-item="1" {{ $item && $item->dipilih ? 'checked' : '' }}>
                                         <label class="form-check-label" for="item1_ya">Ya</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input item-radio" type="radio" name="items[1][dipilih]" value="0" id="item1_tidak" checked data-item="1">
+                                        <input class="form-check-input item-radio" type="radio" name="items[1][dipilih]" value="0" id="item1_tidak" data-item="1" {{ !$item || !$item->dipilih ? 'checked' : '' }}>
                                         <label class="form-check-label" for="item1_tidak">Tidak</label>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="row" id="keterangan-1">
+                                        @php
+                                            $keteranganDipilih = $item ? $item->keteranganItems->where('is_lainnya', false)->pluck('keterangan')->toArray() : [];
+                                            $keteranganLain = $item ? $item->keteranganItems->where('is_lainnya', true)->pluck('keterangan')->first() : '';
+                                        @endphp
                                         <div class="col-md-6">
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[1][keterangan][]" value="Memerlukan dukungan pembaca, penerjemah, pelayan, penulis. untuk merekam jawaban asesi." id="item1_ket1" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[1][keterangan][]" value="Memerlukan dukungan pembaca, penerjemah, pelayan, penulis. untuk merekam jawaban asesi." id="item1_ket1" {{ in_array('Memerlukan dukungan pembaca, penerjemah, pelayan, penulis. untuk merekam jawaban asesi.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item1_ket1">Memerlukan dukungan pembaca, penerjemah, pelayan, penulis. untuk merekam jawaban asesi.</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[1][keterangan][]" value="Melakukan asesmen verbal (gunakan pertanyaan lisan/pertanyaan wawancara) dengan dilengkapi gambar diagram dan bentuk-bentuk visual." id="item1_ket2" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[1][keterangan][]" value="Melakukan asesmen verbal (gunakan pertanyaan lisan/pertanyaan wawancara) dengan dilengkapi gambar diagram dan bentuk-bentuk visual." id="item1_ket2" {{ in_array('Melakukan asesmen verbal (gunakan pertanyaan lisan/pertanyaan wawancara) dengan dilengkapi gambar diagram dan bentuk-bentuk visual.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item1_ket2">Melakukan asesmen verbal (gunakan pertanyaan lisan/pertanyaan wawancara) dengan dilengkapi gambar diagram dan bentuk-bentuk visual.</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[1][keterangan][]" value="Menggunakan Hasil produksi" id="item1_ket3" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[1][keterangan][]" value="Menggunakan Hasil produksi" id="item1_ket3" {{ in_array('Menggunakan Hasil produksi', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item1_ket3">Menggunakan Hasil produksi</label>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[1][keterangan][]" value="Menggunakan Ceklis observasi/demonstrasi." id="item1_ket4" disabled>
-                                                <label class="form-check-label" for="item1_ket4">Menggunakan Ceklis observasi/demonstrasi.</label>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[1][keterangan][]" value="Mengunakan Ceklis observasi/demonstrasi." id="item1_ket4" {{ in_array('Mengunakan Ceklis observasi/demonstrasi.', $keteranganDipilih) ? 'checked' : '' }} disabled>
+                                                <label class="form-check-label" for="item1_ket4">Mengunakan Ceklis observasi/demonstrasi.</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[1][keterangan][]" value="Menggunakan daftar instruksi terstruktur." id="item1_ket5" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[1][keterangan][]" value="Menggunakan daftar instruksi terstruktur." id="item1_ket5" {{ in_array('Menggunakan daftar instruksi terstruktur.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item1_ket5">Menggunakan daftar instruksi terstruktur.</label>
                                             </div>
                                         </div>
-                                        <!-- Input Lainnya -->
                                         <div class="col-12 mt-2">
                                             <div class="input-group">
                                                 <span class="input-group-text">Lainnya:</span>
-                                                <input type="text" class="form-control item-text" name="items[1][keterangan_lain]" placeholder="Isi keterangan lain..." disabled>
+                                                <input type="text" class="form-control item-text" name="items[1][keterangan_lain]" placeholder="Isi keterangan lain..." value="{{ $keteranganLain }}" disabled>
                                             </div>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
+
                             <!-- Item 2 -->
                             <tr>
                                 <td class="align-middle text-center">2</td>
-                                <td class="align-middle">Penyediaan dukungan pembaca, penerjemah, pelayan, penulis.</td>
+                                <td class="align-middle">{{ $itemLabels[2] }}</td>
                                 <td class="align-middle">
+                                    @php $item = $items->get(2); @endphp
                                     <div class="form-check">
-                                        <input class="form-check-input item-radio" type="radio" name="items[2][dipilih]" value="1" id="item2_ya" data-item="2">
+                                        <input class="form-check-input item-radio" type="radio" name="items[2][dipilih]" value="1" id="item2_ya" data-item="2" {{ $item && $item->dipilih ? 'checked' : '' }}>
                                         <label class="form-check-label" for="item2_ya">Ya</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input item-radio" type="radio" name="items[2][dipilih]" value="0" id="item2_tidak" checked data-item="2">
+                                        <input class="form-check-input item-radio" type="radio" name="items[2][dipilih]" value="0" id="item2_tidak" data-item="2" {{ !$item || !$item->dipilih ? 'checked' : '' }}>
                                         <label class="form-check-label" for="item2_tidak">Tidak</label>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="row" id="keterangan-2">
+                                        @php
+                                            $keteranganDipilih = $item ? $item->keteranganItems->where('is_lainnya', false)->pluck('keterangan')->toArray() : [];
+                                            $keteranganLain = $item ? $item->keteranganItems->where('is_lainnya', true)->pluck('keterangan')->first() : '';
+                                        @endphp
                                         <div class="col-md-6">
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[2][keterangan][]" value="Menggunakan pertanyaan lisan dengan dilengkapi gambar diagram dan bentuk-bentuk visual." id="item2_ket1" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[2][keterangan][]" value="Menggunakan pertanyaan lisan dengan dilengkapi gambar diagram dan bentuk-bentuk visual." id="item2_ket1" {{ in_array('Menggunakan pertanyaan lisan dengan dilengkapi gambar diagram dan bentuk-bentuk visual.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item2_ket1">Menggunakan pertanyaan lisan dengan dilengkapi gambar diagram dan bentuk-bentuk visual.</label>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[2][keterangan][]" value="Menggunakan pertanyaan wawancara dengan dilengkapi gambar diagram dan bentuk-bentuk visual." id="item2_ket2" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[2][keterangan][]" value="Menggunakan pertanyaan wawancara dengan dilengkapi gambar diagram dan bentuk-bentuk visual." id="item2_ket2" {{ in_array('Menggunakan pertanyaan wawancara dengan dilengkapi gambar diagram dan bentuk-bentuk visual.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item2_ket2">Menggunakan pertanyaan wawancara dengan dilengkapi gambar diagram dan bentuk-bentuk visual.</label>
                                             </div>
                                         </div>
-                                        <!-- Input Lainnya -->
                                         <div class="col-12 mt-2">
                                             <div class="input-group">
                                                 <span class="input-group-text">Lainnya:</span>
-                                                <input type="text" class="form-control item-text" name="items[2][keterangan_lain]" placeholder="Isi keterangan lain..." disabled>
+                                                <input type="text" class="form-control item-text" name="items[2][keterangan_lain]" placeholder="Isi keterangan lain..." value="{{ $keteranganLain }}" disabled>
                                             </div>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
+
                             <!-- Item 3 -->
                             <tr>
                                 <td class="align-middle text-center">3</td>
-                                <td class="align-middle">Penggunaan teknologi adaptif atau peralatan khusus. (Tidak dapat menggunakan teknologi adaptif (misal: mengoperasikan komputer dan printer, peralatan digital dsb).</td>
+                                <td class="align-middle">{{ $itemLabels[3] }}</td>
                                 <td class="align-middle">
+                                    @php $item = $items->get(3); @endphp
                                     <div class="form-check">
-                                        <input class="form-check-input item-radio" type="radio" name="items[3][dipilih]" value="1" id="item3_ya" data-item="3">
+                                        <input class="form-check-input item-radio" type="radio" name="items[3][dipilih]" value="1" id="item3_ya" data-item="3" {{ $item && $item->dipilih ? 'checked' : '' }}>
                                         <label class="form-check-label" for="item3_ya">Ya</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input item-radio" type="radio" name="items[3][dipilih]" value="0" id="item3_tidak" checked data-item="3">
+                                        <input class="form-check-input item-radio" type="radio" name="items[3][dipilih]" value="0" id="item3_tidak" data-item="3" {{ !$item || !$item->dipilih ? 'checked' : '' }}>
                                         <label class="form-check-label" for="item3_tidak">Tidak</label>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="row" id="keterangan-3">
+                                        @php
+                                            $keteranganDipilih = $item ? $item->keteranganItems->where('is_lainnya', false)->pluck('keterangan')->toArray() : [];
+                                            $keteranganLain = $item ? $item->keteranganItems->where('is_lainnya', true)->pluck('keterangan')->first() : '';
+                                        @endphp
                                         <div class="col-md-6">
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[3][keterangan][]" value="Ceklis observasi/demonstrasi Demonstrasi." id="item3_ket1" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[3][keterangan][]" value="Ceklis observasi/demonstrasi Demonstrasi." id="item3_ket1" {{ in_array('Ceklis observasi/demonstrasi Demonstrasi.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item3_ket1">Ceklis observasi/demonstrasi Demonstrasi.</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[3][keterangan][]" value="Pertanyaan lisan" id="item3_ket2" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[3][keterangan][]" value="Pertanyaan lisan" id="item3_ket2" {{ in_array('Pertanyaan lisan', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item3_ket2">Pertanyaan lisan</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[3][keterangan][]" value="Pertanyaan tertulis." id="item3_ket3" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[3][keterangan][]" value="Pertanyaan tertulis." id="item3_ket3" {{ in_array('Pertanyaan tertulis.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item3_ket3">Pertanyaan tertulis.</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[3][keterangan][]" value="Pertanyaan wawancara." id="item3_ket4" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[3][keterangan][]" value="Pertanyaan wawancara." id="item3_ket4" {{ in_array('Pertanyaan wawancara.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item3_ket4">Pertanyaan wawancara.</label>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[3][keterangan][]" value="Daftar instruksi terstruktur." id="item3_ket5" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[3][keterangan][]" value="Daftar instruksi terstruktur." id="item3_ket5" {{ in_array('Daftar instruksi terstruktur.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item3_ket5">Daftar instruksi terstruktur.</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[3][keterangan][]" value="Ceklis verifikasi portofolio." id="item3_ket6" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[3][keterangan][]" value="Ceklis verifikasi portofolio." id="item3_ket6" {{ in_array('Ceklis verifikasi portofolio.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item3_ket6">Ceklis verifikasi portofolio.</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[3][keterangan][]" value="Menggunakan dukungan operator komputer." id="item3_ket7" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[3][keterangan][]" value="Menggunakan dukungan operator komputer." id="item3_ket7" {{ in_array('Menggunakan dukungan operator komputer.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item3_ket7">Menggunakan dukungan operator komputer.</label>
                                             </div>
                                         </div>
-                                        <!-- Input Lainnya -->
                                         <div class="col-12 mt-2">
                                             <div class="input-group">
                                                 <span class="input-group-text">Lainnya:</span>
-                                                <input type="text" class="form-control item-text" name="items[3][keterangan_lain]" placeholder="Isi keterangan lain..." disabled>
+                                                <input type="text" class="form-control item-text" name="items[3][keterangan_lain]" placeholder="Isi keterangan lain..." value="{{ $keteranganLain }}" disabled>
                                             </div>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
+
                             <!-- Item 4 -->
                             <tr>
                                 <td class="align-middle text-center">4</td>
-                                <td class="align-middle">Pelaksanaan asesmen secara fleksibel karena alasan keletihan atau keperluan pengobatan.</td>
+                                <td class="align-middle">{{ $itemLabels[4] }}</td>
                                 <td class="align-middle">
+                                    @php $item = $items->get(4); @endphp
                                     <div class="form-check">
-                                        <input class="form-check-input item-radio" type="radio" name="items[4][dipilih]" value="1" id="item4_ya" data-item="4">
+                                        <input class="form-check-input item-radio" type="radio" name="items[4][dipilih]" value="1" id="item4_ya" data-item="4" {{ $item && $item->dipilih ? 'checked' : '' }}>
                                         <label class="form-check-label" for="item4_ya">Ya</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input item-radio" type="radio" name="items[4][dipilih]" value="0" id="item4_tidak" checked data-item="4">
+                                        <input class="form-check-input item-radio" type="radio" name="items[4][dipilih]" value="0" id="item4_tidak" data-item="4" {{ !$item || !$item->dipilih ? 'checked' : '' }}>
                                         <label class="form-check-label" for="item4_tidak">Tidak</label>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="row" id="keterangan-4">
+                                        @php
+                                            $keteranganDipilih = $item ? $item->keteranganItems->where('is_lainnya', false)->pluck('keterangan')->toArray() : [];
+                                            $keteranganLain = $item ? $item->keteranganItems->where('is_lainnya', true)->pluck('keterangan')->first() : '';
+                                        @endphp
                                         <div class="col-md-6">
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[4][keterangan][]" value="Menggunakan juru tulis." id="item4_ket1" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[4][keterangan][]" value="Menggunakan juru tulis." id="item4_ket1" {{ in_array('Menggunakan juru tulis.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item4_ket1">Menggunakan juru tulis.</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[4][keterangan][]" value="Menggunakan kamaramen perekam vidio/ataudio." id="item4_ket2" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[4][keterangan][]" value="Menggunakan kamaramen perekam vidio/ataudio." id="item4_ket2" {{ in_array('Menggunakan kamaramen perekam vidio/ataudio.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item4_ket2">Menggunakan kamaramen perekam vidio/ataudio.</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[4][keterangan][]" value="Memperbolehkan periode waktu yang lebih panjang untuk menyelesaikan tugas pekrejaan dalam asesmen." id="item4_ket3" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[4][keterangan][]" value="Memperbolehkan periode waktu yang lebih panjang untuk menyelesaikan tugas pekrejaan dalam asesmen." id="item4_ket3" {{ in_array('Memperbolehkan periode waktu yang lebih panjang untuk menyelesaikan tugas pekrejaan dalam asesmen.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item4_ket3">Memperbolehkan periode waktu yang lebih panjang untuk menyelesaikan tugas pekrejaan dalam asesmen.</label>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[4][keterangan][]" value="Melakukan tugas pekerjaan dalam asesmen dengan waktu lebih pendek." id="item4_ket4" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[4][keterangan][]" value="Melakukan tugas pekerjaan dalam asesmen dengan waktu lebih pendek." id="item4_ket4" {{ in_array('Melakukan tugas pekerjaan dalam asesmen dengan waktu lebih pendek.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item4_ket4">Melakukan tugas pekerjaan dalam asesmen dengan waktu lebih pendek.</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[4][keterangan][]" value="Menggunakan instruksi-instruksi spesifik pada proyek yang dapat dilakukan pada berbagai tingkatan." id="item4_ket5" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[4][keterangan][]" value="Menggunakan instruksi-instruksi spesifik pada proyek yang dapat dilakukan pada berbagai tingkatan." id="item4_ket5" {{ in_array('Menggunakan instruksi-instruksi spesifik pada proyek yang dapat dilakukan pada berbagai tingkatan.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item4_ket5">Menggunakan instruksi-instruksi spesifik pada proyek yang dapat dilakukan pada berbagai tingkatan.</label>
                                             </div>
                                         </div>
-                                        <!-- Input Lainnya -->
                                         <div class="col-12 mt-2">
                                             <div class="input-group">
                                                 <span class="input-group-text">Lainnya:</span>
-                                                <input type="text" class="form-control item-text" name="items[4][keterangan_lain]" placeholder="Isi keterangan lain..." disabled>
+                                                <input type="text" class="form-control item-text" name="items[4][keterangan_lain]" placeholder="Isi keterangan lain..." value="{{ $keteranganLain }}" disabled>
                                             </div>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
+
                             <!-- Item 5 -->
                             <tr>
                                 <td class="align-middle text-center">5</td>
-                                <td class="align-middle">Penyediaan peralatan asesmen berupa braille, audio/video-tape.</td>
+                                <td class="align-middle">{{ $itemLabels[5] }}</td>
                                 <td class="align-middle">
+                                    @php $item = $items->get(5); @endphp
                                     <div class="form-check">
-                                        <input class="form-check-input item-radio" type="radio" name="items[5][dipilih]" value="1" id="item5_ya" data-item="5">
+                                        <input class="form-check-input item-radio" type="radio" name="items[5][dipilih]" value="1" id="item5_ya" data-item="5" {{ $item && $item->dipilih ? 'checked' : '' }}>
                                         <label class="form-check-label" for="item5_ya">Ya</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input item-radio" type="radio" name="items[5][dipilih]" value="0" id="item5_tidak" checked data-item="5">
+                                        <input class="form-check-input item-radio" type="radio" name="items[5][dipilih]" value="0" id="item5_tidak" data-item="5" {{ !$item || !$item->dipilih ? 'checked' : '' }}>
                                         <label class="form-check-label" for="item5_tidak">Tidak</label>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="row" id="keterangan-5">
+                                        @php
+                                            $keteranganDipilih = $item ? $item->keteranganItems->where('is_lainnya', false)->pluck('keterangan')->toArray() : [];
+                                            $keteranganLain = $item ? $item->keteranganItems->where('is_lainnya', true)->pluck('keterangan')->first() : '';
+                                        @endphp
                                         <div class="col-md-6">
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[5][keterangan][]" value="Menggunakan pertanyaan lisan." id="item5_ket1" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[5][keterangan][]" value="Menggunakan pertanyaan lisan." id="item5_ket1" {{ in_array('Menggunakan pertanyaan lisan.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item5_ket1">Menggunakan pertanyaan lisan.</label>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[5][keterangan][]" value="Menggunakan pertanyaan wawancara." id="item5_ket2" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[5][keterangan][]" value="Menggunakan pertanyaan wawancara." id="item5_ket2" {{ in_array('Menggunakan pertanyaan wawancara.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item5_ket2">Menggunakan pertanyaan wawancara.</label>
                                             </div>
                                         </div>
-                                        <!-- Input Lainnya -->
                                         <div class="col-12 mt-2">
                                             <div class="input-group">
                                                 <span class="input-group-text">Lainnya:</span>
-                                                <input type="text" class="form-control item-text" name="items[5][keterangan_lain]" placeholder="Isi keterangan lain..." disabled>
+                                                <input type="text" class="form-control item-text" name="items[5][keterangan_lain]" placeholder="Isi keterangan lain..." value="{{ $keteranganLain }}" disabled>
                                             </div>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
+
                             <!-- Item 6 -->
                             <tr>
                                 <td class="align-middle text-center">6</td>
-                                <td class="align-middle">Penyesuaian tempat fisik/lingkungan asesmen</td>
+                                <td class="align-middle">{{ $itemLabels[6] }}</td>
                                 <td class="align-middle">
+                                    @php $item = $items->get(6); @endphp
                                     <div class="form-check">
-                                        <input class="form-check-input item-radio" type="radio" name="items[6][dipilih]" value="1" id="item6_ya" data-item="6">
+                                        <input class="form-check-input item-radio" type="radio" name="items[6][dipilih]" value="1" id="item6_ya" data-item="6" {{ $item && $item->dipilih ? 'checked' : '' }}>
                                         <label class="form-check-label" for="item6_ya">Ya</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input item-radio" type="radio" name="items[6][dipilih]" value="0" id="item6_tidak" checked data-item="6">
+                                        <input class="form-check-input item-radio" type="radio" name="items[6][dipilih]" value="0" id="item6_tidak" data-item="6" {{ !$item || !$item->dipilih ? 'checked' : '' }}>
                                         <label class="form-check-label" for="item6_tidak">Tidak</label>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="row" id="keterangan-6">
+                                        @php
+                                            $keteranganDipilih = $item ? $item->keteranganItems->where('is_lainnya', false)->pluck('keterangan')->toArray() : [];
+                                            $keteranganLain = $item ? $item->keteranganItems->where('is_lainnya', true)->pluck('keterangan')->first() : '';
+                                        @endphp
                                         <div class="col-md-6">
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[6][keterangan][]" value="Pertanyaan lisan." id="item6_ket1" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[6][keterangan][]" value="Pertanyaan lisan." id="item6_ket1" {{ in_array('Pertanyaan lisan.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item6_ket1">Pertanyaan lisan.</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[6][keterangan][]" value="Pertanyaan tulis." id="item6_ket2" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[6][keterangan][]" value="Pertanyaan tulis." id="item6_ket2" {{ in_array('Pertanyaan tulis.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item6_ket2">Pertanyaan tulis.</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[6][keterangan][]" value="Pertanyaan wawancara." id="item6_ket3" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[6][keterangan][]" value="Pertanyaan wawancara." id="item6_ket3" {{ in_array('Pertanyaan wawancara.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item6_ket3">Pertanyaan wawancara.</label>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[6][keterangan][]" value="Ceklis Verifikasi portofolio." id="item6_ket4" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[6][keterangan][]" value="Ceklis Verifikasi portofolio." id="item6_ket4" {{ in_array('Ceklis Verifikasi portofolio.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item6_ket4">Ceklis Verifikasi portofolio.</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[6][keterangan][]" value="Ceklis reviu produk." id="item6_ket5" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[6][keterangan][]" value="Ceklis reviu produk." id="item6_ket5" {{ in_array('Ceklis reviu produk.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item6_ket5">Ceklis reviu produk.</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[6][keterangan][]" value="Daftar instruksi terstruktur." id="item6_ket6" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[6][keterangan][]" value="Daftar instruksi terstruktur." id="item6_ket6" {{ in_array('Daftar instruksi terstruktur.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item6_ket6">Daftar instruksi terstruktur.</label>
                                             </div>
                                         </div>
-                                        <!-- Input Lainnya -->
                                         <div class="col-12 mt-2">
                                             <div class="input-group">
                                                 <span class="input-group-text">Lainnya:</span>
-                                                <input type="text" class="form-control item-text" name="items[6][keterangan_lain]" placeholder="Isi keterangan lain..." disabled>
+                                                <input type="text" class="form-control item-text" name="items[6][keterangan_lain]" placeholder="Isi keterangan lain..." value="{{ $keteranganLain }}" disabled>
                                             </div>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
+
                             <!-- Item 7 -->
                             <tr>
                                 <td class="align-middle text-center">7</td>
-                                <td class="align-middle">Pertimbangan umur/usia lanjut/gender asesi. (Adanya perbedaan usia dengan asesor yang lebih muda).</td>
+                                <td class="align-middle">{{ $itemLabels[7] }}</td>
                                 <td class="align-middle">
+                                    @php $item = $items->get(7); @endphp
                                     <div class="form-check">
-                                        <input class="form-check-input item-radio" type="radio" name="items[7][dipilih]" value="1" id="item7_ya" data-item="7">
+                                        <input class="form-check-input item-radio" type="radio" name="items[7][dipilih]" value="1" id="item7_ya" data-item="7" {{ $item && $item->dipilih ? 'checked' : '' }}>
                                         <label class="form-check-label" for="item7_ya">Ya</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input item-radio" type="radio" name="items[7][dipilih]" value="0" id="item7_tidak" checked data-item="7">
+                                        <input class="form-check-input item-radio" type="radio" name="items[7][dipilih]" value="0" id="item7_tidak" data-item="7" {{ !$item || !$item->dipilih ? 'checked' : '' }}>
                                         <label class="form-check-label" for="item7_tidak">Tidak</label>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="row" id="keterangan-7">
+                                        @php
+                                            $keteranganDipilih = $item ? $item->keteranganItems->where('is_lainnya', false)->pluck('keterangan')->toArray() : [];
+                                            $keteranganLain = $item ? $item->keteranganItems->where('is_lainnya', true)->pluck('keterangan')->first() : '';
+                                        @endphp
                                         <div class="col-md-6">
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[7][keterangan][]" value="Menggunakan studi kasus/daftar instruksi terstrukut" id="item7_ket1" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[7][keterangan][]" value="Menggunakan studi kasus/daftar instruksi terstrukut" id="item7_ket1" {{ in_array('Menggunakan studi kasus/daftar instruksi terstrukut', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item7_ket1">Menggunakan studi kasus/daftar instruksi terstrukut</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[7][keterangan][]" value="Menggunakan instrumen asesmen dengan huruf normal jangan terlalu kecil." id="item7_ket2" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[7][keterangan][]" value="Menggunakan instrumen asesmen dengan huruf normal jangan terlalu kecil." id="item7_ket2" {{ in_array('Menggunakan instrumen asesmen dengan huruf normal jangan terlalu kecil.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item7_ket2">Menggunakan instrumen asesmen dengan huruf normal jangan terlalu kecil.</label>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[7][keterangan][]" value="Menggunakan asesor dengan jenis kelamin yang sama dengan asesi." id="item7_ket3" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[7][keterangan][]" value="Menggunakan asesor dengan jenis kelamin yang sama dengan asesi." id="item7_ket3" {{ in_array('Menggunakan asesor dengan jenis kelamin yang sama dengan asesi.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item7_ket3">Menggunakan asesor dengan jenis kelamin yang sama dengan asesi.</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[7][keterangan][]" value="Menggunakan instrumen asesmen yang sama walaupun berbeda jenis kelamin (tidak boleh memberi tanda tambahan)." id="item7_ket4" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[7][keterangan][]" value="Menggunakan instrumen asesmen yang sama walaupun berbeda jenis kelamin (tidak boleh memberi tanda tambahan)." id="item7_ket4" {{ in_array('Menggunakan instrumen asesmen yang sama walaupun berbeda jenis kelamin (tidak boleh memberi tanda tambahan).', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item7_ket4">Menggunakan instrumen asesmen yang sama walaupun berbeda jenis kelamin (tidak boleh memberi tanda tambahan).</label>
                                             </div>
                                         </div>
-                                        <!-- Input Lainnya -->
                                         <div class="col-12 mt-2">
                                             <div class="input-group">
                                                 <span class="input-group-text">Lainnya:</span>
-                                                <input type="text" class="form-control item-text" name="items[7][keterangan_lain]" placeholder="Isi keterangan lain..." disabled>
+                                                <input type="text" class="form-control item-text" name="items[7][keterangan_lain]" placeholder="Isi keterangan lain..." value="{{ $keteranganLain }}" disabled>
                                             </div>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
+
                             <!-- Item 8 -->
                             <tr>
                                 <td class="align-middle text-center">8</td>
-                                <td class="align-middle">Pertimbangan budaya/tradisi/agama.</td>
+                                <td class="align-middle">{{ $itemLabels[8] }}</td>
                                 <td class="align-middle">
+                                    @php $item = $items->get(8); @endphp
                                     <div class="form-check">
-                                        <input class="form-check-input item-radio" type="radio" name="items[8][dipilih]" value="1" id="item8_ya" data-item="8">
+                                        <input class="form-check-input item-radio" type="radio" name="items[8][dipilih]" value="1" id="item8_ya" data-item="8" {{ $item && $item->dipilih ? 'checked' : '' }}>
                                         <label class="form-check-label" for="item8_ya">Ya</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input item-radio" type="radio" name="items[8][dipilih]" value="0" id="item8_tidak" checked data-item="8">
+                                        <input class="form-check-input item-radio" type="radio" name="items[8][dipilih]" value="0" id="item8_tidak" data-item="8" {{ !$item || !$item->dipilih ? 'checked' : '' }}>
                                         <label class="form-check-label" for="item8_tidak">Tidak</label>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="row" id="keterangan-8">
+                                        @php
+                                            $keteranganDipilih = $item ? $item->keteranganItems->where('is_lainnya', false)->pluck('keterangan')->toArray() : [];
+                                            $keteranganLain = $item ? $item->keteranganItems->where('is_lainnya', true)->pluck('keterangan')->first() : '';
+                                        @endphp
                                         <div class="col-md-6">
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[8][keterangan][]" value="Menggunakan studi kasus daftar instruksi terstrukut" id="item8_ket1" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[8][keterangan][]" value="Menggunakan studi kasus daftar instruksi terstrukut" id="item8_ket1" {{ in_array('Menggunakan studi kasus daftar instruksi terstrukut', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item8_ket1">Menggunakan studi kasus daftar instruksi terstrukut</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[8][keterangan][]" value="Menggunakan asesor tanpa pertimbangan budaya/tradisi/agama." id="item8_ket2" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[8][keterangan][]" value="Menggunakan asesor tanpa pertimbangan budaya/tradisi/agama." id="item8_ket2" {{ in_array('Menggunakan asesor tanpa pertimbangan budaya/tradisi/agama.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item8_ket2">Menggunakan asesor tanpa pertimbangan budaya/tradisi/agama.</label>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-check">
-                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[8][keterangan][]" value="Menggunakan instrumen asesmen yang sama walaupun berbeda budaya/tradisi/agama." id="item8_ket3" disabled>
+                                                <input class="form-check-input item-checkbox" type="checkbox" name="items[8][keterangan][]" value="Menggunakan instrumen asesmen yang sama walaupun berbeda budaya/tradisi/agama." id="item8_ket3" {{ in_array('Menggunakan instrumen asesmen yang sama walaupun berbeda budaya/tradisi/agama.', $keteranganDipilih) ? 'checked' : '' }} disabled>
                                                 <label class="form-check-label" for="item8_ket3">Menggunakan instrumen asesmen yang sama walaupun berbeda budaya/tradisi/agama.</label>
                                             </div>
                                         </div>
-                                        <!-- Input Lainnya -->
                                         <div class="col-12 mt-2">
                                             <div class="input-group">
                                                 <span class="input-group-text">Lainnya:</span>
-                                                <input type="text" class="form-control item-text" name="items[8][keterangan_lain]" placeholder="Isi keterangan lain..." disabled>
+                                                <input type="text" class="form-control item-text" name="items[8][keterangan_lain]" placeholder="Isi keterangan lain..." value="{{ $keteranganLain }}" disabled>
                                             </div>
                                         </div>
                                     </div>
@@ -558,32 +589,32 @@
             <div class="card-body pt-3">
                 <div class="mb-3">
                     <label class="form-label">1) Acuan Pembanding Asesmen</label>
-                    <textarea name="acuan_pembanding" class="form-control" rows="2" placeholder="Isi acuan pembanding..."></textarea>
+                    <textarea name="acuan_pembanding" class="form-control" rows="2" placeholder="Isi acuan pembanding...">{{ $penyesuaian->acuan_pembanding }}</textarea>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">2) Metode Asesmen</label>
-                    <textarea name="metode_asesmen" class="form-control" rows="2" placeholder="Isi metode asesmen..."></textarea>
+                    <textarea name="metode_asesmen" class="form-control" rows="2" placeholder="Isi metode asesmen...">{{ $penyesuaian->metode_asesmen }}</textarea>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">3) Instrumen Asesmen</label>
-                    <textarea name="instrumen_asesmen" class="form-control" rows="2" placeholder="Isi instrumen asesmen..."></textarea>
+                    <textarea name="instrumen_asesmen" class="form-control" rows="2" placeholder="Isi instrumen asesmen...">{{ $penyesuaian->instrumen_asesmen }}</textarea>
                 </div>
             </div>
         </div>
 
         <!-- Tombol Aksi -->
         <div class="button-group mt-4">
-            <a href="{{ route('asesor.penyesuaian_wajar.index') }}" class="btn-back">
+            <a href="{{ route('asesor.penyesuaian_wajar.show', $penyesuaian->id_penyesuaian) }}" class="btn-back">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left me-2" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
                 </svg>
-                Kembali
+                Batal
             </a>
             <button type="submit" class="btn-next">
-                Simpan Draf
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-save ms-2" viewBox="0 0 16 16">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-save me-2" viewBox="0 0 16 16">
                     <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v4.5h2V2h2v12H2V2h2v4.5h2V2a1 1 0 0 0-1-1H2z"/>
                 </svg>
+                Update Draf
             </button>
         </div>
     </form>
@@ -669,10 +700,6 @@
         color: var(--primary) !important;
     }
 
-    .border-primary {
-        border-color: var(--primary) !important;
-    }
-
     /* Tombol Next & Back */
     .btn-next {
         background: linear-gradient(135deg, var(--primary), var(--primary-dark));
@@ -688,12 +715,14 @@
         justify-content: center;
         box-shadow: 0 8px 18px rgba(11,47,124,0.3);
         transition: all 0.2s;
+        text-decoration: none;
     }
 
     .btn-next:hover {
         background: linear-gradient(135deg, var(--primary-dark), #061944);
         transform: translateY(-2px);
         box-shadow: 0 12px 22px rgba(11,47,124,0.35);
+        color: #fff;
     }
 
     .btn-back {
@@ -739,22 +768,18 @@
     }
 </style>
 
-<!-- Script untuk toggle keterangan -->
+<!-- Script untuk toggle keterangan (salin dari create) -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Dapatkan semua radio button dengan class item-radio
         const radios = document.querySelectorAll('.item-radio');
-        
-        // Fungsi untuk mengaktifkan/menonaktifkan checkbox dan input teks berdasarkan radio yang dipilih
+
         function toggleKeterangan(itemId, isYa) {
             const keteranganDiv = document.getElementById('keterangan-' + itemId);
             if (keteranganDiv) {
-                // Toggle checkbox
                 const checkboxes = keteranganDiv.querySelectorAll('.item-checkbox');
                 checkboxes.forEach(cb => {
                     cb.disabled = !isYa;
                 });
-                // Toggle input text "Lainnya"
                 const textInputs = keteranganDiv.querySelectorAll('.item-text');
                 textInputs.forEach(inp => {
                     inp.disabled = !isYa;
@@ -762,16 +787,15 @@
             }
         }
 
-        // Saat radio berubah
         radios.forEach(radio => {
             radio.addEventListener('change', function() {
                 const itemId = this.dataset.item;
-                const isYa = (this.value === '1'); // Ya
+                const isYa = (this.value === '1');
                 toggleKeterangan(itemId, isYa);
             });
         });
 
-        // Inisialisasi: untuk setiap item, jika radio "Tidak" yang terpilih (default), nonaktifkan
+        // Inisialisasi
         for (let i = 1; i <= 8; i++) {
             const radioYa = document.querySelector(`input[name="items[${i}][dipilih]"][value="1"]`);
             const radioTidak = document.querySelector(`input[name="items[${i}][dipilih]"][value="0"]`);

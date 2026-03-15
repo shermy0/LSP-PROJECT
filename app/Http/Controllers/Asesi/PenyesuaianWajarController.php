@@ -12,10 +12,16 @@ use App\Models\PenyesuaianWajar;
 
 class PenyesuaianWajarController extends Controller
 {
+    /**
+     * Menampilkan daftar penyesuaian wajar milik asesi.
+     */
     public function index()
     {
         $asesi = Asesi::where('user_id', Auth::id())->firstOrFail();
-        $penyesuaian = PenyesuaianWajar::with(['asesmen.permohonan.skema'])
+        $penyesuaian = PenyesuaianWajar::with([
+                'permohonan.skema', // relasi ke permohonan, lalu ke skema
+                'persetujuan'
+            ])
             ->where('id_asesi', $asesi->id_asesi)
             ->orderBy('created_at', 'desc')
             ->get();
@@ -23,13 +29,17 @@ class PenyesuaianWajarController extends Controller
         return view('asesi.penyesuaian_wajar.index', compact('penyesuaian'));
     }
 
+    /**
+     * Menampilkan detail penyesuaian wajar.
+     */
     public function show($id)
     {
         $penyesuaian = PenyesuaianWajar::with([
-            'asesmen.permohonan.skema',
-            'asesor',
+            'permohonan.skema',
+            'permohonan.persetujuan.tuk', // ambil data TUK dari persetujuan
+            'asesor.user',
             'potensi',
-            'items',
+            'items.keteranganItems', // relasi ke keterangan per item
             'persetujuan'
         ])->findOrFail($id);
 
@@ -41,6 +51,9 @@ class PenyesuaianWajarController extends Controller
         return view('asesi.penyesuaian_wajar.show', compact('penyesuaian'));
     }
 
+    /**
+     * Menyimpan tanda tangan asesi.
+     */
     public function storeSignature(Request $request, $id)
     {
         $penyesuaian = PenyesuaianWajar::findOrFail($id);
@@ -50,14 +63,15 @@ class PenyesuaianWajarController extends Controller
             abort(403);
         }
 
-        if ($penyesuaian->status !== 'draf') {
-            return back()->with('error', 'Tidak dapat menandatangani pada status ini.');
+        // Asesi hanya boleh menandatangani jika status = 'menunggu_asesi'
+        if ($penyesuaian->status !== 'menunggu_asesi') {
+            return back()->with('error', 'Tanda tangan hanya dapat dilakukan saat status "Menunggu Tanda Tangan Anda".');
         }
 
         $request->validate([
-            'ttd_asesi' => 'required|string',
+            'ttd_asesi'    => 'required|string',
             'tgl_ttd_asesi' => 'required|date',
-            'setuju' => 'required|accepted', // checkbox setuju harus dicentang
+            'setuju'       => 'required|accepted', // checkbox persetujuan harus dicentang
         ]);
 
         $ttdPath = $this->saveSignature($request->ttd_asesi, 'asesi');
@@ -65,15 +79,20 @@ class PenyesuaianWajarController extends Controller
             ['id_penyesuaian' => $id],
             [
                 'tgl_ttd_asesi' => $request->tgl_ttd_asesi,
-                'ttd_asesi' => $ttdPath,
+                'ttd_asesi'     => $ttdPath,
             ]
         );
+
+        // Ubah status menjadi 'menunggu_asesor' (selanjutnya asesor yang menandatangani)
         $penyesuaian->update(['status' => 'menunggu_asesor']);
 
         return redirect()->route('asesi.penyesuaian_wajar.show', $id)
             ->with('success', 'Tanda tangan berhasil disimpan.');
     }
 
+    /**
+     * Simpan file signature dari base64.
+     */
     private function saveSignature($base64, $prefix)
     {
         $image = str_replace('data:image/png;base64,', '', $base64);

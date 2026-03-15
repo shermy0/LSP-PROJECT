@@ -2,27 +2,37 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class PenyesuaianWajarItem extends Model
 {
+    use HasFactory;
+
     protected $table = 'penyesuaian_wajar_item';
     protected $primaryKey = 'id_item';
-    public $timestamps = false;
+    public $timestamps = true;
+
     protected $fillable = [
         'id_penyesuaian',
-        'jenis_modifikasi',
+        'nomor_item',
         'dipilih',
-        'keterangan',
     ];
 
-    public function penyesuaian()
+    protected $casts = [
+        'nomor_item' => 'integer',
+        'dipilih'    => 'boolean',
+    ];
+
+    // Relasi balik ke penyesuaian wajar
+    public function penyesuaianWajar()
     {
-        return $this->belongsTo(PenyesuaianWajar::class, 'id_penyesuaian');
+        return $this->belongsTo(PenyesuaianWajar::class, 'id_penyesuaian', 'id_penyesuaian');
     }
 
-    public function details()
+    // Relasi ke keterangan item (checkbox & lainnya)
+    public function keteranganItems()
     {
-        return $this->hasMany(PenyesuaianWajarItemDetail::class, 'id_item');
+        return $this->hasMany(PenyesuaianWajarKeteranganItem::class, 'id_item', 'id_item');
     }
 }

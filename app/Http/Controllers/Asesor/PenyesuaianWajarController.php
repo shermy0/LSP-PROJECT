@@ -12,6 +12,7 @@ use App\Models\Permohonan;
 use App\Models\PenyesuaianWajar;
 use App\Models\PenyesuaianWajarPotensi;
 use App\Models\PenyesuaianWajarItem;
+use App\Models\PenyesuaianWajarKeteranganItem;
 use App\Models\PenyesuaianWajarPersetujuan;
 
 class PenyesuaianWajarController extends Controller
@@ -65,18 +66,17 @@ class PenyesuaianWajarController extends Controller
     }
 
     /**
-     * Menyimpan data penyesuaian wajar (draft).
+     * Menyimpan data penyesuaian wajar (langsung dikirim ke asesi).
      */
     public function store(Request $request)
     {
         $request->validate([
-            'id_permohonan' => 'required|exists:permohonan,id_permohonan',
-            'hasil_penyesuaian' => 'nullable|string',
-            'acuan_pembanding' => 'nullable|string',
-            'metode_asesmen' => 'nullable|string',
-            'instrumen_asesmen' => 'nullable|string',
-            'potensi' => 'nullable|array',
-            'items' => 'nullable|array',
+            'id_permohonan'       => 'required|exists:permohonan,id_permohonan',
+            'acuan_pembanding'    => 'nullable|string',
+            'metode_asesmen'      => 'nullable|string',
+            'instrumen_asesmen'   => 'nullable|string',
+            'potensi'             => 'nullable|array',
+            'items'               => 'nullable|array',
         ]);
 
         DB::beginTransaction();
@@ -86,24 +86,23 @@ class PenyesuaianWajarController extends Controller
 
             // Simpan data utama
             $penyesuaian = PenyesuaianWajar::create([
-                'id_permohonan' => $request->id_permohonan,
-                'id_asesi' => $permohonan->id_asesi,
-                'id_asesor' => $asesor->id_asesor,
-                'hasil_penyesuaian' => $request->hasil_penyesuaian,
-                'acuan_pembanding' => $request->acuan_pembanding,
-                'metode_asesmen' => $request->metode_asesmen,
+                'id_permohonan'     => $request->id_permohonan,
+                'id_asesi'          => $permohonan->id_asesi,
+                'id_asesor'         => $asesor->id_asesor,
+                'acuan_pembanding'  => $request->acuan_pembanding,
+                'metode_asesmen'    => $request->metode_asesmen,
                 'instrumen_asesmen' => $request->instrumen_asesmen,
-                'status' => 'draf',
+                'status'            => 'draf', // sementara draf dulu
             ]);
 
             // Simpan potensi
             if ($request->has('potensi')) {
                 foreach ($request->potensi as $potensiText => $dipilih) {
-                    if ($dipilih) {
+                    if ($dipilih == "1") {
                         PenyesuaianWajarPotensi::create([
                             'id_penyesuaian' => $penyesuaian->id_penyesuaian,
-                            'potensi' => $potensiText,
-                            'dipilih' => true,
+                            'teks_potensi'   => $potensiText,
+                            'dipilih'        => true,
                         ]);
                     }
                 }
@@ -111,28 +110,42 @@ class PenyesuaianWajarController extends Controller
 
             // Simpan item (1-8)
             if ($request->has('items')) {
-                foreach ($request->items as $jenis => $itemData) {
-                    // $jenis adalah nomor item (1,2,3,...)
-                    if (isset($itemData['dipilih']) && $itemData['dipilih'] == 1) {
-                        // Gabungkan keterangan jika ada
-                        $keterangan = null;
-                        if (isset($itemData['keterangan']) && is_array($itemData['keterangan'])) {
-                            $keterangan = implode(', ', $itemData['keterangan']);
-                        }
-                        PenyesuaianWajarItem::create([
+                foreach ($request->items as $nomor => $itemData) {
+                    if (isset($itemData['dipilih']) && $itemData['dipilih'] == "1") {
+                        $item = PenyesuaianWajarItem::create([
                             'id_penyesuaian' => $penyesuaian->id_penyesuaian,
-                            'jenis_modifikasi' => $jenis, // misal '1', '2', dst
-                            'dipilih' => true,
-                            'keterangan' => $keterangan,
+                            'nomor_item'     => (int) $nomor,
+                            'dipilih'        => true,
                         ]);
+
+                        if (isset($itemData['keterangan']) && is_array($itemData['keterangan'])) {
+                            foreach ($itemData['keterangan'] as $keterangan) {
+                                PenyesuaianWajarKeteranganItem::create([
+                                    'id_item'     => $item->id_item,
+                                    'keterangan'  => $keterangan,
+                                    'is_lainnya'  => false,
+                                ]);
+                            }
+                        }
+
+                        if (!empty($itemData['keterangan_lain'])) {
+                            PenyesuaianWajarKeteranganItem::create([
+                                'id_item'     => $item->id_item,
+                                'keterangan'  => $itemData['keterangan_lain'],
+                                'is_lainnya'  => true,
+                            ]);
+                        }
                     }
                 }
             }
 
+            // Setelah semua data tersimpan, ubah status menjadi menunggu asesi
+            $penyesuaian->update(['status' => 'menunggu_asesi']);
+
             DB::commit();
 
             return redirect()->route('asesor.penyesuaian_wajar.show', $penyesuaian->id_penyesuaian)
-                ->with('success', 'Draf penyesuaian wajar berhasil disimpan.');
+                ->with('success', 'Penyesuaian wajar berhasil disimpan dan dikirim ke asesi.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage())->withInput();
@@ -150,7 +163,7 @@ class PenyesuaianWajarController extends Controller
             'asesi',
             'asesor',
             'potensi',
-            'items',
+            'items.keteranganItems',
             'persetujuan'
         ])->findOrFail($id);
 
@@ -188,20 +201,19 @@ class PenyesuaianWajarController extends Controller
         }
 
         $request->validate([
-            'hasil_penyesuaian' => 'nullable|string',
-            'acuan_pembanding' => 'nullable|string',
-            'metode_asesmen' => 'nullable|string',
-            'instrumen_asesmen' => 'nullable|string',
-            'potensi' => 'nullable|array',
-            'items' => 'nullable|array',
+            'acuan_pembanding'    => 'nullable|string',
+            'metode_asesmen'      => 'nullable|string',
+            'instrumen_asesmen'   => 'nullable|string',
+            'potensi'             => 'nullable|array',
+            'items'               => 'nullable|array',
         ]);
 
         DB::beginTransaction();
         try {
+            // Update data utama
             $penyesuaian->update([
-                'hasil_penyesuaian' => $request->hasil_penyesuaian,
-                'acuan_pembanding' => $request->acuan_pembanding,
-                'metode_asesmen' => $request->metode_asesmen,
+                'acuan_pembanding'  => $request->acuan_pembanding,
+                'metode_asesmen'    => $request->metode_asesmen,
                 'instrumen_asesmen' => $request->instrumen_asesmen,
             ]);
 
@@ -209,42 +221,90 @@ class PenyesuaianWajarController extends Controller
             $penyesuaian->potensi()->delete();
             if ($request->has('potensi')) {
                 foreach ($request->potensi as $potensiText => $dipilih) {
-                    if ($dipilih) {
+                    if ($dipilih == "1") {
                         PenyesuaianWajarPotensi::create([
                             'id_penyesuaian' => $penyesuaian->id_penyesuaian,
-                            'potensi' => $potensiText,
-                            'dipilih' => true,
+                            'teks_potensi'   => $potensiText,
+                            'dipilih'        => true,
                         ]);
                     }
                 }
             }
 
-            // Update items: hapus lama, buat baru
+            // Update items: hapus lama
             $penyesuaian->items()->delete();
             if ($request->has('items')) {
-                foreach ($request->items as $jenis => $itemData) {
-                    if (isset($itemData['dipilih']) && $itemData['dipilih'] == 1) {
-                        $keterangan = isset($itemData['keterangan']) && is_array($itemData['keterangan'])
-                            ? implode(', ', $itemData['keterangan'])
-                            : null;
-                        PenyesuaianWajarItem::create([
+                foreach ($request->items as $nomor => $itemData) {
+                    if (isset($itemData['dipilih']) && $itemData['dipilih'] == "1") {
+                        $item = PenyesuaianWajarItem::create([
                             'id_penyesuaian' => $penyesuaian->id_penyesuaian,
-                            'jenis_modifikasi' => $jenis,
-                            'dipilih' => true,
-                            'keterangan' => $keterangan,
+                            'nomor_item'     => (int) $nomor,
+                            'dipilih'        => true,
                         ]);
+
+                        if (isset($itemData['keterangan']) && is_array($itemData['keterangan'])) {
+                            foreach ($itemData['keterangan'] as $keterangan) {
+                                PenyesuaianWajarKeteranganItem::create([
+                                    'id_item'     => $item->id_item,
+                                    'keterangan'  => $keterangan,
+                                    'is_lainnya'  => false,
+                                ]);
+                            }
+                        }
+
+                        if (!empty($itemData['keterangan_lain'])) {
+                            PenyesuaianWajarKeteranganItem::create([
+                                'id_item'     => $item->id_item,
+                                'keterangan'  => $itemData['keterangan_lain'],
+                                'is_lainnya'  => true,
+                            ]);
+                        }
                     }
                 }
             }
+
+            // Setelah update, ubah status menjadi menunggu asesi
+            $penyesuaian->update(['status' => 'menunggu_asesi']);
 
             DB::commit();
 
             return redirect()->route('asesor.penyesuaian_wajar.show', $penyesuaian->id_penyesuaian)
-                ->with('success', 'Penyesuaian wajar berhasil diperbarui.');
+                ->with('success', 'Penyesuaian wajar berhasil diperbarui dan dikirim ke asesi.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage())->withInput();
         }
+    }
+
+    /**
+     * Form edit penyesuaian wajar (hanya jika status draf).
+     */
+    public function edit($id)
+    {
+        $penyesuaian = PenyesuaianWajar::with([
+            'permohonan.skema',
+            'permohonan.persetujuan.tuk',
+            'asesi',
+            'potensi',
+            'items.keteranganItems'
+        ])->findOrFail($id);
+
+        $asesor = Asesor::where('user_id', Auth::id())->firstOrFail();
+
+        // Pastikan asesor yang login adalah pemilik
+        if ($penyesuaian->id_asesor != $asesor->id_asesor) {
+            abort(403);
+        }
+
+        // Pastikan status masih draf
+        if ($penyesuaian->status !== 'draf') {
+            return redirect()->route('asesor.penyesuaian_wajar.show', $id)
+                ->with('error', 'Tidak dapat mengedit karena sudah tidak dalam status draf.');
+        }
+
+        $permohonan = $penyesuaian->permohonan;
+
+        return view('asesor.penyesuaian_wajar.edit', compact('penyesuaian', 'permohonan'));
     }
 
     /**
@@ -265,7 +325,7 @@ class PenyesuaianWajarController extends Controller
             }
 
             $request->validate([
-                'ttd_asesor' => 'required|string',
+                'ttd_asesor'    => 'required|string',
                 'tgl_ttd_asesor' => 'required|date',
             ]);
 
@@ -274,7 +334,7 @@ class PenyesuaianWajarController extends Controller
                 ['id_penyesuaian' => $id],
                 [
                     'tgl_ttd_asesor' => $request->tgl_ttd_asesor,
-                    'ttd_asesor' => $ttdPath,
+                    'ttd_asesor'     => $ttdPath,
                 ]
             );
             $penyesuaian->update(['status' => 'selesai']);
@@ -286,6 +346,9 @@ class PenyesuaianWajarController extends Controller
         abort(403);
     }
 
+    /**
+     * Simpan base64 signature ke file.
+     */
     private function saveSignature($base64, $prefix)
     {
         $image = str_replace('data:image/png;base64,', '', $base64);

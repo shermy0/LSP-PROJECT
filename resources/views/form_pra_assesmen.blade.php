@@ -36,6 +36,7 @@
                 @if(Auth::user()->role === 'asesi')
                     @php
                         $status = $permohonan->status ?? null;
+                        $persetujuan = $permohonan->persetujuan ?? null; // ambil data persetujuan
                     @endphp
 
                     {{-- FR.APL.01 - PERMOHONAN SERTIFIKASI --}}
@@ -223,7 +224,6 @@
                         {{-- FR.AK.01 - PERSETUJUAN ASESMEN (hanya muncul jika asesmen mandiri selesai dan dapat dilanjutkan) --}}
                         @if($asesmenExists && $rekom === 'Dapat Dilanjutkan')
                             @php
-                                $persetujuan = $permohonan->persetujuan ?? null;
                                 $persetujuanLabel = $persetujuan ? ($persetujuan->status == 'selesai' ? 'Selesai' : ($persetujuan->status == 'menunggu_asesor' ? 'Menunggu TTD Asesor' : 'Draf')) : 'Belum dibuat';
                                 $persetujuanBadge = $persetujuan ? ($persetujuan->status == 'selesai' ? 'bg-success' : ($persetujuan->status == 'menunggu_asesor' ? 'bg-warning text-dark' : 'bg-secondary')) : 'bg-secondary';
                                 $persetujuanHref = $persetujuan ? route('asesi.persetujuan_asesmen.show', $persetujuan->id_persetujuan) : '#';
@@ -249,8 +249,8 @@
                             </a>
                         @endif
 
-                        {{-- FR.AK.07 - PENYESUAIAN WAJAR (hanya muncul jika sudah dibuat) --}}
-                        @if(isset($penyesuaianWajar) && $penyesuaianWajar)
+                        {{-- FR.AK.07 - PENYESUAIAN WAJAR (hanya muncul jika persetujuan sudah selesai dan data tersedia) --}}
+                        @if(isset($penyesuaianWajar) && $penyesuaianWajar && $persetujuan && $persetujuan->status === 'selesai')
                             @php
                                 $pwStatus = $penyesuaianWajar->status;
                                 $pwLabel = $pwStatus == 'selesai' ? 'Selesai' : ($pwStatus == 'menunggu_asesor' ? 'Menunggu TTD Asesor' : ($pwStatus == 'menunggu_asesi' ? 'Menunggu TTD Anda' : 'Draf'));

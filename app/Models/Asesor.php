@@ -39,6 +39,11 @@ class Asesor extends Model
         return $this->belongsTo(Jurusan::class, 'id_jurusan', 'id_jurusan');
     }
 
+    public function penyesuaianWajar()
+{
+    return $this->hasMany(PenyesuaianWajar::class, 'id_asesor', 'id_asesor');
+}
+
     /**
      * Relasi many-to-many dengan SkemaSertifikasi.
      */

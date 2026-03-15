@@ -82,6 +82,11 @@ class Asesi extends Model
         return $this->hasMany(Permohonan::class, 'id_asesi', 'id_asesi');
     }
 
+    public function penyesuaianWajar()
+{
+    return $this->hasMany(PenyesuaianWajar::class, 'id_asesi', 'id_asesi');
+}
+
     public function asesmenMandiriMaster()
 {
     return $this->hasMany(AsesmenMandiriMaster::class, 'id_asesi', 'id_asesi');

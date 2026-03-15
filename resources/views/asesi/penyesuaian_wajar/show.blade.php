@@ -13,15 +13,15 @@
             </svg>
         </div>
         <h1 class="display-6 fw-bold text-dark">Detail Penyesuaian Wajar dan Beralasan</h1>
-        <p class="text-secondary">FR.AK.07 – Data penyesuaian untuk asesor</p>
+        <p class="text-secondary">FR.AK.07 – Data penyesuaian untuk asesi</p>
         <span class="badge bg-{{ $penyesuaian->status == 'selesai' ? 'success' : ($penyesuaian->status == 'draf' ? 'secondary' : ($penyesuaian->status == 'menunggu_asesi' ? 'warning' : 'info')) }} px-3 py-2 rounded-pill">
             Status: 
             @if($penyesuaian->status == 'menunggu_asesi')
-                Menunggu Tanda Tangan Asesi
+                Menunggu Tanda Tangan Anda
             @elseif($penyesuaian->status == 'menunggu_asesor')
-                Menunggu Tanda Tangan Anda (Asesor)
+                Menunggu Tanda Tangan Asesor
             @elseif($penyesuaian->status == 'draf')
-                Draf
+                Draf (Asesor)
             @elseif($penyesuaian->status == 'selesai')
                 Selesai
             @else
@@ -246,78 +246,79 @@
         <div class="card-body pt-3">
             @php $persetujuan = $penyesuaian->persetujuan; @endphp
 
-            <div class="row">
-                {{-- Tanda Tangan Asesi --}}
-                <div class="col-md-6 text-center mb-3">
-                    <div class="border rounded p-3 bg-light h-100">
-                        <h6 class="fw-bold mb-3">Asesi</h6>
-                        @if($persetujuan && $persetujuan->ttd_asesi)
-                            <img src="{{ asset('storage/' . $persetujuan->ttd_asesi) }}" alt="Tanda Tangan Asesi" class="img-fluid mb-2" style="max-height: 100px;">
-                            <p class="mb-0">Tanggal: {{ $persetujuan->tgl_ttd_asesi ? \Carbon\Carbon::parse($persetujuan->tgl_ttd_asesi)->format('d-m-Y') : '-' }}</p>
-                        @else
-                            <p class="text-muted fst-italic">Belum ditandatangani</p>
-                        @endif
-                    </div>
-                </div>
+            {{-- Jika status menunggu asesi dan asesi belum tanda tangan, tampilkan form --}}
+            @if($penyesuaian->status == 'menunggu_asesi' && (!$persetujuan || !$persetujuan->ttd_asesi))
+                {{-- Form Tanda Tangan Asesi --}}
+                <form method="POST" action="{{ route('asesi.penyesuaian_wajar.signature', $penyesuaian->id_penyesuaian) }}" id="signatureForm">
+                    @csrf
 
-                {{-- Tanda Tangan Asesor --}}
-                <div class="col-md-6 text-center mb-3">
-                    <div class="border rounded p-3 bg-light h-100">
-                        <h6 class="fw-bold mb-3">Asesor (Anda)</h6>
-                        @if($persetujuan && $persetujuan->ttd_asesor)
-                            <img src="{{ asset('storage/' . $persetujuan->ttd_asesor) }}" alt="Tanda Tangan Asesor" class="img-fluid mb-2" style="max-height: 100px;">
-                            <p class="mb-0">Tanggal: {{ $persetujuan->tgl_ttd_asesor ? \Carbon\Carbon::parse($persetujuan->tgl_ttd_asesor)->format('d-m-Y') : '-' }}</p>
-                        @else
-                            {{-- Jika status menunggu asesor dan asesor belum tanda tangan, tampilkan form --}}
-                            @if($penyesuaian->status == 'menunggu_asesor' && Auth::user()->role == 'asesor')
-                                <form method="POST" action="{{ route('asesor.penyesuaian_wajar.signature', $penyesuaian->id_penyesuaian) }}" id="signatureFormAsesor">
-                                    @csrf
-                                    <div class="mb-3">
-                                        <label class="form-label">Tanggal Tanda Tangan</label>
-                                        <input type="date" name="tgl_ttd_asesor" class="form-control" value="{{ date('Y-m-d') }}" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Tanda Tangan</label>
-                                        <div class="canvas-wrapper mb-2">
-                                            <canvas id="ttd-asesor" class="ttd-canvas" width="400" height="160"></canvas>
-                                            <span class="canvas-placeholder">Tanda tangan di sini</span>
-                                        </div>
-                                        <input type="hidden" name="ttd_asesor" id="ttd-asesor-input" required>
-                                        <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="clearCanvasAsesor()">Hapus</button>
-                                    </div>
-                                    <button type="submit" id="submitSignatureAsesor" class="btn btn-primary mt-2" disabled>Simpan Tanda Tangan</button>
-                                </form>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="setuju" value="1" id="setujuCheckbox" required>
+                                <label class="form-check-label fw-semibold" for="setujuCheckbox">
+                                    Saya menyetujui penyesuaian yang wajar dan beralasan ini
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="hidden" name="tgl_ttd_asesi" value="{{ date('Y-m-d') }}">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="canvas-wrapper mb-2">
+                                <canvas id="ttd-asesi" class="ttd-canvas" width="400" height="160"></canvas>
+                                <span class="canvas-placeholder">Tanda tangan di sini</span>
+                            </div>
+                            <input type="hidden" name="ttd_asesi" id="ttd-asesi-input" required>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-3">
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearCanvas('ttd-asesi')">Hapus</button>
+                        <button type="submit" id="submitSignature" class="btn btn-sm btn-primary" disabled>Simpan Tanda Tangan</button>
+                    </div>
+                </form>
+            @else
+                {{-- Tampilkan tanda tangan jika sudah ada --}}
+                <div class="row">
+                    <div class="col-md-6 text-center mb-3">
+                        <div class="border rounded p-3 bg-light h-100">
+                            <h6 class="fw-bold mb-3">Asesi (Anda)</h6>
+                            @if($persetujuan && $persetujuan->ttd_asesi)
+                                <img src="{{ asset('storage/' . $persetujuan->ttd_asesi) }}" alt="Tanda Tangan Asesi" class="img-fluid mb-2" style="max-height: 100px;">
+                                <p class="mb-0">Tanggal: {{ $persetujuan->tgl_ttd_asesi ? \Carbon\Carbon::parse($persetujuan->tgl_ttd_asesi)->format('d-m-Y') : '-' }}</p>
                             @else
                                 <p class="text-muted fst-italic">Belum ditandatangani</p>
                             @endif
-                        @endif
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-center mb-3">
+                        <div class="border rounded p-3 bg-light h-100">
+                            <h6 class="fw-bold mb-3">Asesor</h6>
+                            @if($persetujuan && $persetujuan->ttd_asesor)
+                                <img src="{{ asset('storage/' . $persetujuan->ttd_asesor) }}" alt="Tanda Tangan Asesor" class="img-fluid mb-2" style="max-height: 100px;">
+                                <p class="mb-0">Tanggal: {{ $persetujuan->tgl_ttd_asesor ? \Carbon\Carbon::parse($persetujuan->tgl_ttd_asesor)->format('d-m-Y') : '-' }}</p>
+                            @else
+                                <p class="text-muted fst-italic">Belum ditandatangani</p>
+                            @endif
+                        </div>
                     </div>
                 </div>
-            </div>
+            @endif
         </div>
     </div>
 
-    <!-- Tombol Aksi (sesuai role & status) -->
+    <!-- Tombol Aksi -->
     <div class="button-group mt-4">
-        <a href="{{ route('asesor.penyesuaian_wajar.index') }}" class="btn-back">
+        <a href="{{ route('form_pra_assesmen') }}" class="btn-back">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left me-2" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
             </svg>
             Kembali
         </a>
-
-        @php
-            $user = Auth::user();
-        @endphp
-
-        @if($user->role === 'asesor' && $penyesuaian->status === 'draf')
-            <a href="{{ route('asesor.penyesuaian_wajar.edit', $penyesuaian->id_penyesuaian) }}" class="btn-next" style="background: linear-gradient(135deg, #ffc107, #e0a800);">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil me-2" viewBox="0 0 16 16">
-                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-                </svg>
-                Edit Draf
-            </a>
-        @endif
     </div>
 </div>
 
@@ -368,7 +369,7 @@
         margin-bottom: 0.3rem;
     }
 
-    .form-control, .form-select {
+    .form-control {
         border: 1.5px solid #e2e8f0;
         border-radius: 0.75rem;
         padding: 0.6rem 1rem;
@@ -377,7 +378,7 @@
         background-color: #fff;
     }
 
-    .form-control:focus, .form-select:focus {
+    .form-control:focus {
         border-color: var(--primary);
         box-shadow: 0 0 0 4px rgba(11,47,124,0.15);
         outline: none;
@@ -434,36 +435,13 @@
         gap: 0.75rem;
     }
 
-    .btn-next {
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: #fff;
-        padding: 0.7rem 1.8rem;
-        border-radius: 2rem;
-        font-weight: 600;
-        font-size: 1rem;
-        border: none;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 18px rgba(11,47,124,0.3);
-        transition: all 0.2s;
-        text-decoration: none;
-    }
-
-    .btn-next:hover {
-        background: linear-gradient(135deg, var(--primary-dark), #061944);
-        transform: translateY(-2px);
-        box-shadow: 0 12px 22px rgba(11,47,124,0.35);
-        color: #fff;
-    }
-
     .badge {
         font-weight: 500;
         border-radius: 2rem;
         padding: 0.5rem 1rem;
     }
 
+    /* Canvas wrapper */
     .canvas-wrapper {
         position: relative;
         width: 100%;
@@ -496,7 +474,8 @@
         backdrop-filter: blur(2px);
     }
 
-    .btn-outline-danger {
+    .btn-outline-danger,
+    .btn-primary {
         border-width: 1.5px;
         border-radius: 2rem;
         font-weight: 500;
@@ -512,9 +491,6 @@
         background: linear-gradient(135deg, var(--primary), var(--primary-dark));
         border: none;
         box-shadow: 0 8px 18px rgba(11,47,124,0.3);
-        border-radius: 2rem;
-        padding: 0.5rem 1.5rem;
-        font-weight: 500;
     }
 
     .btn-primary:hover {
@@ -531,8 +507,8 @@
 </style>
 
 <script>
-    // Fungsi inisialisasi signature canvas untuk asesor
-    function initSignatureAsesor(canvasId, inputId) {
+    // Fungsi inisialisasi signature canvas (diadaptasi dari halaman persetujuan)
+    function initSignature(canvasId, inputId) {
         const canvas = document.getElementById(canvasId);
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
@@ -608,8 +584,8 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        window.clearCanvasAsesor = function() {
-            const c = document.getElementById(canvasId);
+        window.clearCanvas = function(id) {
+            const c = document.getElementById(id);
             if (!c) return;
             const ctx = c.getContext('2d');
             const container = c.parentElement;
@@ -623,20 +599,20 @@
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, cssWidth, cssHeight);
             document.getElementById(inputId).value = '';
-            toggleSubmitAsesor();
+            toggleSubmit();
         };
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        const canvasId = 'ttd-asesor';
-        const inputId = 'ttd-asesor-input';
-        initSignatureAsesor(canvasId, inputId);
+        const canvasId = 'ttd-asesi';
+        const inputId = 'ttd-asesi-input';
+        initSignature(canvasId, inputId);
 
+        const setujuCheckbox = document.getElementById('setujuCheckbox');
+        const submitBtn = document.getElementById('submitSignature');
         const canvas = document.getElementById(canvasId);
-        const submitBtn = document.getElementById('submitSignatureAsesor');
 
         function isCanvasBlank() {
-            if (!canvas) return true;
             const ctx = canvas.getContext('2d');
             const pixelData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
             for (let i = 0; i < pixelData.length; i += 4) {
@@ -647,20 +623,26 @@
             return true;
         }
 
-        function toggleSubmitAsesor() {
-            if (submitBtn) {
-                submitBtn.disabled = isCanvasBlank();
+        function toggleSubmit() {
+            if (setujuCheckbox && submitBtn) {
+                submitBtn.disabled = !(setujuCheckbox.checked && !isCanvasBlank());
             }
         }
 
-        if (canvas && submitBtn) {
-            canvas.addEventListener('mouseup', toggleSubmitAsesor);
-            canvas.addEventListener('touchend', toggleSubmitAsesor);
+        if (setujuCheckbox && submitBtn && canvas) {
+            setujuCheckbox.addEventListener('change', toggleSubmit);
+            canvas.addEventListener('mouseup', toggleSubmit);
+            canvas.addEventListener('touchend', toggleSubmit);
         }
 
-        const form = document.getElementById('signatureFormAsesor');
+        const form = document.getElementById('signatureForm');
         if (form) {
             form.addEventListener('submit', function(e) {
+                if (setujuCheckbox && !setujuCheckbox.checked) {
+                    e.preventDefault();
+                    alert('Anda harus menyetujui penyesuaian ini terlebih dahulu.');
+                    return;
+                }
                 if (isCanvasBlank()) {
                     e.preventDefault();
                     alert('Tanda tangan harus diisi.');

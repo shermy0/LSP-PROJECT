@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB; // <-- Tambahkan ini
 use App\Models\Asesi;
 use App\Models\Asesor;
 use App\Models\AsesmenMandiriMaster;
@@ -28,7 +29,7 @@ class AsesmenMandiriController extends Controller
 
         // Ambil asesi yang ditugaskan ke asesor ini dan memiliki asesmen mandiri
         $asesi = Asesi::where('asesor_id', $asesor->id_asesor)
-            ->whereHas('asesmenMandiriMaster') // pastikan relasi ada di model Asesi
+            ->whereHas('asesmenMandiriMaster')
             ->with('user')
             ->orderBy('updated_at', 'desc')
             ->paginate(10);
