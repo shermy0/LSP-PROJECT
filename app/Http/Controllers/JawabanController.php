@@ -92,6 +92,7 @@ class JawabanController extends Controller
  
              // Cek tanda tangan lisan
              $sudahTtdLisan = false;
+
              if ($statusLisanDasar) {
                  $sudahTtdLisan = DB::table('jawaban_asesmen_persetujuan')
                      ->join('jawaban_asesmen', 'jawaban_asesmen_persetujuan.id_jawaban', '=', 'jawaban_asesmen.id_jawaban')
@@ -99,6 +100,7 @@ class JawabanController extends Controller
                      ->where('jawaban_asesmen.id_asesi', $asesi->id_asesi)
                      ->where('jawaban_asesmen.id_skema', $skema->id_skema)
                      ->where('pertanyaan.jenis_pertanyaan', 'lisan')
+                     ->whereNotNull('jawaban_asesmen_persetujuan.ttd_asesi') // PERBAIKAN
                      ->exists();
              }
  
