@@ -220,8 +220,6 @@
         <div class="card-body">
             <p class="fw-semibold">Asesi :</p>
             <p class="mb-3">Bahwa saya telah mendapatkan penjelasan terkait hak dan prosedur banding asesmen dari asesor.</p>
-            <p class="fw-semibold">Asesor :</p>
-            <p class="mb-3">Menyatakan tidak akan membuka hasil pekerjaan yang saya peroleh karena penugasan saya sebagai Asesor dalam pekerjaan Asesmen kepada siapapun atau organisasi apapun selain kepada pihak yang berwenang sehubungan dengan kewajiban saya sebagai Asesor yang ditugaskan oleh LSP.</p>
             <p class="fw-semibold">Asesi :</p>
             <p>Saya setuju mengikuti asesmen dengan pemahaman bahwa informasi yang dikumpulkan hanya digunakan untuk pengembangan profesional dan hanya dapat diakses oleh orang tertentu saja.</p>
         </div>
