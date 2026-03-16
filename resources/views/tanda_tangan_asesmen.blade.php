@@ -137,13 +137,6 @@
         document.getElementById('ttd_asesor').value = dataURL;
     }
 </script>
-{{-- Kembali (kiri bawah) --}}
-@php
-$backUrl = route('pertanyaan.pg.kelompok', [
-    'id_skema' => $skema->id_skema,
-    'id_pembuatan_pertanyaan' => $id_pembuatan_pertanyaan
-]);
-@endphp
 <a href="{{ $backUrl }}"
    style="position:fixed; bottom:20px; left:260px; z-index:9999;
           background-color:#041562; color:#fff; border:none;

@@ -7,7 +7,7 @@
         <div class="card-body p-4">
             <div class="text-center mb-3">
                 <h5 class="fw-bold mb-1" style="color:#041562;">
-                    <i class="bi bi-clipboard2-check me-2"></i>Pertanyaan Mendukung Observasi (PMO)
+                    <i class="bi bi-mic me-2"></i>Pertanyaan Lisan (FR.IA.07)
                 </h5>
                 <h6 class="fw-semibold text-muted mb-2">{{ $skema->nama_skema }}</h6>
                 <div class="d-flex flex-wrap justify-content-center gap-2 mb-1">
@@ -39,7 +39,7 @@
     </div>
 
     <form id="form-jawaban"
-          action="{{ route('jawaban.pmo.simpan', [$skema->id_skema, $pembuatan->id_pembuatan_pertanyaan, $asesi->id_asesi]) }}"
+          action="{{ route('lisan.simpan.jawaban', [$skema->id_skema, $pembuatan->id_pembuatan_pertanyaan, $asesi->id_asesi]) }}"
           method="POST"
           onsubmit="return validateAndSaveSignature()">
         @csrf
@@ -56,65 +56,47 @@
                             <th class="text-black text-center py-2" colspan="2" style="width:24%;">Pencapaian</th>
                         </tr>
                         <tr style="background-color:#041562;">
-                            <th class="text-white text-center py-2" style="width:12%;">Ya</th>
-                            <th class="text-white text-center py-2" style="width:12%;">Tidak</th>
+                            <th class="text-green text-center py-2" style="width:12%;">Ya</th>
+                            <th class="text-red text-center py-2" style="width:12%;">Tidak</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($pertanyaan as $i => $p)
-                        @php
-                            $unitIds = json_decode($p->id_unit, true) ?? [];
-                            $units   = $unitList->whereIn('id_unit', $unitIds);
-                        @endphp
+                        @php $jawabanAsesi = $p->jawabanAsesmen->first(); @endphp
                         <tr>
                             <td class="px-3 py-3">
                                 <div class="d-flex gap-2">
                                     <span class="fw-bold flex-shrink-0" style="color:#041562; min-width:24px;">{{ $i + 1 }}.</span>
                                     <div class="flex-grow-1">
-                                        @if($p->deskripsi_pertanyaan)
+                                        @if($p->kunci_jawaban)
                                         <p class="mb-2 fst-italic fw-semibold" style="color:#c0392b; font-size:0.88rem;">
-                                            {{ $p->deskripsi_pertanyaan }}
+                                            Kunci: {{ $p->kunci_jawaban }}
                                         </p>
                                         @endif
-                                        @if($units->count())
-                                        <div class="mb-2">
-                                            @foreach($units as $unit)
-                                                <span class="badge me-1 mb-1" style="background-color:#e8edf8; color:#041562; font-size:0.75rem;">
-                                                    {{ $unit->kode_unit }}
-                                                </span>
-                                            @endforeach
-                                        </div>
-                                        @endif
-                                        <p class="mb-0" style="color:#222; font-size:0.92rem;">{{ $p->pertanyaan }}</p>
+                                        <p class="mb-0" style="color:#222; font-size:0.92rem;">{{ $p->isi_pertanyaan }}</p>
                                     </div>
                                 </div>
                             </td>
                             <td class="text-center align-middle" style="background-color:#f8fff9;">
-                                <div class="d-flex flex-column align-items-center gap-1">
-                                    <small class="fw-bold" style="color:#041562; font-size:0.75rem;">Ya</small>
-                                    <input type="radio" name="pencapaian[{{ $p->id_pmo_pertanyaan }}]" value="Ya"
-                                           class="form-check-input" style="width:22px; height:22px; cursor:pointer; accent-color:#041562;"
-                                           {{ ($p->pencapaian ?? '') === 'Ya' ? 'checked' : '' }}>
-                                </div>
+                                <input type="radio" name="pencapaian[{{ $p->id_pertanyaan }}]" value="1"
+                                       class="form-check-input" style="width:22px; height:22px; cursor:pointer; accent-color:#041562;"
+                                       {{ ($jawabanAsesi->pencapaian ?? '') == '1' ? 'checked' : '' }}>
                             </td>
                             <td class="text-center align-middle" style="background-color:#fff8f8;">
-                                <div class="d-flex flex-column align-items-center gap-1">
-                                    <small class="fw-bold" style="color:#dc3545; font-size:0.75rem;">Tidak</small>
-                                    <input type="radio" name="pencapaian[{{ $p->id_pmo_pertanyaan }}]" value="Tidak"
-                                           class="form-check-input" style="width:22px; height:22px; cursor:pointer; accent-color:#dc3545;"
-                                           {{ ($p->pencapaian ?? '') === 'Tidak' ? 'checked' : '' }}>
-                                </div>
+                                <input type="radio" name="pencapaian[{{ $p->id_pertanyaan }}]" value="0"
+                                       class="form-check-input" style="width:22px; height:22px; cursor:pointer; accent-color:#dc3545;"
+                                       {{ $jawabanAsesi && ($jawabanAsesi->pencapaian ?? '') == '0' ? 'checked' : '' }}>
                             </td>
                         </tr>
                         <tr style="background-color:#fafbff;">
                             <td colspan="3" class="px-3 py-2">
                                 <div class="fw-semibold mb-1" style="color:#041562; font-size:0.83rem;">
-                                    <i class="bi bi-chat-left-text me-1"></i>Tanggapan:
+                                    <i class="bi bi-chat-left-text me-1"></i>Jawaban Asesi:
                                 </div>
-                                <textarea name="jawaban[{{ $p->id_pmo_pertanyaan }}]"
+                                <textarea name="jawaban[{{ $p->id_pertanyaan }}]"
                                           class="form-control rounded-3" rows="3"
-                                          placeholder="Tuliskan tanggapan asesi di sini..."
-                                          style="border-color:#d0d7e8; font-size:0.9rem; resize:vertical;">{{ old('jawaban.'.$p->id_pmo_pertanyaan, $p->tanggapan ?? '') }}</textarea>
+                                          placeholder="Tuliskan jawaban asesi di sini..."
+                                          style="border-color:#d0d7e8; font-size:0.9rem; resize:vertical;">{{ old('jawaban.'.$p->id_pertanyaan, $jawabanAsesi->jawaban_text ?? '') }}</textarea>
                             </td>
                         </tr>
                         @empty
@@ -147,9 +129,18 @@
                         <div class="fw-bold mb-3 pb-2 border-bottom" style="color:#333;">
                             <i class="bi bi-chat-square-text me-2" style="color:#041562;"></i>Umpan Balik untuk Asesi
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="font-size:0.9rem;">
+                                Unit kompetensi / elemen / KUK yang belum tercapai:
+                            </label>
+                            <textarea id="unit_belum_tercapai" class="form-control rounded-3" rows="3"
+                                      placeholder="Contoh: Unit X, Elemen Y, KUK Z..."
+                                      style="border-color:#d0d7e8; font-size:0.9rem; resize:vertical;"></textarea>
+                        </div>
+                        <hr>
                         <div class="mb-1">
                             <label class="form-label fw-semibold" style="font-size:0.9rem;">Umpan balik untuk asesi:</label>
-                            <textarea id="umpan_balik_input" class="form-control rounded-3" rows="8"
+                            <textarea id="umpan_balik_input" class="form-control rounded-3" rows="4"
                                       placeholder="Tuliskan umpan balik untuk asesi..."
                                       style="border-color:#d0d7e8; font-size:0.9rem; resize:vertical;"></textarea>
                         </div>
@@ -209,7 +200,7 @@
 </div>
 
 <script>
-const timerKey = 'pmoTimer_{{ $pembuatan->id_pembuatan_pertanyaan }}_{{ $asesi->id_asesi }}';
+const timerKey = 'lisanTimer_{{ $pembuatan->id_pembuatan_pertanyaan }}_{{ $asesi->id_asesi }}';
 const savedTimer = sessionStorage.getItem(timerKey);
 let totalDetik = (savedTimer !== null && !isNaN(parseInt(savedTimer)))
                  ? parseInt(savedTimer)
@@ -310,7 +301,14 @@ function saveSignature() {
         document.getElementById('ttd_asesor_data').value = small.toDataURL('image/jpeg', 0.4);
         document.getElementById('tgl_ttd_asesor_data').value = document.getElementById('tanggal-asesor').value;
     }
-    document.getElementById('umpan_balik_final').value = document.getElementById('umpan_balik_input').value.trim();
+
+    const unit = document.getElementById('unit_belum_tercapai').value.trim();
+    const umpan = document.getElementById('umpan_balik_input').value.trim();
+    let gabungan = '';
+    if (unit) gabungan += 'Unit/Elemen/KUK belum tercapai: ' + unit;
+    if (unit && umpan) gabungan += '\n\n';
+    if (umpan) gabungan += 'Umpan balik: ' + umpan;
+    document.getElementById('umpan_balik_final').value = gabungan;
 }
 
 function validateAndSaveSignature() {

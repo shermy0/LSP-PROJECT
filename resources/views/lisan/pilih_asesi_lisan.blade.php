@@ -35,17 +35,13 @@
                      data-nama-asesi="{{ addslashes($asesi->nama_lengkap) }}"
                      data-sudah="{{ $sudah ? '1' : '0' }}"
                      style="transition:all 0.2s; border:2px solid transparent !important;
-                            cursor: {{ $sudah ? 'not-allowed' : 'pointer' }};
                             {{ $sudah ? 'background-color:#f8fff9;' : '' }}">
                     <div class="card-body px-4 py-3 d-flex align-items-center gap-3">
-                        {{-- Avatar --}}
                         <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold text-white"
                              style="width:44px; height:44px; font-size:1rem;
                                     background-color:{{ $sudah ? '#28a745' : '#041562' }};">
                             {{ strtoupper(substr($asesi->nama_lengkap, 0, 1)) }}
                         </div>
-
-                        {{-- Info --}}
                         <div class="flex-grow-1 overflow-hidden">
                             <p class="fw-bold mb-0 text-truncate"
                                style="color:{{ $sudah ? '#28a745' : '#041562' }}; font-size:0.9rem;">
@@ -56,15 +52,11 @@
                                     <i class="bi bi-check-circle-fill me-1"></i>Sudah diinput
                                 </small>
                             @elseif(isset($asesi->telepon_hp) && $asesi->telepon_hp)
-                                <small class="text-muted">
-                                    <i class="bi bi-telephone me-1"></i>{{ $asesi->telepon_hp }}
-                                </small>
+                                <small class="text-muted"><i class="bi bi-telephone me-1"></i>{{ $asesi->telepon_hp }}</small>
                             @else
                                 <small class="text-muted">No telepon tidak tersedia</small>
                             @endif
                         </div>
-
-                        {{-- Icon kanan --}}
                         @if($sudah)
                             <i class="bi bi-check-circle-fill flex-shrink-0" style="color:#28a745; font-size:1.1rem;"></i>
                         @else
@@ -85,7 +77,6 @@
         @endforelse
     </div>
 
-    {{-- Empty state search --}}
     <div id="emptySearch" class="text-center text-muted py-4" style="display:none;">
         <i class="bi bi-search fs-3 d-block mb-2"></i>
         Asesi tidak ditemukan.
@@ -94,8 +85,7 @@
     <div style="height:80px;"></div>
 </div>
 
-{{-- Kembali --}}
-<a href="{{ route('pmo.hasil.kelompok', ['id_skema' => $skema->id_skema]) }}"
+<a href="{{ route('lisan.hasil.kelompok', $skema->id_skema) }}"
    style="position:fixed; bottom:20px; left:260px; z-index:9999;
           background-color:#6c757d; color:#fff; border:none;
           border-radius:50px; padding:10px 18px;
@@ -113,7 +103,6 @@ const idSkema     = {{ $skema->id_skema }};
 const idPembuatan = {{ $pembuatan->id_pembuatan_pertanyaan }};
 const idKelompok  = {{ $kelompok->id_kelompok ?? 0 }};
 
-// Event listener untuk semua card asesi
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.asesi-card').forEach(function (card) {
         const sudah   = card.dataset.sudah === '1';
@@ -132,9 +121,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             });
         } else {
-            // Belum diinput — bisa diklik
             card.style.cursor = 'pointer';
-
             card.addEventListener('mouseenter', function () {
                 card.style.setProperty('border-color', '#041562', 'important');
                 card.style.backgroundColor = '#f0f4ff';
@@ -143,9 +130,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 card.style.setProperty('border-color', 'transparent', 'important');
                 card.style.backgroundColor = '';
             });
-            card.addEventListener('click', function () {
-                pilihAsesi(idAsesi, nama);
-            });
+            card.addEventListener('click', function () { pilihAsesi(idAsesi, nama); });
         }
     });
 });
@@ -168,7 +153,7 @@ function pilihAsesi(idAsesi, namaAsesi) {
         }
     }).then(result => {
         if (result.isConfirmed) {
-            window.location.href = `{{ url('/pmo/hasil') }}/${idSkema}/${idPembuatan}/${idKelompok}/${idAsesi}`;
+            window.location.href = `{{ url('/lisan/hasil') }}/${idSkema}/${idPembuatan}/${idKelompok}/${idAsesi}`;
         }
     });
 }
@@ -177,17 +162,11 @@ function filterAsesi() {
     const keyword = document.getElementById('searchAsesi').value.toLowerCase();
     const items   = document.querySelectorAll('.asesi-item');
     let visible   = 0;
-
     items.forEach(item => {
         const nama = item.dataset.nama || '';
-        if (nama.includes(keyword)) {
-            item.style.display = '';
-            visible++;
-        } else {
-            item.style.display = 'none';
-        }
+        if (nama.includes(keyword)) { item.style.display = ''; visible++; }
+        else item.style.display = 'none';
     });
-
     document.getElementById('emptySearch').style.display = visible === 0 ? 'block' : 'none';
 }
 </script>

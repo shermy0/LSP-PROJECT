@@ -28,14 +28,13 @@
             </a>
         </div>
 
-        <!-- Item 3 - Pertanyaan Lisan -->
-        <div class="accordion-item mb-2">
-            <h2 class="accordion-header p-3 border rounded">
-                <a href="{{ route('formasesmen.pertanyaanLisan', ['id_skema' => $skema->id_skema]) }}"
-                   class="text-dark text-decoration-none">
+        <!-- Item 3 -->
+        <div class="accordion-item mb-2" 
+            onclick="window.location='{{ route('formasesmen.pertanyaanLisan', ['id_skema' => $skema->id_skema]) }}';"
+            style="cursor: pointer;">
+                <h2 class="accordion-header p-3 border rounded">
                     <i class="fa-solid fa-stop me-2"></i> Pertanyaan Lisan
-                </a>
-            </h2>
+                </h2>
         </div>
 
         <!-- Item 4 - Tugas Praktik Demonstrasi -->
