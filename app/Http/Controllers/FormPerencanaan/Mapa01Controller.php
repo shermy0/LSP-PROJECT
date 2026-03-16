@@ -92,12 +92,10 @@ public function downloadPdfAdmin($id_skema)
         ->where('form_type', 'mapa01')
         ->get();
 
-    $validators = DB::table('penyusun_persetujuan')
-        ->where('id_skema', $id_skema)
-        ->where('role', 'validator')
-        ->where('form_type', 'mapa01')
-        ->get();
-
+$validators = DB::table('validasi_validator')
+    ->where('skema_id', $id_skema)
+    ->get();
+    
     $asesors = DB::table('asesor')->select('id_asesor', 'nama_asesor', 'no_registrasi')->get();
 
     // activeRoles: ambil data orang relevan jika ada di penyusun_persetujuan (role lain)
@@ -203,11 +201,9 @@ public function showMapa01Admin($id_skema)
         ->where('form_type', 'mapa01')
         ->get();
 
-    $validators = DB::table('penyusun_persetujuan')
-        ->where('id_skema', $id_skema)
-        ->where('role', 'validator')
-        ->where('form_type', 'mapa01')
-        ->get();
+$validators = DB::table('validasi_validator')
+    ->where('skema_id', $id_skema)
+    ->get();
 
     $asesors = DB::table('asesor')->select('id_asesor', 'nama_asesor', 'no_registrasi')->get();
 
@@ -291,12 +287,15 @@ $standar = (object)[
         ->unique()
         ->toArray();
 
+$validators = DB::table('validasi_validator')
+    ->where('skema_id', $id_skema)
+    ->get();
 
-    return view('form_perencanaan.form_mapa_01.mapa01', compact(
-        'skema','defaultTujuan','customTujuan','tujuanDipilih','pendekatan',
-    
-        'konfirmasi','standar','standarKompetensi', 'konteks'
-    ));
+
+return view('form_perencanaan.form_mapa_01.mapa01', compact(
+    'skema','defaultTujuan','customTujuan','tujuanDipilih','pendekatan',
+    'konfirmasi','standar','standarKompetensi','konteks','validators'
+));
 }
 
 public function storeMapa01(Request $request, $id_skema)
