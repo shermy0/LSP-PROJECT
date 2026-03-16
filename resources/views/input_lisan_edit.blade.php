@@ -5,7 +5,7 @@
     <h4 class="fw-bold">FR.IA.07 – Edit Pertanyaan Lisan</h4>
 
     <form id="formEditPertanyaan" 
-          action="{{ route('lisan.update', $pertanyaan->id_pertanyaan) }}" 
+         action="{{ route('lisan.update', $pertanyaan->id_pertanyaan) }}"
           method="POST">
         @csrf
         @method('PUT')
