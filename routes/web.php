@@ -440,5 +440,11 @@ Route::post('/form-asesmen/{id_skema}/jawaban-pmo/{id_pembuatan}/{id_asesi}', [P
         Route::get('/edit', [ProfileAsesorController::class, 'edit'])->name('profileasesor.edit');
         Route::put('/update', [ProfileAsesorController::class, 'update'])->name('profile.update');
     });
+    // ================== ASESOR LIHAT JAWABAN ASESI ==================
+    Route::get('/asesor/skema', [JawabanController::class, 'indexSkema'])->name('asesor.skema.index');
+    Route::get('/asesor/skema/{id_skema}/jenis', [JawabanController::class, 'listJenis'])->name('asesor.skema.jenis');
+    Route::get('/asesor/skema/{id_skema}/jenis/{jenis}/asesi', [JawabanController::class, 'listAsesi'])->name('asesor.skema.jenis.asesi');
+    Route::get('/asesor/skema/{id_skema}/jenis/{jenis}/asesi/{id_asesi}', [JawabanController::class, 'viewJawaban'])->name('asesor.skema.jenis.asesi.jawaban');
+    Route::post('/asesor/pencapaian/store', [JawabanController::class,'storePencapaian']) ->name('asesor.pencapaian.store');
 
 }); // end middleware auth
