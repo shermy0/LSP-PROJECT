@@ -908,6 +908,62 @@ class PertanyaanController extends Controller
         ]);
     }
 
+    public function kelompokPekerjaanPG(Request $request, $id_skema, $jenis = null)
+    {
+        $jenis = $jenis ?? $request->query('jenis', 'pg');
+        $judul = $request->query('judul');
+        $timer = $request->query('timer');
+        $idPembuatan = $request->query('id_pembuatan_pertanyaan');
+
+        if ($idPembuatan) {
+            $pembuatan = PembuatanPertanyaan::find($idPembuatan);
+            if (!$pembuatan) {
+                return back()->with('error', 'Data pembuatan pertanyaan tidak ditemukan.');
+            }
+            $timer = $pembuatan->timer;
+        } else if ($judul) {
+            $pembuatan = PembuatanPertanyaan::create([
+                'id_skema'         => $id_skema,
+                'judul'            => $judul,
+                'timer'            => $timer ?? 30,
+                'timescap'         => now(),
+                'jenis_pertanyaan' => $jenis,
+            ]);
+        } else {
+            $pembuatan = PembuatanPertanyaan::where('id_skema', $id_skema)
+                            ->where('jenis_pertanyaan', $jenis)
+                            ->latest('id_pembuatan_pertanyaan')
+                            ->first();
+            if (!$pembuatan) {
+                return back()->with('error', 'Belum ada pembuatan pertanyaan sebelumnya.');
+            }
+            $timer = $pembuatan->timer;
+        }
+
+        $kelompok = KelompokPekerjaan::with(['unitKompetensi' => function ($q) use ($id_skema) {
+            $q->where('unit_kompetensi.id_skema', $id_skema);
+        }])->where('id_skema', $id_skema)->get();
+
+        $skema = Skema::find($id_skema);
+
+        $soalList = $pembuatan
+            ? Pertanyaan::where('id_pembuatan_pertanyaan', $pembuatan->id_pembuatan_pertanyaan)
+                ->with('kelompok')
+                ->get()
+            : collect();
+
+        return view('kelompok_pekerjaan_pg', [
+            'kelompok'  => $kelompok,
+            'timer'     => $timer,
+            'id_skema'  => $id_skema,
+            'jenis'     => $jenis,
+            'judul'     => $judul,
+            'skema'     => $skema,
+            'pembuatan' => $pembuatan,
+            'soalList'  => $soalList,
+        ]);
+    }
+
     // ================================
     // FORM TANDA TANGAN ASESOR
     // ================================
