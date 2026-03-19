@@ -134,27 +134,42 @@ class FormAsesmenAdminController extends Controller
     
         }
 
-        // ======================
-        // DATA PERTANYAAN LISAN
-        // ======================
-        $pertanyaan = collect();
-        if ($tipe === 'lisan') {
-            $pertanyaan = DB::table('pertanyaan as p')
-                ->leftJoin('jawaban_asesmen as ja', function ($join) use ($skemaId, $asesiId) {
-                    $join->on('p.id_pertanyaan', '=', 'ja.id_pertanyaan')
-                         ->where('ja.id_skema', $skemaId)
-                         ->where('ja.id_asesi', $asesiId);
-                })
-                ->where('p.jenis_pertanyaan', 'lisan')
-                ->where('p.id_skema', $skemaId)
-                ->select(
-                    'p.id_pertanyaan',
-                    'p.isi_pertanyaan',
-                    'p.kunci_jawaban',
-                    'ja.jawaban_text as jawaban_asesi'
-                )
-                ->get();
-        }
+// ======================
+// DATA PERTANYAAN LISAN
+// ======================
+$pertanyaan = collect();
+
+if ($tipe === 'lisan') {
+
+    $pertanyaan = DB::table('pertanyaan as p')
+        ->leftJoin('jawaban_asesmen as ja', function ($join) use ($skemaId, $asesiId) {
+            $join->on('p.id_pertanyaan', '=', 'ja.id_pertanyaan')
+                 ->where('ja.id_skema', $skemaId)
+                 ->where('ja.id_asesi', $asesiId);
+        })
+        ->where('p.jenis_pertanyaan', 'lisan')
+        ->where('p.id_skema', $skemaId)
+        ->select(
+            'p.id_pertanyaan',
+            'p.isi_pertanyaan',
+            'p.kunci_jawaban',
+            'ja.id_jawaban',
+            'ja.jawaban_text as jawaban_asesi'
+        )
+        ->get();
+
+    // Ambil ID jawaban
+    $ids = $pertanyaan->pluck('id_jawaban')->filter();
+
+    // Ambil umpan balik
+    if ($ids->isNotEmpty()) {
+        $umpanBalik = DB::table('jawaban_asesmen_persetujuan')
+            ->whereIn('id_jawaban', $ids)
+            ->whereNotNull('umpan_balik')
+            ->pluck('umpan_balik')
+            ->implode("\n");
+    }
+}
 
 // ======================
 // DATA OBSERVASI
@@ -362,25 +377,32 @@ $ttdAsesor = $ttdAsesorFile ? asset('storage/ttd/' . basename($ttdAsesorFile)) :
             else abort(404, 'Tipe asesmen tidak ditemukan.');
         }
 
-$umpanBalik = '';
-
+// ======================
+// UMpan Balik GLOBAL (JANGAN TIMPA LISAN)
+// ======================
 if ($tipe === 'esai') {
-    // ambil umpan balik esai
-// Ambil semua umpan balik esai dan gabungkan
-$jawabanEsaiIds = $jawabanEsai->pluck('id_jawaban'); // ambil semua ID jawaban esai
+
+    $jawabanEsaiIds = $jawabanEsai->pluck('id_jawaban');
 
 $umpanBalik = DB::table('jawaban_asesmen_persetujuan')
     ->whereIn('id_jawaban', $jawabanEsaiIds)
     ->whereNotNull('umpan_balik')
-    ->pluck('umpan_balik')       // ambil semua
-    ->implode(' | ');    
+    ->pluck('umpan_balik')
+    ->map(function ($text) {
+
+        // ambil hanya sebelum "Umpan balik:" atau "Unit/Elemen"
+        $clean = preg_split('/Umpan balik:|Unit\/Elemen/i', $text)[0];
+
+        return trim($clean);
+    })
+    ->filter()
+    ->implode("\n\n");
 }
 
-if ($tipe === 'pg') {
-    // Ambil ID jawaban PG
+elseif ($tipe === 'pg') {
+
     $jawabanPgIds = $jawabanPg->pluck('id_jawaban');
 
-    // Ambil umpan balik PG saja
     $umpanBalik = DB::table('jawaban_asesmen_persetujuan')
         ->whereIn('id_jawaban', $jawabanPgIds)
         ->whereNotNull('umpan_balik')
@@ -388,10 +410,11 @@ if ($tipe === 'pg') {
         ->implode(' | ');
 }
 
-if ($tipe === 'observasi' && isset($hasilObservasi->umpan_balik)) {
+elseif ($tipe === 'observasi' && isset($hasilObservasi->umpan_balik)) {
     $umpanBalik = $hasilObservasi->umpan_balik;
 }
 
+// ⚠️ PENTING: JANGAN ADA else / reset lagi
 
         return view($view, compact(
             'asesi',
@@ -418,7 +441,7 @@ if ($tipe === 'observasi' && isset($hasilObservasi->umpan_balik)) {
             'tanggalTTD',
             'ttdAsesi',
             'ttdAsesor',
-            'umpanBalik'
+            'umpanBalik',
         ));
     }
 
@@ -455,28 +478,74 @@ public function downloadHasilPdf($skemaId, $asesiId, $tipe)
     $view = null;
 
     // ======================
-    // Lisan
-    // ======================
-    if ($tipe === 'lisan') {
-        $pertanyaan = DB::table('pertanyaan as p')
-            ->leftJoin('jawaban_asesmen as ja', function ($join) use ($skemaId, $asesiId) {
-                $join->on('p.id_pertanyaan', '=', 'ja.id_pertanyaan')
-                     ->where('ja.id_skema', $skemaId)
-                     ->where('ja.id_asesi', $asesiId);
-            })
-            ->where('p.jenis_pertanyaan', 'lisan')
-            ->where('p.id_skema', $skemaId)
-            ->select(
-                'p.id_pertanyaan',
-                'p.isi_pertanyaan',
-                'p.kunci_jawaban',
-                'ja.jawaban_text as jawaban_asesi'
-            )
-            ->get();
+// Lisan
+// ======================
+if ($tipe === 'lisan') {
 
-        $view = 'admin.form-asesmen.pdf.hasil-pdf-lisan';
+    // ======================
+    // Ambil pertanyaan + jawaban asesi
+    // ======================
+    $pertanyaan = DB::table('pertanyaan as p')
+        ->leftJoin('jawaban_asesmen as ja', function ($join) use ($skemaId, $asesiId) {
+            $join->on('p.id_pertanyaan', '=', 'ja.id_pertanyaan')
+                 ->where('ja.id_skema', $skemaId)
+                 ->where('ja.id_asesi', $asesiId);
+        })
+        ->where('p.jenis_pertanyaan', 'lisan')
+        ->where('p.id_skema', $skemaId)
+        ->select(
+            'p.id_pertanyaan',
+            'p.isi_pertanyaan',
+            'p.kunci_jawaban',
+            'ja.id_jawaban',
+            'ja.jawaban_text as jawaban_asesi'
+        )
+        ->get();
+
+    // ======================
+    // Ambil ID jawaban
+    // ======================
+    $jawabanIds = $pertanyaan
+        ->pluck('id_jawaban')
+        ->filter()
+        ->values();
+
+    // ======================
+    // Ambil & rapihin umpan balik (FIX TOTAL)
+    // ======================
+    if ($jawabanIds->isNotEmpty()) {
+        $umpanBalik = DB::table('jawaban_asesmen_persetujuan')
+            ->whereIn('id_jawaban', $jawabanIds)
+            ->whereNotNull('umpan_balik')
+            ->pluck('umpan_balik')
+            ->map(function ($text) {
+
+                $text = trim($text);
+
+                // Pecah berdasarkan "Umpan balik:"
+                $parts = explode('Umpan balik:', $text);
+
+                // Ambil bagian atas (Unit/KUK)
+                $unitText = trim($parts[0] ?? '');
+
+                // Bersihin kalimat panjang yang ga perlu
+                $unitText = preg_replace('/Aspek pengetahuan.*?\n?/i', '', $unitText);
+
+                // Ambil feedback
+                $feedbackText = trim($parts[1] ?? '');
+
+                // FINAL FORMAT
+                return trim(
+                    ($unitText ? $unitText . "\n\n" : '') .
+                    ($feedbackText ? 'Umpan balik: ' . $feedbackText : '')
+                );
+            })
+            ->filter()
+            ->implode("\n\n");
     }
 
+    $view = 'admin.form-asesmen.pdf.hasil-pdf-lisan';
+}
     // ======================
     // Esai
     // ======================

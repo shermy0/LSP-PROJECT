@@ -161,7 +161,7 @@
         <td width="50%" class="center">
             <strong>Asesor</strong><br><br>
             Nama : {{ $asesor->nama_asesor ?? '-' }}<br>
-            No. Reg : {{ $asesor->no_reg ?? '-' }}<br>
+            No. Reg : {{ $asesor->no_registrasi ?? '-' }}<br>
             Tanggal : {{ $tanggalTTD ?? '-' }}<br><br>
             @if(!empty($ttdAsesor))
                 <img src="{{ $ttdAsesor }}" class="signature-img">

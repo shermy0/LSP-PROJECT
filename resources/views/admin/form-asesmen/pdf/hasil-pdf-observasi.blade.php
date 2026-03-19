@@ -135,7 +135,7 @@ Tanggal: {{ $tanggalTTD ?? '-' }}<br><br>
 <td width="50%" class="center">
 <strong>Asesor</strong><br>
 Nama: {{ $asesor->nama_asesor ?? $namaTTD ?? '-' }}<br>
-No. Reg: {{ $asesor->no_reg ?? '-' }}<br>
+No. Reg: {{ $asesor->no_registrasi ?? '-' }}<br>
 Tanggal: {{ $tanggalTTD ?? '-' }}<br><br>
 @if(!empty($ttdAsesor))
 <img src="{{ $ttdAsesor }}" class="signature-img">

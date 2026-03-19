@@ -311,38 +311,31 @@ Tidak ada pertanyaan lisan
 
 {{-- ================= UMPAN BALIK ================= --}}
 <div class="section-title">
-Umpan Balik untuk Asesi
+    Umpan Balik untuk Asesi
 </div>
 
-
 <table class="table table-bordered">
+    <tr>
+        <td width="35%">
+            <strong>Umpan balik</strong>
+        </td>
 
-<tr>
+        <td width="65%">
 
-<td width="35%">
-<strong>
-Umpan balik
-</strong>
-</td>
+            Tuliskan unit/elemen/KUK jika belum tercapai:
+            <br><br>
 
+            @php
+                $text = $umpanBalik ?? '-';
 
-<td width="65%">
+                // Pisahkan agar "Umpan balik:" turun baris
+$text = str_replace('Umpan balik:', "\nUmpan balik:", $text);
+            @endphp
 
-Aspek pengetahuan seluruh unit kompetensi yang diujikan
-(tercapai / belum tercapai).
+            {!! nl2br(e($text)) !!}
 
-<br><br>
-
-Tuliskan unit/elemen/KUK jika belum tercapai:
-
-<br>
-
-..........................................................
-
-</td>
-
-</tr>
-
+        </td>
+    </tr>
 </table>
 
 

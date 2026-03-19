@@ -189,7 +189,7 @@ Tanggal : {{ $tanggalTTD ?? '-' }}<br><br>
 <strong>Asesor</strong><br><br>
 
 Nama : {{ $asesor->nama_asesor ?? '-' }}<br>
-No. Reg : {{ $asesor->no_reg ?? '-' }}<br><br>
+No. Reg : {{ $asesor->no_registrasi ?? '-' }}<br><br>
 
 Tanggal : {{ $tanggalTTD ?? '-' }}<br><br>
 
