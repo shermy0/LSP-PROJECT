@@ -184,23 +184,24 @@ if ($tipe === 'observasi') {
             ->get()
             ->keyBy('id_kuk'); // jadikan key berdasarkan id_kuk
 
-        // loop semua unit/elemen, mapping otomatis ke hasilObservasi
-        foreach ($kelompok as $k) {
-            foreach ($k->unitKompetensi as $uk) {
-                foreach ($uk->elemen as $elemen) {
-                    foreach ($elemen->kuk as $kuk) {
+foreach ($kelompok as $k) {
+    foreach ($k->unitKompetensi as $uk) {
+        foreach ($uk->elemen as $elemen) {
+            foreach ($elemen->kuk as $kuk) {
 
-                        $item = $items[$kuk->id_kuk] ?? null;
+                $item = $items[$kuk->id_kuk] ?? null;
 
-                        $hasilObservasi->detail[$kuk->id_kuk] = (object)[
-                            'standar_industri' => $item->standar_industri ?? '-',
-                            'status' => $item->pencapaian ?? '-',
-                            'catatan' => $item->penilaian_lanjut ?? ''
-                        ];
-                    }
-                }
+                $hasilObservasi->detail[$kuk->id_kuk] = (object)[
+                    'nama_elemen' => $elemen->nama_elemen ?? '-',
+                    'deskripsi_kuk' => $kuk->deskripsi_kuk ?? '-',
+                    'standar_industri' => $item->standar_industri ?? '-',
+                    'status' => $item->pencapaian ?? '-',
+                    'catatan' => $item->penilaian_lanjut ?? ''
+                ];
             }
         }
+    }
+}
 
         // umpan balik
         $hasilObservasi->umpan_balik = $obs->umpan_balik ?? '';
@@ -218,23 +219,45 @@ if ($tipe === 'observasi') {
         ];
     }
 }
-    
-        // ======================
+
+// ======================
 // DATA PMO
 // ======================
 $unit = collect();
 $pmoPertanyaan = [];
+$form = null;
+
+// ======================
+// DATA PMO
+// ======================
+$unit = collect();
+$pmoPertanyaan = [];
+
 if ($tipe === 'pmo') {
-    $unit = UnitKompetensi::orderBy('kode_unit')->get();
 
-    // Ambil semua PMO untuk asesi terkait
-    $listPmo = PMO::where('id_asesi', $asesiId)->get();
+$unit = DB::table('unit_kompetensi')
+    ->join('hasil_asesmen', function($join) use ($asesiId) {
+        $join->on('unit_kompetensi.id_unit', '=', 'hasil_asesmen.id_unit')
+             ->where('hasil_asesmen.id_asesi', $asesiId);
+    })
+    ->select('unit_kompetensi.id_unit', 'unit_kompetensi.kode_unit', 'unit_kompetensi.judul_unit')
+    ->orderBy('unit_kompetensi.kode_unit')
+    ->get();
+    
+    // ambil semua tanggapan PMO dari asesi
+    $listPmo = DB::table('pmo')
+        ->where('id_asesi', $asesiId)
+        ->get();
 
+    // mapping pertanyaan per unit
     foreach ($unit as $u) {
+
         $pmoPertanyaan[$u->id_unit] = $listPmo
-            ->filter(fn($p) => in_array($u->id_unit, json_decode($p->id_kuk)))
-            ->map(function ($r) {
-                // Ambil pertanyaan terkait dari tabel pmo_pertanyaan
+            ->filter(function($p) use ($u) {
+                $kukIds = json_decode($p->id_kuk) ?? [];
+                return in_array($u->id_unit, $kukIds);
+            })
+            ->map(function($r) {
                 $pertanyaanList = DB::table('pmo_pertanyaan')
                     ->where('id_pmo', $r->id_pmo)
                     ->pluck('pertanyaan')
@@ -242,11 +265,23 @@ if ($tipe === 'pmo') {
 
                 return (object)[
                     'pertanyaan' => implode(', ', $pertanyaanList),
-                    'tanggapan'  => $r->umpan_balik_untuk_asesi,
+                    'pencapaian' => $r->pencapaian ?? $r->umpan_balik_untuk_asesi
                 ];
             })
-            ->toArray();
+            ->values();
     }
+
+    // ambil form PMO terbaru untuk header & umpan balik
+    $form = $listPmo->sortByDesc('id_pmo')->first();
+
+    $hasil = (object)[
+        'tuk' => $form->id_tuk ?? '-',
+        'umpan_balik_untuk_asesi' => $form->umpan_balik_untuk_asesi ?? '-',
+        'ttd_asesi' => $form->ttd_asesi ?? null,
+        'ttd_asesor' => $form->ttd_asesor ?? null,
+        'tanggal_ttd_asesi' => $form->tanggal_ttd_asesi ?? null,
+        'tanggal_ttd_asesor' => $form->tanggal_ttd_asesor ?? null,
+    ];
 }
 
 // ======================
@@ -331,11 +366,14 @@ $umpanBalik = '';
 
 if ($tipe === 'esai') {
     // ambil umpan balik esai
-    $umpanBalik = DB::table('jawaban_asesmen_persetujuan as jp')
-        ->join('jawaban_asesmen as ja', 'jp.id_jawaban', '=', 'ja.id_jawaban')
-        ->where('ja.id_asesi', $asesiId)
-        ->where('ja.id_skema', $skemaId)
-        ->value('jp.umpan_balik'); // ambil satu umpan balik
+// Ambil semua umpan balik esai dan gabungkan
+$jawabanEsaiIds = $jawabanEsai->pluck('id_jawaban'); // ambil semua ID jawaban esai
+
+$umpanBalik = DB::table('jawaban_asesmen_persetujuan')
+    ->whereIn('id_jawaban', $jawabanEsaiIds)
+    ->whereNotNull('umpan_balik')
+    ->pluck('umpan_balik')       // ambil semua
+    ->implode(' | ');    
 }
 
 if ($tipe === 'pg') {
@@ -402,7 +440,7 @@ public function downloadHasilPdf($skemaId, $asesiId, $tipe)
     if ($tipe === 'pilihan_ganda') $tipe = 'pg';
 
     // ======================
-    // Inisialisasi semua variabel supaya compact() aman
+    // Inisialisasi variabel
     // ======================
     $jawabanEsai = collect();
     $jawabanPg = collect();
@@ -413,7 +451,7 @@ public function downloadHasilPdf($skemaId, $asesiId, $tipe)
     $pmoPertanyaan = [];
     $kelompok = collect();
     $hasilObservasi = collect();
-    $umpanBalik = ''; // ← INI TAMBAHAN
+    $umpanBalik = '';
     $view = null;
 
     // ======================
@@ -442,113 +480,125 @@ public function downloadHasilPdf($skemaId, $asesiId, $tipe)
     // ======================
     // Esai
     // ======================
-if ($tipe === 'esai') {
-    // Ambil jawaban esai saja
-    $jawabanEsai = JawabanAsesmen::where([
-        'id_skema' => $skemaId,
-        'id_asesi' => $asesiId
-    ])
-    ->whereNotNull('jawaban_text') // jawaban esai
-    ->whereNull('jawaban_opsi')   // pastikan bukan PG
-    ->get();
-
-    // Ambil ID jawaban esai
-    $jawabanEsaiIds = $jawabanEsai->pluck('id_jawaban');
-
-    // Ambil umpan balik esai saja
-    $umpanBalik = DB::table('jawaban_asesmen_persetujuan')
-        ->whereIn('id_jawaban', $jawabanEsaiIds)
-        ->whereNotNull('umpan_balik')
-        ->pluck('umpan_balik')
-        ->implode(' | ');
-
-    $view = 'admin.form-asesmen.pdf.hasil-pdf-esai';
-}
-
-if ($tipe === 'pg') {
-    $jawabanPg = DB::table('jawaban_asesmen as ja')
-        ->join('opsi_jawaban as oj', 'ja.jawaban_opsi', '=', 'oj.id_opsi')
-        ->select(
-            'ja.*',
-            'oj.kode_opsi',
-            'oj.isi_opsi',
-            DB::raw('(SELECT id_opsi FROM opsi_jawaban WHERE id_pertanyaan=ja.id_pertanyaan AND benar=1 LIMIT 1) as opsi_benar')
-        )
-        ->where('ja.id_skema', $skemaId)
-        ->where('ja.id_asesi', $asesiId)
-        ->get();
-
-    // ===========================
-    // Ambil umpan balik PG saja
-    // ===========================
-    $jawabanPgIds = $jawabanPg->pluck('id_jawaban');
-
-    $umpanBalik = DB::table('jawaban_asesmen_persetujuan')
-        ->whereIn('id_jawaban', $jawabanPgIds)
-        ->whereNotNull('umpan_balik')
-        ->pluck('umpan_balik')
-        ->implode(' | ');
-
-    $view = 'admin.form-asesmen.pdf.hasil-pdf-pg';
-}
-
-if ($tipe === 'observasi') {
-
-    // Ambil Kelompok dan Unit Kompetensi
-    $kelompok = DB::table('kelompok_pekerjaan')
-        ->where('id_skema', $skemaId)
-        ->get()
-        ->map(function($kel) use ($skemaId) {
-            $kel->unitKompetensi = DB::table('unit_kompetensi')
-                ->where('id_skema', $skemaId) // hanya filter skema
-                ->get()
-                ->map(function($unit) {
-                    $unit->elemen = DB::table('elemen_kompetensi')
-                        ->where('id_unit', $unit->id_unit)
-                        ->get()
-                        ->map(function($ele) {
-                            $ele->kuk = DB::table('kuk')
-                                ->where('id_elemen', $ele->id_elemen)
-                                ->get();
-                            return $ele;
-                        });
-                    return $unit;
-                });
-            return $kel;
-        });
-
-    // Ambil hasil observasi
-    $hasilObservasi = DB::table('observasi_ceklis')
-        ->where('id_skema', $skemaId)
-        ->where('id_asesi', $asesiId)
-        ->first();
-
-    if (!$hasilObservasi) {
-        $hasilObservasi = (object)[
-            'id_observasi' => null,
-            'tanggal' => now()->format('d-m-Y'),
-            'tuk' => 'Sewaktu / Tempat Kerja / Mandiri',
-            'umpan_balik' => '',
-            'ttd_asesi' => null,
-            'ttd_asesor' => null,
-            'detail' => collect()
-        ];
-    } else {
-        // Ambil semua KUK yang relevan dari database
-        $kukIds = DB::table('observasi_ceklis_item')
-            ->where('id_observasi', $hasilObservasi->id_observasi)
-            ->pluck('id_kuk')
-            ->toArray();
-
-        // Filter detail observasi sesuai KUK yang ada
-        $hasilObservasi->detail = DB::table('observasi_ceklis_item')
-            ->where('id_observasi', $hasilObservasi->id_observasi)
-            ->whereIn('id_kuk', $kukIds)
+    if ($tipe === 'esai') {
+        $jawabanEsai = JawabanAsesmen::where('id_skema', $skemaId)
+            ->where('id_asesi', $asesiId)
+            ->whereNotNull('jawaban_text')
+            ->whereNull('jawaban_opsi')
             ->get();
+
+        $jawabanIds = $jawabanEsai->pluck('id_jawaban');
+
+        $umpanBalik = DB::table('jawaban_asesmen_persetujuan')
+            ->whereIn('id_jawaban', $jawabanIds)
+            ->whereNotNull('umpan_balik')
+            ->pluck('umpan_balik')
+            ->implode(' | ');
+
+        $ttdPath = 'storage/ttd/ttd_asesor_8_esai_1773622856.png';
+        $view = 'admin.form-asesmen.pdf.hasil-pdf-esai';
     }
 
-    $view = 'admin.form-asesmen.pdf.hasil-pdf-observasi';
-}
+    // ======================
+    // Pilihan Ganda
+    // ======================
+    if ($tipe === 'pg') {
+        $jawabanPg = DB::table('jawaban_asesmen as ja')
+            ->join('opsi_jawaban as oj', 'ja.jawaban_opsi', '=', 'oj.id_opsi')
+            ->select(
+                'ja.*',
+                'oj.kode_opsi',
+                'oj.isi_opsi',
+                DB::raw('(SELECT id_opsi FROM opsi_jawaban WHERE id_pertanyaan=ja.id_pertanyaan AND benar=1 LIMIT 1) as opsi_benar')
+            )
+            ->where('ja.id_skema', $skemaId)
+            ->where('ja.id_asesi', $asesiId)
+            ->get();
+
+        $jawabanIds = $jawabanPg->pluck('id_jawaban');
+
+        $umpanBalik = DB::table('jawaban_asesmen_persetujuan')
+            ->whereIn('id_jawaban', $jawabanIds)
+            ->whereNotNull('umpan_balik')
+            ->pluck('umpan_balik')
+            ->implode(' | ');
+
+        $ttdPath = 'storage/ttd/ttd_asesor_8_pilihan_ganda_1773622826.png';
+        $view = 'admin.form-asesmen.pdf.hasil-pdf-pg';
+    }
+
+    // ======================
+    // Observasi
+    // ======================
+    if ($tipe === 'observasi') {
+        $kelompok = DB::table('kelompok_pekerjaan')
+            ->where('id_skema', $skemaId)
+            ->get()
+            ->map(function($kel) use ($skemaId) {
+                $kel->unitKompetensi = DB::table('unit_kompetensi')
+                    ->where('id_skema', $skemaId)
+                    ->get()
+                    ->map(function($unit) use ($skemaId) {
+                        $unit->elemen = DB::table('elemen_kompetensi')
+                            ->where('id_unit', $unit->id_unit)
+                            ->get()
+                            ->map(function($ele) {
+                                $ele->kuk = DB::table('kuk')
+                                    ->where('id_elemen', $ele->id_elemen)
+                                    ->get();
+                                return $ele;
+                            });
+                        return $unit;
+                    });
+                return $kel;
+            });
+
+        $obs = DB::table('observasi_ceklis')
+            ->where('id_skema', $skemaId)
+            ->where('id_asesi', $asesiId)
+            ->orderByDesc('id_observasi')
+            ->first();
+
+        $hasilObservasi = new \stdClass();
+        $hasilObservasi->detail = collect();
+
+        if ($obs) {
+            $items = DB::table('observasi_ceklis_item')
+                ->where('id_observasi', $obs->id_observasi)
+                ->get()
+                ->keyBy('id_kuk');
+
+            foreach ($kelompok as $kel) {
+                foreach ($kel->unitKompetensi as $unit) {
+                    foreach ($unit->elemen as $ele) {
+                        foreach ($ele->kuk as $kuk) {
+                            if (isset($items[$kuk->id_kuk])) {
+                                $item = $items[$kuk->id_kuk];
+                                $hasilObservasi->detail->push((object)[
+                                    'nama_elemen' => $ele->nama_elemen,
+                                    'nomor_elemen' => $ele->nomor_elemen ?? '',
+                                    'deskripsi_kuk' => $kuk->deskripsi_kuk,
+                                    'standar_industri' => $item->standar_industri ?? '-',
+                                    'status' => $item->pencapaian ?? '-',
+                                    'catatan' => $item->penilaian_lanjut ?? ''
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            $hasilObservasi->umpan_balik = $obs->umpan_balik ?? '';
+            $hasilObservasi->ttd_asesi = DB::table('observasi_ceklis_persetujuan')
+                ->where('id_observasi', $obs->id_observasi)
+                ->value('tgl_ttd_asesi');
+            $hasilObservasi->ttd_asesor = DB::table('observasi_ceklis_persetujuan')
+                ->where('id_observasi', $obs->id_observasi)
+                ->value('tgl_ttd_asesor');
+        }
+
+        $view = 'admin.form-asesmen.pdf.hasil-pdf-observasi';
+    }
 
     // ======================
     // Praktik / Demonstrasi
@@ -590,11 +640,11 @@ if ($tipe === 'observasi') {
                 ->toArray();
         }
 
-        $view = 'admin.form-asesmen.pdf.hasil-pmo';
+        $view = 'admin.form-asesmen.pdf.hasil-pdf-pmo';
     }
 
     // ======================
-    // Asesor
+    // Asesor & data tambahan PDF
     // ======================
     $asesor = DB::table('asesor')->where('id_asesor', $asesi->asesor_id)->first();
     if (!$asesor) {
@@ -604,9 +654,6 @@ if ($tipe === 'observasi') {
         ];
     }
 
-    // ======================
-    // Data tambahan untuk PDF
-    // ======================
     $judulSkema = $skema->nama_skema ?? '-';
     $nomorSertifikat = $skema->kode_skema ?? '-';
     $waktuPenilaian = now()->format('H:i');
@@ -614,17 +661,17 @@ if ($tipe === 'observasi') {
     $noReg = $asesor->no_registrasi ?? '-';
     $namaTTD = $asesor->nama_asesor ?? '-';
 
-$namaFileAsesi = strtolower(str_replace(' ', '_', $asesi->name));
-$ttdAsesiFile = collect(glob(storage_path('app/public/ttd/ttd_asesmen_' . $namaFileAsesi . '_*.png')))
-    ->sortByDesc(fn($file) => filemtime($file))
-    ->first();
-$ttdAsesi = $ttdAsesiFile ?? null; // pakai path absolut
+    $namaFileAsesi = strtolower(str_replace(' ', '_', $asesi->name));
+    $ttdAsesiFile = collect(glob(storage_path('app/public/ttd/ttd_asesmen_' . $namaFileAsesi . '_*.png')))
+        ->sortByDesc(fn($file) => filemtime($file))
+        ->first();
+    $ttdAsesi = $ttdAsesiFile ?? null;
 
-$namaAsesorFile = strtolower(str_replace(' ', '_', $asesor->nama_asesor));
-$ttdAsesorFile = collect(glob(storage_path('app/public/ttd/*'.$namaAsesorFile.'*.png')))
-    ->sortByDesc(fn($file) => filemtime($file))
-    ->first();
-$ttdAsesor = $ttdAsesorFile ?? null; // jangan pakai asset()
+    $namaAsesorFile = strtolower(str_replace(' ', '_', $asesor->nama_asesor));
+    $ttdAsesorFile = collect(glob(storage_path('app/public/ttd/*'.$namaAsesorFile.'*.png')))
+        ->sortByDesc(fn($file) => filemtime($file))
+        ->first();
+    $ttdAsesor = $ttdAsesorFile ?? null;
 
     // ======================
     // Generate PDF
@@ -633,7 +680,7 @@ $ttdAsesor = $ttdAsesorFile ?? null; // jangan pakai asset()
         'asesi','skema','jawabanEsai','jawabanPg','pertanyaan','asesor',
         'hasilObservasi','jawabanAsesi','demonstrasi','kelompok','unit','pmoPertanyaan',
         'judulSkema','nomorSertifikat','waktuPenilaian','noReg','namaTTD','tanggalTTD',
-        'ttdAsesi','ttdAsesor','tipe', 'umpanBalik'
+        'ttdAsesi','ttdAsesor','tipe','umpanBalik'
     ))->setPaper('A4','portrait');
 
     $filename = 'Hasil_Asesmen_' . $asesi->name . '_' . now()->format('Ymd') . '.pdf';

@@ -36,7 +36,7 @@
     <tr>
         <td>TUK</td>
         <td>:</td>
-        <td>{{ $tuk ?? 'Sewaktu/Tempat Kerja/Mandiri*' }}</td>
+        <td>{{ $tuk ?? '-' }}</td>
 
         <td>Nomor</td>
         <td>:</td>

@@ -75,13 +75,12 @@ th {
 </tr>
 </table>
 
-<!-- Hasil Observasi -->
+<!-- Hasil Observasi per Kelompok -->
 @forelse($kelompok as $k => $kel)
 <p class="section-title">Kelompok Pekerjaan {{ $k+1 }} : {{ $kel->nama_kelompok ?? '-' }}</p>
 
-<!-- Hasil Observasi -->
-@if($hasilObservasi->detail->isNotEmpty())
-<table border="1" cellpadding="5" cellspacing="0" width="100%">
+@if(!empty($hasilObservasi) && $hasilObservasi->detail->isNotEmpty())
+<table border="1" cellpadding="5" cellspacing="0">
     <thead>
         <tr>
             <th>Elemen Kompetensi</th>
@@ -94,14 +93,14 @@ th {
     </thead>
     <tbody>
         @foreach($hasilObservasi->detail as $nilai)
-            <tr>
-                <td>{{ $nilai->nama_elemen ?? '-' }}</td>
-                <td>{{ $nilai->deskripsi_kuk ?? '-' }}</td>
-                <td>{{ $nilai->standar_industri ?? '-' }}</td>
-                <td class="center">{{ ($nilai->pencapaian ?? '') == 'Ya' ? '☑' : '☐' }}</td>
-                <td class="center">{{ ($nilai->pencapaian ?? '') == 'Tidak' ? '☑' : '☐' }}</td>
-                <td>{{ $nilai->penilaian_lanjut ?? '-' }}</td>
-            </tr>
+        <tr>
+<td>{{ $nilai->nama_elemen ?? '-' }}</td>
+<td>{{ $nilai->deskripsi_kuk ?? '-' }}</td>
+<td>{{ $nilai->standar_industri ?? '-' }}</td>
+<td class="center">{{ ($nilai->status ?? '') == 'Ya' ? '☑' : '☐' }}</td>
+<td class="center">{{ ($nilai->status ?? '') == 'Tidak' ? '☑' : '☐' }}</td>
+<td>{{ $nilai->catatan ?? '-' }}</td>
+        </tr>
         @endforeach
     </tbody>
 </table>
@@ -146,6 +145,10 @@ Tanggal: {{ $tanggalTTD ?? '-' }}<br><br>
 </td>
 </tr>
 </table>
+
+@empty
+<p class="center">Tidak ada kelompok pekerjaan untuk ditampilkan.</p>
+@endforelse
 
 </body>
 </html>
