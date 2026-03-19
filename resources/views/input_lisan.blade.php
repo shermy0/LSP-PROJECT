@@ -1,75 +1,88 @@
 @extends('master')
-
 @section('konten')
 <div class="container mt-4">
-    @if(isset($pertanyaan))
-        <h4 class="fw-bold">FR.IA.07 – Edit Pertanyaan Lisan</h4>
 
-        <form id="formEditPertanyaan" action="{{ route('lisan.update', $pertanyaan->id_pertanyaan) }}" method="POST">
-            @csrf
-            @method('PUT')
+    <h4 class="fw-bold text-dark mb-1">Input Pertanyaan Lisan</h4>
+    <p class="text-muted mb-1">
+        Kelompok: <strong>{{ $kelompok->nama_kelompok ?? '—' }}</strong>
+    </p>
+    <p class="text-muted mb-4">
+        Jumlah pertanyaan: <strong>{{ $jumlah ?? 1 }}</strong>
+        @if($id_pembuatan)
+            | ID Pembuatan: <span class="text-success fw-bold">#{{ $id_pembuatan }}</span>
+        @endif
+    </p>
 
-            <input type="hidden" name="id_skema" value="{{ $pertanyaan->id_skema }}">
-            <input type="hidden" name="id_asesor" value="{{ $pertanyaan->id_asesor }}">
-            <input type="hidden" name="id_kelompok" value="{{ $pertanyaan->id_kelompok }}">
-            <input type="hidden" name="id_pembuatan_pertanyaan" value="{{ $pertanyaan->id_pembuatan_pertanyaan }}">
+    <form action="{{ route('lisan.store.pertanyaan', ['id_skema' => $skema->id_skema]) }}" method="POST">
+        @csrf
 
-            <div class="card mb-3 shadow-sm">
+        {{-- Hidden fields --}}
+        <input type="hidden" name="id_kelompok"  value="{{ $kelompok->id_kelompok ?? '' }}">
+        <input type="hidden" name="timer"         value="{{ $timer ?? 30 }}">
+        <input type="hidden" name="judul"         value="{{ $judul ?? '' }}">
+        <input type="hidden" name="id_pembuatan"  value="{{ $id_pembuatan ?? '' }}">
+
+        @for($i = 0; $i < ($jumlah ?? 1); $i++)
+            <div class="card shadow-sm mb-4 border-0">
+                <div class="card-header d-flex align-items-center" style="background-color:#041562; color:white;">
+                    <span class="rounded-circle d-flex align-items-center justify-content-center me-2 fw-bold"
+                          style="width:28px; height:28px; background:#ffffff20; font-size:13px; border:2px solid #fff; flex-shrink:0;">
+                        {{ $i + 1 }}
+                    </span>
+                    <span class="fw-bold">Pertanyaan ke-{{ $i + 1 }}</span>
+                </div>
                 <div class="card-body">
-                    <h6 class="fw-bold">Pertanyaan</h6>
-                    <textarea name="isi_pertanyaan" class="form-control mb-2" rows="2" required>{{ old('isi_pertanyaan', $pertanyaan->isi_pertanyaan) }}</textarea>
 
-                    <h6 class="fw-bold mt-3">Kunci Jawaban</h6>
-                    <input type="text" name="kunci_jawaban" class="form-control"
-                        value="{{ old('kunci_jawaban', $pertanyaan->kunci_jawaban) }}" placeholder="Kunci jawaban">
+                    {{-- Unit Kompetensi --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            Unit Kompetensi
+                            <small class="text-muted fw-normal">(bisa pilih lebih dari 1)</small>
+                        </label>
+                        @forelse($unitKompetensi as $unit)
+                            <div class="form-check mb-1">
+                                <input class="form-check-input" type="checkbox"
+                                       name="id_unit[{{ $i }}][]"
+                                       value="{{ $unit->id_unit }}"
+                                       id="unit_{{ $i }}_{{ $unit->id_unit }}">
+                                <label class="form-check-label" for="unit_{{ $i }}_{{ $unit->id_unit }}">
+                                    <span class="badge me-1" style="background-color:#e6eef6; color:#041562;">
+                                        {{ $unit->kode_unit }}
+                                    </span>
+                                    {{ $unit->judul_unit }}
+                                </label>
+                            </div>
+                        @empty
+                            <div class="text-danger small">Belum ada unit kompetensi untuk kelompok ini.</div>
+                        @endforelse
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Pertanyaan</label>
+                        <textarea name="isi_pertanyaan[]" class="form-control" rows="3"
+                                  placeholder="Tulis pertanyaan lisan ke-{{ $i + 1 }}..."></textarea>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label fw-bold">
+                            Kunci Jawaban
+                            <small class="text-muted fw-normal">(perkiraan jawaban)</small>
+                        </label>
+                        <textarea name="kunci_jawaban[]" class="form-control" rows="2"
+                                  placeholder="Tulis perkiraan jawaban..."></textarea>
+                    </div>
+
                 </div>
             </div>
+        @endfor
 
-            <button type="submit" class="btn btn-success">Simpan Perubahan</button>
-            <a href="{{ route('lisan.crud', $pertanyaan->id_skema) }}" class="btn btn-secondary">Batal</a>
-            {{-- 🔽 Tambahan tombol simpan & kembali --}}
-            <a href="{{ route('kelompok.lisan.index', $pertanyaan->id_skema) }}" class="btn btn-primary">
-                Simpan & Kembali
-            </a>
-        </form>
-
-    @else
-        <h4 class="fw-bold text-center">FR.IA.07 – Lembar Pertanyaan Lisan</h4>
-        <p class="text-center text-muted">Skema: <span class="fw-bold">{{ $skema->nama_skema ?? '-' }}</span></p>
-
-        <form id="formPertanyaanLisan" action="{{ route('lisan.store') }}" method="POST">
-            @csrf
-            <input type="hidden" name="id_skema" value="{{ $skema->id_skema ?? ($id_skema ?? '') }}">
-            <input type="hidden" name="id_asesor" value="{{ $id_asesor ?? 1 }}">
-            <input type="hidden" name="id_pembuatan_pertanyaan" value="{{ $idPembuatanPertanyaan ?? '' }}">
-            <input type="hidden" name="id_kelompok" value="{{ $idKelompok ?? '' }}">
-
-            <div id="daftarPertanyaanLisan">
-                @for ($i = 1; $i <= ($jumlah ?? 5); $i++)
-                <div class="card mb-3 shadow-sm border-0 rounded-4">
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Pertanyaan {{ $i }}</label>
-                            <textarea name="isi_pertanyaan[]" class="form-control rounded-3" rows="2"
-                                placeholder="Masukkan pertanyaan lisan ke-{{ $i }}" required></textarea>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Kunci Jawaban</label>
-                            <input type="text" name="kunci_jawaban[]" class="form-control rounded-3"
-                                placeholder="Masukkan kunci jawaban">
-                        </div>
-                   </div>
-                </div>
-                @endfor
-            </div>
-
-            <div class="text-center mt-4 d-flex gap-2 justify-content-center">
-                <button type="submit" class="btn px-4 fw-bold text-white" style="background-color:#041562;">
-                    Simpan
-                </button>
-            </div>
-        </form>
-    @endif
+        <div class="d-flex justify-content-between mt-2 mb-5">
+            <a href="{{ route('kelompok.lisan', ['id_skema' => $skema->id_skema, 'id_pembuatan' => $id_pembuatan ?? '']) }}"
+               class="btn btn-secondary px-4">Kembali</a>
+            <button type="submit" class="btn text-white px-4" style="background-color:#041562;">
+                Simpan Semua Pertanyaan
+            </button>
+        </div>
+    </form>
 </div>
 @endsection

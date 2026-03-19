@@ -29,9 +29,9 @@
 <div class="accordion-item mb-2" 
      onclick="window.location='{{ route('formasesmen.pertanyaanLisan', ['id_skema' => $skema->id_skema]) }}';"
      style="cursor: pointer;">
-    <h2 class="accordion-header p-3 border rounded">
-        <i class="fa-solid fa-stop me-2"></i> Pertanyaan Esai
-    </h2>
+        <h2 class="accordion-header p-3 border rounded">
+            <i class="fa-solid fa-stop me-2"></i> Pertanyaan Lisan
+        </h2>
 </div>
 
 
@@ -55,9 +55,10 @@
     </button>
     <ul class="dropdown-menu w-100 shadow-sm" aria-labelledby="dropdownMenuButton">
         <li>
-            <a class="dropdown-item" href="{{ url('/fr-va-sebelum') }}">
-                CEKLIS OBSERVASI
-            </a>
+            <a class="dropdown-item"
+                       href="{{ route('ceklisobservasi.index', ['id_skema' => $skema->id_skema]) }}">
+                        CEKLIS OBSERVASI
+                    </a>
         </li>
         <li>
            <a class="dropdown-item"

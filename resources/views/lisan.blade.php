@@ -32,9 +32,11 @@
         </div>
         <div class="card-body">
             <ol class="list-group list-group-numbered">
-                <li class="list-group-item border-0 ps-0">Buatlah pertanyaan lisan yang dapat menguji kemampuan komunikasi, pemahaman konsep, serta keterampilan praktis dari peserta uji.</li>
-                <li class="list-group-item border-0 ps-0">Pertanyaan lisan sebaiknya singkat, jelas, dan dapat dijawab secara langsung oleh peserta.</li>
-                <li class="list-group-item border-0 ps-0">Asesor dapat menyesuaikan pertanyaan sesuai dengan unit kompetensi yang sedang diuji.</li>
+                <li class="list-group-item border-0 ps-0">Pertanyaan lisan merupakan jenis bukti tambahan untuk mendukung bukti-bukti yang sudah ada.</li>
+                <li class="list-group-item border-0 ps-0">Buatlah pertanyaan lisan yang dapat mencakupi penguatan informasi berdasarkan KUK, batasan variabel, pengetahuan dan ketrampilan esensial, sikap dan aspek kritis.</li>
+                <li class="list-group-item border-0 ps-0">Perkiraan jawaban dapat diisikan pada baris kunci jawaban.</li>
+                <li class="list-group-item border-0 ps-0">Tanggapan/penilaian dapat diisi dengan centang (✓) pada kolom Asesi "Ya" atau "Tidak".</li>
+                <li class="list-group-item border-0 ps-0">Dibutuhkan jastifikasi profesional asesor untuk memutuskan hal ini.</li>
             </ol>
         </div>
     </div>
@@ -73,7 +75,7 @@
                             <td>{{ $p->timescap ? \Carbon\Carbon::parse($p->timescap)->format('d-m-Y H:i') : '-' }}</td>
                             <td>
                                 <div class="d-flex gap-2 flex-wrap">
-                                    <a href="{{ route('pertanyaan.lisan.kelompok', [
+                                    <a href="{{ route('kelompok.lisan', [
                                         'id_skema'     => $skema->id_skema,
                                         'id_pembuatan' => $p->id_pembuatan_pertanyaan,
                                         'timer'        => $p->timer,
@@ -145,10 +147,10 @@
                 </button>
 
                 @if($pembuatanTerbaru)
-                    <a href="{{ route('lisan.crud', $skema->id_skema) }}"
+                    <a href="{{ route('lisan.hasil.kelompok', ['id_skema' => $skema->id_skema]) }}"
                        class="btn w-100 fw-bold"
                        style="background-color:#f1f1f1; color:#333;">
-                        Lihat Pertanyaan
+                        Input Jawaban
                     </a>
                 @else
                     <button class="btn w-100 fw-bold" style="background-color:#f1f1f1; color:#333;" disabled>
@@ -209,7 +211,7 @@ function lanjutBuatSetLisan() {
         document.getElementById('inputTimerLisan').classList.remove('is-invalid');
     }
 
-    let url = `{{ route('kelompok.pekerjaan.lisan', ['id' => $skema->id_skema]) }}?timer=${timer}&judul=${encodeURIComponent(judul)}`;
+    let url = `{{ route('kelompok.lisan', ['id_skema' => $skema->id_skema]) }}?baru=1&timer=${timer}&judul=${encodeURIComponent(judul)}`;
     window.location.href = url;
 }
 

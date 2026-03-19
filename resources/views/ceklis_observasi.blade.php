@@ -1,9 +1,19 @@
-    @extends('master')
+@extends('master')
 
 @section('konten')
 <div class="container mt-4">
     <h1 class="fw-bold mb-4 text-primary">Form Ceklis Observasi Aktivitas Praktik</h1>
     <h1 class="fw-bold mb-4 text-primary">(FR.IA.01)</h1>
+
+    <a href="{{ route('ceklisobservasi.index', ['id_skema' => request('id_skema')]) }}"
+       style="display:inline-flex; align-items:center; gap:8px; padding:9px 20px; border-radius:10px;
+              background:#fff; border:1.5px solid rgba(4,21,98,0.15); color:#041562;
+              font-weight:600; font-size:0.88rem; text-decoration:none; margin-bottom:1.25rem;
+              box-shadow:0 2px 8px rgba(4,21,98,0.07); transition:all 0.2s;"
+       onmouseover="this.style.background='#eef2ff'; this.style.borderColor='#041562';"
+       onmouseout="this.style.background='#fff'; this.style.borderColor='rgba(4,21,98,0.15)';">
+        &#8592; Kembali
+    </a>
 
     {{-- Pesan --}}
     @if(session('success'))
@@ -47,7 +57,7 @@
             <ul class="mb-0 text-secondary small">
                 <li>Lengkapi nama unit kompetensi, elemen, dan kriteria unjuk kerja sesuai kolom dalam tabel.</li>
                 <li>Isilah standar industri atau tempat kerja.</li>
-                <li>Beri tanda centang (√) pada kolom “Ya” jika asesi dapat melakukan tugas sesuai KUK, atau “Tidak” jika sebaliknya.</li>
+                <li>Beri tanda centang (√) pada kolom "Ya" jika asesi dapat melakukan tugas sesuai KUK, atau "Tidak" jika sebaliknya.</li>
                 <li>Penilaian Lanjut diisi bila hasil belum dapat disimpulkan.</li>
                 <li>Isilah kolom KUK sesuai dengan Unit Kompetensi/SKKNI.</li>
             </ul>
@@ -151,15 +161,18 @@ function loadData(skemaId) {
                             <tr>
                                 <th style="width:5%">No.</th>
                                 <th style="width:20%">Elemen</th>
-                                <th style="width:35%">Kriteria Unjuk Kerja</th>
+                                <th style="width:33%">Kriteria Unjuk Kerja</th>
                                 <th style="width:15%">Standar Industri / Tempat Kerja</th>
-                                <th colspan="2" style="width:10%">Pencapaian</th>
+                                <th colspan="2" style="width:12%; text-align:center;">Pencapaian</th>
                                 <th style="width:15%">Penilaian Lanjut</th>
                             </tr>
                             <tr style="background-color:#eaf1ff;">
-                                <th></th><th></th><th></th><th></th>
-                                <th class="text-center">Ya</th>
-                                <th class="text-center">Tidak</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th style="text-align:center; width:6%">Ya</th>
+                                <th style="text-align:center; width:6%">Tidak</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -175,8 +188,8 @@ function loadData(skemaId) {
                                 <td>${ele.nama_elemen ?? '-'}</td>
                                 <td>${kuk.deskripsi_kuk ?? '-'}</td>
                                 <td>
-                                    <select class="form-select form-select-sm" 
-                                            name="kuk[${kukId}][standar_industri]" 
+                                    <select class="form-select form-select-sm"
+                                            name="kuk[${kukId}][standar_industri]"
                                             onchange="toggleLainnya(this, ${kukId})">
                                         <option value="Modul Praktek" selected>Modul Praktek</option>
                                         <option value="SOP">SOP</option>
@@ -185,8 +198,14 @@ function loadData(skemaId) {
                                     <input type="text" class="form-control form-control-sm mt-2 d-none"
                                            name="kuk[${kukId}][standar_lainnya]" placeholder="Tulis standar lainnya">
                                 </td>
-                                <td class="text-center"><input type="radio" name="kuk[${kukId}][status]" value="Ya" required></td>
-                                <td class="text-center"><input type="radio" name="kuk[${kukId}][status]" value="Tidak"></td>
+                                <td class="text-center">
+                                    <input type="radio" name="kuk[${kukId}][status]" value="Ya" checked
+                                           style="width:22px; height:22px; cursor:pointer;" required>
+                                </td>
+                                <td class="text-center">
+                                    <input type="radio" name="kuk[${kukId}][status]" value="Tidak"
+                                           style="width:22px; height:22px; cursor:pointer;">
+                                </td>
                                 <td><input type="text" name="kuk[${kukId}][catatan]" class="form-control form-control-sm"></td>
                             </tr>`;
                         });

@@ -12,10 +12,10 @@ return new class extends Migration
             $table->id('id_pmo_persetujuan');
             $table->unsignedBigInteger('id_pmo');
             $table->date('tgl_ttd_asesi')->nullable();
-            $table->longText('ttd_asesi')->nullable();  // ubah di sini
+            $table->longText('ttd_asesi')->nullable();
             $table->date('tgl_ttd_asesor')->nullable();
-            $table->longText('ttd_asesor')->nullable();  // ubah di sini
-
+            $table->longText('ttd_asesor')->nullable();
+            $table->text('umpan_balik')->nullable(); // ← tambah ini
             $table->foreign('id_pmo')->references('id_pmo')->on('pmo')->onDelete('cascade');
         });
     }
