@@ -41,21 +41,21 @@
                         </div>
                         <div class="card-body pt-3">
                             <div class="table-responsive">
-                                <table class="table table-borderless mb-0">
-                                    <tr>
-                                        <td width="30%" class="fw-semibold text-secondary">Nama Lengkap Peserta</td>
-                                        <td class="text-dark">{{ $asesi->nama_lengkap ?? '-' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-semibold text-secondary">Nomor Peserta</td>
-                                        <td class="text-dark">{{ $asesi->no_peserta ?? '-' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-semibold text-secondary">Skema Sertifikasi</td>
-                                        <td class="text-dark">{{ $permohonan->skema ?? '-' }}</td>
-                                    </tr>
-                                </table>
-                            </div>
+    <table class="table table-borderless mb-0">
+        <tr>
+            <td width="30%" class="fw-semibold text-secondary">Nama Lengkap Peserta</td>
+            <td class="text-dark">{{ $asesi->nama_lengkap ?? '-' }}</td>
+        </tr>
+        <tr>
+            <td class="fw-semibold text-secondary">Nomor Peserta</td>
+            <td class="text-dark">{{ $asesi->id_asesi ?? '-' }}</td>
+        </tr>
+        <tr>
+            <td class="fw-semibold text-secondary">Skema Sertifikasi</td>
+            <td class="text-dark">{{ $permohonan->skema ?? '-' }}</td>
+        </tr>
+    </table>
+</div>
                         </div>
                     </div>
 
@@ -119,6 +119,12 @@
                                                                         data-filename="{{ $j->dokumen->nama_file ?? $j->dokumen->path_file }}">
                                                                         <i class="bi bi-file-earmark-fill text-primary fs-4" title="Lihat Dokumen"></i>
                                                                     </button>
+                                                                @elseif($j && $j->file_lain)
+                                                                    <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#dokumenModal"
+                                                                        data-src="{{ Storage::url($j->file_lain) }}"
+                                                                        data-filename="{{ basename($j->file_lain) }}">
+                                                                        <i class="bi bi-file-earmark-fill text-primary fs-4" title="Lihat File Lain"></i>
+                                                                    </button>
                                                                 @else
                                                                     <span class="text-muted">-</span>
                                                                 @endif
@@ -134,7 +140,7 @@
                         </div>
                     @endforeach
 
-                    <!-- Rekomendasi Asesor (dengan nilai sebelumnya) -->
+                    <!-- Rekomendasi Asesor -->
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-header bg-white border-0 pt-4 pb-0">
                             <div class="d-flex align-items-center">
@@ -172,7 +178,7 @@
                         </div>
                     </div>
 
-                    <!-- Catatan Asesor (dengan nilai sebelumnya) -->
+                    <!-- Catatan Asesor -->
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-header bg-white border-0 pt-4 pb-0">
                             <div class="d-flex align-items-center">
@@ -280,7 +286,7 @@
         </div>
     </div>
 
-    <!-- Modal Preview Dokumen (diperbaiki) -->
+    <!-- Modal Preview Dokumen -->
     <div class="modal fade" id="dokumenModal" tabindex="-1" aria-labelledby="dokumenModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg">
@@ -292,7 +298,6 @@
                 </div>
                 <div class="modal-body p-0">
                     <div class="d-flex flex-column">
-                        <!-- Info file -->
                         <div class="bg-light p-3 border-bottom">
                             <div class="row align-items-center">
                                 <div class="col-md-8">
@@ -305,7 +310,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Preview konten -->
                         <div class="p-4 text-center" id="dokumenPreview" style="min-height: 400px; max-height: 80vh; overflow: auto;">
                             <p class="text-muted">Memuat preview...</p>
                         </div>
@@ -588,7 +592,6 @@
             gap: 0.75rem;
         }
 
-        /* Modal preview styling */
         #dokumenPreview img {
             max-width: 100%;
             max-height: 70vh;

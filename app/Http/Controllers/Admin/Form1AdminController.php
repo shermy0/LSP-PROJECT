@@ -84,7 +84,7 @@ class Form1AdminController extends Controller
             ->select(
                 'dokumen_persyaratan.id_dokumen',
                 'dokumen_persyaratan.path_file',
-                'dokumen_persyaratan.memenuhi_syarat', // field ini harus ada di tabel
+                'dokumen_persyaratan.memenuhi_syarat',
                 'jenis_dokumen.nama_dokumen as jenis'
             )
             ->get();
@@ -106,56 +106,62 @@ class Form1AdminController extends Controller
 
     /**
      * Memperbarui keputusan permohonan, status dokumen, dan tanda tangan admin
+     * Otomatis menolak jika ada dokumen yang tidak memenuhi syarat
      */
     public function update(Request $request, $id_permohonan)
     {
         $request->validate([
             'status_permohonan' => 'required|in:Diterima,Ditolak',
             'catatan'           => 'nullable|string',
-            'syarat'            => 'nullable|array',      // array id_dokumen => Ya/Tidak
-            'ttd_admin'         => 'nullable|string',     // base64 image
+            'syarat'            => 'nullable|array',
+            'ttd_admin'         => 'nullable|string',
             'tanggal_admin'     => 'nullable|date'
         ]);
 
-        // Ambil ID admin dari user yang login
-        $adminId = DB::table('admin')
-            ->where('user_id', Auth::id())
-            ->value('id_admin');
-
-        // 1. Update status permohonan
-        DB::table('permohonan')
-            ->where('id_permohonan', $id_permohonan)
-            ->update([
-                'status'     => $request->status_permohonan,
-                'catatan'    => $request->catatan,
-                'id_admin'   => $adminId,
-                'updated_at' => now(),
-            ]);
-
-        // 2. Update memenuhi_syarat setiap dokumen
+        // 1. Update memenuhi_syarat setiap dokumen (sebelum menentukan status)
+        $hasUnmet = false;
         if ($request->has('syarat')) {
             foreach ($request->syarat as $idDokumen => $nilai) {
-                // Pastikan hanya memproses jika idDokumen valid (angka)
                 if (is_numeric($idDokumen)) {
+                    $memenuhi = $nilai === 'Ya' ? 1 : 0;
+                    if ($memenuhi == 0) {
+                        $hasUnmet = true;
+                    }
                     DB::table('dokumen_persyaratan')
                         ->where('id_dokumen', $idDokumen)
                         ->update([
-                            'memenuhi_syarat' => $nilai === 'Ya' ? 1 : 0,
+                            'memenuhi_syarat' => $memenuhi,
                             'updated_at'      => now(),
                         ]);
                 }
             }
         }
 
-        // 3. Simpan tanda tangan admin jika ada
+        // 2. Tentukan status akhir permohonan
+        $finalStatus = $request->status_permohonan;
+        if ($hasUnmet && $finalStatus === 'Diterima') {
+            $finalStatus = 'Ditolak';
+            // Kirim pesan flash peringatan
+            session()->flash('warning', 'Terdapat dokumen yang tidak memenuhi syarat. Status permohonan otomatis diubah menjadi Ditolak.');
+        }
+
+        // 3. Update status permohonan
+        $adminId = DB::table('admin')->where('user_id', Auth::id())->value('id_admin');
+        DB::table('permohonan')
+            ->where('id_permohonan', $id_permohonan)
+            ->update([
+                'status'     => $finalStatus,
+                'catatan'    => $request->catatan,
+                'id_admin'   => $adminId,
+                'updated_at' => now(),
+            ]);
+
+        // 4. Simpan tanda tangan admin (jika ada)
         if ($request->filled('ttd_admin')) {
-            // Hapus prefix data:image/png;base64
             $imageData = str_replace('data:image/png;base64,', '', $request->ttd_admin);
             $imageData = str_replace(' ', '+', $imageData);
-
             $fileName = 'ttd_admin_' . time() . '.png';
             $filePath = 'tanda_tangan/' . $fileName;
-
             Storage::disk('public')->put($filePath, base64_decode($imageData));
 
             DB::table('permohonan_persetujuan')

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Models\TujuanAsesmen;
 use App\Models\Permohonan;
 use App\Models\DokumenPersyaratan;
@@ -14,7 +15,6 @@ use Throwable;
 
 class PermohonanController extends Controller
 {
-
     /*
     |--------------------------------------------------------------------------
     | FORM 1 (DATA DIRI)
@@ -36,7 +36,6 @@ class PermohonanController extends Controller
             'asesi'
         ));
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -63,13 +62,11 @@ class PermohonanController extends Controller
         $existingDocs = collect();
 
         if ($asesi) {
-
             $permohonan = Permohonan::where('id_asesi', $asesi->id_asesi)
                 ->latest('id_permohonan')
                 ->first();
 
             if ($permohonan) {
-
                 $existingDocs = DokumenPersyaratan::where('id_permohonan', $permohonan->id_permohonan)
                     ->get()
                     ->keyBy('id_jenis_dokumen');
@@ -89,8 +86,6 @@ class PermohonanController extends Controller
         );
     }
 
-
-
     /*
     |--------------------------------------------------------------------------
     | SIMPAN DATA DIRI ASESI
@@ -102,29 +97,25 @@ class PermohonanController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-            'nik' => 'nullable|string|max:255',
-            'nama_lengkap' => 'nullable|string|max:255',
-            'tempat_lahir' => 'nullable|string|max:255',
-            'tgl_lahir' => 'nullable|date',
-            'jenis_kelamin' => 'nullable|in:L,P',
-            'kebangsaan' => 'nullable|string|max:100',
-
-            'alamat_rumah' => 'nullable|string',
-            'kode_pos_rumah' => 'nullable|string|max:10',
-            'telepon_rumah' => 'nullable|string|max:50',
-            'telepon_hp' => 'nullable|string|max:50',
-            'email' => 'nullable|email|max:255',
-
+            'nik'                 => 'nullable|string|max:255',
+            'nama_lengkap'        => 'nullable|string|max:255',
+            'tempat_lahir'        => 'nullable|string|max:255',
+            'tgl_lahir'           => 'nullable|date',
+            'jenis_kelamin'       => 'nullable|in:L,P',
+            'kebangsaan'          => 'nullable|string|max:100',
+            'alamat_rumah'        => 'nullable|string',
+            'kode_pos_rumah'      => 'nullable|string|max:10',
+            'telepon_rumah'       => 'nullable|string|max:50',
+            'telepon_hp'          => 'nullable|string|max:50',
+            'email'               => 'nullable|email|max:255',
             'kualifikasi_pendidikan' => 'nullable|string|max:255',
-            'nama_institusi' => 'nullable|string|max:255',
-
-            'jabatan' => 'nullable|string|max:255',
-            'alamat_kantor' => 'nullable|string',
-            'kode_pos_kantor' => 'nullable|string|max:10',
-
-            'telepon_kantor' => ['nullable','string','max:50','regex:/^([-+()0-9\s]+|-)$/'],
-            'fax_kantor' => ['nullable','string','max:50','regex:/^([-+()0-9\s]+|-)$/'],
-            'email_kantor' => 'nullable|email|max:255',
+            'nama_institusi'      => 'nullable|string|max:255',
+            'jabatan'             => 'nullable|string|max:255',
+            'alamat_kantor'       => 'nullable|string',
+            'kode_pos_kantor'     => 'nullable|string|max:10',
+            'telepon_kantor'      => ['nullable','string','max:50','regex:/^([-+()0-9\s]+|-)$/'],
+            'fax_kantor'          => ['nullable','string','max:50','regex:/^([-+()0-9\s]+|-)$/'],
+            'email_kantor'        => 'nullable|email|max:255',
         ]);
 
         $validated['user_id'] = $user->id;
@@ -153,8 +144,6 @@ class PermohonanController extends Controller
             ->route('asesi.permohonan.form2')
             ->with('success', 'Data pribadi berhasil disimpan.');
     }
-
-
 
     /*
     |--------------------------------------------------------------------------
@@ -196,8 +185,6 @@ class PermohonanController extends Controller
         ]);
     }
 
-
-
     /*
     |--------------------------------------------------------------------------
     | SIMPAN PERMOHONAN + DOKUMEN
@@ -206,6 +193,7 @@ class PermohonanController extends Controller
 
     public function storeDokumen(Request $request)
     {
+        // Validasi input
         $request->validate([
             'id_skema'  => 'required|exists:skema_sertifikasi,id_skema',
             'tujuan_id' => 'required|exists:tujuan_asesmen,id_tujuan',
@@ -215,10 +203,7 @@ class PermohonanController extends Controller
         ]);
 
         $user = Auth::user();
-
-        $asesi = DB::table('asesi')
-            ->where('user_id', $user->id)
-            ->first();
+        $asesi = DB::table('asesi')->where('user_id', $user->id)->first();
 
         if (!$asesi) {
             return redirect()
@@ -229,13 +214,15 @@ class PermohonanController extends Controller
         DB::beginTransaction();
 
         try {
-            // Cek permohonan terakhir
+            // Ambil permohonan terakhir
             $permohonan = Permohonan::where('id_asesi', $asesi->id_asesi)
                 ->latest('id_permohonan')
                 ->first();
 
+            // JANGAN HAPUS SEMUA DOKUMEN SAAT DITOLAK
+            // Cukup buat permohonan baru atau update status
+
             if (!$permohonan) {
-                // Belum pernah mengajukan → buat baru
                 $permohonan = Permohonan::create([
                     'id_asesi'       => $asesi->id_asesi,
                     'id_skema'       => $request->id_skema,
@@ -245,18 +232,17 @@ class PermohonanController extends Controller
                     'catatan'        => null
                 ]);
             } else {
-                // Sudah pernah mengajukan → update data yang ada (termasuk jika status Ditolak)
                 $permohonan->update([
                     'id_skema'       => $request->id_skema,
                     'id_tujuan'      => $request->tujuan_id,
                     'tgl_permohonan' => now()->toDateString(),
-                    'status'         => 'Diajukan'   // kembalikan ke Diajukan
+                    'status'         => 'Diajukan'
                 ]);
             }
 
             $idPermohonan = $permohonan->id_permohonan;
 
-            // Handle remove dokumen
+            // 1. Hapus dokumen yang ditandai remove
             $removeFlags = $request->input('remove_dokumen', []);
             foreach ($removeFlags as $jenisId => $flag) {
                 if ($flag != 1) continue;
@@ -269,50 +255,39 @@ class PermohonanController extends Controller
                     if ($doc->path_file) {
                         Storage::disk('public')->delete($doc->path_file);
                     }
-
-                    $doc->update([
-                        'nama_file' => null,
-                        'path_file' => null,
-                        'ada' => false,
-                        'memenuhi_syarat' => false,
-                        'catatan' => null
-                    ]);
+                    $doc->delete();
                 }
             }
 
-            // Handle upload file
+            // 2. Upload file baru (untuk jenis dokumen yang diupload ulang)
             $uploadedFiles = $request->file('dokumen', []);
             foreach ($uploadedFiles as $jenisId => $file) {
                 if (!$file) continue;
 
-                $existing = DokumenPersyaratan::where('id_permohonan', $idPermohonan)
-                    ->where('id_jenis_dokumen', $jenisId)
-                    ->first();
-
-                if ($existing && $existing->path_file) {
-                    Storage::disk('public')->delete($existing->path_file);
+                if (!$file->isValid()) {
+                    throw new \Exception("File tidak valid untuk jenis dokumen ID {$jenisId}");
                 }
+
+                // Hapus dokumen lama untuk jenis ini (jika ada)
+                DokumenPersyaratan::where('id_permohonan', $idPermohonan)
+                    ->where('id_jenis_dokumen', $jenisId)
+                    ->delete();
 
                 $path = $file->store("dokumen/" . $asesi->id_asesi, 'public');
 
-                DokumenPersyaratan::updateOrCreate(
-                    [
-                        'id_permohonan' => $idPermohonan,
-                        'id_jenis_dokumen' => $jenisId
-                    ],
-                    [
-                        'nama_file' => $file->getClientOriginalName(),
-                        'path_file' => $path,
-                        'ada' => true,
-                        'memenuhi_syarat' => false,
-                        'catatan' => null
-                    ]
-                );
+                DokumenPersyaratan::create([
+                    'id_permohonan'      => $idPermohonan,
+                    'id_jenis_dokumen'   => $jenisId,
+                    'nama_file'          => $file->getClientOriginalName(),
+                    'path_file'          => $path,
+                    'ada'                => true,
+                    'memenuhi_syarat'    => false,
+                    'catatan'            => null
+                ]);
             }
 
-            // Simpan TTD Asesi
+            // 3. Simpan tanda tangan
             $ttdBase64 = $request->ttd_asesi;
-
             if (preg_match('/^data:image\/(png|jpeg);base64,/', $ttdBase64)) {
                 $ttdData = base64_decode(substr($ttdBase64, strpos($ttdBase64, ',') + 1));
                 $fileName = "ttd/asesi_" . $asesi->id_asesi . "_" . time() . ".png";
@@ -323,10 +298,12 @@ class PermohonanController extends Controller
                         ['id_permohonan' => $idPermohonan],
                         [
                             'tgl_ttd_asesi' => $request->tanggal,
-                            'ttd_asesi' => $fileName,
-                            'updated_at' => now()
+                            'ttd_asesi'     => $fileName,
+                            'updated_at'    => now()
                         ]
                     );
+            } else {
+                throw new \Exception('Format tanda tangan tidak valid');
             }
 
             DB::commit();
@@ -338,9 +315,18 @@ class PermohonanController extends Controller
         } catch (Throwable $e) {
             DB::rollBack();
 
+            Log::error('Gagal menyimpan permohonan', [
+                'user_id'   => $user->id,
+                'asesi_id'  => $asesi->id_asesi ?? null,
+                'request'   => $request->except(['ttd_asesi', 'dokumen']),
+                'error'     => $e->getMessage(),
+                'trace'     => $e->getTraceAsString()
+            ]);
+
             return redirect()
                 ->back()
-                ->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
+                ->withInput()
+                ->with('error', 'Gagal menyimpan data. Pastikan file tidak terlalu besar dan coba lagi.');
         }
     }
 }

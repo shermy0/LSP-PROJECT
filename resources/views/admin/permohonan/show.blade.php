@@ -221,7 +221,7 @@
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead class="table-light">
-                            <tr>
+                            32
                                 <th>No</th>
                                 <th>Kode Unit</th>
                                 <th>Judul Unit</th>
@@ -416,7 +416,6 @@
                         </div>
                         <div class="invalid-feedback">Silakan pilih status keputusan.</div>
                     </div>
-                    {{-- CATATAN SELALU TAMPIL --}}
                     <div class="col-md-6 mb-3">
                         <label for="catatan" class="form-label fw-semibold">Catatan / Keterangan</label>
                         <textarea id="catatan" name="catatan" class="form-control" rows="3" placeholder="Isi catatan jika diperlukan (wajib jika ditolak)">{{ old('catatan', $permohonan->catatan ?? '') }}</textarea>
@@ -674,7 +673,7 @@
     }
 </style>
 
-{{-- SCRIPT untuk canvas admin (diadaptasi dari halaman sebelumnya) --}}
+{{-- SCRIPT untuk canvas admin dan aturan keputusan otomatis --}}
 <script>
     // Fungsi preview dokumen
     function openPreview(url, ext) {
@@ -864,6 +863,55 @@
             setCatatanRequired();
         }
     })();
+
+    // ===== FITUR BARU: Jika ada dokumen yang "Tidak Memenuhi Syarat", maka keputusan otomatis "Ditolak" =====
+    function checkDocumentUnmet() {
+        const dokumenRadios = document.querySelectorAll('input[name^="syarat["]');
+        let hasUnmet = false;
+        dokumenRadios.forEach(radio => {
+            if (radio.checked && radio.value === 'Tidak') {
+                hasUnmet = true;
+            }
+        });
+        return hasUnmet;
+    }
+
+    function updateKeputusanRadio() {
+        const diterimaRadio = document.getElementById('statusDiterima');
+        const ditolakRadio = document.getElementById('statusDitolak');
+        const hasUnmet = checkDocumentUnmet();
+
+        if (hasUnmet) {
+            diterimaRadio.disabled = true;
+            diterimaRadio.checked = false;
+            ditolakRadio.checked = true;
+            // Tampilkan peringatan jika belum ada
+            let warningMsg = document.getElementById('unmetWarning');
+            if (!warningMsg) {
+                warningMsg = document.createElement('div');
+                warningMsg.id = 'unmetWarning';
+                warningMsg.className = 'alert alert-warning alert-dismissible fade show mt-2';
+                warningMsg.innerHTML = `
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    Ada dokumen yang tidak memenuhi syarat. Permohonan akan ditolak.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+                `;
+                document.querySelector('.card.border-0.shadow-sm.mb-4:last-of-type .card-body').prepend(warningMsg);
+            }
+        } else {
+            diterimaRadio.disabled = false;
+            const warningMsg = document.getElementById('unmetWarning');
+            if (warningMsg) warningMsg.remove();
+        }
+    }
+
+    // Pasang event listener pada setiap radio dokumen
+    document.querySelectorAll('input[name^="syarat["]').forEach(radio => {
+        radio.addEventListener('change', updateKeputusanRadio);
+    });
+
+    // Jalankan saat halaman dimuat
+    updateKeputusanRadio();
 
     // Validasi form + simpan TTD sebelum submit
     (function () {

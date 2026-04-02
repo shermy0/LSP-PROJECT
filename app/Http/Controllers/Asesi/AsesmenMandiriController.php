@@ -41,7 +41,7 @@ class AsesmenMandiriController extends Controller
 
     /**
      * Tampilkan halaman kedua: daftar unit kompetensi, elemen, KUK, dan pilihan bukti
-     * Jika ada asesmen mandiri sebelumnya dengan rekomendasi 'Tidak Dapat Dilanjutkan', maka data lama ditampilkan (mode edit)
+     * Hanya menampilkan dokumen "Fotocopy Raport" dan "Sertifikat PKL" (selain upload file lain)
      */
     public function form2()
     {
@@ -85,11 +85,18 @@ class AsesmenMandiriController extends Controller
             ->whereIn('id_elemen', $elemen->pluck('id_elemen')->toArray())
             ->get();
 
-        // Ambil dokumen pendukung (contoh: rapor, sertifikat PKL) - sesuaikan id_jenis_dokumen dengan kebutuhan
+        // ========== PERUBAHAN: Hanya ambil dokumen "Fotocopy Raport" dan "Sertifikat PKL" ==========
+        // Sesuaikan id_jenis_dokumen dengan nilai di database Anda
+        $dokumenIds = [1, 2]; // Misal: 1 = Fotocopy Raport, 2 = Sertifikat PKL
+        // Atau bisa menggunakan nama dokumen:
+        // $namaDokumen = ['Fotocopy Raport', 'Sertifikat PKL'];
+
         $dokumen = DB::table('dokumen_persyaratan')
             ->join('jenis_dokumen', 'dokumen_persyaratan.id_jenis_dokumen', '=', 'jenis_dokumen.id_jenis_dokumen')
             ->where('dokumen_persyaratan.id_permohonan', $permohonan->id_permohonan)
-            ->whereIn('dokumen_persyaratan.id_jenis_dokumen', [1, 2]) // Sesuaikan
+            ->where('dokumen_persyaratan.ada', true)
+            ->whereIn('jenis_dokumen.id_jenis_dokumen', $dokumenIds) // filter berdasarkan id
+            // ->whereIn('jenis_dokumen.nama_dokumen', $namaDokumen) // alternatif menggunakan nama
             ->select(
                 'dokumen_persyaratan.id_dokumen',
                 'dokumen_persyaratan.path_file as file_path',
@@ -108,7 +115,7 @@ class AsesmenMandiriController extends Controller
 
         if ($master) {
             $rekomendasi = $master->rekomendasi;
-            // Jika rekomendasi 'Tidak Dapat Dilanjutkan', ambil jawaban lama untuk ditampilkan (mode edit)
+            // Jika rekomendasi 'Tidak Dapat Dilanjutkan', ambil jawaban lama untuk mode edit
             if ($master->rekomendasi === 'Tidak Dapat Dilanjutkan') {
                 $jawaban = DB::table('asesmen_mandiri_jawaban')
                     ->where('id_asesmen_mandiri', $master->id_asesmen_mandiri)
@@ -125,7 +132,7 @@ class AsesmenMandiriController extends Controller
 
     /**
      * Simpan jawaban asesmen mandiri (K/BK dan pilihan bukti)
-     * Jika sudah ada master dengan rekomendasi 'Tidak Dapat Dilanjutkan', data lama dihapus dan diganti dengan yang baru, serta rekomendasi direset.
+     * Mendukung upload file lain (bukan dari dokumen persyaratan)
      */
     public function store(Request $request)
     {
@@ -147,60 +154,87 @@ class AsesmenMandiriController extends Controller
                 ->with('error', 'Anda belum mengajukan permohonan.');
         }
 
-        // Cek apakah sudah ada master asesmen mandiri
         $master = DB::table('asesmen_mandiri_master')
             ->where('id_permohonan', $permohonan->id_permohonan)
             ->first();
 
         DB::beginTransaction();
         try {
-            $idAsesmen = null;
-            if ($master) {
-                // Jika ada master dan rekomendasi = 'Tidak Dapat Dilanjutkan', hapus jawaban lama dan reset rekomendasi
-                if ($master->rekomendasi === 'Tidak Dapat Dilanjutkan') {
-                    // Hapus jawaban lama (tabel asesmen_mandiri_jawaban)
-                    DB::table('asesmen_mandiri_jawaban')
-                        ->where('id_asesmen_mandiri', $master->id_asesmen_mandiri)
-                        ->delete();
+            $oldAnswers = collect();
 
-                    // Reset rekomendasi dan id_asesor
+            if ($master) {
+                // Ambil jawaban lama sebelum dihapus (untuk mengambil file_lain yang tidak diubah)
+                $oldAnswers = DB::table('asesmen_mandiri_jawaban')
+                    ->where('id_asesmen_mandiri', $master->id_asesmen_mandiri)
+                    ->get()
+                    ->keyBy('id_kuk');
+
+                // Hapus jawaban lama
+                DB::table('asesmen_mandiri_jawaban')
+                    ->where('id_asesmen_mandiri', $master->id_asesmen_mandiri)
+                    ->delete();
+
+                // Jika master ada dan rekomendasi = 'Tidak Dapat Dilanjutkan', reset rekomendasi
+                if ($master->rekomendasi === 'Tidak Dapat Dilanjutkan') {
                     DB::table('asesmen_mandiri_master')
                         ->where('id_asesmen_mandiri', $master->id_asesmen_mandiri)
                         ->update([
                             'rekomendasi' => null,
                             'id_asesor' => null,
-                            // Tidak ada updated_at di tabel, jadi hapus
                         ]);
-                    $idAsesmen = $master->id_asesmen_mandiri;
-                } else {
-                    // Jika master sudah ada tapi bukan ditolak, kita tetap bisa update (misal asesi ingin mengubah jawaban sebelum diverifikasi)
-                    // Hapus jawaban lama lalu insert baru
-                    DB::table('asesmen_mandiri_jawaban')
-                        ->where('id_asesmen_mandiri', $master->id_asesmen_mandiri)
-                        ->delete();
-                    $idAsesmen = $master->id_asesmen_mandiri;
                 }
+                $idAsesmen = $master->id_asesmen_mandiri;
             } else {
-                // Belum ada master, buat baru
+                // Buat master baru
                 $idAsesmen = DB::table('asesmen_mandiri_master')->insertGetId([
                     'id_permohonan' => $permohonan->id_permohonan,
                     'id_asesi' => $asesi->id_asesi,
                     'id_asesor' => null,
                     'rekomendasi' => null,
-                    // Jika tidak ada timestamps, jangan sertakan
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
             }
 
-            // Simpan jawaban baru
             $jawabanKuk = $request->input('kuk', []);
-            $dokumenKuk = $request->input('bukti', []); // bukti berupa id_dokumen dari tabel dokumen_persyaratan
+            $dokumenKuk = $request->input('bukti', []);
 
             foreach ($jawabanKuk as $id_kuk => $status) {
+                $idDokumen = $dokumenKuk[$id_kuk] ?? null;
+                $fileLain = null;
+                $hapusFileLain = $request->input("hapus_file_lain.$id_kuk", 0);
+
+                // Jika pilih upload_lain
+                if ($idDokumen === 'upload_lain') {
+                    $idDokumen = null;
+                    // Cek apakah ada file baru diupload
+                    if ($request->hasFile("file_lain.$id_kuk")) {
+                        $file = $request->file("file_lain.$id_kuk");
+                        $path = $file->store("bukti_asesmen_mandiri", 'public');
+                        $fileLain = $path;
+                    } else {
+                        // Tidak ada file baru, cek apakah ada file lama dan tidak dihapus
+                        if ($hapusFileLain != 1 && $oldAnswers->has($id_kuk) && $oldAnswers[$id_kuk]->file_lain) {
+                            $fileLain = $oldAnswers[$id_kuk]->file_lain;
+                        }
+                    }
+                } else {
+                    // Jika pilih dokumen biasa, pastikan file_lain dihapus jika ada
+                    if ($oldAnswers->has($id_kuk) && $oldAnswers[$id_kuk]->file_lain) {
+                        // Hapus file fisik jika ada
+                        Storage::disk('public')->delete($oldAnswers[$id_kuk]->file_lain);
+                    }
+                    $fileLain = null;
+                }
+
                 DB::table('asesmen_mandiri_jawaban')->insert([
                     'id_asesmen_mandiri' => $idAsesmen,
                     'id_kuk' => $id_kuk,
                     'status' => $status,
-                    'id_dokumen' => $dokumenKuk[$id_kuk] ?? null,
+                    'id_dokumen' => $idDokumen,
+                    'file_lain' => $fileLain,
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
             }
 

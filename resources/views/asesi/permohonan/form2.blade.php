@@ -93,7 +93,7 @@
                     <div class="table-responsive">
                         <table class="table table-bordered align-middle">
                             <thead class="table-light">
-                                <tr>
+                                32
                                     <th>No</th>
                                     <th>Kode Unit</th>
                                     <th>Judul Unit</th>

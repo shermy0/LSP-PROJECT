@@ -4,7 +4,7 @@
 
 @section('konten')
     <div class="container-fluid px-4 py-4">
-        <form id="asesmenForm" action="{{ route('asesi.asesmen_mandiri.store') }}" method="POST">
+        <form id="asesmenForm" action="{{ route('asesi.asesmen_mandiri.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             <!-- Header dengan ikon dan judul (warna #0b2f7c) -->
@@ -43,7 +43,7 @@
                         @endphp
 
                         @foreach($elemenUnit as $e)
-                            <!-- Elemen card (tanpa nesting berlebihan) -->
+                            <!-- Elemen card -->
                             <div class="elemen-card mb-3">
                                 <div class="elemen-header">
                                     <span class="elemen-number">{{ $loop->iteration }}</span>
@@ -88,9 +88,22 @@
                                                                     {{ $d->nama_jenis }} ({{ basename($d->file_path) }})
                                                                 </option>
                                                             @endforeach
+                                                            <option value="upload_lain" {{ $jawab && $jawab->id_dokumen == null && $jawab->file_lain ? 'selected' : '' }}>+ Upload file lain</option>
                                                         </select>
                                                         <div class="invalid-msg text-danger small"></div>
-                                                    </td>
+                                                        
+                                                        <!-- Wrapper untuk upload file lain -->
+                                                        <div class="upload-lain-wrapper mt-2" style="display: {{ $jawab && $jawab->id_dokumen == null && $jawab->file_lain ? 'block' : 'none' }};">
+                                                            <input type="file" name="file_lain[{{ $k->id_kuk }}]" class="form-control file-lain-input" accept=".pdf,.jpg,.jpeg,.png">
+                                                            <div class="file-lain-info small text-muted mt-1">
+                                                                @if($jawab && $jawab->file_lain)
+                                                                    <strong>File tersimpan:</strong> {{ basename($jawab->file_lain) }}
+                                                                    <button type="button" class="btn btn-sm btn-link text-danger" onclick="hapusFileLain(this)">Hapus</button>
+                                                                    <input type="hidden" name="hapus_file_lain[{{ $k->id_kuk }}]" value="0" class="hapus-file-lain-flag">
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                     </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -119,296 +132,335 @@
             </div>
         </form>
     </div>
-@endsection
 
-<style>
-    /* ===== VARIABEL & RESET dengan warna utama #0b2f7c ===== */
-    :root {
-        --primary: #0b2f7c;
-        --primary-dark: #08205c;
-        --primary-light: #1a3e9c;
-        --secondary: #6c757d;
-        --success: #198754;
-        --danger: #dc3545;
-        --light: #f8f9fa;
-        --dark: #212529;
-        --font-sans: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-    }
-
-    body {
-        font-family: var(--font-sans);
-        background-color: #f1f4f9;
-    }
-
-    .container-fluid {
-        max-width: 1280px;
-        margin: 0 auto;
-    }
-
-    /* ===== CARD STYLE ===== */
-    .card {
-        border-radius: 1.25rem;
-        overflow: hidden;
-        transition: all 0.2s ease;
-        background: #ffffff;
-    }
-
-    .card:hover {
-        box-shadow: 0 1rem 2rem rgba(0,0,0,0.08) !important;
-    }
-
-    .card-header {
-        background: transparent;
-        padding-bottom: 0;
-    }
-
-    /* ===== WARNA UTAMA #0b2f7c ===== */
-    .bg-primary {
-        background-color: var(--primary) !important;
-    }
-
-    .bg-primary.bg-gradient {
-        background: linear-gradient(145deg, var(--primary), var(--primary-dark)) !important;
-    }
-
-    .bg-primary.bg-opacity-10 {
-        background-color: rgba(11,47,124,0.1) !important;
-    }
-
-    .text-primary {
-        color: var(--primary) !important;
-    }
-
-    /* ===== ELEMEN CARD ===== */
-    .elemen-card {
-        background: #ffffff;
-        border: 1px solid #e9edf4;
-        border-radius: 1rem;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .elemen-header {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        margin-bottom: 1rem;
-        background: #f8fbff;
-        padding: 0.75rem 1rem;
-        border-radius: 0.75rem;
-        border-left: 4px solid var(--primary);
-    }
-
-    .elemen-number {
-        width: 28px;
-        height: 28px;
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 0.9rem;
-    }
-
-    /* ===== TABLE ===== */
-    .table {
-        border-radius: 1rem;
-        overflow: hidden;
-    }
-
-    .table thead th {
-        background: #f0f5ff;
-        color: var(--primary);
-        font-weight: 600;
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-        border-bottom: 2px solid #d0d9e8;
-        padding: 0.75rem;
-    }
-
-    .table tbody td {
-        padding: 0.75rem;
-        vertical-align: middle;
-        background: white;
-        border-bottom: 1px solid #e9edf4;
-    }
-
-    .table-hover tbody tr:hover td {
-        background: #f8fbff;
-    }
-
-    .table td.td-deskripsi {
-        position: relative;
-    }
-
-    /* ===== FORM ELEMENTS ===== */
-    .form-check-input {
-        width: 1.2em;
-        height: 1.2em;
-        border: 2px solid #b0c4de;
-        cursor: pointer;
-    }
-
-    .form-check-input:checked {
-        background-color: var(--primary);
-        border-color: var(--primary);
-    }
-
-    .form-select {
-        border: 1.5px solid #e2e8f0;
-        border-radius: 0.75rem;
-        padding: 0.4rem 1rem;
-        font-size: 0.9rem;
-        background-color: #fff;
-        cursor: pointer;
-        transition: all 0.15s ease;
-    }
-
-    .form-select:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 4px rgba(11,47,124,0.15);
-        outline: none;
-    }
-
-    /* ===== INVALID STATE ===== */
-    .is-invalid {
-        border: 2px solid var(--danger) !important;
-        background: #fff8f8 !important;
-    }
-
-    .td-deskripsi.is-invalid {
-        border: 2px solid var(--danger);
-        border-radius: 0.5rem;
-        padding: 0.75rem !important;
-    }
-
-    .invalid-msg {
-        font-size: 0.75rem;
-        color: var(--danger);
-        margin-top: 0.2rem;
-    }
-
-    /* ===== BUTTONS ===== */
-    .btn-next {
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: #fff;
-        padding: 0.7rem 1.8rem;
-        border-radius: 2rem;
-        font-weight: 600;
-        font-size: 1rem;
-        border: none;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 18px rgba(11,47,124,0.3);
-        transition: all 0.2s;
-        text-decoration: none;
-    }
-
-    .btn-next:hover {
-        background: linear-gradient(135deg, var(--primary-dark), #061944);
-        transform: translateY(-2px);
-        box-shadow: 0 12px 22px rgba(11,47,124,0.35);
-        color: #fff;
-    }
-
-    .btn-back {
-        background-color: #fff;
-        color: var(--secondary);
-        padding: 0.7rem 1.8rem;
-        border-radius: 2rem;
-        font-weight: 600;
-        font-size: 1rem;
-        text-decoration: none;
-        border: 1.5px solid #dee2e6;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
-    }
-
-    .btn-back:hover {
-        background-color: #f1f3f5;
-        color: #495057;
-        border-color: #ced4da;
-    }
-
-    .button-group {
-        display: flex;
-        justify-content: flex-end;
-        gap: 0.75rem;
-    }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 768px) {
-        .button-group {
-            justify-content: center;
+    <style>
+        /* ===== VARIABEL & RESET dengan warna utama #0b2f7c ===== */
+        :root {
+            --primary: #0b2f7c;
+            --primary-dark: #08205c;
+            --primary-light: #1a3e9c;
+            --secondary: #6c757d;
+            --success: #198754;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --font-sans: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
         }
-        .table thead th {
-            font-size: 0.75rem;
-            padding: 0.5rem;
+
+        body {
+            font-family: var(--font-sans);
+            background-color: #f1f4f9;
         }
-        .table tbody td {
-            font-size: 0.85rem;
-            padding: 0.5rem;
+
+        .container-fluid {
+            max-width: 1280px;
+            margin: 0 auto;
         }
-        .form-select {
-            font-size: 0.8rem;
-            padding: 0.3rem 0.6rem;
+
+        .card {
+            border-radius: 1.25rem;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            background: #ffffff;
         }
+
+        .card:hover {
+            box-shadow: 0 1rem 2rem rgba(0,0,0,0.08) !important;
+        }
+
+        .card-header {
+            background: transparent;
+            padding-bottom: 0;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1e293b;
+            margin-bottom: 0.3rem;
+        }
+
+        .form-control, .form-select {
+            border: 1.5px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 0.6rem 1rem;
+            font-size: 0.95rem;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            background-color: #fff;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(11,47,124,0.15);
+            outline: none;
+        }
+
+        .bg-primary {
+            background-color: var(--primary) !important;
+        }
+
+        .bg-primary.bg-gradient {
+            background: linear-gradient(145deg, var(--primary), var(--primary-dark)) !important;
+        }
+
+        .bg-primary.bg-opacity-10 {
+            background-color: rgba(11,47,124,0.1) !important;
+        }
+
+        .text-primary {
+            color: var(--primary) !important;
+        }
+
+        .elemen-card {
+            background: #ffffff;
+            border: 1px solid #e9edf4;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
         .elemen-header {
-            flex-wrap: wrap;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            background: #f8fbff;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            border-left: 4px solid var(--primary);
         }
-    }
-</style>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.getElementById('asesmenForm');
-        const radios = form.querySelectorAll('.radio-kuk');
-        const selects = form.querySelectorAll('.bukti-select');
+        .elemen-number {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
 
-        radios.forEach(radio => {
-            radio.addEventListener('invalid', function (event) {
-                const tr = this.closest('tr');
-                const tdDesc = tr.querySelector('.td-deskripsi');
-                tdDesc.classList.add('is-invalid');
-                const msg = tdDesc.querySelector('.invalid-msg');
-                msg.innerText = 'Pilih K atau BK';
-                event.preventDefault();
+        .table thead th {
+            background: #f0f5ff;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #d0d9e8;
+            padding: 0.75rem;
+        }
+
+        .table tbody td {
+            padding: 0.75rem;
+            vertical-align: middle;
+            background: white;
+            border-bottom: 1px solid #e9edf4;
+        }
+
+        .form-check-input {
+            width: 1.2em;
+            height: 1.2em;
+            border: 2px solid #b0c4de;
+            cursor: pointer;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .is-invalid {
+            border: 2px solid var(--danger) !important;
+            background: #fff8f8 !important;
+        }
+
+        .td-deskripsi.is-invalid {
+            border: 2px solid var(--danger);
+            border-radius: 0.5rem;
+            padding: 0.75rem !important;
+        }
+
+        .invalid-msg {
+            font-size: 0.75rem;
+            color: var(--danger);
+            margin-top: 0.2rem;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            padding: 0.7rem 1.8rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 18px rgba(11,47,124,0.3);
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-next:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #061944);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 22px rgba(11,47,124,0.35);
+            color: #fff;
+        }
+
+        .btn-back {
+            background-color: #fff;
+            color: var(--secondary);
+            padding: 0.7rem 1.8rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            border: 1.5px solid #dee2e6;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn-back:hover {
+            background-color: #f1f3f5;
+            color: #495057;
+            border-color: #ced4da;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        @media (max-width: 768px) {
+            .button-group {
+                justify-content: center;
+            }
+            .table thead th {
+                font-size: 0.75rem;
+                padding: 0.5rem;
+            }
+            .table tbody td {
+                font-size: 0.85rem;
+                padding: 0.5rem;
+            }
+            .form-select {
+                font-size: 0.8rem;
+                padding: 0.3rem 0.6rem;
+            }
+            .elemen-header {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('asesmenForm');
+            const radios = form.querySelectorAll('.radio-kuk');
+            const selects = form.querySelectorAll('.bukti-select');
+
+            // Fungsi untuk menampilkan/menyembunyikan input file upload lain
+            selects.forEach(select => {
+                select.addEventListener('change', function() {
+                    const wrapper = this.closest('td').querySelector('.upload-lain-wrapper');
+                    if (this.value === 'upload_lain') {
+                        wrapper.style.display = 'block';
+                    } else {
+                        wrapper.style.display = 'none';
+                        // Reset input file jika tidak dipilih
+                        const fileInput = wrapper.querySelector('.file-lain-input');
+                        if (fileInput) fileInput.value = '';
+                    }
+                });
             });
 
-            radio.addEventListener('change', function () {
-                const tr = this.closest('tr');
-                const tdDesc = tr.querySelector('.td-deskripsi');
-                tdDesc.classList.remove('is-invalid');
-                const msg = tdDesc.querySelector('.invalid-msg');
-                msg.innerText = '';
+            // Validasi manual
+            radios.forEach(radio => {
+                radio.addEventListener('invalid', function (event) {
+                    const tr = this.closest('tr');
+                    const tdDesc = tr.querySelector('.td-deskripsi');
+                    tdDesc.classList.add('is-invalid');
+                    const msg = tdDesc.querySelector('.invalid-msg');
+                    msg.innerText = 'Pilih K atau BK';
+                    event.preventDefault();
+                });
+
+                radio.addEventListener('change', function () {
+                    const tr = this.closest('tr');
+                    const tdDesc = tr.querySelector('.td-deskripsi');
+                    tdDesc.classList.remove('is-invalid');
+                    const msg = tdDesc.querySelector('.invalid-msg');
+                    msg.innerText = '';
+                });
+            });
+
+            selects.forEach(select => {
+                select.addEventListener('invalid', function (event) {
+                    this.classList.add('is-invalid');
+                    const msg = this.parentElement.querySelector('.invalid-msg');
+                    msg.innerText = 'Wajib pilih bukti';
+                    event.preventDefault();
+                });
+
+                select.addEventListener('change', function () {
+                    this.classList.remove('is-invalid');
+                    const msg = this.parentElement.querySelector('.invalid-msg');
+                    msg.innerText = '';
+                });
+            });
+
+            // Prevent default HTML5 validation bubbles
+            form.addEventListener('invalid', function (e) {
+                e.preventDefault();
+            }, true);
+
+            // Validasi tambahan untuk file lain: jika pilih upload_lain tetapi file tidak diupload
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+                document.querySelectorAll('.bukti-select').forEach(select => {
+                    if (select.value === 'upload_lain') {
+                        const wrapper = select.closest('td').querySelector('.upload-lain-wrapper');
+                        const fileInput = wrapper.querySelector('.file-lain-input');
+                        const hapusFlag = wrapper.querySelector('.hapus-file-lain-flag');
+                        const hasExistingFile = wrapper.querySelector('.file-lain-info strong') !== null;
+                        // Jika tidak ada file baru dan tidak ada file lama (atau file lama dihapus)
+                        if ((!fileInput || fileInput.files.length === 0) && (!hasExistingFile || (hapusFlag && hapusFlag.value === '1'))) {
+                            select.classList.add('is-invalid');
+                            const msg = select.parentElement.querySelector('.invalid-msg');
+                            msg.innerText = 'Harap upload file bukti';
+                            isValid = false;
+                        }
+                    }
+                });
+                if (!isValid) {
+                    e.preventDefault();
+                }
             });
         });
 
-        selects.forEach(select => {
-            select.addEventListener('invalid', function (event) {
-                this.classList.add('is-invalid');
-                const msg = this.parentElement.querySelector('.invalid-msg');
-                msg.innerText = 'Wajib pilih bukti';
-                event.preventDefault();
-            });
-
-            select.addEventListener('change', function () {
-                this.classList.remove('is-invalid');
-                const msg = this.parentElement.querySelector('.invalid-msg');
-                msg.innerText = '';
-            });
-        });
-
-        // Prevent default HTML5 validation bubbles (we use custom messages)
-        form.addEventListener('invalid', function (e) {
-            e.preventDefault();
-        }, true);
-    });
-</script>
+        // Fungsi global untuk hapus file lain
+        function hapusFileLain(btn) {
+            const wrapper = btn.closest('.upload-lain-wrapper');
+            const fileInput = wrapper.querySelector('.file-lain-input');
+            const infoDiv = wrapper.querySelector('.file-lain-info');
+            const flagInput = wrapper.querySelector('.hapus-file-lain-flag');
+            if (fileInput) fileInput.value = '';
+            if (infoDiv) infoDiv.innerHTML = '';
+            if (flagInput) flagInput.value = '1';
+            wrapper.style.display = 'none';
+            // Ubah pilihan select kembali ke opsi default
+            const select = wrapper.closest('td').querySelector('.bukti-select');
+            if (select) select.value = '';
+        }
+    </script>
+@endsection
