@@ -92,7 +92,6 @@
             background: #fff;
         }
 
-        /* use uploaded image path for preview/test */
         .brand .avatar img {
             width: 100%;
             height: 100%;
@@ -125,8 +124,7 @@
             display: none
         }
 
-        /* Toggle wrapper INSIDE brand so when expanded it's at right of titles,
-           and when collapsed we reposition it to center over menu icons */
+        /* Toggle wrapper INSIDE brand */
         .toggle-wrapper {
             margin-left: auto;
             display: flex;
@@ -154,15 +152,11 @@
             transform: translateY(-2px)
         }
 
-        /* When collapsed: move toggle below brand and center-aligned with menu icons */
+        /* When collapsed: move toggle below brand and center-aligned */
         .sidebar.collapsed .toggle-wrapper {
             position: relative;
             margin-left: 0;
             justify-content: center;
-        }
-
-        /* additional offset to align with first menu icon visually */
-        .sidebar.collapsed .toggle-wrapper {
             margin-top: 10px;
             margin-bottom: 2px;
         }
@@ -239,7 +233,7 @@
             border-radius: 8px
         }
 
-        /* FOOTER: keep bottom avatar unchanged when collapsed */
+        /* FOOTER */
         .sidebar-footer {
             padding-top: 10px;
             border-top: 1px solid rgba(255, 255, 255, 0.04);
@@ -283,12 +277,10 @@
             color: var(--muted)
         }
 
-        /* Keep bottom avatar shape unchanged on collapse */
         .sidebar.collapsed .user-info {
             display: none
         }
 
-        /* LOGOUT */
         .logout-btn {
             width: 100%;
             background: var(--danger);
@@ -326,7 +318,7 @@
         main#main-content {
             margin-left: var(--sidebar-w);
             padding: 24px;
-            transition: margin-left .26s ease, width .26s ease;
+            transition: margin-left .26s ease;
             min-height: 100vh;
         }
 
@@ -334,55 +326,42 @@
             margin-left: var(--sidebar-collapsed-w);
         }
 
-        /* mobile */
-        @media (max-width:900px) {
+        /* ========== MOBILE: Sidebar tetap terlihat, tidak disembunyikan ========== */
+        @media (max-width: 900px) {
             .sidebar {
-                transform: translateX(-100%);
-                position: fixed
-            }
-
-            .sidebar.open {
-                transform: translateX(0)
-            }
-
-            main#main-content {
-                margin-left: 0;
-                padding: 16px
-            }
-
-            #sidebar-off {
+                transform: none !important;
                 position: fixed;
-                inset: 0;
-                z-index: 1040
+                width: var(--sidebar-w);
             }
-
-            .sidebar.open .titles {
-                display: flex
+            .sidebar.collapsed {
+                width: var(--sidebar-collapsed-w);
             }
-
-            .sidebar.open .brand .avatar {
-                display: block
+            main#main-content {
+                margin-left: var(--sidebar-w);
             }
-
-            .sidebar.open .user-info {
-                display: flex
+            .sidebar.collapsed~main#main-content {
+                margin-left: var(--sidebar-collapsed-w);
             }
-        }
-
-        /* utilities */
-        .small-muted {
-            font-size: 13px;
-            color: var(--muted)
-        }
-
-        ::-webkit-scrollbar {
-            height: 8px;
-            width: 8px
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.12);
-            border-radius: 8px
+            /* Toggle tetap berfungsi untuk collapse/expand */
+            .sidebar.open {
+                /* Tidak diperlukan lagi, karena tidak disembunyikan */
+                transform: none;
+            }
+            /* Hapus overlay jika ada */
+            #sidebar-off {
+                display: none;
+            }
+            /* Pastikan brand dan user-info tidak disembunyikan secara paksa */
+            .sidebar .titles,
+            .sidebar .brand .avatar,
+            .sidebar .user-info {
+                display: flex;
+            }
+            .sidebar.collapsed .titles,
+            .sidebar.collapsed .brand .avatar,
+            .sidebar.collapsed .user-info {
+                display: none;
+            }
         }
     </style>
 
@@ -395,7 +374,6 @@
         <!-- Brand (top) -->
         <div class="brand">
             <div class="avatar">
-                <!-- use uploaded image for preview/testing; change to {{ asset('...') }} in production -->
                 <img src="{{ asset('assets/poto/potta.png') }}" alt="LSP 11 Logo">
             </div>
 
@@ -404,7 +382,6 @@
                 <div class="subtitle">Solusi Digital Asesmen</div>
             </div>
 
-            <!-- Toggle wrapper INSIDE brand: when expanded appears to the right of titles -->
             <div class="toggle-wrapper">
                 <button class="toggle-btn" id="toggle-btn" aria-label="Toggle sidebar">
                     <i class="fas fa-bars" aria-hidden="true"></i>
@@ -415,7 +392,6 @@
         <!-- NAVIGATION -->
         <nav class="menu" aria-label="Main menu">
             <ul>
-
                 {{-- ===================== ADMIN ===================== --}}
                 @if(Auth::user()->role == 'admin')
                     <li>
@@ -426,7 +402,6 @@
                             <span class="label">Dashboard</span>
                         </a>
                     </li>
-
                     <li>
                         <a href="{{ route('admin.permohonan.index') }}"
                             class="{{ request()->routeIs('admin.permohonan.*') ? 'active' : '' }}" title="Daftar Permohonan"
@@ -435,25 +410,22 @@
                             <span class="label">Daftar Permohonan</span>
                         </a>
                     </li>
-
                     <li>
                         <a href="{{ route('admin.asesor.index') }}"
-                            class="{{ request()->routeIs('admin.asesor.*') ? 'active' : '' }}" title="Daftar Permohonan"
+                            class="{{ request()->routeIs('admin.asesor.*') ? 'active' : '' }}" title="Daftar Asesor"
                             data-label="Daftar Asesor">
                             <span class="iicon"><i class="bi bi-person-vcard-fill"></i></span>
                             <span class="label">Daftar Asesor</span>
                         </a>
                     </li>
-
                     <li>
                         <a href="{{ route('admin.penugasan.index') }}"
-                            class="{{ request()->routeIs('admin.penugasan.*') ? 'active' : '' }}" title="Daftar Permohonan"
+                            class="{{ request()->routeIs('admin.penugasan.*') ? 'active' : '' }}" title="Penugasan Asesor"
                             data-label="Penugasan Asesor">
                             <span class="iicon"><i class="bi bi-clipboard-plus-fill"></i></span>
                             <span class="label">Penugasan Asesor</span>
                         </a>
                     </li>
-
                     <li>
                         <a href="{{ route('admin.banding-asesmen.index') }}"
                             class="{{ request()->routeIs('admin.banding-asesmen.index') ? 'active' : '' }}" title="Daftar Banding Asesmen"
@@ -464,11 +436,8 @@
                     </li>
                 @endif
 
-
-
                 {{-- ===================== ASESOR ===================== --}}
                 @if(Auth::user()->role == 'asesor')
-
                     <li>
                         <a href="{{ route('asesor.dashboard') }}"
                             class="{{ request()->routeIs('asesor.dashboard') ? 'active' : '' }}" title="Dashboard"
@@ -477,7 +446,6 @@
                             <span class="label">Dashboard</span>
                         </a>
                     </li>
-
                     <li>
                         <a href="{{ route('form_pra_assesmen') }}"
                             class="{{ request()->routeIs('form_pra_assesmen') ? 'active' : '' }}" title="Form Pra Asesmen"
@@ -486,7 +454,6 @@
                             <span class="label">Form Pra Asesmen</span>
                         </a>
                     </li>
-
                     <li>
                         <a href="{{ route('formasesmen') }}" class="{{ request()->routeIs('formasesmen') ? 'active' : '' }}"
                             title="Form Asesmen" data-label="Form Asesmen">
@@ -494,7 +461,6 @@
                             <span class="label">Form Asesmen</span>
                         </a>
                     </li>
-
                     <li>
                         <a href="#" class="{{ request()->is('asesor/peserta*') ? 'active' : '' }}" title="Data Peserta Uji"
                             data-label="Data Peserta Uji">
@@ -502,7 +468,6 @@
                             <span class="label">Data Peserta Uji</span>
                         </a>
                     </li>
-
                     <li>
                         <a href="{{ route('formperencanaan') }}"
                             class="{{ request()->routeIs('formperencanaan') ? 'active' : '' }}" title="Form Perencanaan"
@@ -511,7 +476,6 @@
                             <span class="label">Form Perencanaan</span>
                         </a>
                     </li>
-
                     <li>
                         <a href="#" class="{{ request()->is('asesor/rekap*') ? 'active' : '' }}" title="Rekap Asesmen"
                             data-label="Rekap Asesmen">
@@ -519,15 +483,10 @@
                             <span class="label">Rekap Asesmen</span>
                         </a>
                     </li>
-
                 @endif
-
-
-
 
                 {{-- ===================== ASESI ===================== --}}
                 @if(Auth::user()->role == 'asesi')
-
                     <li>
                         <a href="{{ route('asesi.dashboard') }}"
                             class="{{ request()->routeIs('asesi.dashboard') ? 'active' : '' }}" title="Dashboard"
@@ -536,7 +495,6 @@
                             <span class="label">Dashboard</span>
                         </a>
                     </li>
-
                     <li>
                         <a href="{{ route('form_pra_assesmen') }}"
                             class="{{ request()->routeIs('form_pra_assesmen') ? 'active' : '' }}" title="Form Pra Asesmen"
@@ -545,7 +503,6 @@
                             <span class="label">Form Pra Asesmen</span>
                         </a>
                     </li>
-
                     <li>
                         <a href="#" class="{{ request()->is('asesi/formasesmen*') ? 'active' : '' }}" title="Form Asesmen"
                             data-label="Form Asesmen">
@@ -553,7 +510,6 @@
                             <span class="label">Form Asesmen</span>
                         </a>
                     </li>
-
                     <li>
                         <a href="#" class="{{ request()->is('asesi/rekap*') ? 'active' : '' }}" title="Rekap Asesmen"
                             data-label="Rekap Asesmen">
@@ -561,12 +517,9 @@
                             <span class="label">Rekap Asesmen</span>
                         </a>
                     </li>
-
                 @endif
-
             </ul>
         </nav>
-
 
         <!-- FOOTER (user + logout) -->
         <div class="sidebar-footer">
@@ -599,7 +552,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
 
-    <!-- JS (toggle, mobile, logout) -->
     <script>
         const sidebar = document.getElementById('sidebar');
         const toggleBtn = document.getElementById('toggle-btn');
@@ -617,29 +569,7 @@
             try { localStorage.setItem('lsp_sidebar_collapsed', sidebar.classList.contains('collapsed')); } catch (e) { }
         }
 
-        // wire toggle button
         toggleBtn.addEventListener('click', toggleSidebar);
-
-        // mobile toggle (if using a mobile button)
-        function mobileToggle() {
-            if (window.innerWidth <= 900) {
-                sidebar.classList.toggle('open');
-                if (sidebar.classList.contains('open')) {
-                    const off = document.createElement('div');
-                    off.id = 'sidebar-off';
-                    off.style.position = 'fixed';
-                    off.style.inset = '0';
-                    off.style.zIndex = '1040';
-                    off.addEventListener('click', () => { sidebar.classList.remove('open'); off.remove(); });
-                    document.body.appendChild(off);
-                } else {
-                    const existing = document.getElementById('sidebar-off');
-                    if (existing) existing.remove();
-                }
-            } else {
-                toggleSidebar();
-            }
-        }
 
         // logout confirmation
         document.getElementById('logout-btn').addEventListener('click', function () {

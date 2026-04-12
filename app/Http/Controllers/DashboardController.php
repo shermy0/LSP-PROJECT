@@ -3,49 +3,71 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
+    /**
+     * Redirect ke dashboard sesuai role (jika ada yang memanggil route 'dashboard')
+     */
     public function index()
     {
-        $user = auth()->user();
-
-        // Menu otomatis berdasarkan role
-        $menus = [];
-        if ($user->role == 'admin') {
-            $menus = [
-                ['name' => 'Dashboard', 'route' => route('admin.dashboard'), 'icon' => 'fas fa-home'],
-                ['name' => 'Data Peserta Uji', 'route' => '#', 'icon' => 'fas fa-users'],
-            ];
-        } elseif ($user->role == 'asesor') {
-            $menus = [
-                ['name' => 'Dashboard', 'route' => route('asesor.dashboard'), 'icon' => 'fas fa-home'],
-                ['name' => 'Form Perencanaan', 'route' => route('formperencanaan'), 'icon' => 'fas fa-file-alt'],
-
-            ];
-        } elseif ($user->role == 'asesi') {
-            $menus = [
-                ['name' => 'Dashboard', 'route' => route('asesi.dashboard'), 'icon' => 'fas fa-home'],
-                ['name' => 'Form Perencanaan', 'route' => route('formperencanaan'), 'icon' => 'fas fa-edit'],
-            ];
+        $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('login');
         }
 
-        return view('dashboard', compact('menus'));
+        Log::info('DashboardController@index dipanggil oleh user ID: ' . $user->id . ', role: ' . $user->role);
+
+        switch ($user->role) {
+            case 'admin':
+                return redirect()->route('admin.dashboard');
+            case 'asesor':
+                return redirect()->route('asesor.dashboard');
+            case 'asesi':
+                return redirect()->route('asesi.dashboard');
+            default:
+                return redirect()->route('login');
+        }
     }
 
+    /**
+     * Dashboard Admin
+     */
     public function admin()
     {
-        // Hilangkan dulu total agar tidak error
+        // Pastikan view ada, jika tidak redirect ke halaman default
+        if (!View::exists('admin.dashboard')) {
+            Log::warning('View admin.dashboard tidak ditemukan');
+            return redirect()->route('form_pra_assesmen');
+        }
         return view('admin.dashboard');
     }
 
+    /**
+     * Dashboard Asesi
+     */
     public function asesi()
     {
+        if (!View::exists('asesi.dashboard')) {
+            Log::warning('View asesi.dashboard tidak ditemukan, redirect ke form_pra_assesmen');
+            return redirect()->route('form_pra_assesmen');
+        }
         return view('asesi.dashboard');
     }
 
+    /**
+     * Dashboard Asesor
+     */
     public function asesor()
     {
+        if (!View::exists('asesor.dashboard')) {
+            Log::warning('View asesor.dashboard tidak ditemukan, redirect ke form_pra_assesmen');
+            return redirect()->route('form_pra_assesmen');
+        }
+
         // --- REAL DATA ---
         $totalPeserta    = DB::table('asesi')->count();
         $totalSertifikat = DB::table('sertifikat')->count();
@@ -57,7 +79,7 @@ class DashboardController extends Controller
         // --- DUMMY DATA (sementara) ---
         $penghargaan     = 0;
 
-        // Grafik sertifikasi per jurusan (sementara dummy karena di tabel asesi belum ada field jurusan)
+        // Grafik sertifikasi per jurusan (dummy)
         $labels = collect(['AKL', 'MPLB', 'PEMASARAN', 'M-LOG', 'DKV', 'RPL', 'TJKT']);
         $values = collect([45, 65, 30, 15, 40, 50, 10]);
 

@@ -28,7 +28,7 @@
 
         .card-wrap {
             width: 100%;
-            max-width: 580px; /* Diperbesar sedikit untuk 2 kolom */
+            max-width: 580px;
             background: var(--blue-deep);
             color: #ffffff;
             border-radius: var(--card-radius);
@@ -134,8 +134,7 @@
 
         .help-row {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: flex-end;
             margin-bottom: 1rem;
             color: #bfdff9;
             font-size: .9rem;
@@ -147,9 +146,6 @@
             font-weight: 600;
         }
         .help-row a:hover { text-decoration: underline; }
-
-        .form-check-label { color: #d7eafc; font-size: .92rem; }
-        .form-check-input { width: 18px; height: 18px; }
 
         .btn-primary-custom {
             display: inline-block;
@@ -172,10 +168,9 @@
 
         .text-error { color: #ffd6d6; font-size: .88rem; margin-top: .4rem; }
 
-        /* Responsif untuk form double */
         @media (max-width: 768px) {
             .form-row-double {
-                grid-template-columns: 1fr; /* Satu kolom di mobile */
+                grid-template-columns: 1fr;
                 gap: 0.5rem;
             }
         }
@@ -186,7 +181,6 @@
                 border-radius: 12px;
                 max-width: 95%;
             }
-            
             body {
                 padding: 1rem;
             }
@@ -199,21 +193,16 @@
     <div class="card-title" id="regTitle">Daftar Akun Baru</div>
     <div class="subtitle">Buat akun untuk mengakses layanan LSP</div>
 
-    {{-- Global error --}}
     @if ($errors->any())
         <div class="mb-3 text-start">
-            <div class="text-error">
-                {{-- menampilkan error pertama untuk ringkas --}}
-                {{ $errors->first() }}
-            </div>
+            @foreach ($errors->all() as $error)
+                <div class="text-error">{{ $error }}</div>
+            @endforeach
         </div>
     @endif
 
     <form action="{{ route('register.store') }}" method="POST" novalidate>
         @csrf
-
-        {{-- hidden default role (asesi) --}}
-        <input type="hidden" name="role" value="asesi">
 
         <!-- Nama -->
         <div class="form-row text-start">
@@ -237,9 +226,8 @@
             @error('email') <div class="text-error">{{ $message }}</div> @enderror
         </div>
 
-        <!-- Password dan Konfirmasi Password (Bersebelahan) -->
+        <!-- Password dan Konfirmasi Password -->
         <div class="form-row-double text-start">
-            <!-- Password -->
             <div>
                 <label for="password" style="color:#cfe7ff;font-size:.95rem;">Password</label>
                 <div class="input-wrapper">
@@ -253,7 +241,6 @@
                 @error('password') <div class="text-error">{{ $message }}</div> @enderror
             </div>
 
-            <!-- Konfirmasi Password -->
             <div>
                 <label for="password_confirmation" style="color:#cfe7ff;font-size:.95rem;">Konfirmasi Password</label>
                 <div class="input-wrapper">
@@ -285,10 +272,8 @@
             @error('jurusan_id') <div class="text-error">{{ $message }}</div> @enderror
         </div>
 
-        <!-- help row: lupa password (fallback bukan aktif disini) -->
-        <div class="help-row" style="justify-content:flex-end;">
-            <!-- kosong left (no remember) and right link to login/register -->
-            <a href="{{ Route::has('login') ? route('login') : '#' }}">Sudah punya akun? Login</a>
+        <div class="help-row">
+            <a href="{{ route('login') }}">Sudah punya akun? Login</a>
         </div>
 
         <div class="form-row">
@@ -301,10 +286,8 @@
     </div>
 </div>
 
-<!-- scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Toggle password visibility for both password fields
     (function () {
         const toggleBtn = document.getElementById('togglePassword');
         const toggleBtnConfirm = document.getElementById('togglePasswordConfirm');
@@ -333,25 +316,27 @@
             });
         }
 
-        // simple client-side check to prevent submitting if password mismatch
-        document.querySelector('form').addEventListener('submit', function (e) {
-            const p = passInput ? passInput.value : '';
-            const c = passConfirm ? passConfirm.value : '';
-            const jurusan = document.getElementById('jurusan_id') ? document.getElementById('jurusan_id').value : '';
-            
-            if (p !== c) {
-                e.preventDefault();
-                alert('Password dan konfirmasi password tidak sama.');
-                if (passConfirm) passConfirm.focus();
-                return;
-            }
-            
-            if (!jurusan) {
-                e.preventDefault();
-                alert('Silakan pilih jurusan terlebih dahulu.');
-                if (document.getElementById('jurusan_id')) document.getElementById('jurusan_id').focus();
-            }
-        });
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                const p = passInput ? passInput.value : '';
+                const c = passConfirm ? passConfirm.value : '';
+                const jurusan = document.getElementById('jurusan_id') ? document.getElementById('jurusan_id').value : '';
+
+                if (p !== c) {
+                    e.preventDefault();
+                    alert('Password dan konfirmasi password tidak sama.');
+                    if (passConfirm) passConfirm.focus();
+                    return;
+                }
+
+                if (!jurusan) {
+                    e.preventDefault();
+                    alert('Silakan pilih jurusan terlebih dahulu.');
+                    if (document.getElementById('jurusan_id')) document.getElementById('jurusan_id').focus();
+                }
+            });
+        }
     })();
 </script>
 </body>

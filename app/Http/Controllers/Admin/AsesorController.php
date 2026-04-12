@@ -23,7 +23,7 @@ class AsesorController extends Controller
             ->orderBy('updated_at', 'desc')
             ->paginate(15);
 
-        $daftarSkema = SkemaSertifikasi::all(); // ganti nama variabel
+        $daftarSkema = SkemaSertifikasi::all();
 
         return view('admin.asesor.index', compact('asesor', 'daftarSkema'));
     }
@@ -36,28 +36,17 @@ class AsesorController extends Controller
 
     public function store(Request $request)
     {
+        // Validasi: email wajib dan unik
         $validator = Validator::make($request->all(), [
-            'nama_asesor' => 'required|string|max:255',
-            'nip' => 'nullable|string|max:100|unique:asesor,nip',
-            'email' => 'nullable|email|max:255',
-            'telepon' => 'nullable|string|max:30',
-            'id_jurusan' => 'nullable|exists:jurusan,id_jurusan',
+            'nama_asesor'   => 'required|string|max:255',
+            'nip'           => 'nullable|string|max:100|unique:asesor,nip',
+            'email'         => 'required|email|max:255|unique:users,email|unique:asesor,email',
+            'telepon'       => 'nullable|string|max:30',
+            'id_jurusan'    => 'nullable|exists:jurusan,id_jurusan',
             'no_registrasi' => 'nullable|string|max:100|unique:asesor,no_registrasi',
-            'create_account' => 'nullable|in:1',
-            'skema_ids' => 'nullable|array',
-            'skema_ids.*' => 'exists:skema_sertifikasi,id_skema',
+            'skema_ids'     => 'nullable|array',
+            'skema_ids.*'   => 'exists:skema_sertifikasi,id_skema',
         ]);
-
-        // tambahan validasi: jika create_account dicentang => email wajib & unik di users
-        $validator->after(function ($v) use ($request) {
-            if ($request->has('create_account')) {
-                if (empty($request->email)) {
-                    $v->errors()->add('email', 'Email wajib diisi jika membuat akun untuk asesor.');
-                } elseif (User::where('email', $request->email)->exists()) {
-                    $v->errors()->add('email', 'Email ini sudah terdaftar di sistem.');
-                }
-            }
-        });
 
         if ($validator->fails()) {
             return redirect()->back()
@@ -67,66 +56,54 @@ class AsesorController extends Controller
 
         DB::beginTransaction();
         try {
-            $data = $validator->validated();
+            // Generate password random (8 karakter)
+            $plainPassword = Str::random(8);
 
-            $plainPassword = null;
-            $userId = null;
-
-            if (isset($data['create_account']) && $data['create_account'] == '1') {
-                // generate password random
-                $plainPassword = Str::random(10);
-
-                // create user
-                $user = User::create([
-                    'name' => $request->nama_asesor,
-                    'email' => $request->email,
-                    'password' => Hash::make($plainPassword),
-                    'role' => 'asesor', // pastikan kolom role ada di tabel users
-                ]);
-
-                $userId = $user->id;
-
-                // kirim email kredensial (jika konfigurasi mail sudah diisi)
-                try {
-                    Mail::to($request->email)->send(new AsesorCredentialsMail($user, $plainPassword));
-                } catch (\Exception $e) {
-                    \Log::error('Failed to send asesor credentials email: ' . $e->getMessage());
-                }
-            }
-
-            // simpan data asesor dengan id_jurusan
-            $asesor = Asesor::create([
-                'user_id' => $userId,
-                'nama_asesor' => $request->nama_asesor,
-                'nip' => $request->nip,
-                'email' => $request->email,
-                'telepon' => $request->telepon,
-                'id_jurusan' => $request->id_jurusan,
-                'no_registrasi' => $request->no_registrasi,
+            // Buat user account (role asesor)
+            $user = User::create([
+                'name'     => $request->nama_asesor,
+                'email'    => $request->email,
+                'password' => Hash::make($plainPassword),
+                'role'     => 'asesor',
             ]);
 
-            // sync skema yang dipilih
+            // Simpan data asesor
+            $asesor = Asesor::create([
+                'user_id'        => $user->id,
+                'nama_asesor'    => $request->nama_asesor,
+                'nip'            => $request->nip,
+                'email'          => $request->email,
+                'telepon'        => $request->telepon,
+                'id_jurusan'     => $request->id_jurusan,
+                'no_registrasi'  => $request->no_registrasi,
+            ]);
+
+            // Sync skema yang dipilih
             if ($request->has('skema_ids')) {
                 $asesor->skemas()->sync($request->skema_ids);
             }
 
-            DB::commit();
-
-            if ($plainPassword) {
-                return redirect()->route('admin.asesor.index')
-                    ->with('success', 'Asesor berhasil ditambahkan dan akun dibuat.')
-                    ->with('asesor_email', $request->email)
-                    ->with('asesor_password', $plainPassword);
+            // Kirim email berisi kredensial
+            try {
+                Mail::to($request->email)->send(new AsesorCredentialsMail($user, $plainPassword));
+            } catch (\Exception $e) {
+                // Log error tapi tidak menggagalkan proses
+                \Log::error('Gagal mengirim email kredensial asesor: ' . $e->getMessage());
             }
 
+            DB::commit();
+
+            // Redirect dengan flash message password (hanya sekali)
             return redirect()->route('admin.asesor.index')
-                ->with('success', 'Asesor berhasil ditambahkan.');
+                ->with('success', 'Asesor berhasil ditambahkan dan akun login telah dibuat.')
+                ->with('asesor_email', $request->email)
+                ->with('asesor_password', $plainPassword);
 
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Error create asesor: ' . $e->getMessage());
             return redirect()->back()
-                ->with('error', 'Terjadi kesalahan saat menyimpan data.')
+                ->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage())
                 ->withInput();
         }
     }

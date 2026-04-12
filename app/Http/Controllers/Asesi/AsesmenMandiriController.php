@@ -115,13 +115,11 @@ class AsesmenMandiriController extends Controller
 
         if ($master) {
             $rekomendasi = $master->rekomendasi;
-            // Jika rekomendasi 'Tidak Dapat Dilanjutkan', ambil jawaban lama untuk mode edit
-            if ($master->rekomendasi === 'Tidak Dapat Dilanjutkan') {
-                $jawaban = DB::table('asesmen_mandiri_jawaban')
-                    ->where('id_asesmen_mandiri', $master->id_asesmen_mandiri)
-                    ->get()
-                    ->keyBy('id_kuk');
-            }
+            // 🔥 PERUBAHAN: Selalu ambil jawaban jika master ada
+            $jawaban = DB::table('asesmen_mandiri_jawaban')
+                ->where('id_asesmen_mandiri', $master->id_asesmen_mandiri)
+                ->get()
+                ->keyBy('id_kuk');
         }
 
         return view(

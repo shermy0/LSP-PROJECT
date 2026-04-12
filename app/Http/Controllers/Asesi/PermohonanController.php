@@ -24,17 +24,10 @@ class PermohonanController extends Controller
     public function form1()
     {
         $user = Auth::user();
-
         $tuk = DB::table('tuk')->first();
+        $asesi = DB::table('asesi')->where('user_id', $user->id)->first();
 
-        $asesi = DB::table('asesi')
-            ->where('user_id', $user->id)
-            ->first();
-
-        return view('asesi.permohonan.form1', compact(
-            'tuk',
-            'asesi'
-        ));
+        return view('asesi.permohonan.form1', compact('tuk', 'asesi'));
     }
 
     /*
@@ -46,44 +39,21 @@ class PermohonanController extends Controller
     public function form2()
     {
         $user = Auth::user();
-
-        $asesi = DB::table('asesi')
-            ->where('user_id', $user->id)
-            ->first();
-
+        $asesi = DB::table('asesi')->where('user_id', $user->id)->first();
         $skema = DB::table('skema_sertifikasi')->get();
-
         $jenisDokumen = DB::table('jenis_dokumen')->get();
-
         $tujuanAsesmen = TujuanAsesmen::all();
-
         $permohonan = null;
-
         $existingDocs = collect();
 
         if ($asesi) {
-            $permohonan = Permohonan::where('id_asesi', $asesi->id_asesi)
-                ->latest('id_permohonan')
-                ->first();
-
+            $permohonan = Permohonan::where('id_asesi', $asesi->id_asesi)->latest('id_permohonan')->first();
             if ($permohonan) {
-                $existingDocs = DokumenPersyaratan::where('id_permohonan', $permohonan->id_permohonan)
-                    ->get()
-                    ->keyBy('id_jenis_dokumen');
+                $existingDocs = DokumenPersyaratan::where('id_permohonan', $permohonan->id_permohonan)->get()->keyBy('id_jenis_dokumen');
             }
         }
 
-        return view(
-            'asesi.permohonan.form2',
-            compact(
-                'skema',
-                'asesi',
-                'jenisDokumen',
-                'tujuanAsesmen',
-                'permohonan',
-                'existingDocs'
-            )
-        );
+        return view('asesi.permohonan.form2', compact('skema', 'asesi', 'jenisDokumen', 'tujuanAsesmen', 'permohonan', 'existingDocs'));
     }
 
     /*
@@ -120,9 +90,7 @@ class PermohonanController extends Controller
 
         $validated['user_id'] = $user->id;
 
-        $asesi = DB::table('asesi')
-            ->where('user_id', $user->id)
-            ->first();
+        $asesi = DB::table('asesi')->where('user_id', $user->id)->first();
 
         if ($asesi) {
             DB::table('asesi')
@@ -193,13 +161,16 @@ class PermohonanController extends Controller
 
     public function storeDokumen(Request $request)
     {
-        // Validasi input
         $request->validate([
             'id_skema'  => 'required|exists:skema_sertifikasi,id_skema',
             'tujuan_id' => 'required|exists:tujuan_asesmen,id_tujuan',
             'dokumen.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'tanggal'   => 'required|date',
             'ttd_asesi' => 'required|string',
+        ], [
+            'dokumen.*.max'   => 'Ukuran file maksimal 2MB.',
+            'dokumen.*.mimes' => 'File harus berformat PDF, JPG, JPEG, atau PNG.',
+            'dokumen.*.file'  => 'File yang diunggah tidak valid.',
         ]);
 
         $user = Auth::user();
@@ -214,13 +185,9 @@ class PermohonanController extends Controller
         DB::beginTransaction();
 
         try {
-            // Ambil permohonan terakhir
             $permohonan = Permohonan::where('id_asesi', $asesi->id_asesi)
                 ->latest('id_permohonan')
                 ->first();
-
-            // JANGAN HAPUS SEMUA DOKUMEN SAAT DITOLAK
-            // Cukup buat permohonan baru atau update status
 
             if (!$permohonan) {
                 $permohonan = Permohonan::create([
@@ -259,7 +226,7 @@ class PermohonanController extends Controller
                 }
             }
 
-            // 2. Upload file baru (untuk jenis dokumen yang diupload ulang)
+            // 2. Upload file baru
             $uploadedFiles = $request->file('dokumen', []);
             foreach ($uploadedFiles as $jenisId => $file) {
                 if (!$file) continue;
@@ -268,7 +235,7 @@ class PermohonanController extends Controller
                     throw new \Exception("File tidak valid untuk jenis dokumen ID {$jenisId}");
                 }
 
-                // Hapus dokumen lama untuk jenis ini (jika ada)
+                // Hapus dokumen lama untuk jenis ini
                 DokumenPersyaratan::where('id_permohonan', $idPermohonan)
                     ->where('id_jenis_dokumen', $jenisId)
                     ->delete();
@@ -326,7 +293,7 @@ class PermohonanController extends Controller
             return redirect()
                 ->back()
                 ->withInput()
-                ->with('error', 'Gagal menyimpan data. Pastikan file tidak terlalu besar dan coba lagi.');
+                ->with('error', 'Gagal menyimpan data. Pastikan file tidak terlalu besar (maksimal 2MB) dan coba lagi.');
         }
     }
 }

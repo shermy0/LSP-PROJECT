@@ -213,7 +213,6 @@
                         </tr>
                         @endforelse
                     </tbody>
-
                 </table>
             </div>
         </div>
@@ -300,7 +299,7 @@
     </div>
 </div>
 
-{{-- ================== MODAL TAMBAH ASESOR ================== --}}
+{{-- ================== MODAL TAMBAH ASESOR (TANPA CHECKBOX) ================== --}}
 <div class="modal fade" id="addAsesorModal" tabindex="-1" aria-labelledby="addAsesorModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow">
@@ -365,9 +364,9 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small">Email</label>
+                            <label class="form-label fw-semibold small">Email <span class="text-danger">*</span></label>
                             <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
-                                value="{{ old('email') }}" placeholder="email@example.com">
+                                value="{{ old('email') }}" placeholder="email@example.com" required>
                             @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -434,22 +433,6 @@
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
-
-                        <div class="col-12">
-                            <div class="account-option-card">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="1" id="createAccount"
-                                        name="create_account" {{ old('create_account') ? 'checked' : '' }}>
-                                    <label class="form-check-label fw-semibold" for="createAccount">
-                                        Buat akun login untuk asesor ini
-                                    </label>
-                                </div>
-                                <small class="text-muted d-block mt-2 ms-4">
-                                    <i class="bi bi-info-circle me-1"></i>
-                                    Sistem akan membuat akun user dan mengirim kredensial login melalui email
-                                </small>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -466,7 +449,6 @@
     </div>
 </div>
 
-{{-- ================== CUSTOM CSS ================== --}}
 <style>
     /* Primary Color Variables */
     :root {
@@ -593,17 +575,6 @@
         font-weight: 500;
     }
 
-    /* Badge Skema */
-    .badge-skema {
-        background-color: #e2e8ff;
-        color: var(--primary-dark);
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 11px;
-        font-weight: 500;
-        white-space: nowrap;
-    }
-
     /* Table Styling */
     table thead {
         background-color: var(--primary-light);
@@ -679,21 +650,8 @@
     }
 
     .modal-body {
-        max-height: 70vh; /* Batasi tinggi modal agar bisa discroll */
+        max-height: 70vh;
         overflow-y: auto;
-    }
-
-    .account-option-card {
-        background: #f8f9fa;
-        border: 1px solid #e9ecef;
-        border-radius: 8px;
-        padding: 16px;
-        transition: all 0.3s ease;
-    }
-
-    .account-option-card:has(.form-check-input:checked) {
-        background: var(--primary-light);
-        border-color: var(--primary-dark);
     }
 
     .form-check-input:checked {
@@ -717,12 +675,6 @@
         border-radius: 8px;
     }
 
-    /* Hover Effects */
-    .btn {
-        transition: all 0.3s ease;
-    }
-
-    /* Responsive */
     @media (max-width: 768px) {
         .icon-box {
             width: 48px;
@@ -750,15 +702,14 @@
         }
 
         .modal-body {
-            max-height: 60vh; /* Lebih kecil di mobile */
+            max-height: 60vh;
         }
     }
 </style>
 
-{{-- ================== SCRIPT ================== --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Search functionality with debounce
+        // Search functionality
         const searchInput = document.getElementById('searchInput');
         const table = document.getElementById('asesorTable');
         const rows = table ? table.querySelectorAll('tbody tr') : [];
@@ -769,20 +720,10 @@
                 clearTimeout(debounceTimer);
                 debounceTimer = setTimeout(() => {
                     const keyword = this.value.toLowerCase().trim();
-                    let visibleCount = 0;
-
                     rows.forEach(row => {
                         const text = row.textContent.toLowerCase();
-                        const shouldShow = text.includes(keyword);
-                        row.style.display = shouldShow ? '' : 'none';
-                        if (shouldShow) visibleCount++;
+                        row.style.display = text.includes(keyword) ? '' : 'none';
                     });
-
-                    // Optional: Show message if no results
-                    const noResultsRow = table.querySelector('.no-results-row');
-                    if (visibleCount === 0 && !row.classList.contains('no-results-row')) {
-                        console.log('Tidak ada hasil yang cocok');
-                    }
                 }, 300);
             });
         }

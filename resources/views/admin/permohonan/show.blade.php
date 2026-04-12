@@ -237,7 +237,7 @@
                                     <td>{{ $unit->standar_kompetensi ?? '-' }}</td>
                                 </tr>
                             @empty
-                                <tr><td colspan="4" class="text-center text-muted py-4">Belum ada unit kompetensi</td></tr>
+                                <td><td colspan="4" class="text-center text-muted py-4">Belum ada unit kompetensi</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -349,7 +349,7 @@
                         </div>
                     </div>
 
-                    <!-- Admin (interactive canvas dengan desain baru) -->
+                    <!-- Admin (interactive canvas) - TANDA TANGAN SELALU FRESH -->
                     <div class="col-md-6">
                         <div class="bg-light p-4 rounded-4 h-100">
                             <h6 class="fw-bold mb-3">Admin</h6>
@@ -366,7 +366,7 @@
                                     <canvas id="ttd-admin" class="ttd-canvas" width="400" height="160"></canvas>
                                     <span class="canvas-placeholder">Tanda tangan di sini</span>
                                 </div>
-                                <input type="hidden" name="ttd_admin" id="ttd_admin_data" value="{{ old('ttd_admin', $persetujuan->ttd_admin ?? $permohonan->ttd_admin ?? '') }}">
+                                <input type="hidden" name="ttd_admin" id="ttd_admin_data" value=""> <!-- SELALU KOSONG -->
                                 <div class="invalid-feedback">Tanda tangan admin wajib diisi.</div>
                             </div>
 
@@ -482,7 +482,6 @@
     </div>
 </div>
 
-{{-- STYLE disesuaikan dengan tema #0b2f7c dan gaya halaman sebelumnya --}}
 <style>
     :root {
         --primary: #0b2f7c;
@@ -673,7 +672,6 @@
     }
 </style>
 
-{{-- SCRIPT untuk canvas admin dan aturan keputusan otomatis --}}
 <script>
     // Fungsi preview dokumen
     function openPreview(url, ext) {
@@ -690,7 +688,7 @@
         new bootstrap.Modal(document.getElementById('previewModal')).show();
     }
 
-    // Inisialisasi canvas tanda tangan admin
+    // Inisialisasi canvas tanda tangan admin (selalu fresh)
     (function() {
         const canvas = document.getElementById('ttd-admin');
         if (!canvas) return;
@@ -806,10 +804,7 @@
         };
 
         window.saveAdminTTD = function(required = true) {
-            const prev = document.getElementById('ttd_admin_data').value;
-            if (prev && prev.trim().length > 0) {
-                return true;
-            }
+            // TIDAK membaca nilai dari hidden input lama, selalu minta tanda tangan baru
             if (isCanvasBlankAdmin()) {
                 if (required) {
                     new bootstrap.Modal(document.getElementById('ttdWarningModal')).show();
@@ -885,7 +880,6 @@
             diterimaRadio.disabled = true;
             diterimaRadio.checked = false;
             ditolakRadio.checked = true;
-            // Tampilkan peringatan jika belum ada
             let warningMsg = document.getElementById('unmetWarning');
             if (!warningMsg) {
                 warningMsg = document.createElement('div');
@@ -905,12 +899,9 @@
         }
     }
 
-    // Pasang event listener pada setiap radio dokumen
     document.querySelectorAll('input[name^="syarat["]').forEach(radio => {
         radio.addEventListener('change', updateKeputusanRadio);
     });
-
-    // Jalankan saat halaman dimuat
     updateKeputusanRadio();
 
     // Validasi form + simpan TTD sebelum submit
@@ -919,6 +910,7 @@
         const form = document.getElementById('permohonanForm');
 
         form.addEventListener('submit', function (event) {
+            // Pastikan tanda tangan admin valid (harus diisi ulang, tidak pakai yang lama)
             if (typeof saveAdminTTD === 'function') {
                 const ok = saveAdminTTD(true);
                 if (!ok) {
@@ -959,5 +951,14 @@
             form.classList.add('was-validated');
         }, false);
     })();
+
+    // Reset hidden input dan canvas saat halaman dimuat (memastikan fresh)
+    document.addEventListener('DOMContentLoaded', function() {
+        const ttdInput = document.getElementById('ttd_admin_data');
+        if (ttdInput) ttdInput.value = '';
+        if (typeof clearCanvasAdmin === 'function') {
+            clearCanvasAdmin();
+        }
+    });
 </script>
 @endsection

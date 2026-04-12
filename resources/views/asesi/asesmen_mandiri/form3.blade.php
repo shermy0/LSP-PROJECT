@@ -250,7 +250,7 @@
         border-radius: 2rem;
         font-weight: 600;
         font-size: 1rem;
-        border: none;
+        border: none;   
         cursor: pointer;
         display: inline-flex;
         align-items: center;

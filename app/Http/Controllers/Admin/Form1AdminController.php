@@ -74,10 +74,9 @@ class Form1AdminController extends Controller
         if (!empty($permohonan->id_tuk)) {
             $tuk = DB::table('tuk')->where('id_tuk', $permohonan->id_tuk)->first();
         } else {
-            $tuk = DB::table('tuk')->first(); // fallback
+            $tuk = DB::table('tuk')->first();
         }
 
-        // Dokumen persyaratan beserta nilai memenuhi_syarat (jika sudah ada)
         $dokumen = DB::table('dokumen_persyaratan')
             ->join('jenis_dokumen', 'dokumen_persyaratan.id_jenis_dokumen', '=', 'jenis_dokumen.id_jenis_dokumen')
             ->where('dokumen_persyaratan.id_permohonan', $permohonan->id_permohonan)
@@ -118,7 +117,7 @@ class Form1AdminController extends Controller
             'tanggal_admin'     => 'nullable|date'
         ]);
 
-        // 1. Update memenuhi_syarat setiap dokumen (sebelum menentukan status)
+        // 1. Update memenuhi_syarat setiap dokumen
         $hasUnmet = false;
         if ($request->has('syarat')) {
             foreach ($request->syarat as $idDokumen => $nilai) {
@@ -141,7 +140,6 @@ class Form1AdminController extends Controller
         $finalStatus = $request->status_permohonan;
         if ($hasUnmet && $finalStatus === 'Diterima') {
             $finalStatus = 'Ditolak';
-            // Kirim pesan flash peringatan
             session()->flash('warning', 'Terdapat dokumen yang tidak memenuhi syarat. Status permohonan otomatis diubah menjadi Ditolak.');
         }
 
@@ -169,8 +167,8 @@ class Form1AdminController extends Controller
                     ['id_permohonan' => $id_permohonan],
                     [
                         'tgl_ttd_admin' => $request->tanggal_admin ?? now(),
-                        'ttd_admin'      => $filePath,
-                        'updated_at'     => now(),
+                        'ttd_admin'     => $filePath,
+                        'updated_at'    => now(),
                     ]
                 );
         }

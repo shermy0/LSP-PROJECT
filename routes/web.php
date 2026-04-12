@@ -4,15 +4,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
 use App\Http\Controllers\FormAsesmenController;
 use App\Http\Controllers\Asesi\PermohonanController;
 use App\Http\Controllers\Admin\Form1AdminController;
 use App\Http\Controllers\Admin\PenugasanController;
-// Hapus use BandingAsesmenController global karena tidak digunakan
-// use App\Http\Controllers\BandingAsesmenController;
 use App\Http\Controllers\FormPraAsesmenController;
 use App\Http\Controllers\Asesi\AsesmenMandiriController as AsesiAsesmenMandiriController;
 use App\Http\Controllers\Asesor\AsesmenMandiriController as AsesorAsesmenMandiriController;
@@ -21,30 +18,38 @@ use App\Http\Controllers\Asesi\PersetujuanAsesmenController as AsesiPersetujuanC
 use App\Http\Controllers\Asesor\PenyesuaianWajarController as AsesorPenyesuaianWajarController;
 use App\Http\Controllers\Asesi\PenyesuaianWajarController as AsesiPenyesuaianWajarController;
 
-// ================== AUTH ==================
-// login
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
-
-// register
-Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-Route::post('/register', [AuthController::class, 'register'])->name('register.store');
+// ================== AUTH (tanpa middleware auth) ==================
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.store');
+});
 
 // ================== REDIRECT DEFAULT ==================
+// ================== REDIRECT DEFAULT ==================
 Route::get('/', function () {
+    if (Auth::check()) {
+        $user = Auth::user();
+        switch ($user->role) {
+            case 'admin': return redirect()->route('admin.dashboard');
+            case 'asesor': return redirect()->route('asesor.dashboard');
+            case 'asesi': return redirect()->route('asesi.dashboard');
+            default: return redirect()->route('login');
+        }
+    }
     return redirect()->route('login');
 });
 
+// ================== LOGOUT (dengan middleware auth) ==================
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
 // ================== ROUTES WITH AUTH ==================
 Route::middleware(['auth'])->group(function () {
-
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    // Admin dashboard
+    // Dashboard
     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
-
-    // Asesi dashboard
     Route::get('/asesi/dashboard', [DashboardController::class, 'asesi'])->name('asesi.dashboard');
+    Route::get('/asesor/dashboard', [DashboardController::class, 'asesor'])->name('asesor.dashboard');
 
     // ================== PERMOHONAN (FR.APL.01) ==================
     Route::prefix('asesi/permohonan')->name('asesi.permohonan.')->group(function () {
@@ -59,9 +64,6 @@ Route::middleware(['auth'])->group(function () {
 
     // ambil data skema via ajax
     Route::get('/get-skema/{id}', [PermohonanController::class, 'getSkema'])->name('get.skema');
-
-    // ================== ASESOR DASHBOARD ==================
-    Route::get('/asesor/dashboard', [DashboardController::class, 'asesor'])->name('asesor.dashboard');
 
     // ================== FORM ASESMEN ==================
     Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('formperencanaan');
@@ -83,7 +85,6 @@ Route::middleware(['auth'])->group(function () {
 
     // ================== ADMIN ==================
     Route::prefix('admin')->name('admin.')->group(function () {
-
         // Permohonan
         Route::prefix('permohonan')->name('permohonan.')->group(function () {
             Route::get('/', [Form1AdminController::class, 'index'])->name('index');
@@ -101,11 +102,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/penugasan/{id}/edit', [PenugasanController::class, 'edit'])->name('penugasan.edit');
         Route::put('/penugasan/{id}', [PenugasanController::class, 'update'])->name('penugasan.update');
 
-        // ===== BANDING ASESMEN UNTUK ADMIN =====
+        // Banding Asesmen untuk Admin
         Route::resource('banding-asesmen', \App\Http\Controllers\Admin\BandingAsesmenController::class)
             ->only(['index', 'show']);
-
-        // ===== DOWNLOAD PDF BANDING =====
         Route::get('/banding-asesmen/{id}/download', [\App\Http\Controllers\Admin\BandingAsesmenController::class, 'downloadPdf'])->name('banding-asesmen.download');
     });
 
@@ -180,42 +179,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('form-pra-assesmen', [FormPraAsesmenController::class, 'index'])->name('form_pra_assesmen');
 });
 
-// Route untuk update permohonan admin (di luar group? sudah ada di dalam group, tapi kita tambahkan juga yang ini)
+// Route untuk update permohonan admin (tambahan)
 Route::post('/admin/permohonan/{id_permohonan}/update', [Form1AdminController::class, 'update'])->name('admin.permohonan.update');
-
-// ================== LOGOUT ==================
-Route::post('/logout', function () {
-    Auth::logout();
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-    return redirect('/login');
-})->name('logout');
-
-// ================== VIEW STATIC (opsional) ==================
-Route::get('/asesi', function () {
-    return view('asesi.index');
-})->name('index-asesi');
-
-Route::get('/asesmen', function () {
-    return view('asesi.asesmen');
-})->name('asesmen');
-
-Route::get('/asesmen2', function () {
-    return view('asesi.asesmen2');
-})->name('asesmen2');
-
-Route::get('/asesmen3', function () {
-    return view('asesi.asesmen3');
-})->name('asesmen3');
-
-Route::get('/index', function () {
-    return view('asesor.index');
-})->name('index');
-
-Route::get('/verifasesmen', function () {
-    return view('asesor.verifasesmen');
-})->name('verifasesmen');
-
-Route::get('/verifasesmen2', function () {
-    return view('asesor.verifasesmen2');
-})->name('verifasesmen2');

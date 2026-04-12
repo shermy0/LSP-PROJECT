@@ -93,7 +93,7 @@
                     <div class="table-responsive">
                         <table class="table table-bordered align-middle">
                             <thead class="table-light">
-                                32
+                                <tr>
                                     <th>No</th>
                                     <th>Kode Unit</th>
                                     <th>Judul Unit</th>
@@ -122,7 +122,7 @@
                         </div>
                         <div>
                             <h5 class="fw-bold mb-0">A. Bukti Persyaratan Dasar Pemohon</h5>
-                            <p class="text-secondary mb-0 small">Unggah dokumen persyaratan dasar yang diperlukan</p>
+                            <p class="text-secondary mb-0 small">Unggah dokumen persyaratan dasar yang diperlukan (maksimal 2MB per file)</p>
                         </div>
                     </div>
                 </div>
@@ -156,6 +156,9 @@
                                     Belum ada file dipilih
                                 @endif
                             </div>
+                            <div class="text-muted small mt-1">
+                                <i class="bi bi-info-circle"></i> Format: PDF, JPG, JPEG, PNG. Maksimal 2MB.
+                            </div>
                             @if($doc && !$doc->memenuhi_syarat)
                                 <div class="text-danger small mt-1">Dokumen belum memenuhi syarat.</div>
                                 @if(!empty($doc->catatan))
@@ -179,7 +182,7 @@
                         </div>
                         <div>
                             <h5 class="fw-bold mb-0">B. Bukti Administratif</h5>
-                            <p class="text-secondary mb-0 small">Unggah dokumen administratif yang diperlukan</p>
+                            <p class="text-secondary mb-0 small">Unggah dokumen administratif yang diperlukan (maksimal 2MB per file)</p>
                         </div>
                     </div>
                 </div>
@@ -212,6 +215,9 @@
                                 @else
                                     Belum ada file dipilih
                                 @endif
+                            </div>
+                            <div class="text-muted small mt-1">
+                                <i class="bi bi-info-circle"></i> Format: PDF, JPG, JPEG, PNG. Maksimal 2MB.
                             </div>
                             @if($doc && !$doc->memenuhi_syarat)
                                 <div class="text-danger small mt-1">Dokumen belum memenuhi syarat.</div>
