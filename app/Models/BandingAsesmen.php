@@ -20,6 +20,7 @@ class BandingAsesmen extends Model
         'tgl_asesmen',
         'banding_dijelaskan',
         'diskusi_dengan_asesor',
+        'libatkan_orang_lain',
         'alasan_banding',
         'tgl_banding',
     ];
