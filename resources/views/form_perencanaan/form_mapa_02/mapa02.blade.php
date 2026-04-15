@@ -1,7 +1,19 @@
 @extends('master')
 @section('konten')
 <link rel="stylesheet" href="{{ asset('assets/css/mapa01.css') }}">
+<style>
+    .td-disabled {
+    background-color: #e9ecef; /* abu bootstrap */
+    cursor: not-allowed;
+}
 
+.td-disabled input {
+    cursor: not-allowed;
+}
+.td-disabled {
+    background-color: #f1f3f5;
+}
+</style>
 <div class="card mapa-card">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -180,17 +192,17 @@
         }
     @endphp
 
-    <td class="text-center">
-        <input type="radio"
-            name="{{ $field }}_{{ $kelompok->id_kelompok }}"
-            value="{{ $j }}"
-            class="form-check-input"
-            @if(!$bolehIsi) disabled @endif
-            @if(isset($instrumenPerKelompok[$kelompok->id_kelompok]) &&
-                $instrumenPerKelompok[$kelompok->id_kelompok]->$field == $j)
-                checked
-            @endif>
-    </td>
+<td class="text-center {{ !$bolehIsi ? 'td-disabled' : '' }}">
+    <input type="radio"
+        name="{{ $field }}_{{ $kelompok->id_kelompok }}"
+        value="{{ $j }}"
+        class="form-check-input"
+        @if(!$bolehIsi) disabled @endif
+        @if(isset($instrumenPerKelompok[$kelompok->id_kelompok]) &&
+            $instrumenPerKelompok[$kelompok->id_kelompok]->$field == $j)
+            checked
+        @endif>
+</td>
 @endfor
 
                         </tr>

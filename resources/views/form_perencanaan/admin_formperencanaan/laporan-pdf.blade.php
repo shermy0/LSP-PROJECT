@@ -1,3 +1,7 @@
+@php
+\Carbon\Carbon::setLocale('id');
+@endphp
+
 <!DOCTYPE html>
 <html lang="id">
 <head>

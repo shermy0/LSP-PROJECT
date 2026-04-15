@@ -140,18 +140,23 @@ $validators = $asesors;
                         <td class="text-center no">1</td>
                         <td><input type="text" name="perbaikan[]" class="form-control"></td>
                         <td><input type="date" name="waktu[]" class="form-control"></td>
-                        <td>
-                            <select name="penanggung[]" class="form-control penanggung">
-                                <option value="">-- Pilih Penanggung Jawab --</option>
-                                @foreach($asesors as $asesor)
-                                    <option value="{{ $asesor->nama_asesor }}"
-                                            data-no="{{ $asesor->no_registrasi }}">
-                                        {{ $asesor->nama_asesor }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <input type="hidden" name="no_registrasi_penanggung[]" class="no-registrasi-penanggung">
-                        </td>
+             <td>
+<select name="penanggung[]" class="form-control penanggung">
+<option value="">-- Pilih Penanggung Jawab --</option>
+
+@foreach($asesors as $asesor)
+<option value="{{ $asesor->id_asesor }}"
+        data-no="{{ $asesor->no_registrasi }}">
+    {{ $asesor->nama_asesor }}
+</option>
+@endforeach
+
+</select>
+
+<input type="hidden"
+       name="no_registrasi_penanggung[]"
+       class="no-registrasi-penanggung">
+</td>
                         <td class="text-center">
                             <canvas class="signature-preview" width="120" height="50"
                                     style="border:1px solid #ccc; cursor:pointer;"></canvas>
@@ -213,9 +218,9 @@ $validators = $asesors;
 <select name="nama_validator[]" class="form-select nama-validator-sebelum">
 <option value="">-- Pilih Asesor --</option>
 @foreach($asesors as $asesor)
-<option value="{{ $asesor->id_asesor }}"
+<option value="{{ $asesor->nama_asesor }}"
 data-no="{{ $asesor->no_registrasi }}"
-{{ $v == $asesor->id_asesor ? 'selected' : '' }}>
+{{ $v == $asesor->nama_asesor ? 'selected' : '' }}>
 {{ $asesor->nama_asesor }}
 </option>
 @endforeach
@@ -271,7 +276,7 @@ value="{{ $ttdValidator[$i] ?? '' }}">
 <select name="nama_validator[]" class="form-select nama-validator-sebelum">
 <option value="">-- Pilih Asesor --</option>
 @foreach($asesors as $asesor)
-<option value="{{ $asesor->id_asesor }}"
+<option value="{{ $asesor->nama_asesor }}"
 data-no="{{ $asesor->no_registrasi }}">
 {{ $asesor->nama_asesor }}
 </option>
