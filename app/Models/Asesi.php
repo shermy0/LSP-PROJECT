@@ -42,7 +42,52 @@ class Asesi extends Model
         'telepon_kantor',
         'fax_kantor',
         'email_kantor',
+        // Legacy names used by the incoming perencanaan controllers.
+        'alamat',
+        'telepon',
+        'pendidikan_terakhir',
+        'institusi',
     ];
+
+    public function setAlamatAttribute($value): void
+    {
+        $this->attributes['alamat_rumah'] = $value;
+    }
+
+    public function getAlamatAttribute(): ?string
+    {
+        return $this->alamat_rumah;
+    }
+
+    public function setTeleponAttribute($value): void
+    {
+        $this->attributes['telepon_hp'] = $value;
+    }
+
+    public function getTeleponAttribute(): ?string
+    {
+        return $this->telepon_hp;
+    }
+
+    public function setPendidikanTerakhirAttribute($value): void
+    {
+        $this->attributes['kualifikasi_pendidikan'] = $value;
+    }
+
+    public function getPendidikanTerakhirAttribute(): ?string
+    {
+        return $this->kualifikasi_pendidikan;
+    }
+
+    public function setInstitusiAttribute($value): void
+    {
+        $this->attributes['nama_institusi'] = $value;
+    }
+
+    public function getInstitusiAttribute(): ?string
+    {
+        return $this->nama_institusi;
+    }
 
     // ===============================
     // 🔗 RELASI ELOQUENT

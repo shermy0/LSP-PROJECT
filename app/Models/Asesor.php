@@ -27,13 +27,18 @@ class Asesor extends Model
     }
 
     public function skema()
-{
-    return $this->belongsToMany(
-        SkemaSertifikasi::class,  // model tujuan
-        'asesor_skema',           // nama tabel pivot
-        'asesor_id',              // foreign key untuk asesor di pivot
-        'skema_id'                // foreign key untuk skema di pivot
-    );
-}
+    {
+        return $this->belongsToMany(
+            SkemaSertifikasi::class,
+            'asesor_skema',
+            'asesor_id',
+            'skema_id'
+        );
+    }
+
+    public function skemas()
+    {
+        return $this->skema();
+    }
 
 }

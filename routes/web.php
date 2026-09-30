@@ -10,10 +10,15 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
 use App\Http\Controllers\PertanyaanController;
 use App\Http\Controllers\JawabanController;
-use App\Http\Controllers\FormPerencanaan\MapaController;
+use App\Http\Controllers\FormPerencanaan\Mapa01Controller;
+use App\Http\Controllers\FormPerencanaan\Mapa02Controller;
+use App\Http\Controllers\FormPerencanaan\KonfirmasiController;
+use App\Http\Controllers\FormPerencanaan\LaporanController;
+use App\Http\Controllers\FormPerencanaan\MeninjauAsesmenController;
+use App\Http\Controllers\FormPerencanaan\ModifikasiController as FormModifikasiController;
+use App\Http\Controllers\FormPerencanaanController;
 use App\Http\Controllers\SkemaController;
 use App\Http\Controllers\RekamanAsesmenController;
-use App\Http\Controllers\ModifikasiController;
 use App\Http\Controllers\FormAsesmenController;
 use App\Http\Controllers\Asesi\PermohonanController;
 use App\Http\Controllers\Admin\Form1AdminController;
@@ -118,26 +123,80 @@ Route::middleware(['auth'])->group(function () {
     |----------------------------------------------------------------------
     */
     Route::get('/formperencanaan', [PerencanaanController::class, 'index'])->name('formperencanaan');
-    Route::get('/form-mapa01', [SkemaController::class, 'formMapa01'])->name('form.mapa01');
+    Route::post('/formperencanaan', [PerencanaanController::class, 'simpan'])->name('formperencanaan.simpan');
+    Route::get('/perencanaan/skema', [FormPerencanaanController::class, 'index'])->name('formperencanaan.index');
+    Route::get('/perencanaan/skema/{id_skema}', [FormPerencanaanController::class, 'show'])->name('formperencanaan.show');
+    Route::get('/form-mapa01', [SkemaController::class, 'formMapa01'])->name('form.mapa01.select');
 
     Route::prefix('form-perencanaan')->group(function () {
-        Route::get('/mapa01', [MapaController::class, 'create'])->name('form.mapa01');
-        Route::get('/mapa01/kode-unit/{skema_id}', [MapaController::class, 'kodeUnit'])->name('form.mapa01.kodeunit');
-        Route::get('/mapa01/{skema_id}/kelompok/{kelompok_id}/tambah-unit', [MapaController::class, 'tambahUnit'])->name('form.mapa01.tambahunit');
-        Route::post('/mapa01/{skema_id}/kelompok/{kelompok_id}/simpan-unit', [MapaController::class, 'simpanUnit'])->name('form.mapa01.simpanunit');
-        Route::delete('/mapa01/{skema_id}/hapus-unit/{id}', [MapaController::class, 'hapusUnit'])->name('form.mapa01.hapusunit');
-        Route::post('/{skema_id}/tambah-kelompok', [MapaController::class, 'tambahKelompok'])->name('form.mapa01.tambahKelompok');
-        Route::delete('/{skema_id}/hapus-kelompok/{kelompok_id}', [MapaController::class, 'hapusKelompok'])->name('form.mapa01.hapusKelompok');
-        Route::get('/get-skema/{id}', [MapaController::class, 'getSkema']);
-        Route::get('/mapa01/modifikasi/{skema_id}', [ModifikasiController::class, 'index'])->name('form.mapa01.modifikasi');
-        Route::get('/mapa01/konfirmasi/{skema_id}', [MapaController::class, 'index'])->name('form.mapa01.konfirmasi');
-        Route::get('/mapa01/edit-unit/{skema_id}/{id}', [MapaController::class, 'editUnit'])->name('form.mapa01.editunit');
-        Route::put('/mapa01/update-unit/{skema_id}/{id}', [MapaController::class, 'updateUnit'])->name('form.mapa01.updateunit');
+        Route::get('/mapa01/{id_skema}', [Mapa01Controller::class, 'showMapa01'])->name('form.mapa01');
+        Route::post('/mapa01/{id_skema}/store', [Mapa01Controller::class, 'storeMapa01'])->name('form.mapa01.store');
+        Route::post('/mapa01/{skema}/tujuan/{tujuan}/update', [Mapa01Controller::class, 'updateTujuan'])->name('mapa01.tujuan.update');
+        Route::delete('/mapa01/{skema}/tujuan/{tujuan}', [Mapa01Controller::class, 'deleteTujuan'])->name('mapa01.tujuan.delete');
+        Route::get('/mapa01/kode-unit/{skema_id}', [Mapa01Controller::class, 'kodeUnit'])->name('form.mapa01.kodeunit');
+        Route::get('/mapa01/{skema_id}/kelompok/{kelompok_id}/tambah-unit', [Mapa01Controller::class, 'tambahUnit'])->name('form.mapa01.tambahunit');
+        Route::post('/mapa01/{skema_id}/kelompok/{kelompok_id}/simpan-unit', [Mapa01Controller::class, 'simpanUnit'])->name('form.mapa01.simpanunit');
+        Route::delete('/mapa01/{skema_id}/hapus-unit/{id}', [Mapa01Controller::class, 'hapusUnit'])->name('form.mapa01.hapusunit');
+        Route::post('/mapa01/{skema_id}/tambah-kelompok', [Mapa01Controller::class, 'tambahKelompok'])->name('form.mapa01.tambahKelompok');
+        Route::delete('/mapa01/{skema_id}/hapus-kelompok/{kelompok_id}', [Mapa01Controller::class, 'hapusKelompok'])->name('form.mapa01.hapusKelompok');
+        Route::get('/mapa01/get-skema/{id}', [Mapa01Controller::class, 'getSkema'])->name('form.mapa01.getskema');
+        Route::get('/mapa01/edit-unit/{skema_id}/{id}', [Mapa01Controller::class, 'editUnit'])->name('form.mapa01.editunit');
+        Route::put('/mapa01/update-unit/{skema_id}/{id}', [Mapa01Controller::class, 'updateUnit'])->name('form.mapa01.updateunit');
+        Route::get('/mapa01/konfirmasi/{skema_id}', [KonfirmasiController::class, 'konfirmasi'])->name('form.mapa01.konfirmasi');
+        Route::post('/mapa01/konfirmasi/{skema_id}', [KonfirmasiController::class, 'store'])->name('form.mapa01.konfirmasi.simpan');
+        Route::delete('/mapa01/konfirmasi/penyusun/{id}', [KonfirmasiController::class, 'deletePenyusun'])->name('form.mapa01.konfirmasi.penyusun.delete');
+        Route::get('/mapa01/konfirmasi/ttd/{id}/download', [KonfirmasiController::class, 'downloadTtd'])->name('form.mapa01.konfirmasi.ttd.download');
+        Route::delete('/mapa01/konfirmasi/ttd/{id}/delete', [KonfirmasiController::class, 'deleteTtd'])->name('form.mapa01.konfirmasi.ttd.delete');
+        Route::get('/mapa01/modifikasi/{skema_id}', [FormModifikasiController::class, 'index'])->name('form.mapa01.modifikasi');
+        Route::post('/mapa01/modifikasi/{skema_id}', [FormModifikasiController::class, 'store'])->name('form.mapa01.modifikasi.store');
+
+        Route::get('/mapa02/{skema_id}/asesor', [Mapa02Controller::class, 'showMapa02Asesor'])->name('form.mapa02.asesor');
+        Route::get('/mapa02/{id_skema}', [Mapa02Controller::class, 'showMapa02'])->name('form.mapa02');
+        Route::post('/mapa02/instrumen/simpan-potensi', [Mapa02Controller::class, 'simpanInstrumen'])->name('mapa02.simpanInstrumen');
+        Route::post('/mapa02/{skema_id}/penyusun/simpan', [Mapa02Controller::class, 'storePenyusun'])->name('form.mapa02.penyusun.store');
+        Route::delete('/mapa02/penyusun/{id}', [Mapa02Controller::class, 'deletePenyusun'])->name('form.mapa02.penyusun.delete');
+        Route::delete('/mapa02/penyusun/{id}/delete-ttd', [KonfirmasiController::class, 'deleteTtd'])->name('form.mapa02.penyusun.deleteTtd');
+        Route::get('/mapa02/penyusun/{id}/download-ttd', [KonfirmasiController::class, 'downloadTtd'])->name('form.mapa02.penyusun.downloadTtd');
+
+        Route::get('/laporan/{skema_id}', [LaporanController::class, 'showLaporan'])->name('laporan.show');
+        Route::get('/laporan/{skema_id}/asesi/{asesor_id}', [LaporanController::class, 'getAsesiByAsesor'])->name('laporan.getAsesi');
+        Route::post('/laporan/store', [LaporanController::class, 'store'])->name('laporan_asesor.store');
+        Route::post('/laporan/{skema_id}/store', [LaporanController::class, 'store'])->name('laporan.store');
+        Route::get('/laporan_asesor/{skema_id}', [LaporanController::class, 'showLaporanAsesor'])->name('form_perencanaan.laporan_asesmen.laporan_asesor');
+        Route::post('/laporan_asesor/{skema_id}/asesor/store', [KonfirmasiController::class, 'storeLaporanAsesor'])->name('form_perencanaan.laporan_asesmen.laporan_asesor.store');
+        Route::delete('/laporan_asesor/ttd/{id}', [KonfirmasiController::class, 'deleteTtd'])->name('form_perencanaan.laporan_asesmen.ttd.delete');
+        Route::get('/laporan_asesor/ttd/{id}/download', [KonfirmasiController::class, 'downloadTtd'])->name('form_perencanaan.laporan_asesmen.ttd.download');
+
+        Route::get('/ninjau_asesmen/{id_skema}', [MeninjauAsesmenController::class, 'showNinjauAsesmen'])->name('form_perencanaan.ninjau_asesmen');
+        Route::get('/ninjau-asesmen-asesor/{id_skema}', [MeninjauAsesmenController::class, 'showNinjauAsesmenAsesor'])->name('form_perencanaan.ninjau_asesmen_asesor');
+        Route::post('/ninjau-asesmen-asesor/{id_skema}/simpan', [MeninjauAsesmenController::class, 'simpanLanjut'])->name('form_perencanaan.ninjau_asesmen_asesor.store');
+        Route::post('/ninjau-asesmen-asesor/{asesor_id}/simpan-persetujuan', [MeninjauAsesmenController::class, 'storeAsesor'])->name('form_perencanaan.ninjau_asesmen_asesor.simpan');
+        Route::get('/meninjau-proses/{skema}/data/{asesor}', [MeninjauAsesmenController::class, 'getDataByAsesor'])->name('meninjau-proses.data');
+        Route::get('/fr-va/{periode}/{skema_id?}', [PerencanaanController::class, 'frva'])->name('form_perencanaan.fr_va');
+        Route::get('/fr-va-asesor/{periode}/{skema_id?}', [PerencanaanController::class, 'frVaAsesor'])->name('form_perencanaan.fr_va_asesor');
+        Route::post('/fr-va-asesor/simpan', [PerencanaanController::class, 'simpanLanjutfrVa'])->name('form_perencanaan.fr_va_asesor.simpan');
+        Route::post('/formperencanaan/simpan-semua', [PerencanaanController::class, 'simpanSemua'])->name('formperencanaan.simpan_semua');
     });
 
-    Route::get('/get-unit/{id}', [MapaController::class, 'getUnit'])->name('form.mapa01.getunit');
-    Route::get('/search-unit', [MapaController::class, 'searchUnit'])->name('form.mapa01.searchunit');
+    Route::get('/get-unit/{id}', [Mapa01Controller::class, 'getUnit'])->name('form.mapa01.getunit');
+    Route::get('/get-units/{skema_id}', [Mapa01Controller::class, 'getUnitsBySkema'])->name('form.mapa01.getunits');
+    Route::get('/search-unit', [Mapa01Controller::class, 'searchUnit'])->name('form.mapa01.searchunit');
     Route::get('/get-skema/{id}', [PermohonanController::class, 'getSkema'])->name('get.skema');
+
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/form/mapa01/{id_skema}/download-all', [Mapa01Controller::class, 'downloadAll'])->name('form.mapa01.downloadAll');
+        Route::get('/admin/form-perencanaan/mapa01/{id_skema}/pdf', [Mapa01Controller::class, 'downloadPdfAdmin'])->name('form.mapa01.admin.pdf');
+        Route::get('/admin/formperencanaan/mapa01/{id_skema}', [Mapa01Controller::class, 'showMapa01Admin'])->name('admin.mapa01.admin');
+        Route::get('/admin/formperencanaan/mapa01/pdf/{id_skema}', [Mapa01Controller::class, 'downloadPdfAdmin'])->name('admin.mapa01.pdf');
+        Route::get('/admin/formperencanaan/mapa02/{id_skema}', [Mapa02Controller::class, 'showMapa02Admin'])->name('admin.mapa02.admin');
+        Route::get('/admin/formperencanaan/mapa02/pdf/{id_skema}', [Mapa02Controller::class, 'downloadPdfAdmin'])->name('admin.mapa02.pdf');
+        Route::get('/admin/laporan-asesmen/{id_skema}', [LaporanController::class, 'showAdminLaporan'])->name('admin.laporan.admin');
+        Route::get('/form-perencanaan/laporan/download/{skema_id}/{asesor_id}', [LaporanController::class, 'downloadPdfAdmin'])->name('admin.laporan.pdf');
+        Route::get('/admin/ninjau_asesmen/{id_skema}', [MeninjauAsesmenController::class, 'showAdmin'])->name('admin.meninjau.admin');
+        Route::get('/form-perencanaan/meninjau-proses/download/{id_skema}/{id_asesor}', [MeninjauAsesmenController::class, 'downloadPdfAdmin'])->name('admin.meninjau.pdf');
+        Route::get('/fr_va_pdf/preview/{skema_id}/{periode}', [PerencanaanController::class, 'preview'])->name('form_perencanaan.fr_va_pdf');
+        Route::get('/fr_va_pdf/download/{skema_id}/{periode}', [PerencanaanController::class, 'download'])->name('form_perencanaan.pdf_frva');
+    });
 
     /*
     |----------------------------------------------------------------------

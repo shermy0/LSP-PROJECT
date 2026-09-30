@@ -11,6 +11,7 @@ class UnitKompetensi extends Model
 
     protected $table = 'unit_kompetensi';   
     protected $primaryKey = 'id_unit';      
+    public $timestamps = false;
 
     protected $fillable = [
         'id_skema',
@@ -31,4 +32,5 @@ class UnitKompetensi extends Model
     {
         return $this->hasMany(ElemenKompetensi::class, 'id_unit', 'id_unit');
     }
+
 }

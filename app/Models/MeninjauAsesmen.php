@@ -13,7 +13,7 @@ class MeninjauAsesmen extends Model
     protected $primaryKey = 'id_meninjau';
 
     protected $fillable = [
-        'id_asesmen',
+        'id_asesmen', 'skema_id', 'asesor_id',
         'rencana_valid', 'rencana_reliabel', 'rencana_fleksibel', 'rencana_adil',
         'persiapan_valid', 'persiapan_reliabel', 'persiapan_fleksibel', 'persiapan_adil',
         'implementasi_valid', 'implementasi_reliabel', 'implementasi_fleksibel', 'implementasi_adil',

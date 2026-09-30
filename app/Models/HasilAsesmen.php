@@ -22,21 +22,20 @@ protected $fillable = [
 
 
     
-    public function bukti()
-    {
-        return $this->hasMany(HasilAsesmenBukti::class, 'id_hasil');
-    }
+public function unit()
+{
+    return $this->belongsTo(UnitKompetensi::class, 'id_unit', 'id_unit');
+}
 
-    public function perangkat()
-    {
-        return $this->hasMany(HasilAsesmenPerangkat::class, 'id_hasil');
-    }
+public function bukti()
+{
+    return $this->hasMany(HasilAsesmenBukti::class, 'id_hasil', 'id_hasil');
+}
 
-    // Relasi ke UnitKompetensi
-    public function unit()
-    {
-        return $this->belongsTo(UnitKompetensi::class, 'id_unit', 'id_unit');
-    }
+public function perangkat()
+{
+    return $this->hasMany(HasilAsesmenPerangkat::class, 'id_hasil', 'id_hasil');
+}
 
     // Relasi ke InstrumenAsesmen
     public function instrumen()

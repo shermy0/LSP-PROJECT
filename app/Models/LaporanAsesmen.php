@@ -2,13 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class LaporanAsesmen extends Model
 {
-    use HasFactory;
-
     protected $table = 'laporan_asesmen';
     protected $primaryKey = 'id_laporan';
     public $timestamps = false;
@@ -19,20 +16,18 @@ class LaporanAsesmen extends Model
         'penolakan',
         'saran_perbaikan',
         'tgl_laporan',
-        'asesor_id',
         'skema_id',
-        'no_registrasi',
     ];
-    
-    public function asesor()
+
+    // Relasi ke ValidasiAsesmen
+    public function validasi()
     {
-        // relasi ke tabel asesor
-        return $this->belongsTo(Asesor::class, 'asesor_id', 'id_asesor');
+        return $this->hasMany(ValidasiAsesmen::class, 'id_laporan');
     }
 
+    // Relasi ke Skema
     public function skema()
     {
-        // relasi ke tabel skema_sertifikasi
-        return $this->belongsTo(Skema::class, 'skema_id', 'id_skema');
+        return $this->belongsTo(Skema::class, 'skema_id');
     }
 }

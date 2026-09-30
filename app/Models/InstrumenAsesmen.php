@@ -9,10 +9,7 @@ class InstrumenAsesmen extends Model
 {
     use HasFactory;
 
-    protected $table = 'instrumen_asesmen';
-    protected $primaryKey = 'id_instrumen';
-
-    protected $fillable = [
-        'nama_instrumen','kode_instrumen','jenis_instrumen','deskripsi'
-    ];
+    protected $table = 'instrumen_asesmen'; // nama tabel sesuai di database kamu
+    protected $primaryKey = 'id_instrumen'; // kalau primary key bukan "id"
+    public $timestamps = false; // kalau tabel ga punya created_at & updated_at
 }
