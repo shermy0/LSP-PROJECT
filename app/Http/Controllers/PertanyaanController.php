@@ -143,6 +143,7 @@ class PertanyaanController extends Controller
         $isiList      = $request->input('isi_pertanyaan', []);
         $kunciList    = $request->input('kunci_jawaban', []);
         $id_kelompok  = $request->input('id_kelompok');
+        $unitPerSoal  = $request->input('id_unit', []);
         $id_pembuatan = $request->input('id_pembuatan');
         $timer        = $request->input('timer', 30);
         $judul        = $request->input('judul');
@@ -156,6 +157,12 @@ class PertanyaanController extends Controller
 
         if (!$adaSoalValid) {
             return back()->with('error', 'Tidak ada pertanyaan yang tersimpan.');
+        }
+
+        foreach ($isiList as $index => $isi) {
+            if (filled($isi) && empty($unitPerSoal[$index] ?? [])) {
+                return back()->withInput()->with('error', 'Pilih minimal satu unit kompetensi untuk setiap pertanyaan.');
+            }
         }
 
         if (!$id_pembuatan) {
@@ -178,6 +185,7 @@ class PertanyaanController extends Controller
                 'id_asesor'               => $id_asesor,
                 'id_kelompok'             => $id_kelompok,
                 'id_pembuatan_pertanyaan' => $id_pembuatan,
+                'id_unit'                 => json_encode(array_values($unitPerSoal[$key] ?? [])),
                 'jenis_pertanyaan'        => 'lisan',
                 'isi_pertanyaan'          => $isi,
                 'kunci_jawaban'           => $kunciList[$key] ?? null,

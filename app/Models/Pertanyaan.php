@@ -16,6 +16,7 @@ class Pertanyaan extends Model
     protected $fillable = [
         'id_skema',
         'id_kelompok',              // 🔹 Tambahin ini
+        'id_unit',
         'id_pembuatan_pertanyaan',
         'id_asesor',
         'jenis_pertanyaan',

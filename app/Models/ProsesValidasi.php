@@ -10,8 +10,8 @@ class ProsesValidasi extends Model
     use HasFactory;
 
     protected $table = 'proses_validasi';
-    protected $primaryKey = 'id_validasi';
-    public $timestamps = false; // sesuaikan jika tabel tidak pakai created_at/updated_at
+    protected $primaryKey = 'id';
+    public $timestamps = true;
 
     protected $fillable = [
         'skema_id', 'periode', 'tujuan', 'tujuan_lain',
