@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LSP 11</title>
 
+    {{-- Tambah CSRF Token untuk semua request POST --}}
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link rel="stylesheet" href="{{ asset('assets/css/master.css')}}">
@@ -23,7 +24,6 @@
 
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
-
     <button class="toggle-btn" onclick="toggleSidebar()">
         <img src="{{ asset('assets/poto/potta.png') }}" alt="Potta" class="img-fluid" style="width: 30px; height: 30px; border-radius: 50%;">
         <div class="toggle-left" style="display: flex; align-items: center; gap: 10px;">
@@ -40,6 +40,7 @@
             @if(Auth::check() && Auth::user()->role == 'admin')
                 <li><i class="bi bi-house-door-fill"></i><a href="#">Dashboard</a></li>
                 <li><i class="bi bi-pencil-square"></i><a href="{{ route('formperencanaan.index') }}">Form Perencanaan</a></li>
+                <li><i class="bi bi-journal-album"></i><a href="{{ route('admin.formasesmen.skema') }}">Form Asesmen</a></li>
             @endif
 
             @if(Auth::check() && Auth::user()->role == 'asesor')
@@ -79,15 +80,12 @@
             </button>
         </form>
     </div>
-
 </div>
 
 <!-- Main content -->
 <main id="main-content">
     @yield('konten')
 </main>
-
-
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -100,7 +98,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", function () {
-        const logoutBtn  = document.getElementById("logout-btn");
+        const logoutBtn = document.getElementById("logout-btn");
         const logoutForm = document.getElementById("logout-form");
 
         logoutBtn.addEventListener("click", function () {

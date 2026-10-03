@@ -976,13 +976,13 @@ class PertanyaanController extends Controller
     // FORM TANDA TANGAN ASESOR
     // ================================
     public function formTTDAsesor($id_skema, $id_pembuatan_pertanyaan)
-    {
-        $user = auth()->user(); 
-        $asesorLogin = Asesor::where('user_id', $user->id)->first();
+{
+    $user = auth()->user(); 
+    $asesorLogin = Asesor::where('user_id', $user->id)->first();
 
-        $pembuatan_pertanyaan = PembuatanPertanyaan::find($id_pembuatan_pertanyaan);
-        $pembuatan = PembuatanPertanyaan::find($id_pembuatan_pertanyaan);
-        $skema = Skema::find($id_skema);
+    $pembuatan_pertanyaan = PembuatanPertanyaan::find($id_pembuatan_pertanyaan);
+    $pembuatan = PembuatanPertanyaan::find($id_pembuatan_pertanyaan);
+    $skema = Skema::find($id_skema);
 
         switch ($pembuatan->jenis_pertanyaan) {
             case 'esai':
@@ -1021,18 +1021,21 @@ class PertanyaanController extends Controller
             )
             ->get();
 
-        return view('tanda_tangan_asesmen', compact(
-            'asesorLogin',
-            'asesorSudahTTD',
-            'pembuatan_pertanyaan',
-            'skema',
-            'id_skema',
-            'id_pembuatan_pertanyaan',
-            'pembuatan',
-            'backUrl'
-        ));
-    }
+    // ======= Tambahkan ini =======
+    $backUrl = url()->previous(); // atau arahkan ke route PMO khusus kalau mau
+    // ==============================
 
+    return view('tanda_tangan_asesmen', compact(
+        'asesorLogin',
+        'asesorSudahTTD',
+        'pembuatan_pertanyaan',
+        'skema',
+        'id_skema',
+        'id_pembuatan_pertanyaan',
+        'pembuatan',
+        'backUrl' // sekarang aman
+    ));
+}
     // ================================
     // SIMPAN TTD ASESOR
     // ================================
@@ -1399,11 +1402,12 @@ class PertanyaanController extends Controller
         $pencapaian = $request->input('pencapaian', []);
         $allIds     = array_unique(array_merge(array_keys($jawaban), array_keys($pencapaian)));
 
-        foreach ($allIds as $id_pmo_pertanyaan) {
-            $pmopertanyaan = DB::table('pmo_pertanyaan')
-                ->where('id_pmo_pertanyaan', $id_pmo_pertanyaan)
-                ->first();
-            if (!$pmopertanyaan) continue;
+    // ===== Simpan jawaban PMO =====
+    foreach ($allIds as $id_pmo_pertanyaan) {
+        $pmopertanyaan = DB::table('pmo_pertanyaan')
+            ->where('id_pmo_pertanyaan', $id_pmo_pertanyaan)
+            ->first();
+        if (!$pmopertanyaan) continue;
 
             $unitIds = json_decode($pmopertanyaan->id_unit, true) ?? [];
 
@@ -1449,10 +1453,49 @@ class PertanyaanController extends Controller
             }
         }
 
+            // ===== Simpan TTD Asesor ke pmo_persetujuan =====
+    $ttd_asesor     = $request->input('ttd_asesor');
+    $tgl_ttd_asesor = $request->input('tgl_ttd_asesor');
+
         return redirect()->route('pmo.hasil.kelompok', [
             'id_skema' => $id_skema,
         ])->with('success', 'Tanggapan PMO berhasil disimpan.');
+    
+if ($ttd = $request->input('ttd')) {
+    $pmo = DB::table('pmo')->where('id_skema', $id_skema)->first();
+
+    if ($pmo) {
+        // hapus prefix base64
+        $ttdData = preg_replace('/^data:image\/\w+;base64,/', '', $ttd);
+        $ttdData = str_replace(' ', '+', $ttdData);
+
+        // nama file simpel
+        $fileName = 'ttd_' . $id_asesi . '_' . time() . '.png';
+
+        // pastikan folder ada, buat kalau belum ada
+        $folderPath = storage_path('app/public/ttd/');
+        if (!is_dir($folderPath)) {
+            mkdir($folderPath, 0755, true);
+        }
+
+        // simpan file
+        \File::put($folderPath . $fileName, base64_decode($ttdData));
+
+        // simpan nama file di DB
+        DB::table('pmo_persetujuan')->updateOrInsert(
+            ['id_pmo' => $pmo->id_pmo],
+            [
+                'ttd' => $fileName,
+                'tgl_ttd' => $request->input('tgl_ttd'),
+            ]
+        );
     }
+}
+
+    return redirect()->route('pmo.hasil.kelompok', [
+        'id_skema' => $id_skema,
+    ])->with('success', 'Tanggapan PMO berhasil disimpan.');
+}
 
     public function tampilJawabanPMO($id_skema, $id_pembuatan)
     {
@@ -1565,18 +1608,18 @@ class PertanyaanController extends Controller
         $asesi     = DB::table('asesi')->where('id_asesi', $id_asesi)->first();
 
         $pertanyaan = DB::table('pmo_pertanyaan')
-            ->leftJoin('pmo_tanggapan', function($join) use ($id_asesi) {
-                $join->on('pmo_pertanyaan.id_pmo_pertanyaan', '=', 'pmo_tanggapan.id_pmo_pertanyaan')
-                     ->where('pmo_tanggapan.id_asesi', '=', $id_asesi);
-            })
-            ->where('pmo_pertanyaan.id_pembuatan_pertanyaan', $id_pembuatan)
-            ->where('pmo_pertanyaan.id_kelompok', $id_kelompok)
-            ->select(
-                'pmo_pertanyaan.*',
-                'pmo_tanggapan.tanggapan',
-                'pmo_tanggapan.pencapaian'
-            )
-            ->get();
+    ->leftJoin('pmo_tanggapan', function($join) use ($id_kelompok) {
+        $join->on('pmo_pertanyaan.id_pmo_pertanyaan', '=', 'pmo_tanggapan.id_pmo_pertanyaan')
+             ->where('pmo_tanggapan.id_kelompok', '=', $id_kelompok);
+    })
+    ->where('pmo_pertanyaan.id_pembuatan_pertanyaan', $id_pembuatan)
+    ->where('pmo_pertanyaan.id_kelompok', $id_kelompok)
+    ->select(
+        'pmo_pertanyaan.*',
+        'pmo_tanggapan.tanggapan',
+        'pmo_tanggapan.pencapaian'
+    )
+    ->get();
 
         $unitList = DB::table('unit_kompetensi')->get();
 
@@ -1588,18 +1631,20 @@ class PertanyaanController extends Controller
     // ================================
     // Pilih Asesi PMO
     // ================================
-    public function pilihAsesiPMO($id_skema, $id_pembuatan, $id_kelompok)
-    {
-        $skema     = Skema::findOrFail($id_skema);
-        $pembuatan = PembuatanPertanyaan::findOrFail($id_pembuatan);
-        $kelompok  = KelompokPekerjaan::findOrFail($id_kelompok);
+    // Controller PertanyaanController
+public function pilihAsesiPMO($id_skema, $id_pembuatan)
+{
+    $skema = DB::table('skema_sertifikasi')
+        ->where('id_skema', $id_skema)
+        ->first();
 
-        $id_asesor = Asesor::where('user_id', Auth::id())->value('id_asesor');
+    $pembuatan = DB::table('pembuatan_pertanyaan')
+        ->where('id_pembuatan_pertanyaan', $id_pembuatan)
+        ->first();
 
-        $asesiList = DB::table('asesi')
-            ->where('asesor_id', $id_asesor)
-            ->orderBy('nama_lengkap')
-            ->get();
+    $kelompok = DB::table('kelompok_pekerjaan')
+        ->where('id_skema', $id_skema)
+        ->first();
 
         $pmoIds = DB::table('pmo_pertanyaan')
             ->where('id_pembuatan_pertanyaan', $id_pembuatan)
@@ -1613,11 +1658,25 @@ class PertanyaanController extends Controller
             ->unique()
             ->toArray();
 
-        return view('PMO.pilih_asesi_PMO', compact(
-            'skema', 'pembuatan', 'kelompok', 'asesiList', 'sudahInputIds'
-        ));
+
+    /* CEK STATUS INPUT PER ASESI */
+    foreach ($asesiDiAsesor as $asesi) {
+
+        $cek = DB::table('pmo_tanggapan')
+            ->where('id_asesi', $asesi->id_asesi)
+            ->where('id_kelompok', $kelompok->id_kelompok)
+            ->exists();
+
+        $asesi->sudah_input = $cek;
     }
 
+    return view('PMO.pilih_asesi_PMO', compact(
+        'skema',
+        'pembuatan',
+        'kelompok',
+        'asesiDiAsesor'
+    ));
+}
     public function inputPMO(Request $request, $id_skema)
     {
         $timer              = $request->query('timer', 30);

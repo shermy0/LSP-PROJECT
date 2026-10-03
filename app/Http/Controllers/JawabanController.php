@@ -136,7 +136,7 @@ $ttdObservasiExists = DB::table('observasi_ceklis')
      }
      
 
-   public function show($id_skema, $jenis)
+public function show($id_skema, $jenis)
 {
     $user = auth()->user();
     if (!$user) {
