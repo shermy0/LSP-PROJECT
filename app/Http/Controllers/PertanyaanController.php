@@ -45,6 +45,28 @@ class PertanyaanController extends Controller
         return view('lisan', compact('skema', 'pembuatanList'));
     }
 
+    /**
+     * Legacy route without a selected scheme: send the user to the scheme list.
+     */
+    public function createLisan()
+    {
+        return redirect()->route('formasesmen');
+    }
+
+    /**
+     * Compatibility handler for older forms that post the scheme as a field.
+     */
+    public function storeLisan(Request $request)
+    {
+        $idSkema = $request->input('id_skema');
+        if (!$idSkema) {
+            return redirect()->route('formasesmen')
+                ->with('error', 'Pilih skema asesmen sebelum menambahkan pertanyaan lisan.');
+        }
+
+        return $this->storePertanyaanLisan($request, $idSkema);
+    }
+
     // ================================
     // LISAN - Kelompok Pekerjaan (= pertanyaanPMOKelompok)
     // ================================
