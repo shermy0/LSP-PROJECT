@@ -72,19 +72,27 @@ class JawabanController extends Controller
                      ->where('jawaban_asesmen.id_asesi', $asesi->id_asesi)
                      ->where('jawaban_asesmen.id_skema', $skema->id_skema)
                      ->where('pertanyaan.jenis_pertanyaan', 'pilihan_ganda')
-                     ->count(),
+                     ->whereNotNull('jawaban_asesmen.jawaban_opsi')
+                     ->distinct('jawaban_asesmen.id_pertanyaan')
+                     ->count('jawaban_asesmen.id_pertanyaan'),
                  'esai' => DB::table('jawaban_asesmen')
                      ->join('pertanyaan', 'jawaban_asesmen.id_pertanyaan', '=', 'pertanyaan.id_pertanyaan')
                      ->where('jawaban_asesmen.id_asesi', $asesi->id_asesi)
                      ->where('jawaban_asesmen.id_skema', $skema->id_skema)
                      ->where('pertanyaan.jenis_pertanyaan', 'esai')
-                     ->count(),
+                     ->whereNotNull('jawaban_asesmen.jawaban_text')
+                     ->where('jawaban_asesmen.jawaban_text', '<>', '')
+                     ->distinct('jawaban_asesmen.id_pertanyaan')
+                     ->count('jawaban_asesmen.id_pertanyaan'),
                  'lisan' => DB::table('jawaban_asesmen')
                      ->join('pertanyaan', 'jawaban_asesmen.id_pertanyaan', '=', 'pertanyaan.id_pertanyaan')
                      ->where('jawaban_asesmen.id_asesi', $asesi->id_asesi)
                      ->where('jawaban_asesmen.id_skema', $skema->id_skema)
                      ->where('pertanyaan.jenis_pertanyaan', 'lisan')
-                     ->count(),
+                     ->whereNotNull('jawaban_asesmen.jawaban_text')
+                     ->where('jawaban_asesmen.jawaban_text', '<>', '')
+                     ->distinct('jawaban_asesmen.id_pertanyaan')
+                     ->count('jawaban_asesmen.id_pertanyaan'),
              ];
  
              // Tentukan status dasar lisan
@@ -287,7 +295,7 @@ public function show($id_skema, $jenis)
                 
                         $pencapaian = 0;
                         if (!empty($jawabanUserId) && $idOpsiKunci) {
-                            $pencapaian = ($idOpsiKunci === $jawabanUserId) ? 1 : 0;
+                            $pencapaian = ((int) $idOpsiKunci === $jawabanUserId) ? 1 : 0;
                         }
                 
                         JawabanAsesmen::updateOrCreate(
@@ -404,13 +412,14 @@ public function show($id_skema, $jenis)
                 return redirect()->back()->withErrors(['error' => 'Tidak ada soal asesmen lisan pada skema ini.']);
             }
     
-            // Hitung jumlah pertanyaan lisan yang sudah memiliki baris jawaban oleh asesi ini.
-            // NOTE: kita tidak memakai whereNotNull karena baris bisa sudah dibuat dengan jawaban null.
+            // Placeholder jawaban kosong bukan jawaban yang sudah diisi.
             $jumlahJawabanLisan = DB::table('jawaban_asesmen')
                 ->join('pertanyaan', 'jawaban_asesmen.id_pertanyaan', '=', 'pertanyaan.id_pertanyaan')
                 ->where('jawaban_asesmen.id_asesi', $asesi->id_asesi)
                 ->where('jawaban_asesmen.id_skema', $idSkema)
                 ->where('pertanyaan.jenis_pertanyaan', 'lisan')
+                ->whereNotNull('jawaban_asesmen.jawaban_text')
+                ->where('jawaban_asesmen.jawaban_text', '<>', '')
                 ->distinct('jawaban_asesmen.id_pertanyaan')
                 ->count('jawaban_asesmen.id_pertanyaan');
     

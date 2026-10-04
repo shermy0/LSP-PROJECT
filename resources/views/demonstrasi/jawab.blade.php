@@ -32,25 +32,13 @@
         <input type="hidden" name="ttd_asesi" id="ttd_asesi_data">
         <input type="hidden" name="tgl_ttd_asesi" id="tgl_ttd_asesi_data">
 
-        {{-- Navigasi Soal --}}
-        <div class="mb-3 bg-white py-2 border rounded" id="soal-navigation-container">
-            <div class="d-flex flex-wrap justify-content-center" id="soal-navigation" style="gap:5px;">
-                @foreach($tugas as $index => $p)
-                    <button type="button" class="btn btn-outline-primary btn-sm soal-nav mb-1 mx-1" data-index="{{ $index }}">
-                        {{ $index+1 }}
-                    </button>
-                @endforeach
-            </div>
-        </div>
-
-        {{-- Container Soal --}}
-        <div class="soal-container border rounded p-3 bg-light">
+        {{-- Tampilkan semua tugas sekaligus, seperti daftar pertanyaan lisan --}}
+        <div class="border rounded p-3 bg-light" id="questions-section">
             <div class="main-header">Tugas Demonstrasi</div>
             @foreach($tugas as $index => $p)
-                <div class="soal-item" data-index="{{ $index }}" style="{{ $index == 0 ? '' : 'display:none;' }}">
+                <div class="soal-item card mb-3" data-index="{{ $index }}">
                     <div class="soal-content">
-                        <label class="fw-bold soal-number">{{ $index+1 }}.</label>
-                        <label class="soal-text">{{ $p->isi_pertanyaan_demonstrasi }}</label>
+                        <h5 class="fw-bold soal-text"><span class="soal-number">{{ $index+1 }}.</span> {{ $p->isi_pertanyaan_demonstrasi }}</h5>
 
                         {{-- Deskripsi Tugas --}}
                         @if($p->deskripsi_pertanyaan)
@@ -88,27 +76,13 @@
                         @endif
                     </div>
 
-                    <div class="mt-4 d-flex justify-content-between navigation-buttons">
-                        @if($index > 0)
-                            <button type="button" class="btn btn-secondary prev-btn">
-                                <i class="fas fa-arrow-left me-1"></i> Kembali
-                            </button>
-                        @else
-                            <div></div>
-                        @endif
-
-                        @if($index < $tugas->count()-1)
-                            <button type="button" class="btn btn-primary next-btn">
-                                Lanjut <i class="fas fa-arrow-right ms-1"></i>
-                            </button>
-                        @else
-                            <button type="button" class="btn btn-info next-to-signature-btn">
-                                Ke Tanda Tangan <i class="fas fa-signature ms-1"></i>
-                            </button>
-                        @endif
-                    </div>
                 </div>
             @endforeach
+            <div class="text-end mt-4">
+                <button type="button" class="btn btn-primary" id="toSignatureBtn">
+                    Lanjut ke Tanda Tangan <i class="fas fa-signature ms-1"></i>
+                </button>
+            </div>
         </div>
 
         {{-- Tanda Tangan --}}
@@ -184,58 +158,24 @@ let timerInterval = setInterval(updateCountdown, 1000);
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const soalItems = document.querySelectorAll('.soal-item');
-    const navButtons = document.querySelectorAll('.soal-nav');
     const signatureSection = document.getElementById('signature-section');
-    const soalContainer = document.querySelector('.soal-container');
-
-    function showSoal(index) {
-        soalItems.forEach((item, i) => item.style.display = (i===index)?'':'none');
-        window.scrollTo({ top:0, behavior:'smooth' });
-        updateNavigationStatus();
-    }
+    const questionsSection = document.getElementById('questions-section');
 
     function showSignatureSection() {
         saveSignature();
-        soalContainer.style.display='none';
+        questionsSection.style.display='none';
         signatureSection.style.display='';
         window.scrollTo({ top:0, behavior:'smooth' });
     }
 
     function showSoalContainer() {
         signatureSection.style.display='none';
-        soalContainer.style.display='';
-        showSoal(soalItems.length-1);
+        questionsSection.style.display='';
+        window.scrollTo({ top:0, behavior:'smooth' });
     }
 
-    soalItems.forEach((item,index)=>{
-        const nextBtn = item.querySelector('.next-btn');
-        const prevBtn = item.querySelector('.prev-btn');
-        const nextToSignatureBtn = item.querySelector('.next-to-signature-btn');
-        if(nextBtn) nextBtn.addEventListener('click',()=>showSoal(index+1));
-        if(prevBtn) prevBtn.addEventListener('click',()=>showSoal(index-1));
-        if(nextToSignatureBtn) nextToSignatureBtn.addEventListener('click', showSignatureSection);
-    });
-
+    document.getElementById('toSignatureBtn').addEventListener('click', showSignatureSection);
     document.getElementById('backToQuestionsBtn').addEventListener('click', showSoalContainer);
-
-    navButtons.forEach((btn,index)=>btn.addEventListener('click',()=>showSoal(index)));
-
-    function updateNavigationStatus() {
-        const textareas = document.querySelectorAll('.jawaban-textarea');
-        textareas.forEach((textarea,index)=>{
-            if(textarea.value.trim()!==''){
-                navButtons[index].classList.remove('btn-outline-primary');
-                navButtons[index].classList.add('btn-success');
-            } else {
-                navButtons[index].classList.add('btn-outline-primary');
-                navButtons[index].classList.remove('btn-success');
-            }
-        });
-    }
-
-    document.querySelectorAll('.jawaban-textarea').forEach(textarea=>textarea.addEventListener('input',updateNavigationStatus));
-    updateNavigationStatus();
 });
 
 // Tanda tangan
@@ -302,9 +242,7 @@ function downloadTTD(){
 
 {{-- Style --}}
 <style>
-#soal-navigation-container{z-index:100;box-shadow:0 2px 10px rgba(0,0,0,0.1);position:sticky;top:0;}
-.soal-nav{min-width:40px;transition:all 0.2s ease;}
-.soal-container{box-shadow:0 0 15px rgba(0,0,0,0.05);min-height:300px;}
+.soal-item{padding:1.25rem; max-width:none!important; margin:0 0 1rem!important;}
 .soal-number{color:#0d6efd;margin-right:5px;}
 .soal-text{color:#333;line-height:1.6;}
 .jawaban-textarea{resize:vertical;min-height:150px;border:1px solid #ced4da;}
@@ -318,6 +256,6 @@ function downloadTTD(){
 .btns .clear{background:#dc3545;color:white;}
 .btns .download{background:#0d6efd;color:white;}
 .btns button:hover{opacity:0.9;transform:translateY(-2px);transition:all 0.2s;}
-@media(max-width:768px){.container{padding-left:10px;padding-right:10px;}.soal-nav{min-width:35px;padding:0.25rem 0.4rem;font-size:0.8rem;}.card{padding:20px 15px;}.btns{flex-direction:column;}}
+@media(max-width:768px){.container{padding-left:10px;padding-right:10px;}.card{padding:20px 15px;}.btns{flex-direction:column;}}
 </style>
 @endsection

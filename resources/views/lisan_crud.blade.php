@@ -47,4 +47,10 @@
             @endforelse
         </div>
     @endisset
+
+    <div class="mt-3 mb-4">
+        <a href="{{ route('pertanyaan.lisan', ['id_skema' => $skema->id_skema]) }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Kembali
+        </a>
+    </div>
 @endsection

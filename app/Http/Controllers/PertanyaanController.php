@@ -147,6 +147,14 @@ class PertanyaanController extends Controller
                 ->get()
             : collect();
 
+        if ($unitKompetensi->isEmpty()) {
+            return redirect()->route('kelompok.lisan', [
+                'id_skema' => $id_skema,
+                'id_pembuatan' => $id_pembuatan,
+                'timer' => $timer,
+            ])->with('error', 'Tambahkan unit kompetensi terlebih dahulu sebelum membuat pertanyaan lisan.');
+        }
+
         return view('input_lisan', [
             'skema'          => $skema,
             'timer'          => $timer,
@@ -200,18 +208,24 @@ class PertanyaanController extends Controller
 
         $saved = 0;
         foreach ($isiList as $key => $isi) {
-            if (empty(trim($isi))) continue;
+            $isi = trim($isi);
+            if ($isi === '') continue;
 
-            Pertanyaan::create([
+            // Repeated form submissions update the same question instead of
+            // creating another row in this set and work group.
+            $pertanyaan = Pertanyaan::firstOrNew([
                 'id_skema'                => $id_skema,
-                'id_asesor'               => $id_asesor,
                 'id_kelompok'             => $id_kelompok,
                 'id_pembuatan_pertanyaan' => $id_pembuatan,
-                'id_unit'                 => json_encode(array_values($unitPerSoal[$key] ?? [])),
                 'jenis_pertanyaan'        => 'lisan',
                 'isi_pertanyaan'          => $isi,
-                'kunci_jawaban'           => $kunciList[$key] ?? null,
             ]);
+
+            $pertanyaan->fill([
+                'id_asesor'      => $id_asesor,
+                'id_unit'        => json_encode(array_values($unitPerSoal[$key] ?? [])),
+                'kunci_jawaban'  => $kunciList[$key] ?? null,
+            ])->save();
             $saved++;
         }
 
@@ -723,7 +737,8 @@ class PertanyaanController extends Controller
             
             return redirect()->route('pg.crud', [
                 'id_skema'    => $request->id_skema,
-                'id_kelompok' => $request->id_kelompok
+                'id_kelompok' => $request->id_kelompok,
+                'id_pembuatan_pertanyaan' => $pembuatan->id_pembuatan_pertanyaan,
             ])->with('success', 'Pertanyaan pilihan ganda berhasil disimpan!');
 
         } catch (\Exception $e) {
@@ -745,23 +760,28 @@ class PertanyaanController extends Controller
             }])
             ->get();
 
-        $pembuatan_pertanyaan = $pertanyaan->isNotEmpty()
-            ? PembuatanPertanyaan::find($pertanyaan->first()->id_pembuatan_pertanyaan)
-            : null;
+        $pembuatanId = request()->query('id_pembuatan_pertanyaan');
+        $pembuatan_pertanyaan = $pembuatanId
+            ? PembuatanPertanyaan::find($pembuatanId)
+            : ($pertanyaan->isNotEmpty()
+                ? PembuatanPertanyaan::find($pertanyaan->first()->id_pembuatan_pertanyaan)
+                : null);
 
-        $asesor = DB::table('asesor')
-            ->leftJoin('pertanyaan_asesmen_persetujuan', function($join) use ($pembuatan_pertanyaan) {
-                $join->on('asesor.id_asesor', '=', 'pertanyaan_asesmen_persetujuan.id_asesor')
-                     ->where('pertanyaan_asesmen_persetujuan.id_pembuatan_pertanyaan', $pembuatan_pertanyaan->id_pembuatan_pertanyaan);
-            })
-            ->select(
-                'asesor.id_asesor',
-                'asesor.nama_asesor',
-                'asesor.no_registrasi',
-                'pertanyaan_asesmen_persetujuan.tgl_ttd_asesor'
-            )
-            ->orderBy('asesor.nama_asesor')
-            ->get();
+        $asesor = $pembuatan_pertanyaan
+            ? DB::table('asesor')
+                ->leftJoin('pertanyaan_asesmen_persetujuan', function($join) use ($pembuatan_pertanyaan) {
+                    $join->on('asesor.id_asesor', '=', 'pertanyaan_asesmen_persetujuan.id_asesor')
+                         ->where('pertanyaan_asesmen_persetujuan.id_pembuatan_pertanyaan', $pembuatan_pertanyaan->id_pembuatan_pertanyaan);
+                })
+                ->select(
+                    'asesor.id_asesor',
+                    'asesor.nama_asesor',
+                    'asesor.no_registrasi',
+                    'pertanyaan_asesmen_persetujuan.tgl_ttd_asesor'
+                )
+                ->orderBy('asesor.nama_asesor')
+                ->get()
+            : collect();
 
         return view('pertanyaan.pg_crud', compact(
             'pertanyaan',
@@ -938,12 +958,19 @@ class PertanyaanController extends Controller
         ]);
     }
 
-    public function kelompokPekerjaanPG(Request $request, $id_skema, $jenis = null)
+    public function kelompokPekerjaanPG(Request $request, $id_skema, $routeValue = null)
     {
-        $jenis = $jenis ?? $request->query('jenis', 'pg');
+        // Route /pertanyaan/pg/kelompok/{id_skema}/{id_pembuatan?} mengirim
+        // segmen ketiga sebagai ID set, sementara route kelompok-pg memakai
+        // parameter default "jenis". Bedakan keduanya agar tombol Lanjutkan
+        // membuka set yang dipilih, bukan mencari set dengan jenis bernilai ID.
+        $routeValueIsId = is_numeric($routeValue);
+        $jenis = $request->query('jenis')
+            ?? ($routeValue !== null && !$routeValueIsId ? $routeValue : 'pilihan_ganda');
         $judul = $request->query('judul');
         $timer = $request->query('timer');
-        $idPembuatan = $request->query('id_pembuatan_pertanyaan');
+        $idPembuatan = $request->query('id_pembuatan_pertanyaan')
+            ?? ($routeValueIsId ? $routeValue : null);
 
         if ($idPembuatan) {
             $pembuatan = PembuatanPertanyaan::find($idPembuatan);
@@ -1025,7 +1052,8 @@ class PertanyaanController extends Controller
             case 'lisan':
                 $backUrl = route('kelompok.lisan', [
                     'id_skema' => $id_skema,
-                    'id_pembuatan' => $id_pembuatan_pertanyaan
+                    'id_pembuatan' => $id_pembuatan_pertanyaan,
+                    'timer' => $pembuatan->timer ?? 30,
                 ]);
                 break;
             default:
@@ -1042,10 +1070,6 @@ class PertanyaanController extends Controller
                 'pertanyaan_asesmen_persetujuan.tgl_ttd_asesor'
             )
             ->get();
-
-    // ======= Tambahkan ini =======
-    $backUrl = url()->previous(); // atau arahkan ke route PMO khusus kalau mau
-    // ==============================
 
     return view('tanda_tangan_asesmen', compact(
         'asesorLogin',

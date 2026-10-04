@@ -13,7 +13,7 @@
         @endif
     </p>
 
-    <form action="{{ route('lisan.store.pertanyaan', ['id_skema' => $skema->id_skema]) }}" method="POST">
+    <form id="lisan-question-form" action="{{ route('lisan.store.pertanyaan', ['id_skema' => $skema->id_skema]) }}" method="POST">
         @csrf
 
         {{-- Hidden fields --}}
@@ -79,10 +79,17 @@
         <div class="d-flex justify-content-between mt-2 mb-5">
             <a href="{{ route('kelompok.lisan', ['id_skema' => $skema->id_skema, 'id_pembuatan' => $id_pembuatan ?? '']) }}"
                class="btn btn-secondary px-4">Kembali</a>
-            <button type="submit" class="btn text-white px-4" style="background-color:#041562;">
+            <button id="lisan-submit-button" type="submit" class="btn text-white px-4" style="background-color:#041562;">
                 Simpan Semua Pertanyaan
             </button>
         </div>
     </form>
 </div>
+<script>
+document.getElementById('lisan-question-form').addEventListener('submit', function () {
+    const button = document.getElementById('lisan-submit-button');
+    button.disabled = true;
+    button.textContent = 'Menyimpan...';
+});
+</script>
 @endsection

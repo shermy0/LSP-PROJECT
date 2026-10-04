@@ -16,6 +16,10 @@
     <div class="mb-4">
         <h5 class="fw-bold text-primary">Kelompok Pekerjaan ID: {{ $id_kelompok }}</h5>
 
+        @if(session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+
         @forelse($tugas as $index => $t)
             <div class="card mb-3 shadow-sm">
                 <div class="card-body">
@@ -61,8 +65,15 @@
         @endforelse
     </div>
 
-    {{-- Tombol Tambah Tugas Baru --}}
-    <div class="text-center mt-4">
+    {{-- Aksi form demonstrasi --}}
+    <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+        @if($demonstrasi)
+            <a href="{{ route('demonstrasi.ttd', [$skema->id_skema, $demonstrasi->id_demonstrasi]) }}?id_kelompok={{ $id_kelompok }}"
+               class="btn btn-outline-primary fw-bold">
+                ✍️ Tanda Tangan Asesor
+            </a>
+        @endif
+
         <a href="{{ route('demonstrasi.createTugas', [
                 'id_skema' => $skema->id_skema, 
                 'kelompok_id' => $id_kelompok
@@ -72,4 +83,10 @@
         </a>
     </div>
 </div>
+
+<a href="{{ route('pertanyaan.demonstrasi.kelompok', ['id_skema' => $skema->id_skema, 'timer' => $timer]) }}"
+   class="btn btn-secondary fw-bold"
+   style="position:fixed; bottom:20px; left:345px; z-index:1050; border-radius:50px; padding:10px 20px; box-shadow:0 4px 12px rgba(0,0,0,.2);">
+    <i class="bi bi-arrow-left me-1"></i> Kembali
+</a>
 @endsection

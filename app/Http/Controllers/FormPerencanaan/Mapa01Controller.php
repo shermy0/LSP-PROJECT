@@ -461,7 +461,10 @@ public function tambahUnit($skema_id, $kelompok_id)
         ->get();
 
     $jenisBukti = MasterJenisBukti::all();
-    $perangkat = PerangkatAsesmen::with('jenisBukti')->get();
+    $perangkat = PerangkatAsesmen::whereIn('id_unit', $units->pluck('id_unit'))
+        ->orderBy('id_unit')
+        ->orderBy('id_perangkat')
+        ->get();
 
     return view('form_perencanaan.form_mapa_01.mapa01_kodeunit_add', compact(
         'skema',
@@ -577,7 +580,10 @@ public function editUnit($skema_id, $id)
 
     $units = UnitKompetensi::where('id_skema', $skema_id)->get();
     $jenisBukti = MasterJenisBukti::all();
-    $perangkat = PerangkatAsesmen::with('jenisBukti')->get();
+    $perangkat = PerangkatAsesmen::whereIn('id_unit', $units->pluck('id_unit'))
+        ->orderBy('id_unit')
+        ->orderBy('id_perangkat')
+        ->get();
 
     return view('form_perencanaan.form_mapa_01.mapa01_kodeunit_edit', compact(
         'skema',

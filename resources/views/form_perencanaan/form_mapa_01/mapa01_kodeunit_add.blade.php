@@ -58,23 +58,35 @@
 {{-- Jenis Bukti --}}
 <div class="mb-3">
     <label>Jenis Bukti</label><br>
-    @foreach ($jenisBukti as $bukti)
-        <label>
+    @forelse ($jenisBukti as $bukti)
+        <label class="d-inline-flex align-items-center me-3 mb-2">
             <input type="checkbox" class="form-check-input me-2" name="jenis_bukti[]" value="{{ $bukti->id_jenis_bukti }}">
             {{ $bukti->nama_bukti }}
-        </label><br>
-    @endforeach
+        </label>
+    @empty
+        <div class="alert alert-warning py-2 mb-0">
+            Pilihan jenis bukti belum tersedia. Data master jenis bukti belum diisi.
+        </div>
+    @endforelse
 </div>
 
 {{-- Metode & Perangkat Asesmen --}}
 <div class="mb-3">
     <label>Metode dan Perangkat Asesmen</label><br>
-    @foreach ($perangkat as $p)
-        <label>
+    @if ($perangkat->isNotEmpty())
+        <div id="metodeKosong" class="text-muted mb-2">Pilih unit kompetensi untuk melihat metode asesmen.</div>
+    @endif
+    @forelse ($perangkat as $p)
+        <label class="metode-option d-flex align-items-center mb-2"
+               data-unit-id="{{ $p->id_unit }}" style="display: none !important">
             <input type="checkbox" class="form-check-input me-2" name="metode[]" value="{{ $p->id_perangkat }}">
             {{ $p->jenis_bukti }} ({{ $p->catatan_penerapan }})
-        </label><br>
-    @endforeach
+        </label>
+    @empty
+        <div class="alert alert-warning py-2 mb-0">
+            Pilihan metode belum tersedia. Data perangkat asesmen belum diisi.
+        </div>
+    @endforelse
 </div>
 
 
@@ -97,11 +109,33 @@
     kodeUnitSelect.addEventListener('change', function() {
         const selectedId = this.value;
         judulUnitSelect.value = selectedId;
+        tampilkanMetode(selectedId);
     });
     judulUnitSelect.addEventListener('change', function() {
         const selectedId = this.value;
         kodeUnitSelect.value = selectedId;
+        tampilkanMetode(selectedId);
     });
+
+    function tampilkanMetode(unitId) {
+        const options = document.querySelectorAll('.metode-option');
+        let jumlahCocok = 0;
+
+        options.forEach(option => {
+            const cocok = unitId !== '' && option.dataset.unitId === unitId;
+            option.style.setProperty('display', cocok ? 'flex' : 'none', 'important');
+            option.querySelector('input').checked = false;
+            if (cocok) jumlahCocok++;
+        });
+
+        const emptyState = document.getElementById('metodeKosong');
+        if (emptyState) {
+            emptyState.textContent = unitId === ''
+                ? 'Pilih unit kompetensi untuk melihat metode asesmen.'
+                : (jumlahCocok === 0 ? 'Belum ada metode asesmen untuk unit ini.' : '');
+            emptyState.style.display = jumlahCocok === 0 ? 'block' : 'none';
+        }
+    }
 
     // VALIDASI FORM
     document.getElementById("formUnit").addEventListener("submit", function(e) {
@@ -110,6 +144,20 @@
         let bukti = document.getElementById("bukti").value.trim();
         let jenisBukti = document.querySelectorAll('input[name="jenis_bukti[]"]:checked');
         let metode = document.querySelectorAll('input[name="metode[]"]:checked');
+
+        const jenisBuktiTersedia = document.querySelectorAll('input[name="jenis_bukti[]"]').length > 0;
+        const metodeTersedia = document.querySelectorAll('.metode-option:not([style*="display: none"]) input[name="metode[]"]').length > 0;
+
+        if (!jenisBuktiTersedia || !metodeTersedia) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Pilihan checkbox belum tersedia',
+                text: 'Lengkapi data master jenis bukti dan perangkat asesmen terlebih dahulu.',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
 
         if(kode === "" || judul === "" || bukti === "" || jenisBukti.length === 0 || metode.length === 0) {
             e.preventDefault();

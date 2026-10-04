@@ -71,13 +71,15 @@
 
 <div class="mb-3">
     <label>Metode dan Perangkat Asesmen</label><br>
+    <div id="metodeKosong" class="text-muted mb-2">Pilih unit kompetensi untuk melihat metode asesmen.</div>
     @foreach ($perangkat as $p)
-        <label>
+        <label class="metode-option d-flex align-items-center mb-2"
+               data-unit-id="{{ $p->id_unit }}" style="display: none !important">
             <input type="checkbox" class="form-check-input me-2" 
                    name="metode[]" value="{{ $p->id_perangkat }}"
                    {{ $hasil->perangkat->pluck('id_perangkat')->contains($p->id_perangkat) ? 'checked' : '' }}>
             {{ $p->jenis_bukti }} ({{ $p->catatan_penerapan }})
-        </label><br>
+        </label>
     @endforeach
 </div>
 
@@ -98,10 +100,34 @@
     // sinkronisasi dropdown
     kodeUnitSelect.addEventListener('change', function() {
         judulUnitSelect.value = this.value;
+        tampilkanMetode(this.value, true);
     });
     judulUnitSelect.addEventListener('change', function() {
         kodeUnitSelect.value = this.value;
+        tampilkanMetode(this.value, true);
     });
+
+    function tampilkanMetode(unitId, reset = false) {
+        const options = document.querySelectorAll('.metode-option');
+        let jumlahCocok = 0;
+
+        options.forEach(option => {
+            const cocok = unitId !== '' && option.dataset.unitId === unitId;
+            option.style.setProperty('display', cocok ? 'flex' : 'none', 'important');
+            if (reset) option.querySelector('input').checked = false;
+            if (cocok) jumlahCocok++;
+        });
+
+        const emptyState = document.getElementById('metodeKosong');
+        if (emptyState) {
+            emptyState.textContent = unitId === ''
+                ? 'Pilih unit kompetensi untuk melihat metode asesmen.'
+                : (jumlahCocok === 0 ? 'Belum ada metode asesmen untuk unit ini.' : '');
+            emptyState.style.display = jumlahCocok === 0 ? 'block' : 'none';
+        }
+    }
+
+    tampilkanMetode(kodeUnitSelect.value);
 
     // VALIDASI FORM
     document.getElementById("formEditUnit").addEventListener("submit", function(e) {
@@ -109,7 +135,8 @@
         let judul = judulUnitSelect.value.trim();
         let bukti = document.getElementById("bukti").value.trim();
         let jenisBukti = document.querySelectorAll('input[name="jenis_bukti[]"]:checked');
-        let metode = document.querySelectorAll('input[name="metode[]"]:checked');
+        let metode = Array.from(document.querySelectorAll('input[name="metode[]"]:checked'))
+            .filter(input => input.closest('.metode-option').dataset.unitId === kodeUnitSelect.value);
 
         if(kode === "" || judul === "" || bukti === "" || jenisBukti.length === 0 || metode.length === 0) {
             e.preventDefault();

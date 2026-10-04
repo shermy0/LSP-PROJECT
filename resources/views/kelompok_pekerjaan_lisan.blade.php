@@ -22,19 +22,33 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Unit kompetensi belum tersedia',
+                    text: @json(session('error')),
+                    confirmButtonText: 'Mengerti'
+                });
+            });
+        </script>
+    @endif
+
     @forelse($kelompok as $index => $k)
         <div class="card shadow-sm mb-4 border-0">
             <div class="card-header" style="background-color:#041562; color:white; font-weight:bold;">
                 <div class="d-flex justify-content-between align-items-center">
                     <span>Kelompok {{ $index+1 }}: {{ $k->nama_kelompok }}</span>
                     @if(isset($pembuatan) && $pembuatan || isset($id_pembuatan) && $id_pembuatan)
-                    <button
+                            <button
                         class="btn btn-light btn-sm"
                         onclick="popupJumlahPertanyaan(
                             {{ $skema->id_skema }},
                             '{{ $timer ?? 30 }}',
                             {{ $k->id_kelompok }},
-                            '{{ addslashes($k->nama_kelompok) }}'
+                            '{{ addslashes($k->nama_kelompok) }}',
+                            {{ $k->unitKompetensi->isNotEmpty() ? 'true' : 'false' }}
                         )">
                         <i class="bi bi-plus-circle"></i> Tambahkan Pertanyaan Lisan
                     </button>
@@ -126,7 +140,17 @@ const globalIdPembuatan = "{{ $resolvedIdPembuatan }}";
 const globalJudul       = "{{ addslashes($judul ?? ($pembuatan->judul ?? '')) }}";
 const globalTimer       = "{{ $timer ?? 30 }}";
 
-function popupJumlahPertanyaan(id_skema, timer, kelompok_id, nama_kelompok) {
+function popupJumlahPertanyaan(id_skema, timer, kelompok_id, nama_kelompok, hasUnits) {
+    if (!hasUnits) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Unit kompetensi belum tersedia',
+            text: 'Tambahkan unit kompetensi terlebih dahulu sebelum membuat pertanyaan lisan.',
+            confirmButtonText: 'Mengerti'
+        });
+        return;
+    }
+
     Swal.fire({
         title: `Jumlah Pertanyaan - ${nama_kelompok}`,
         html: `

@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\{Demonstrasi, MasterTugasDemonstrasi, Skema, KelompokPekerjaan};
+use App\Models\Asesor;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class DemonstrasiController extends Controller
 {
@@ -12,9 +15,9 @@ class DemonstrasiController extends Controller
 {
     $skema = Skema::findOrFail($id_skema);
 
-    $demonstrasi = Demonstrasi::where('id_skema', $id_skema)
-        ->with('tugas') // relasi ke MasterTugasDemonstrasi
-        ->get();
+    // Halaman setup ini tidak memakai daftar demonstrasi. Pada database lama
+    // tabel demonstrasi juga terhubung lewat id_asesmen (bukan id_skema).
+    $demonstrasi = collect();
 
     return view('demonstrasi', compact('skema','demonstrasi'));
 
@@ -123,10 +126,66 @@ $demo = Demonstrasi::create([
 
     }
 
-    return $request->action === 'back'
-        ? redirect()->route('demonstrasi.crud', [$request->id_skema, $request->id_kelompok])
-                    ->with('success', 'Tugas demonstrasi berhasil disimpan!')
-        : back()->with('success', 'Tugas demonstrasi berhasil disimpan!');
+    if ($request->action === 'back') {
+        return redirect()->route('demonstrasi.crud', [$request->id_skema, $request->id_kelompok])
+            ->with('success', 'Tugas demonstrasi berhasil disimpan!');
+    }
+
+    return redirect()->route('demonstrasi.createTugas', [
+        'id_skema' => $request->id_skema,
+        'kelompok_id' => $request->id_kelompok,
+        'timer' => $request->timer,
+        'jumlah' => max(1, count($request->input('isi_pertanyaan_demonstrasi', []))),
+    ])->with('success', 'Tugas demonstrasi berhasil disimpan.');
+}
+
+public function formTtd($id_skema, $id_demonstrasi)
+{
+    $skema = Skema::findOrFail($id_skema);
+    $demonstrasi = Demonstrasi::where('id_demonstrasi', $id_demonstrasi)
+        ->where('id_skema', $id_skema)
+        ->firstOrFail();
+    $asesor = Asesor::where('user_id', auth()->id())->firstOrFail();
+    $tandaTangan = DB::table('master_tugas_demostrasi_persetujuan')->where('id_demonstrasi', $id_demonstrasi)
+        ->where('id_asesor', $asesor->id_asesor)
+        ->first();
+    $id_kelompok = request()->query('id_kelompok');
+
+    return view('demonstrasi_ttd', compact('skema', 'demonstrasi', 'asesor', 'tandaTangan', 'id_kelompok'));
+}
+
+public function simpanTtd(Request $request, $id_skema, $id_demonstrasi)
+{
+    $validated = $request->validate([
+        'tgl_ttd_asesor' => 'required|date',
+        'ttd_asesor' => ['required', 'string', 'regex:/^data:image\\/png;base64,/'],
+    ]);
+
+    $demonstrasi = Demonstrasi::where('id_demonstrasi', $id_demonstrasi)
+        ->where('id_skema', $id_skema)
+        ->firstOrFail();
+    $asesor = Asesor::where('user_id', auth()->id())->firstOrFail();
+
+    $imageData = substr($validated['ttd_asesor'], strpos($validated['ttd_asesor'], ',') + 1);
+    $decodedImage = base64_decode($imageData, true);
+    if ($decodedImage === false) {
+        return back()->withErrors(['ttd_asesor' => 'Tanda tangan tidak valid.'])->withInput();
+    }
+
+    $fileName = 'ttd_demonstrasi_' . Str::slug($asesor->nama_asesor) . '_' . $id_demonstrasi . '.png';
+    Storage::disk('public')->put('ttd/' . $fileName, $decodedImage);
+
+    DB::table('master_tugas_demostrasi_persetujuan')->updateOrInsert(
+        ['id_demonstrasi' => $demonstrasi->id_demonstrasi, 'id_asesor' => $asesor->id_asesor],
+        ['tgl_ttd_asesor' => $validated['tgl_ttd_asesor'], 'ttd_asesor' => $fileName]
+    );
+
+    return redirect()->route('demonstrasi.ttd', [
+        'id_skema' => $id_skema,
+        'id_demonstrasi' => $id_demonstrasi,
+        'id_kelompok' => $request->input('id_kelompok'),
+    ])
+        ->with('success', 'Tanda tangan demonstrasi berhasil disimpan.');
 }
 
 
@@ -135,12 +194,14 @@ $demo = Demonstrasi::create([
     public function crud($id_skema, $id_kelompok)
     {
         $skema = Skema::findOrFail($id_skema);
+        $demonstrasi = Demonstrasi::where('id_skema', $id_skema)->first();
+        $timer = $demonstrasi->timer ?? request()->query('timer', 30);
         $tugas = MasterTugasDemonstrasi::where('id_skema', $id_skema)
                                ->where('id_kelompok', $id_kelompok)
                                ->get();
 
 
-        return view('demonstrasi_crud', compact('skema', 'tugas', 'id_kelompok'));
+        return view('demonstrasi_crud', compact('skema', 'tugas', 'id_kelompok', 'demonstrasi', 'timer'));
     }
 
     // 📍 Form edit tugas demonstrasi (demonstrasi_edit.blade.php)

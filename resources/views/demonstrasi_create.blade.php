@@ -6,6 +6,13 @@
     <p class="text-center text-muted">Skema: <span class="fw-bold">{{ $skema->nama_skema }}</span></p>
     <p class="text-center text-muted">Timer: <span class="fw-bold">{{ $timer }} menit</span></p>
 
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    @if($errors->any())
+        <div class="alert alert-danger">{{ $errors->first() }}</div>
+    @endif
+
     <form id="formTugasDemonstrasi" 
           action="{{ route('demonstrasi.storeTugas') }}" 
           method="POST" 
@@ -15,7 +22,7 @@
         <!-- Hidden input -->
         <input type="hidden" name="id_skema" value="{{ $skema->id_skema }}">
         <input type="hidden" name="id_kelompok" value="{{ $id_kelompok }}">
-        <input type="hidden" name="id_asesor" value="{{ auth()->id() }}">
+        <input type="hidden" name="id_asesor" value="{{ auth()->user()->asesor->id_asesor ?? '' }}">
         <input type="hidden" name="id_demonstrasi" value="{{ $id_demonstrasi }}">
         <input type="hidden" name="timer" value="{{ $timer }}">
 
@@ -64,13 +71,13 @@
             <button type="submit" name="action" value="stay"
                 class="btn px-4 fw-bold text-white"
                 style="background-color:#041562;">
-                Simpan
+                Simpan & Tetap di Halaman
             </button>
 
             <button type="submit" name="action" value="back"
                 class="btn px-4 fw-bold text-white"
                 style="background-color:#28a745;">
-                Simpan & Kembali
+                Simpan & Kembali ke Daftar
             </button>
 </div>
 

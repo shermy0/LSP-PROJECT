@@ -7,7 +7,7 @@
     <div class="card shadow-sm mt-3">
         <div class="card-body">
             <p><strong>Nama Lengkap:</strong> {{ $peserta->nama_lengkap }}</p>
-            <p><strong>Kelas:</strong> {{ $peserta->kelas }}</p>
+            <p><strong>Jurusan:</strong> {{ $peserta->jurusan->nama_jurusan ?? '-' }}</p>
 
             {{-- Jika ada relasi dengan asesor --}}
             @if($peserta->asesor)

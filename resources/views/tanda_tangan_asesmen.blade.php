@@ -3,11 +3,6 @@
 @section('konten')
 <div class="container mt-4">
     <h4 class="fw-bold text-center mb-4">FR.IA.07 – DPL – Tanda Tangan Pembuatan Asesmen</h4>
-    {{-- Pesan sukses --}}
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
     {{-- Form TTD --}}
     <div class="card shadow p-4">
         <form action="{{ route('tanda.tangan.asesmen.simpan', [$id_skema, $id_pembuatan_pertanyaan]) }}" method="POST">
@@ -88,6 +83,7 @@
 </div>
 
 {{-- JS Signature Pad --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     let canvas = document.getElementById('signature-pad');
     let ctx = canvas.getContext('2d');
@@ -136,6 +132,24 @@
         let dataURL = canvas.toDataURL('image/png');
         document.getElementById('ttd_asesor').value = dataURL;
     }
+
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: @json(session('success')),
+            showDenyButton: true,
+            confirmButtonText: 'Tetap di Halaman',
+            denyButtonText: 'Ke Halaman Asesmen',
+            confirmButtonColor: '#7161e8',
+            denyButtonColor: '#6c757d',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isDenied) {
+                window.location.href = @json($backUrl);
+            }
+        });
+    @endif
 </script>
 <a href="{{ $backUrl }}"
    style="position:fixed; bottom:20px; left:260px; z-index:9999;
@@ -147,6 +161,6 @@
           text-decoration:none; transition:opacity 0.2s;"
    onmouseover="this.style.opacity='0.85'"
    onmouseout="this.style.opacity='1'">
-    <i class="bi bi-arrow-left"></i> Kembali
+    <i class="bi bi-arrow-left"></i> Kembali ke Asesmen
 </a>
 @endsection

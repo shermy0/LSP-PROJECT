@@ -33,7 +33,7 @@
                <div class="accordion-item mb-2">
             <h2 class="accordion-header p-3 border rounded">
                 <a href="{{ route('formasesmen.pertanyaanLisan', ['id_skema' => $skema->id_skema]) }}" 
-                class="text-dark text-decoration-none">
+                class="d-block w-100 text-dark text-decoration-none">
                     <i class="fa-solid fa-stop me-2"></i> Pertanyaan Lisan
                 </a>
             </h2>
@@ -42,7 +42,9 @@
         <!-- Item 4 -->
         <div class="accordion-item mb-3">
             <h2 class="accordion-header p-3 border rounded">
-                <i class="fa-solid fa-stop me-2"></i> Tugas Praktik Demonstrasi
+                <a href="{{ route('formasesmen.pertanyaanDemonstrasi', ['id_skema' => $skema->id_skema]) }}" class="d-block w-100 text-dark text-decoration-none">
+                    <i class="fa-solid fa-stop me-2"></i> Tugas Praktik Demonstrasi
+                </a>
             </h2>
         </div>
     </div>

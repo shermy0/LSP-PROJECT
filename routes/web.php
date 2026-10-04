@@ -610,6 +610,8 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/update/{id}', [DemonstrasiController::class, 'update'])->name('demonstrasi.update');
         Route::delete('/destroy/{id}', [DemonstrasiController::class, 'destroy'])->name('demonstrasi.destroy');
         Route::post('/store/jawaban', [JawabanDemonstrasiController::class, 'store'])->name('demonstrasi.storeJawaban');
+        Route::get('/{id_skema}/{id_demonstrasi}/ttd', [DemonstrasiController::class, 'formTtd'])->name('demonstrasi.ttd');
+        Route::post('/{id_skema}/{id_demonstrasi}/ttd', [DemonstrasiController::class, 'simpanTtd'])->name('demonstrasi.ttd.store');
         Route::get('/{id_skema}', [JawabanDemonstrasiController::class, 'show'])->name('demonstrasi.show');
     });
 
@@ -796,7 +798,7 @@ Route::prefix('opsi-jawaban')->group(function () {
 });
 
 // Routes untuk Pertanyaan Pilihan Ganda
-Route::get('/pertanyaan/{id_skema}/kelompok-pg', [PertanyaanController::class, 'kelompokPekerjaan'])
+Route::get('/pertanyaan/{id_skema}/kelompok-pg', [PertanyaanController::class, 'kelompokPekerjaanPG'])
 ->name('pertanyaan.pg.kelompok')
 ->defaults('jenis', 'pilihan_ganda');
 
@@ -1009,4 +1011,3 @@ Route::get('/admin/form-asesmen/{skemaId}/{asesiId}/{tipe}/hasil',
     Route::post('/ceklis-observasi/tandatangan', [CeklisObservasiController::class, 'storeTandatangan'])->name('ceklisobservasi.storeTandatangan'); 
     Route::get('/ceklis-observasi/tandatangan/{id_skema}/{id_asesi}', [CeklisObservasiController::class, 'tandatanganBySkemaAsesi']) ->name('ceklisobservasi.tandatangan.bySkemaAsesi');
     Route::get('/ttd/asesor/{filename}', [App\Http\Controllers\CeklisObservasiController::class, 'showTtdAsesor'])->name('ttd.asesor');
-

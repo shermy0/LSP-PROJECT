@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use App\Models\{Demonstrasi, MasterTugasDemonstrasi, JawabanDemonstrasi, Asesi};
+use Illuminate\Support\Facades\Schema;
+use App\Models\{JawabanDemonstrasi, Asesi};
 
 class JawabanDemonstrasiController extends Controller
 {
@@ -15,19 +16,44 @@ class JawabanDemonstrasiController extends Controller
         $user = auth()->user();
         $asesi = Asesi::where('user_id', $user->id)->firstOrFail();
 
-        $demo = Demonstrasi::where('id_skema', $id_skema)->firstOrFail();
-        $tugas = MasterTugasDemonstrasi::where('id_demonstrasi', $demo->id_demonstrasi)->get();
+        // Struktur tabel demonstrasi berbeda pada beberapa database yang sudah
+        // berjalan. Daftar tugas sendiri terhubung ke skema, jadi jangan
+        // mensyaratkan baris demonstrasi dengan kolom id_skema.
+        $taskQuery = DB::table('master_tugas_demonstrasi')
+            ->where('id_skema', $id_skema)
+            ->orderBy('id_tugas');
 
-        $jawabanSebelumnya = JawabanDemonstrasi::where('id_asesi', $asesi->id_asesi)
-        ->where('id_skema', $id_skema)
-        ->get()
-        ->keyBy('id_tugas');
+        $tugas = $taskQuery->get()->map(function ($task) {
+            $task->isi_pertanyaan_demonstrasi = $task->isi_pertanyaan_demonstrasi
+                ?? $task->nama_tugas
+                ?? $task->deskripsi_pertanyaan
+                ?? 'Tugas demonstrasi';
+            $task->deskripsi_pertanyaan = $task->deskripsi_pertanyaan ?? $task->instruksi ?? null;
+            $task->file_path = $task->file_path ?? null;
+            return $task;
+        });
+
+        $jawabanSebelumnya = collect();
+        if (Schema::hasTable('jawaban_demonstrasi')
+            && Schema::hasColumn('jawaban_demonstrasi', 'id_asesi')
+            && Schema::hasColumn('jawaban_demonstrasi', 'id_tugas')) {
+            $jawabanQuery = DB::table('jawaban_demonstrasi')
+                ->where('id_asesi', $asesi->id_asesi)
+                ->whereIn('id_tugas', $tugas->pluck('id_tugas'));
+
+            $jawabanSebelumnya = $jawabanQuery->get()->keyBy('id_tugas');
+        }
+
+        $demoId = Schema::hasTable('demonstrasi')
+            && Schema::hasColumn('demonstrasi', 'id_skema')
+                ? DB::table('demonstrasi')->where('id_skema', $id_skema)->value('id_demonstrasi')
+                : null;
 
         return view('demonstrasi.jawab', [
             'id_skema' => $id_skema,
-            'id_demonstrasi' => $demo->id_demonstrasi,
+            'id_demonstrasi' => $demoId,
             'tugas' => $tugas,
-            'timer' => $demo->timer,
+            'timer' => 0,
             'asesi' => $asesi,
             'jawabanSebelumnya' => $jawabanSebelumnya,
         ]);

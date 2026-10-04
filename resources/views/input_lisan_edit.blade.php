@@ -26,20 +26,35 @@
             </div>
         </div>
 
-        <button type="button" class="btn btn-success" onclick="konfirmasiEdit()">Simpan Perubahan</button>
-        <button type="button" class="btn btn-secondary" onclick="stayHere()">Batal</button>
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <a href="{{ route('lisan.crud', $pertanyaan->id_skema) }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Kembali
+            </a>
+            <button type="button" class="btn btn-success" onclick="konfirmasiEdit()">
+                <i class="bi bi-save"></i> Simpan
+            </button>
+        </div>
     </form>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 function konfirmasiEdit() {
-    if (confirm("Apakah anda yakin ingin menyimpan perubahan?")) {
-        document.getElementById('formEditPertanyaan').submit();
-    }
+    Swal.fire({
+        icon: 'question',
+        title: 'Simpan perubahan?',
+        text: 'Perubahan pada pertanyaan lisan akan disimpan.',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, simpan',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#041562',
+        cancelButtonColor: '#6c757d'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('formEditPertanyaan').submit();
+        }
+    });
 }
 
-function stayHere() {
-    alert("Edit dibatalkan. Anda tetap di halaman ini.");
-}
 </script>
 @endsection

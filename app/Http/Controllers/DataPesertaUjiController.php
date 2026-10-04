@@ -14,9 +14,10 @@ class DataPesertaUjiController extends Controller
     {
         $userId = Auth::id(); // dari tabel users
         $asesorId = Asesor::where('user_id', $userId)->value('id_asesor');
+        abort_if(!$asesorId, 403, 'Data asesor untuk akun ini tidak ditemukan.');
               
         // Query peserta uji yang hanya dimiliki asesor ini
-        $query = Asesi::with('asesor')
+        $query = Asesi::with(['asesor', 'jurusan'])
             ->where('asesor_id', $asesorId);
 
         // Filter nama
@@ -24,23 +25,9 @@ class DataPesertaUjiController extends Controller
             $query->where('nama_lengkap', 'LIKE', '%' . $request->search . '%');
         }
 
-        // Filter kelas
-        if ($request->filled('kelas')) {
-            $query->where('kelas', $request->kelas);
-        }
-
         // Ambil data peserta + pagination
         $peserta = $query->paginate(10)->withQueryString();
-
-        // Ambil daftar kelas unik hanya untuk asesor ini
-        $kelasList = Asesi::where('asesor_id', $asesorId)
-            ->whereNotNull('kelas')
-            ->select('kelas')
-            ->distinct()
-            ->orderBy('kelas')
-            ->pluck('kelas');
-
-        return view('datapesertauji', compact('peserta', 'kelasList'));
+        return view('datapesertauji', compact('peserta'));
     }
 
     // Detail peserta
@@ -48,8 +35,9 @@ class DataPesertaUjiController extends Controller
     {
         $userId = Auth::id(); // dari tabel users
         $asesorId = Asesor::where('user_id', $userId)->value('id_asesor');
+        abort_if(!$asesorId, 403, 'Data asesor untuk akun ini tidak ditemukan.');
 
-        $peserta = Asesi::with('asesor')
+        $peserta = Asesi::with(['asesor', 'jurusan'])
             ->where('asesor_id', $asesorId) // Hanya peserta milik asesor ini
             ->findOrFail($id);
 

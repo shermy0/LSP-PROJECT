@@ -5,6 +5,15 @@
     <h4 class="fw-bold">FR.IA.07 – Input Pertanyaan Pilihan Ganda</h4>
     <p class="text-muted">Jumlah soal yang dipilih: {{ $jumlah }}</p>
 
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    @if(session('error') || $errors->any())
+        <div class="alert alert-danger">
+            {{ session('error') ?? $errors->first() }}
+        </div>
+    @endif
+
     <form action="{{ route('pertanyaan.pg.store') }}" method="POST" enctype="multipart/form-data" id="formPG">
         @csrf
 
@@ -95,7 +104,11 @@
 
         <div class="d-flex gap-2">
             <button type="submit" class="btn btn-primary">Simpan Semua Pertanyaan</button>
-            <a href="{{ route('pg.crud', ['id_skema' => $skema->id_skema, 'id_kelompok' => $kelompok->id_kelompok]) }}" 
+            <a href="{{ route('pg.crud', [
+                    'id_skema' => $skema->id_skema,
+                    'id_kelompok' => $kelompok->id_kelompok,
+                    'id_pembuatan_pertanyaan' => $id_pembuatan_pertanyaan,
+                ]) }}" 
                class="btn btn-secondary">Kembali</a>
         </div>
     </form>
