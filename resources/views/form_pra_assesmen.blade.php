@@ -109,8 +109,8 @@
                                     <ul>
                                         @forelse($dokumenTidakMemenuhi as $dok)
                                             <li>
-                                                {{ $dok->jenis->nama_dokumen ?? 'Dokumen #' . $dok->id_jenis_dokumen }}
-                                                (<a href="{{ asset('storage/' . $dok->file_path) }}" target="_blank">Lihat</a>)
+                                                {{ $dok->jenis->nama_dokumen ?? ($dok->jenisDokumen->nama_dokumen ?? 'Dokumen #' . $dok->id_jenis_dokumen) }}
+                                                (<a href="{{ asset('storage/' . ($dok->file_path ?? $dok->path_file)) }}" target="_blank">Lihat</a>)
                                             </li>
                                         @empty
                                             <li>Tidak ada data dokumen.</li>
@@ -168,6 +168,89 @@
                         </div>
                         <div class="text-end"><span class="badge {{ $asesmenBadge }}">{{ $asesmenLabel }}</span></div>
                     </a>
+
+                    {{-- FR.AK.01 Persetujuan Asesmen --}}
+                    @if($asesmenExists && $rekom === 'Dapat Dilanjutkan')
+                        @php
+                            $persetujuanLabel = $persetujuan ? ($persetujuan->status == 'selesai' ? 'Selesai' : ($persetujuan->status == 'menunggu_asesor' ? 'Menunggu TTD Asesor' : 'Draf')) : 'Belum dibuat';
+                            $persetujuanBadge = $persetujuan ? ($persetujuan->status == 'selesai' ? 'bg-success' : ($persetujuan->status == 'menunggu_asesor' ? 'bg-warning text-dark' : 'bg-secondary')) : 'bg-secondary';
+                            $persetujuanHref = $persetujuan ? route('asesi.persetujuan_asesmen.show', $persetujuan->id_persetujuan) : '#';
+                        @endphp
+                        <a href="{{ $persetujuanHref }}"
+                           class="pra-item d-flex justify-content-between align-items-center mb-3 p-3 text-decoration-none">
+                            <div class="d-flex align-items-start">
+                                <div class="icon-wrap me-3">📝</div>
+                                <div>
+                                    <h6 class="mb-1 fw-semibold text-dark">FR.AK.01 Persetujuan Asesmen dan Kerahasiaan</h6>
+                                    <small class="text-muted">
+                                        @if($persetujuan)
+                                            Terakhir diupdate: {{ $persetujuan->updated_at ? \Carbon\Carbon::parse($persetujuan->updated_at)->format('d M Y') : '-' }}
+                                        @else
+                                            Menunggu asesor membuat persetujuan.
+                                        @endif
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="text-end"><span class="badge {{ $persetujuanBadge }}">{{ $persetujuanLabel }}</span></div>
+                        </a>
+                    @endif
+
+                    {{-- FR.AK.07 Penyesuaian Wajar --}}
+                    @if($persetujuan && $persetujuan->status === 'selesai')
+                        @php
+                            $pwStatus = $penyesuaianWajar ? $penyesuaianWajar->status : null;
+                            $pwLabel = $pwStatus === 'selesai' ? 'Selesai' : ($pwStatus === 'menunggu_asesor' ? 'Menunggu TTD Asesor' : ($pwStatus === 'menunggu_asesi' ? 'Menunggu TTD Anda' : ($pwStatus === 'draf' ? 'Draf (Asesor)' : 'Belum dibuat')));
+                            $pwBadge = $pwStatus === 'selesai' ? 'bg-success' : ($pwStatus === 'menunggu_asesor' ? 'bg-warning text-dark' : ($pwStatus === 'menunggu_asesi' ? 'bg-info' : 'bg-secondary'));
+                            $pwHref = $penyesuaianWajar ? route('asesi.penyesuaian_wajar.show', $penyesuaianWajar->id_penyesuaian) : '#';
+                        @endphp
+                        <a href="{{ $pwHref }}"
+                           class="pra-item d-flex justify-content-between align-items-center mb-3 p-3 text-decoration-none">
+                            <div class="d-flex align-items-start">
+                                <div class="icon-wrap me-3">📋</div>
+                                <div>
+                                    <h6 class="mb-1 fw-semibold text-dark">FR.AK.07 Penyesuaian Wajar</h6>
+                                    <small class="text-muted">
+                                        @if($penyesuaianWajar)
+                                            Terakhir diupdate: {{ $penyesuaianWajar->updated_at ? \Carbon\Carbon::parse($penyesuaianWajar->updated_at)->format('d M Y') : '-' }}
+                                        @else
+                                            Asesor belum membuat penyesuaian.
+                                        @endif
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="text-end"><span class="badge {{ $pwBadge }}">{{ $pwLabel }}</span></div>
+                        </a>
+                    @endif
+
+                    {{-- FR.AK.04 Banding Asesmen --}}
+                    @if(isset($penyesuaianWajar) && $penyesuaianWajar && $penyesuaianWajar->status === 'selesai')
+                        @if(isset($banding) && $banding)
+                            <a href="{{ route('asesi.banding_asesmen.show', $banding->id_banding) }}"
+                               class="pra-item d-flex justify-content-between align-items-center mb-3 p-3 text-decoration-none">
+                                <div class="d-flex align-items-start">
+                                    <div class="icon-wrap me-3">⚖️</div>
+                                    <div>
+                                        <h6 class="mb-1 fw-semibold text-dark">FR.AK.04 Banding Asesmen</h6>
+                                        <small class="text-muted">Diajukan pada: {{ \Carbon\Carbon::parse($banding->tgl_banding)->format('d M Y') }}</small>
+                                    </div>
+                                </div>
+                                <div class="text-end"><span class="badge bg-success">Sudah diajukan</span></div>
+                            </a>
+                        @else
+                            <a href="{{ route('asesi.banding_asesmen.create', $penyesuaianWajar->id_permohonan) }}"
+                               class="pra-item d-flex justify-content-between align-items-center mb-3 p-3 text-decoration-none">
+                                <div class="d-flex align-items-start">
+                                    <div class="icon-wrap me-3">⚖️</div>
+                                    <div>
+                                        <h6 class="mb-1 fw-semibold text-dark">FR.AK.04 Banding Asesmen</h6>
+                                        <small class="text-muted">Ajukan banding jika proses asesmen tidak sesuai</small>
+                                    </div>
+                                </div>
+                                <div class="text-end"><span class="badge bg-danger">Ajukan Banding</span></div>
+                            </a>
+                        @endif
+                    @endif
+
                 @endif
             @endif
 
@@ -185,7 +268,7 @@
                     <div class="text-end"><span class="badge bg-primary">Akses</span></div>
                 </a>
 
-                <a href="#"
+                <a href="{{ route('asesor.persetujuan_asesmen.index') }}"
                    class="pra-item d-flex justify-content-between align-items-center mb-3 p-3 text-decoration-none">
                     <div class="d-flex align-items-start">
                         <div class="icon-wrap me-3">📝</div>
@@ -197,7 +280,7 @@
                     <div class="text-end"><span class="badge bg-primary">Akses</span></div>
                 </a>
 
-                <a href="#"
+                <a href="{{ route('asesor.penyesuaian_wajar.index') }}"
                    class="pra-item d-flex justify-content-between align-items-center mb-3 p-3 text-decoration-none">
                     <div class="d-flex align-items-start">
                         <div class="icon-wrap me-3">📋</div>

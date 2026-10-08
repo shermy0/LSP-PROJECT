@@ -12,4 +12,9 @@ class Asesmen extends Model
     protected $fillable = [
         'id_permohonan', 'id_jadwal', 'hasil', 'umpan_balik_asesi', 'catatan', 'tgl_asesmen', 'status'
     ];
+
+    public function permohonan()
+{
+    return $this->belongsTo(Permohonan::class, 'id_permohonan', 'id_permohonan');
+}
 }

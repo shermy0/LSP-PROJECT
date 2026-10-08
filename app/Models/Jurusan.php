@@ -29,6 +29,14 @@ class Jurusan extends Model
     }
 
     /**
+     * Relasi ke Asesor.
+     */
+    public function asesors()
+    {
+        return $this->hasMany(Asesor::class, 'id_jurusan', 'id_jurusan');
+    }
+
+    /**
      * Scope untuk jurusan aktif.
      */
     public function scopeAktif($query)
@@ -50,6 +58,14 @@ class Jurusan extends Model
     public function getJumlahAsesiAttribute(): int
     {
         return $this->asesis()->count();
+    }
+
+    /**
+     * Get jumlah asesor dalam jurusan ini.
+     */
+    public function getJumlahAsesorAttribute(): int
+    {
+        return $this->asesors()->count();
     }
 
     /**

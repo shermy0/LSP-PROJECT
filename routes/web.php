@@ -5,7 +5,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerencanaanController;
 use App\Http\Controllers\PertanyaanController;
@@ -15,8 +14,7 @@ use App\Http\Controllers\SkemaController;
 use App\Http\Controllers\RekamanAsesmenController;
 use App\Http\Controllers\ModifikasiController;
 use App\Http\Controllers\FormAsesmenController;
-use App\Http\Controllers\Asesi\PermohonanController;
-use App\Http\Controllers\Admin\Form1AdminController;
+use App\Http\Controllers\FormPraAsesmenController;
 use App\Http\Controllers\OpsiJawabanController;
 use App\Http\Controllers\EvaluasiController;
 use App\Http\Controllers\PdfController;
@@ -26,12 +24,40 @@ use App\Http\Controllers\DemonstrasiController;
 use App\Http\Controllers\JawabanDemonstrasiController;
 use App\Http\Controllers\CeklisObservasiController;
 use App\Http\Controllers\BandingAsesmenController;
-use App\Http\Controllers\FormPraAsesmenController;
+
+// Asesi Controllers
+use App\Http\Controllers\Asesi\PermohonanController;
 use App\Http\Controllers\Asesi\AsesmenMandiriController as AsesiAsesmenMandiriController;
+use App\Http\Controllers\Asesi\PersetujuanAsesmenController as AsesiPersetujuanController;
+use App\Http\Controllers\Asesi\PenyesuaianWajarController as AsesiPenyesuaianWajarController;
+use App\Http\Controllers\Asesi\BandingAsesmenController as AsesiBandingAsesmenController;
+
+// Asesor Controllers
 use App\Http\Controllers\Asesor\AsesmenMandiriController as AsesorAsesmenMandiriController;
+use App\Http\Controllers\Asesor\PersetujuanAsesmenController as AsesorPersetujuanController;
+use App\Http\Controllers\Asesor\PenyesuaianWajarController as AsesorPenyesuaianWajarController;
+
+// Admin Controllers
+use App\Http\Controllers\Admin\Form1AdminController;
+use App\Http\Controllers\Admin\AsesorController as AdminAsesorController;
+use App\Http\Controllers\Admin\PenugasanController as AdminPenugasanController;
+use App\Http\Controllers\Admin\BandingAsesmenController as AdminBandingAsesmenController;
+
 use App\Models\UnitKompetensi;
 use App\Models\Asesi;
 use App\Models\Asesor;
+
+/*
+|--------------------------------------------------------------------------
+| AUTH GUEST (LOGIN & REGISTER)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.store');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -39,31 +65,21 @@ use App\Models\Asesor;
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
+    if (Auth::check()) {
+        $user = Auth::user();
+        switch ($user->role) {
+            case 'admin': return redirect()->route('admin.dashboard');
+            case 'asesor': return redirect()->route('asesor.dashboard');
+            case 'asesi': return redirect()->route('asesi.dashboard');
+            default: return redirect()->route('login');
+        }
+    }
     return redirect()->route('login');
 });
 
 /*
 |--------------------------------------------------------------------------
-| AUTH (LOGIN & REGISTER)
-|--------------------------------------------------------------------------
-*/
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
-
-Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-Route::post('/register', [AuthController::class, 'register'])->name('register.store');
-
-Route::get('/register-role', [AuthController::class, 'showRegisterRole'])->name('register.role');
-
-Route::get('/register/asesi', [RegisterController::class, 'showAsesiForm'])->name('register.asesi');
-Route::post('/register/asesi', [RegisterController::class, 'storeAsesi'])->name('register.asesi.store');
-
-Route::get('/register/asesor', [RegisterController::class, 'showAsesorForm'])->name('register.asesor');
-Route::post('/register/asesor', [RegisterController::class, 'storeAsesor'])->name('register.asesor.store');
-
-/*
-|--------------------------------------------------------------------------
-| PUBLIC / STATIC VIEWS
+| PUBLIC / STATIC VIEWS (KOMPATIBILITAS)
 |--------------------------------------------------------------------------
 */
 Route::get('/asesi', fn() => view('asesi.index'))->name('index-asesi');
@@ -86,12 +102,7 @@ Route::middleware(['auth'])->group(function () {
     | LOGOUT
     |----------------------------------------------------------------------
     */
-    Route::post('/logout', function () {
-        Auth::logout();
-        request()->session()->invalidate();
-        request()->session()->regenerateToken();
-        return redirect('/login');
-    })->name('logout');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     /*
     |----------------------------------------------------------------------
@@ -101,8 +112,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
     Route::get('/asesi/dashboard', [DashboardController::class, 'asesi'])->name('asesi.dashboard');
-    Route::get('/asesor/dashboard', [DashboardController::class, 'asesor'])->name('dashboard.asesor');
-    Route::get('/dashboard/asesor', [DashboardController::class, 'asesor'])->name('asesor.dashboard');
+    Route::get('/asesor/dashboard', [DashboardController::class, 'asesor'])->name('asesor.dashboard');
+    Route::get('/dashboard/asesor', [DashboardController::class, 'asesor'])->name('dashboard.asesor');
 
     Route::middleware('role:admin')->group(function () {
         Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
@@ -184,7 +195,7 @@ Route::middleware(['auth'])->group(function () {
         ->defaults('jenis', 'esai')
         ->name('pertanyaan.esai.kelompok');
 
-   /*
+    /*
     |----------------------------------------------------------------------
     | PERTANYAAN - LISAN
     |----------------------------------------------------------------------
@@ -250,8 +261,6 @@ Route::middleware(['auth'])->group(function () {
     | PMO (FR.IA.03)
     |----------------------------------------------------------------------
     */
-
-    // PMO prefix group
     Route::prefix('pmo')->name('pmo.')->group(function () {
         Route::get('/formasesmen/pertanyaan-pmo/{id_skema}', [FormAsesmenController::class, 'pertanyaanPMO'])->name('formasesmen.pertanyaanPMO');
         Route::get('/{id_pmo}/crud', [PertanyaanController::class, 'crudPMO'])->name('crud');
@@ -264,7 +273,6 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{id_pmo}/store', [PertanyaanController::class, 'storePMO'])->name('pertanyaan.pmo.store');
     });
 
-    // PMO main routes
     Route::get('/form-asesmen/{id_skema}/pmo', [PertanyaanController::class, 'pertanyaanPMO'])->name('formasesmen.pmo');
     Route::get('/pmo/kelompok/{id_skema}/{id_pembuatan?}', [PertanyaanController::class, 'pertanyaanPMOKelompok'])->name('pertanyaan.pmo.kelompok');
     Route::get('/form-asesmen/{id_skema}/input-pmo', [PertanyaanController::class, 'inputPMO'])->name('form.input.pmo');
@@ -304,8 +312,6 @@ Route::middleware(['auth'])->group(function () {
     | DEMONSTRASI
     |----------------------------------------------------------------------
     */
-
-    // Route standalone (harus di atas prefix group agar tidak bentrok)
     Route::get('/demonstrasi/create', [DemonstrasiController::class, 'create'])->name('demonstrasi.create.standalone');
     Route::post('/demonstrasi/store', [DemonstrasiController::class, 'store'])->name('demonstrasi.store.standalone');
     Route::get('/demonstrasi/{id_skema}/crud', [DemonstrasiController::class, 'crud'])->name('demonstrasi.crud.standalone');
@@ -348,9 +354,17 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/store', [CeklisObservasiController::class, 'store'])->name('ceklisobservasi.store');
     });
 
+    Route::get('/ceklis-observasi/pilih/{id_skema}', [CeklisObservasiController::class, 'pilihAsesi'])->name('ceklisobservasi.pilih');
+    Route::get('/ceklis-observasi', [CeklisObservasiController::class, 'index'])->name('ceklisobservasi.index');
+    Route::post('/ceklis-observasi', [CeklisObservasiController::class, 'store'])->name('ceklisobservasi.store');
+    Route::get('/ceklis-observasi/tandatangan/{id}', [CeklisObservasiController::class, 'tandatangan'])->name('ceklisobservasi.tandatangan');
+    Route::post('/ceklis-observasi/tandatangan', [CeklisObservasiController::class, 'storeTandatangan'])->name('ceklisobservasi.storeTandatangan'); 
+    Route::get('/ceklis-observasi/tandatangan/{id_skema}/{id_asesi}', [CeklisObservasiController::class, 'tandatanganBySkemaAsesi'])->name('ceklisobservasi.tandatangan.bySkemaAsesi');
+    Route::get('/ttd/asesor/{filename}', [CeklisObservasiController::class, 'showTtdAsesor'])->name('ttd.asesor');
+
     /*
     |----------------------------------------------------------------------
-    | BANDING ASESMEN
+    | BANDING ASESMEN LAMA (FITUR AWAL)
     |----------------------------------------------------------------------
     */
     Route::get('/banding-asesmen', [BandingAsesmenController::class, 'index'])->name('banding.index');
@@ -366,6 +380,33 @@ Route::middleware(['auth'])->group(function () {
 
     /*
     |----------------------------------------------------------------------
+    | DATA PESERTA UJI & PROFILE ASESOR
+    |----------------------------------------------------------------------
+    */
+    Route::get('/datapesertauji', [DataPesertaUjiController::class, 'index'])->name('datapesertauji');
+    Route::get('/peserta/{id}', [DataPesertaUjiController::class, 'show'])->name('peserta.show');
+    Route::get('/data-peserta-uji', [PertanyaanController::class, 'dataPesertaUji'])->name('data.peserta.uji');
+    Route::get('/detail-jawaban/{skema}/{jenis}', [PertanyaanController::class, 'detailJawaban'])->name('detail.jawaban');
+
+    Route::prefix('profileasesor')->group(function () {
+        Route::get('/', [ProfileAsesorController::class, 'show'])->name('profile.show');
+        Route::get('/edit', [ProfileAsesorController::class, 'edit'])->name('profileasesor.edit');
+        Route::put('/update', [ProfileAsesorController::class, 'update'])->name('profile.update');
+    });
+
+    /*
+    |----------------------------------------------------------------------
+    | ASESOR LIHAT JAWABAN ASESI
+    |----------------------------------------------------------------------
+    */
+    Route::get('/asesor/skema', [JawabanController::class, 'indexSkema'])->name('asesor.skema.index');
+    Route::get('/asesor/skema/{id_skema}/jenis', [JawabanController::class, 'listJenis'])->name('asesor.skema.jenis');
+    Route::get('/asesor/skema/{id_skema}/jenis/{jenis}/asesi', [JawabanController::class, 'listAsesi'])->name('asesor.skema.jenis.asesi');
+    Route::get('/asesor/skema/{id_skema}/jenis/{jenis}/asesi/{id_asesi}', [JawabanController::class, 'viewJawaban'])->name('asesor.skema.jenis.asesi.jawaban');
+    Route::post('/asesor/pencapaian/store', [JawabanController::class, 'storePencapaian'])->name('asesor.pencapaian.store');
+
+    /*
+    |----------------------------------------------------------------------
     | PERMOHONAN ASESI (FR.APL.01)
     |----------------------------------------------------------------------
     */
@@ -374,7 +415,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/store', [PermohonanController::class, 'store'])->name('store');
         Route::get('/form2', [PermohonanController::class, 'form2'])->name('form2');
         Route::post('/store-dokumen', [PermohonanController::class, 'storeDokumen'])->name('storeDokumen');
-        Route::get('/menunggu', fn() => view('asesi.permohonan.menunggu'))->name('menunggu');
+        Route::get('/menunggu', function () {
+            return view('asesi.permohonan.menunggu');
+        })->name('menunggu');
     });
 
     /*
@@ -382,16 +425,20 @@ Route::middleware(['auth'])->group(function () {
     | ASESMEN MANDIRI (FR.APL.02)
     |----------------------------------------------------------------------
     */
+    // Asesi
     Route::prefix('asesi/asesmen-mandiri')->name('asesi.asesmen_mandiri.')->group(function () {
         Route::get('/form1', [AsesiAsesmenMandiriController::class, 'form1'])->name('form1');
         Route::get('/form2', [AsesiAsesmenMandiriController::class, 'form2'])->name('form2');
         Route::get('/form3', [AsesiAsesmenMandiriController::class, 'form3'])->name('form3');
-        Route::get('/waiting', fn() => view('asesi.asesmen_mandiri.waiting'))->name('waiting');
+        Route::get('/waiting', function () {
+            return view('asesi.asesmen_mandiri.waiting');
+        })->name('waiting');
         Route::post('/store', [AsesiAsesmenMandiriController::class, 'store'])->name('store');
         Route::post('/ttd', [AsesiAsesmenMandiriController::class, 'storeTTD'])->name('ttd.store');
         Route::get('/{id}', [AsesiAsesmenMandiriController::class, 'show'])->name('show');
     });
 
+    // Asesor
     Route::prefix('asesor/asesmen-mandiri')->name('asesor.asesmen_mandiri.')->group(function () {
         Route::get('/', [AsesorAsesmenMandiriController::class, 'index'])->name('index');
         Route::get('/{asesi}', [AsesorAsesmenMandiriController::class, 'show'])->name('show');
@@ -400,72 +447,92 @@ Route::middleware(['auth'])->group(function () {
 
     /*
     |----------------------------------------------------------------------
-    | ADMIN - PERMOHONAN (FR.APL.01)
+    | PERSETUJUAN ASESMEN (FR.AK.01)
+    |----------------------------------------------------------------------
+    */
+    // Asesor
+    Route::prefix('asesor/persetujuan-asesmen')->name('asesor.persetujuan_asesmen.')->group(function () {
+        Route::get('/', [AsesorPersetujuanController::class, 'index'])->name('index');
+        Route::get('/create/{id_permohonan}', [AsesorPersetujuanController::class, 'create'])->name('create');
+        Route::post('/', [AsesorPersetujuanController::class, 'store'])->name('store');
+        Route::get('/{id}', [AsesorPersetujuanController::class, 'show'])->name('show');
+        Route::put('/{id}', [AsesorPersetujuanController::class, 'update'])->name('update');
+        Route::post('/{id}/signature', [AsesorPersetujuanController::class, 'storeSignature'])->name('signature');
+    });
+
+    // Asesi
+    Route::prefix('asesi/persetujuan-asesmen')->name('asesi.persetujuan_asesmen.')->group(function () {
+        Route::get('/', [AsesiPersetujuanController::class, 'index'])->name('index');
+        Route::get('/{id}', [AsesiPersetujuanController::class, 'show'])->name('show');
+        Route::post('/{id}/signature', [AsesorPersetujuanController::class, 'storeSignature'])->name('signature');
+    });
+
+    /*
+    |----------------------------------------------------------------------
+    | PENYESUAIAN WAJAR (FR.AK.07)
+    |----------------------------------------------------------------------
+    */
+    // Asesor
+    Route::prefix('asesor/penyesuaian-wajar')->name('asesor.penyesuaian_wajar.')->group(function () {
+        Route::get('/', [AsesorPenyesuaianWajarController::class, 'index'])->name('index');
+        Route::get('/create/{id_permohonan}', [AsesorPenyesuaianWajarController::class, 'create'])->name('create');
+        Route::post('/', [AsesorPenyesuaianWajarController::class, 'store'])->name('store');
+        Route::get('/{id}', [AsesorPenyesuaianWajarController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [AsesorPenyesuaianWajarController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [AsesorPenyesuaianWajarController::class, 'update'])->name('update');
+        Route::post('/{id}/signature', [AsesorPenyesuaianWajarController::class, 'storeSignature'])->name('signature');
+    });
+
+    // Asesi
+    Route::prefix('asesi/penyesuaian-wajar')->name('asesi.penyesuaian_wajar.')->group(function () {
+        Route::get('/', [AsesiPenyesuaianWajarController::class, 'index'])->name('index');
+        Route::get('/{id}', [AsesiPenyesuaianWajarController::class, 'show'])->name('show');
+        Route::post('/{id}/signature', [AsesiPenyesuaianWajarController::class, 'storeSignature'])->name('signature');
+    });
+
+    /*
+    |----------------------------------------------------------------------
+    | BANDING ASESMEN (FR.AK.04) UNTUK ASESI
+    |----------------------------------------------------------------------
+    */
+    Route::prefix('asesi/banding-asesmen')->name('asesi.banding_asesmen.')->group(function () {
+        Route::get('/', [AsesiBandingAsesmenController::class, 'index'])->name('index');
+        Route::get('/create/{id_permohonan}', [AsesiBandingAsesmenController::class, 'create'])->name('create');
+        Route::post('/', [AsesiBandingAsesmenController::class, 'store'])->name('store');
+        Route::get('/{id}', [AsesiBandingAsesmenController::class, 'show'])->name('show');
+        Route::post('/{id}/signature', [AsesiBandingAsesmenController::class, 'storeSignature'])->name('signature');
+    });
+
+    /*
+    |----------------------------------------------------------------------
+    | ADMIN MANAGEMENT (PERMOHONAN, ASESOR, PENUGASAN, BANDING)
     |----------------------------------------------------------------------
     */
     Route::prefix('admin')->name('admin.')->group(function () {
+        // Permohonan
         Route::prefix('permohonan')->name('permohonan.')->group(function () {
             Route::get('/', [Form1AdminController::class, 'index'])->name('index');
             Route::get('/{user_id}', [Form1AdminController::class, 'show'])->name('show');
             Route::post('/{id_permohonan}/update', [Form1AdminController::class, 'update'])->name('update');
         });
+
+        // Asesor
+        Route::get('/asesor', [AdminAsesorController::class, 'index'])->name('asesor.index');
+        Route::get('/asesor/{id}', [AdminAsesorController::class, 'show'])->name('asesor.show');
+        Route::post('/asesor/store', [AdminAsesorController::class, 'store'])->name('asesor.store');
+
+        // Penugasan
+        Route::get('/penugasan', [AdminPenugasanController::class, 'index'])->name('penugasan.index');
+        Route::get('/penugasan/{id}/edit', [AdminPenugasanController::class, 'edit'])->name('penugasan.edit');
+        Route::put('/penugasan/{id}', [AdminPenugasanController::class, 'update'])->name('penugasan.update');
+
+        // Banding Asesmen untuk Admin
+        Route::resource('banding-asesmen', AdminBandingAsesmenController::class)
+            ->only(['index', 'show']);
+        Route::get('/banding-asesmen/{id}/download', [AdminBandingAsesmenController::class, 'downloadPdf'])->name('banding-asesmen.download');
     });
 
+    // Route untuk update permohonan admin (kompatibilitas)
     Route::post('/admin/permohonan/{id_permohonan}/update', [Form1AdminController::class, 'update'])->name('admin.permohonan.update');
+});
 
-    /*
-    |----------------------------------------------------------------------
-    | DATA PESERTA UJI
-    |----------------------------------------------------------------------
-    */
-    Route::get('/datapesertauji', [DataPesertaUjiController::class, 'index'])->name('datapesertauji');
-    Route::get('/peserta/{id}', [DataPesertaUjiController::class, 'show'])->name('peserta.show');
-    Route::get('/data-peserta-uji', [PertanyaanController::class, 'dataPesertaUji'])->name('data.peserta.uji');
-    Route::get('/detail-jawaban/{skema}/{jenis}', [PertanyaanController::class, 'detailJawaban'])->name('detail.jawaban');
-
-    /*
-    |----------------------------------------------------------------------
-    | PROFILE ASESOR
-    |----------------------------------------------------------------------
-    */
-    Route::prefix('profileasesor')->group(function () {
-        Route::get('/', [ProfileAsesorController::class, 'show'])->name('profile.show');
-        Route::get('/edit', [ProfileAsesorController::class, 'edit'])->name('profileasesor.edit');
-        Route::put('/update', [ProfileAsesorController::class, 'update'])->name('profile.update');
-    });
-    // ================== ASESOR LIHAT JAWABAN ASESI ==================
-    Route::get('/asesor/skema', [JawabanController::class, 'indexSkema'])->name('asesor.skema.index');
-    Route::get('/asesor/skema/{id_skema}/jenis', [JawabanController::class, 'listJenis'])->name('asesor.skema.jenis');
-    Route::get('/asesor/skema/{id_skema}/jenis/{jenis}/asesi', [JawabanController::class, 'listAsesi'])->name('asesor.skema.jenis.asesi');
-    Route::get('/asesor/skema/{id_skema}/jenis/{jenis}/asesi/{id_asesi}', [JawabanController::class, 'viewJawaban'])->name('asesor.skema.jenis.asesi.jawaban');
-    Route::post('/asesor/pencapaian/store', [JawabanController::class,'storePencapaian']) ->name('asesor.pencapaian.store');
-
-    // ================== ASESOR LIHAT JAWABAN ASESI ==================
-    Route::get('/asesor/skema', [JawabanController::class, 'indexSkema'])->name('asesor.skema.index');
-    Route::get('/asesor/skema/{id_skema}/jenis', [JawabanController::class, 'listJenis'])->name('asesor.skema.jenis');
-    Route::get('/asesor/skema/{id_skema}/jenis/{jenis}/asesi', [JawabanController::class, 'listAsesi'])->name('asesor.skema.jenis.asesi');
-    Route::get('/asesor/skema/{id_skema}/jenis/{jenis}/asesi/{id_asesi}', [JawabanController::class, 'viewJawaban'])->name('asesor.skema.jenis.asesi.jawaban');
-    Route::post('/asesor/pencapaian/store', [JawabanController::class,'storePencapaian']) ->name('asesor.pencapaian.store');
-
-    /*
-    |----------------------------------------------------------------------
-    | Ceklis Observasi
-    |----------------------------------------------------------------------
-    */
-   // Pilih asesi untuk skema tertentu (skema sudah ditentukan)
-    Route::get('/ceklis-observasi/pilih/{id_skema}', [CeklisObservasiController::class, 'pilihAsesi'])->name('ceklisobservasi.pilih');
-
-    // Halaman form ceklis observasi (dengan parameter id_asesi & id_skema)
-    Route::get('/ceklis-observasi', [CeklisObservasiController::class, 'index'])->name('ceklisobservasi.index');
-
-    // Proses simpan data
-    Route::post('/ceklis-observasi', [CeklisObservasiController::class, 'store'])->name('ceklisobservasi.store');
-
-    // Load data KUK berdasarkan skema (AJAX)
-    Route::get('/ceklisobservasi/data/{skemaId}', [CeklisObservasiController::class, 'loadData'])->name('ceklisobservasi.data');
-
-    Route::get('/ceklis-observasi/tandatangan/{id}', [CeklisObservasiController::class, 'tandatangan'])->name('ceklisobservasi.tandatangan');
-    Route::post('/ceklis-observasi/tandatangan', [CeklisObservasiController::class, 'storeTandatangan'])->name('ceklisobservasi.storeTandatangan'); 
-    Route::get('/ceklis-observasi/tandatangan/{id_skema}/{id_asesi}', [CeklisObservasiController::class, 'tandatanganBySkemaAsesi']) ->name('ceklisobservasi.tandatangan.bySkemaAsesi');
-    Route::get('/ttd/asesor/{filename}', [App\Http\Controllers\CeklisObservasiController::class, 'showTtdAsesor'])->name('ttd.asesor');
-}); // end middleware auth

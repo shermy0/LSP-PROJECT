@@ -10,12 +10,13 @@ return new class extends Migration
     {
         Schema::create('asesor_skema', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('asesor_id');
-            $table->unsignedBigInteger('skema_id');
-            $table->timestamps();
+            $table->unsignedBigInteger('id_asesor');
+            $table->unsignedBigInteger('id_skema');
+            $table->timestamps(); // optional
 
-            $table->foreign('asesor_id')->references('id_asesor')->on('asesor')->onDelete('cascade');
-            $table->foreign('skema_id')->references('id_skema')->on('skema_sertifikasi')->onDelete('cascade');
+            $table->foreign('id_asesor')->references('id_asesor')->on('asesor')->onDelete('cascade');
+            $table->foreign('id_skema')->references('id_skema')->on('skema_sertifikasi')->onDelete('cascade');
+            $table->unique(['id_asesor', 'id_skema']);
         });
     }
 

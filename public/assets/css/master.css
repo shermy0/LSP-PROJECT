@@ -123,7 +123,6 @@ body {
 /* Footer */
 .sidebar-footer {
     padding: 15px;
-<<<<<<< HEAD
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     flex-direction: column;
@@ -521,12 +520,6 @@ h3.fw-bold {
     border-radius: 5px;
     margin-top: 10px;
     cursor: pointer;
-=======
->>>>>>> migration
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
 }
 
 /* Avatar */
@@ -603,31 +596,24 @@ h3.fw-bold {
 }
 
 /* Konten utama */
-<<<<<<< HEAD
-#main-content {
-=======
-#content {
->>>>>>> fc23860cdc99f1db4e1288cbb020fa4d4abcd33f
+#main-content, #content {
     margin-left: 240px;
     padding: 20px;
     box-shadow: 0 3px 8px rgba(0,0,0,0.1);
     margin-bottom: 20px;
 }
 
-<<<<<<< HEAD
 /* Judul Box */
 .judul-box {
     background: #fff;
-=======
-<<<<<<< HEAD
-.sidebar.collapsed + #main-content {
-=======
+}
+
 #content.shrink {
     margin-left: 70px;
 }
 
+.sidebar.collapsed + #main-content,
 .sidebar.collapsed + #content {
->>>>>>> fc23860cdc99f1db4e1288cbb020fa4d4abcd33f
     margin-left: 70px;
 }
 
@@ -854,9 +840,6 @@ body {
     gap: 12px;
     cursor: pointer;
     white-space: nowrap;
->>>>>>> migration
-    border-radius: 8px;
-    overflow: hidden;
 }
 
 .judul-header {
@@ -990,14 +973,11 @@ thead.table-title th {
 
 .box-input {
     border: none;
-<<<<<<< HEAD
     border-top: 1px solid #ccc;
     border-radius: 0 0 6px 6px;
     width: 100%;
     padding: 8px;
     resize: vertical;
-}
-=======
 }
 
 .accordion-header {
@@ -1070,4 +1050,3 @@ thead.table-title th {
     border-radius: 12px;
     border: none;
 }
->>>>>>> migration

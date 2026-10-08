@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Permohonan;
 use App\Models\Asesi;
 use App\Models\DokumenPersyaratan;
+use App\Models\PenyesuaianWajar;
+use App\Models\BandingAsesmen;
 use Illuminate\Support\Facades\DB;
 
 class FormPraAsesmenController extends Controller
@@ -18,20 +20,23 @@ class FormPraAsesmenController extends Controller
         $permohonan = null;
         $asesmenMandiri = null;
         $dokumenTidakMemenuhi = collect();
+        $penyesuaianWajar = null;
+        $persetujuan = null;
+        $banding = null;
 
         if ($asesi) {
-            $permohonan= Permohonan::where('id_asesi', $asesi->id_asesi)
-                ->latest('created_at')
-                ->first();
+            $permohonan = $asesi->permohonan()->latest('created_at')->first();
 
             if ($permohonan) {
-                // join master + persetujuan
+                $permohonan->load('persetujuan');
+                $persetujuan = $permohonan->persetujuan;
+
                 $asesmenMandiri = DB::table('asesmen_mandiri_master as amm')
                     ->leftJoin('asesmen_mandiri_persetujuan as amp', 'amm.id_asesmen_mandiri', '=', 'amp.id_asesmen_mandiri')
                     ->select(
                         'amm.*',
-                        'amm.rekomendasi',               // hasil verifikasi asesor (dapat/tidak)
-                        'amp.status_persetujuan',        // status tanda tangan (menunggu/diterima/ditolak)
+                        'amm.rekomendasi',
+                        'amp.status_persetujuan',
                         'amp.catatan',
                         'amp.tgl_ttd_asesor',
                         'amp.tgl_ttd_asesi',
@@ -39,13 +44,18 @@ class FormPraAsesmenController extends Controller
                         'amp.ttd_asesi'
                     )
                     ->where('amm.id_permohonan', $permohonan->id_permohonan)
-                    ->where('amm.id_asesi', $permohonan->id_asesi)
+                    ->where('amm.id_asesi', $asesi->id_asesi)
                     ->first();
 
+                $penyesuaianWajar = PenyesuaianWajar::where('id_permohonan', $permohonan->id_permohonan)->first();
+
+                // Ambil data banding jika ada
+                $banding = BandingAsesmen::where('id_permohonan', $permohonan->id_permohonan)->first();
+
                 if ($permohonan->status === 'Ditolak') {
-                    $dokumenTidakMemenuhi = DokumenPersyaratan::with('jenis')
+                    $dokumenTidakMemenuhi = DokumenPersyaratan::with('jenisDokumen')
                         ->where('id_permohonan', $permohonan->id_permohonan)
-                        ->where('memenuhi_syarat', 0)
+                        ->where('memenuhi_syarat', false)
                         ->get();
                 }
             }
@@ -54,7 +64,10 @@ class FormPraAsesmenController extends Controller
         return view('form_pra_assesmen', compact(
             'permohonan',
             'asesmenMandiri',
-            'dokumenTidakMemenuhi'
+            'dokumenTidakMemenuhi',
+            'penyesuaianWajar',
+            'persetujuan',
+            'banding'
         ));
     }
 }

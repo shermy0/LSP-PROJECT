@@ -8,30 +8,28 @@ class SkemaSertifikasi extends Model
 {
     protected $table = 'skema_sertifikasi';
     protected $primaryKey = 'id_skema';
-    public $timestamps = false; // karena biasanya tabel ini tidak punya created_at & updated_at
+    public $timestamps = false;
 
     protected $fillable = [
         'kode_skema',
         'nama_skema',
+        'judul_skema',
         'jenjang',
         'bidang_keahlian',
         'deskripsi',
         'status_skema'
     ];
 
-    // Relasi ke Unit Kompetensi
     public function unitKompetensi()
     {
         return $this->hasMany(UnitKompetensi::class, 'id_skema', 'id_skema');
     }
 
-    // Relasi ke Kelompok Pekerjaan
     public function kelompokPekerjaan()
     {
         return $this->hasMany(KelompokPekerjaan::class, 'id_skema', 'id_skema');
     }
 
-    // Relasi Many-to-Many ke Tujuan Asesmen lewat pivot skema_tujuan
     public function tujuans()
     {
         return $this->belongsToMany(
@@ -42,7 +40,7 @@ class SkemaSertifikasi extends Model
         );
     }
 
-    // 🔥 Relasi Many-to-Many ke Asesor
+    // 🔥 Relasi Many-to-Many ke Asesor (kompatibilitas kode lama)
     public function asesor()
     {
         return $this->belongsToMany(
@@ -51,5 +49,18 @@ class SkemaSertifikasi extends Model
             'id_skema',
             'id_asesor'
         );
+    }
+
+    /**
+     * Relasi many-to-many dengan Asesor (dengan timestamps).
+     */
+    public function asesors()
+    {
+        return $this->belongsToMany(
+            Asesor::class,
+            'asesor_skema',
+            'id_skema',
+            'id_asesor'
+        )->withTimestamps();
     }
 }

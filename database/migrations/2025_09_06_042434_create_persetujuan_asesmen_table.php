@@ -22,6 +22,11 @@ return new class extends Migration
             $table->text('pernyataan_kerahasiaan')->nullable();
             $table->boolean('setuju_asesmen')->nullable();
 
+            // Status dalam Bahasa Indonesia
+            $table->enum('status', ['draf', 'menunggu_asesor', 'selesai'])->default('draf');
+            $table->timestamps();
+
+            // Foreign keys
             $table->foreign('id_permohonan')->references('id_permohonan')->on('permohonan')->onDelete('cascade');
             $table->foreign('id_asesi')->references('id_asesi')->on('asesi')->onDelete('cascade');
             $table->foreign('id_asesor')->references('id_asesor')->on('asesor')->onDelete('cascade');

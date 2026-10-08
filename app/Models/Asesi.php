@@ -50,7 +50,6 @@ class Asesi extends Model
 
     /**
      * Setiap Asesi dimiliki oleh satu User.
-     */
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
@@ -79,7 +78,15 @@ class Asesi extends Model
     {
         return $this->hasMany(Permohonan::class, 'id_asesi', 'id_asesi');
     }
+    public function penyesuaianWajar()
+    {
+        return $this->hasMany(PenyesuaianWajar::class, 'id_asesi', 'id_asesi');
+    }
 
+    public function asesmenMandiriMaster()
+    {
+        return $this->hasMany(AsesmenMandiriMaster::class, 'id_asesi', 'id_asesi');
+    }
     /**
      * Shortcut: ambil permohonan terakhir (terbaru).
      */

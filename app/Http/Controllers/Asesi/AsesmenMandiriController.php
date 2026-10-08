@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Storage;
 
 class AsesmenMandiriController extends Controller
 {
+    /**
+     * Tampilkan halaman pertama asesmen mandiri (informasi skema)
+     */
     public function form1()
     {
         $user = Auth::user();
@@ -36,14 +39,23 @@ class AsesmenMandiriController extends Controller
         return view('asesi.asesmen_mandiri.form1', compact('permohonan'));
     }
 
+    /**
+     * Tampilkan halaman kedua: daftar unit kompetensi, elemen, KUK, dan pilihan bukti
+     * Hanya menampilkan dokumen "Fotocopy Raport" dan "Sertifikat PKL" (selain upload file lain)
+     */
     public function form2()
     {
         $user = Auth::user();
         $asesi = DB::table('asesi')->where('user_id', $user->id)->first();
 
+        if (!$asesi) {
+            return redirect()->route('asesi.permohonan.form1')
+                ->with('error', 'Data asesi tidak ditemukan.');
+        }
+
         $permohonan = DB::table('permohonan')
             ->join('skema_sertifikasi', 'permohonan.id_skema', '=', 'skema_sertifikasi.id_skema')
-            ->where('id_asesi', $asesi->id_asesi ?? 0)
+            ->where('permohonan.id_asesi', $asesi->id_asesi)
             ->select(
                 'permohonan.id_permohonan',
                 'permohonan.id_skema',
@@ -51,7 +63,7 @@ class AsesmenMandiriController extends Controller
                 'skema_sertifikasi.kode_skema',
                 'skema_sertifikasi.judul_skema'
             )
-            ->latest('id_permohonan')
+            ->latest('permohonan.id_permohonan')
             ->first();
 
         if (!$permohonan) {
@@ -59,54 +71,71 @@ class AsesmenMandiriController extends Controller
                 ->with('error', 'Anda belum mengajukan permohonan.');
         }
 
+        // Ambil unit, elemen, kuk
         $units = DB::table('unit_kompetensi')
             ->where('id_skema', $permohonan->id_skema)
             ->get();
 
         $elemen = DB::table('elemen_kompetensi')
-            ->whereIn('id_unit', $units->pluck('id_unit'))
+            ->whereIn('id_unit', $units->pluck('id_unit')->toArray())
             ->select('id_elemen', 'id_unit', 'nama_elemen as judul_elemen')
             ->get();
 
         $kuk = DB::table('kuk')
-            ->whereIn('id_elemen', $elemen->pluck('id_elemen'))
+            ->whereIn('id_elemen', $elemen->pluck('id_elemen')->toArray())
             ->get();
+
+        // ========== Hanya ambil dokumen "Fotocopy Raport" dan "Sertifikat PKL" ==========
+        $dokumenIds = [1, 2];
 
         $dokumen = DB::table('dokumen_persyaratan')
             ->join('jenis_dokumen', 'dokumen_persyaratan.id_jenis_dokumen', '=', 'jenis_dokumen.id_jenis_dokumen')
             ->where('dokumen_persyaratan.id_permohonan', $permohonan->id_permohonan)
-            ->whereIn('dokumen_persyaratan.id_jenis_dokumen', [1, 2])
+            ->where('dokumen_persyaratan.ada', true)
+            ->whereIn('jenis_dokumen.id_jenis_dokumen', $dokumenIds)
             ->select(
                 'dokumen_persyaratan.id_dokumen',
-                'dokumen_persyaratan.file_path',
-                'jenis_dokumen.nama_jenis'
+                'dokumen_persyaratan.path_file as file_path',
+                'dokumen_persyaratan.nama_file',
+                'jenis_dokumen.nama_dokumen as nama_jenis'
             )
             ->get();
 
-        // 🔑 Ambil jawaban sebelumnya
-        $asesmen = DB::table('asesmen_mandiri_master')
+        // Cek apakah sudah ada master asesmen mandiri
+        $master = DB::table('asesmen_mandiri_master')
             ->where('id_permohonan', $permohonan->id_permohonan)
             ->first();
 
         $jawaban = [];
-        if ($asesmen) {
+        $rekomendasi = null;
+
+        if ($master) {
+            $rekomendasi = $master->rekomendasi;
             $jawaban = DB::table('asesmen_mandiri_jawaban')
-                ->where('id_asesmen_mandiri', $asesmen->id_asesmen_mandiri)
+                ->where('id_asesmen_mandiri', $master->id_asesmen_mandiri)
                 ->get()
-                ->keyBy('id_kuk'); // index berdasarkan id_kuk
+                ->keyBy('id_kuk');
         }
 
         return view(
             'asesi.asesmen_mandiri.form2',
-            compact('permohonan', 'units', 'elemen', 'kuk', 'dokumen', 'jawaban')
+            compact('permohonan', 'units', 'elemen', 'kuk', 'dokumen', 'jawaban', 'rekomendasi')
         );
     }
 
-
+    /**
+     * Simpan jawaban asesmen mandiri (K/BK dan pilihan bukti)
+     * Mendukung upload file lain (bukan dari dokumen persyaratan)
+     */
     public function store(Request $request)
     {
         $user = Auth::user();
         $asesi = DB::table('asesi')->where('user_id', $user->id)->first();
+
+        if (!$asesi) {
+            return redirect()->route('asesi.permohonan.form1')
+                ->with('error', 'Data asesi tidak ditemukan.');
+        }
 
         $permohonan = DB::table('permohonan')
             ->where('id_asesi', $asesi->id_asesi)
@@ -118,74 +147,162 @@ class AsesmenMandiriController extends Controller
                 ->with('error', 'Anda belum mengajukan permohonan.');
         }
 
-        $asesmen = DB::table('asesmen_mandiri_master')
+        $master = DB::table('asesmen_mandiri_master')
             ->where('id_permohonan', $permohonan->id_permohonan)
             ->first();
 
-        if (!$asesmen) {
-            $idAsesmen = DB::table('asesmen_mandiri_master')->insertGetId([
-                'id_permohonan' => $permohonan->id_permohonan,
-                'id_asesi' => $asesi->id_asesi,
-                'id_asesor' => null,
-                'rekomendasi' => null,
-            ]);
-        } else {
-            $idAsesmen = $asesmen->id_asesmen_mandiri;
-        }
+        DB::beginTransaction();
+        try {
+            $oldAnswers = collect();
 
-        $jawabanKuk = $request->input('kuk', []);
-        $dokumenKuk = $request->input('bukti', []);
+            if ($master) {
+                // Ambil jawaban lama sebelum dihapus (untuk mengambil file_lain yang tidak diubah)
+                $oldAnswers = DB::table('asesmen_mandiri_jawaban')
+                    ->where('id_asesmen_mandiri', $master->id_asesmen_mandiri)
+                    ->get()
+                    ->keyBy('id_kuk');
 
-        foreach ($jawabanKuk as $id_kuk => $status) {
-            DB::table('asesmen_mandiri_jawaban')->updateOrInsert(
-                [
+                // Hapus jawaban lama
+                DB::table('asesmen_mandiri_jawaban')
+                    ->where('id_asesmen_mandiri', $master->id_asesmen_mandiri)
+                    ->delete();
+
+                // Jika master ada dan rekomendasi = 'Tidak Dapat Dilanjutkan', reset rekomendasi
+                if ($master->rekomendasi === 'Tidak Dapat Dilanjutkan') {
+                    DB::table('asesmen_mandiri_master')
+                        ->where('id_asesmen_mandiri', $master->id_asesmen_mandiri)
+                        ->update([
+                            'rekomendasi' => null,
+                            'id_asesor' => null,
+                        ]);
+                }
+                $idAsesmen = $master->id_asesmen_mandiri;
+            } else {
+                // Buat master baru
+                $idAsesmen = DB::table('asesmen_mandiri_master')->insertGetId([
+                    'id_permohonan' => $permohonan->id_permohonan,
+                    'id_asesi' => $asesi->id_asesi,
+                    'id_asesor' => null,
+                    'rekomendasi' => null,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            $jawabanKuk = $request->input('kuk', []);
+            $dokumenKuk = $request->input('bukti', []);
+
+            foreach ($jawabanKuk as $id_kuk => $status) {
+                $idDokumen = $dokumenKuk[$id_kuk] ?? null;
+                $fileLain = null;
+                $hapusFileLain = $request->input("hapus_file_lain.$id_kuk", 0);
+
+                // Jika pilih upload_lain
+                if ($idDokumen === 'upload_lain') {
+                    $idDokumen = null;
+                    // Cek apakah ada file baru diupload
+                    if ($request->hasFile("file_lain.$id_kuk")) {
+                        $file = $request->file("file_lain.$id_kuk");
+                        $path = $file->store("bukti_asesmen_mandiri", 'public');
+                        $fileLain = $path;
+                    } else {
+                        // Tidak ada file baru, cek apakah ada file lama dan tidak dihapus
+                        if ($hapusFileLain != 1 && $oldAnswers->has($id_kuk) && $oldAnswers[$id_kuk]->file_lain) {
+                            $fileLain = $oldAnswers[$id_kuk]->file_lain;
+                        }
+                    }
+                } else {
+                    // Jika pilih dokumen biasa, pastikan file_lain dihapus jika ada
+                    if ($oldAnswers->has($id_kuk) && $oldAnswers[$id_kuk]->file_lain) {
+                        // Hapus file fisik jika ada
+                        Storage::disk('public')->delete($oldAnswers[$id_kuk]->file_lain);
+                    }
+                    $fileLain = null;
+                }
+
+                DB::table('asesmen_mandiri_jawaban')->insert([
                     'id_asesmen_mandiri' => $idAsesmen,
                     'id_kuk' => $id_kuk,
-                ],
-                [
                     'status' => $status,
-                    'id_dokumen' => $dokumenKuk[$id_kuk] ?? null,
-                ]
-            );
+                    'id_dokumen' => $idDokumen,
+                    'file_lain' => $fileLain,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('asesi.asesmen_mandiri.form3')
+                ->with('success', 'Jawaban berhasil disimpan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
         }
-
-        return redirect()->route('asesi.asesmen_mandiri.form3')
-            ->with('success', 'Jawaban berhasil disimpan.');
     }
 
+    /**
+     * Tampilkan halaman ketiga (tanda tangan)
+     */
     public function form3()
-    {
-        return view('asesi.asesmen_mandiri.form3');
-    }
-
-    public function storeTTD(Request $request)
     {
         $user = Auth::user();
         $asesi = DB::table('asesi')->where('user_id', $user->id)->first();
 
-        $asesmen = DB::table('asesmen_mandiri_master')
+        return view('asesi.asesmen_mandiri.form3', compact('asesi'));
+    }
+
+    /**
+     * Simpan tanda tangan asesi
+     */
+    public function storeTTD(Request $request)
+    {
+        $request->validate([
+            'ttd_asesi' => 'required|string',
+            'tgl_ttd_asesi' => 'required|date',
+        ]);
+
+        $user = Auth::user();
+        $asesi = DB::table('asesi')->where('user_id', $user->id)->first();
+
+        if (!$asesi) {
+            return redirect()->back()->with('error', 'Data asesi tidak ditemukan.');
+        }
+
+        $master = DB::table('asesmen_mandiri_master')
             ->where('id_asesi', $asesi->id_asesi)
             ->latest('id_asesmen_mandiri')
             ->first();
 
-        if (!$asesmen) {
+        if (!$master) {
             return redirect()->back()->with('error', 'Data asesmen mandiri belum ada.');
         }
 
         $data = $request->ttd_asesi;
-        $image = str_replace('data:image/png;base64,', '', $data);
-        $image = str_replace(' ', '+', $image);
+        $image = str_replace(['data:image/png;base64,', ' '], ['', '+'], $data);
         $imageName = 'ttd_asesi_' . time() . '.png';
 
         Storage::disk('public')->put('ttd/' . $imageName, base64_decode($image));
 
-        DB::table('asesmen_mandiri_persetujuan')->updateOrInsert(
-            ['id_asesmen_mandiri' => $asesmen->id_asesmen_mandiri],
-            [
+        $persetujuan = DB::table('asesmen_mandiri_persetujuan')
+            ->where('id_asesmen_mandiri', $master->id_asesmen_mandiri)
+            ->first();
+
+        if ($persetujuan) {
+            DB::table('asesmen_mandiri_persetujuan')
+                ->where('id_asesmen_mandiri', $master->id_asesmen_mandiri)
+                ->update([
+                    'tgl_ttd_asesi' => $request->tgl_ttd_asesi,
+                    'ttd_asesi' => 'ttd/' . $imageName,
+                ]);
+        } else {
+            DB::table('asesmen_mandiri_persetujuan')->insert([
+                'id_asesmen_mandiri' => $master->id_asesmen_mandiri,
                 'tgl_ttd_asesi' => $request->tgl_ttd_asesi,
                 'ttd_asesi' => 'ttd/' . $imageName,
-            ]
-        );
+                'status_persetujuan' => 'menunggu',
+            ]);
+        }
 
         return redirect()->route('form_pra_assesmen')
             ->with('success', 'Tanda tangan berhasil disimpan.');

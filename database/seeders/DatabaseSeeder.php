@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
             JenisDokumenSeeder::class,
             KelompokPekerjaanSeeder::class,
             TujuanAsesmenSeeder::class,
+            MasterJenisBuktiSeeder::class
         ]);
     }
 }

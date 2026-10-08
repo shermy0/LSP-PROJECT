@@ -38,11 +38,16 @@
     <div class="menu">
         <ul>
             @if(Auth::check() && Auth::user()->role == 'admin')
-                <li><i class="bi bi-house-door-fill"></i><a href="#">Dashboard</a></li>
+                <li><i class="bi bi-house-door-fill"></i><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                <li><i class="bi bi-file-earmark-text"></i><a href="{{ route('admin.permohonan.index') }}">Permohonan</a></li>
+                <li><i class="bi bi-person-badge"></i><a href="{{ route('admin.asesor.index') }}">Asesor</a></li>
+                <li><i class="bi bi-clipboard-check"></i><a href="{{ route('admin.penugasan.index') }}">Penugasan</a></li>
+                <li><i class="bi bi-exclamation-triangle"></i><a href="{{ route('admin.banding-asesmen.index') }}">Banding</a></li>
             @endif
 
             @if(Auth::check() && Auth::user()->role == 'asesor')
                 <li><i class="bi bi-house-door-fill"></i><a href="{{ route('dashboard.asesor') }}">Dashboard</a></li>
+                <li><i class="bi bi-file-earmark-text-fill"></i><a href="{{ route('form_pra_assesmen') }}">Form Pra Asesmen</a></li>
                 <li><i class="bi bi-journal-album"></i><a href="{{ route('formasesmen') }}">Form Asesmen</a></li>
                 <li><i class="bi bi-people-fill"></i><a href="{{ route('datapesertauji') }}">Data Peserta Uji</a></li>
                 <li><i class="bi bi-pencil-square"></i><a href="{{ route('formperencanaan') }}">Form Perencanaan</a></li>
@@ -51,9 +56,10 @@
             @endif
 
             @if(Auth::check() && Auth::user()->role == 'asesi')
-                <li><i class="bi bi-house-door-fill"></i><a href="#">Dashboard</a></li>
+                <li><i class="bi bi-house-door-fill"></i><a href="{{ route('asesi.dashboard') }}">Dashboard</a></li>
+                <li><i class="bi bi-file-earmark-text-fill"></i><a href="{{ route('form_pra_assesmen') }}">Form Pra Asesmen</a></li>
                 <li><i class="bi bi-pencil-square"></i><a href="{{ route('asesmen.pilih') }}">Form Asesmen</a></li>
-                <li><i class="bi bi-journal-album"></i><a href="#">Rekap Asesmen</a></li>
+                <li><i class="bi bi-journal-album"></i><a href="{{ route('rekap.asesmen') }}">Rekap Asesmen</a></li>
                 <li><i class="bi bi-clipboard-check"></i><a href="{{ route('data.peserta.uji') }}">Hasil Asesmen</a></li>
             @endif
         </ul>
@@ -85,8 +91,6 @@
 <main id="main-content">
     @yield('konten')
 </main>
-
-
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 class MasterTugasDemonstrasi extends Model
 {
     protected $table = 'master_tugas_demonstrasi';
-    protected $primaryKey = 'id_tugas'; // ✅ bukan id_tugas_demonstrasi
+    protected $primaryKey = 'id_tugas';
     public $timestamps = false;
 
     protected $fillable = [
@@ -18,13 +18,25 @@ class MasterTugasDemonstrasi extends Model
         'deskripsi_pertanyaan',
         'kunci_jawaban',
         'file_path',
-        'file_type'
+        'file_type',
+        'timescap',
     ];
 
-
-
+    // Relasi ke Demonstrasi
     public function demonstrasi()
     {
         return $this->belongsTo(Demonstrasi::class, 'id_demonstrasi', 'id_demonstrasi');
+    }
+
+    // Relasi ke Skema
+    public function skema()
+    {
+        return $this->belongsTo(SkemaSertifikasi::class, 'id_skema', 'id_skema');
+    }
+
+    // Relasi ke Kelompok
+    public function kelompok()
+    {
+        return $this->belongsTo(KelompokPekerjaan::class, 'id_kelompok', 'id_kelompok');
     }
 }
